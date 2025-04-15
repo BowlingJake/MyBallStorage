@@ -28,7 +28,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   String currentSearchKeyword = ''; // Keep track of the keyword
 
   // --- Helper function for safer core category extraction ---
-  String _getCoreCategory(String coreName) {
+  String getCoreCategory(String coreName) {
     if (coreName.trim().isEmpty) {
       return '未知'; // Handle empty core names
     }
@@ -44,8 +44,8 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   }
 
   List<String> get arsenalCoreCategories {
-    // Use the helper function
-    final categories = myArsenal.map((ball) => _getCoreCategory(ball.core)).toSet().toList();
+    // Use the public helper function
+    final categories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
@@ -69,7 +69,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
                          ball.brand == selectedBrandFilter;
       final coreCategoryMatch = selectedCoreCategoryFilter == null || 
                                 selectedCoreCategoryFilter == allFilterOption ||
-                                _getCoreCategory(ball.core) == selectedCoreCategoryFilter; 
+                                getCoreCategory(ball.core) == selectedCoreCategoryFilter;
       final coverstockCategoryMatch = selectedCoverstockCategoryFilter == null || 
                                       selectedCoverstockCategoryFilter == allFilterOption ||
                                       ball.coverstockcategory == selectedCoverstockCategoryFilter;
@@ -86,7 +86,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   }
 
   List<String> get allAvailableCoreCategories {
-    final categories = allBalls.map((ball) => _getCoreCategory(ball.core)).toSet().toList();
+    final categories = allBalls.map((ball) => getCoreCategory(ball.core)).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
@@ -172,7 +172,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
                          ball.brand == selectedBrandFilterForSearch;
       final coreCategoryMatch = selectedCoreCategoryFilterForSearch == null ||
                                 selectedCoreCategoryFilterForSearch == allFilterOption ||
-                                _getCoreCategory(ball.core) == selectedCoreCategoryFilterForSearch;
+                                getCoreCategory(ball.core) == selectedCoreCategoryFilterForSearch;
       final coverstockCategoryMatch = selectedCoverstockCategoryFilterForSearch == null ||
                                       selectedCoverstockCategoryFilterForSearch == allFilterOption ||
                                       ball.coverstockcategory == selectedCoverstockCategoryFilterForSearch;
@@ -186,7 +186,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   void _validateAndResetFilters() {
     // Regenerate options based on current arsenal to check against
     final currentBrands = myArsenal.map((ball) => ball.brand).toSet();
-    final currentCoreCategories = myArsenal.map((ball) => _getCoreCategory(ball.core)).toSet();
+    final currentCoreCategories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet();
     final currentCoverstockCategories = myArsenal.map((ball) => ball.coverstockcategory).toSet();
 
     bool filterChanged = false;

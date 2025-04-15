@@ -4,8 +4,9 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 import 'weapon_library_page.dart';
 import '../shared/dialogs/layout_dialog.dart';
 import 'package:provider/provider.dart';
+import 'my_arsenal_page.dart';
 
-/// 武器庫主頁 (顯示我的 Arsenal)
+/// 武器庫主頁 (顯示導航選項)
 class WeaponLibraryHomePage extends StatelessWidget {
   const WeaponLibraryHomePage({super.key});
 
@@ -26,12 +27,17 @@ class WeaponLibraryHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(dialogContext); // Close the dialog
                 final viewModel = context.read<WeaponLibraryViewModel>();
-                Navigator.push<BowlingBall>(
+                Navigator.push<List<BowlingBall>>(
                   context,
                   MaterialPageRoute(builder: (_) => const WeaponLibraryPage()),
-                ).then((selectedBall) {
-                  if (selectedBall != null) {
-                    viewModel.addBallToArsenal(selectedBall);
+                ).then((selectedBalls) {
+                  if (selectedBalls != null && selectedBalls.isNotEmpty) {
+                    for (final ball in selectedBalls) {
+                      viewModel.addBallToArsenal(ball);
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('已成功新增 ${selectedBalls.length} 個球具到我的球櫃')),
+                    );
                   }
                 });
               },
@@ -42,235 +48,184 @@ class WeaponLibraryHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-      child: Row(
-        children: [
-          // Brand Filter
-          Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedBrandFilter,
-              hint: const Text('品牌'),
-              items: viewModel.arsenalBrands.map((String brand) {
-                return DropdownMenuItem<String>(
-                  value: brand,
-                  child: Text(brand, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedBrandFilter(newValue);
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Core Category Filter
-          Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedCoreCategoryFilter,
-              hint: const Text('Core'),
-              items: viewModel.arsenalCoreCategories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedCoreCategoryFilter(newValue);
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Coverstock Category Filter
-          Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedCoverstockCategoryFilter,
-              hint: const Text('Cover'),
-              items: viewModel.arsenalCoverstockCategories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedCoverstockCategoryFilter(newValue);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<WeaponLibraryViewModel>();
-    // Use the filtered list from ViewModel
-    final myFilteredArsenal = viewModel.filteredArsenal;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('武器庫'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                elevation: 2,
-              ),
-              icon: const Icon(Icons.add),
-              label: const Text('添加我的武器'),
-              onPressed: () {
-                _showAddMethodSelectionDialog(context);
-              },
-            ),
-          ),
-        ],
       ),
-      body: Column( // Wrap body content in a Column
-        children: [
-          // Add Search Bar here
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            child: TextField(
-              onChanged: (keyword) => viewModel.filterArsenal(keyword),
-              decoration: const InputDecoration(
-                labelText: '搜尋我的武器',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-                // Optional: Add clear button
-                // suffixIcon: IconButton(
-                //   icon: Icon(Icons.clear),
-                //   onPressed: () {
-                //     // Clear text field and filter
-                //   },
-                // ),
-              ),
-            ),
-          ),
-          // Add the filter dropdowns here
-          _buildFilterDropdown(context, viewModel),
-          // The list view
-          Expanded( // Make ListView take remaining space
-            child: myFilteredArsenal.isEmpty
-                ? const Center(
-                    child: Text(
-                      '沒有符合條件的武器，請調整篩選器或添加武器。',
-                      style: TextStyle(color: Colors.grey),
-                      textAlign: TextAlign.center,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12), // Adjust padding
-                    itemCount: myFilteredArsenal.length,
-                    itemBuilder: (context, index) {
-                      final ball = myFilteredArsenal[index];
-                      return InkWell(
-                        onTap: () {
-                          showBallActionDialog(context, ball, () {
-                            viewModel.notifyListeners();
-                          });
-                        },
-                        child: Card(
-                          elevation: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 100,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: 80,
-                                        height: 80,
-                                        color: Colors.grey[300],
-                                        child: const Center(child: Text('圖片')),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          ball.brand,
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
-                                      ),
-                                      Text(
-                                        ball.releaseDate,
-                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              ball.ball,
-                                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.delete, color: Colors.red),
-                                            onPressed: () => viewModel.removeBallFromArsenal(ball),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text('Core Category: ${ball.core.split(' ').last}', overflow: TextOverflow.ellipsis),
-                                      const SizedBox(height: 4),
-                                      Text('Coverstock Category: ${ball.coverstockcategory}', overflow: TextOverflow.ellipsis),
-                                      const SizedBox(height: 8),
-                                      Text('RG: ${ball.rg} / Diff: ${ball.diff} / MB: ${ball.mbDiff}', overflow: TextOverflow.ellipsis),
-                                      if (ball.handType != null &&
-                                          ball.layoutType != null &&
-                                          ball.layoutValues != null) ...[
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '${ball.handType} • '
-                                          '${ball.layoutType == 'Duel' ? 'Duel Angle Layout' : 'VLS/2LS Layout'}',
-                                          style: const TextStyle(fontWeight: FontWeight.w500),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          ball.layoutType == 'Duel'
-                                              ? '${ball.layoutValues![0]}° X ${ball.layoutValues![1]} X ${ball.layoutValues![2]}°'
-                                              : ball.layoutValues!.join(' X '),
-                                        ),
-                                      ]
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    elevation: 4,
                   ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyArsenalPage()),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.inventory_2_outlined, color: Colors.white, size: 28),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '我的球櫃',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              viewModel.myArsenal.isEmpty ? '還沒有球，點此查看與添加' : '查看已添加的 ${viewModel.myArsenal.length} 個球具',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WeaponLibraryPage(readOnly: true),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.list_alt_outlined, color: Colors.white, size: 28),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '球類資料庫',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              '瀏覽所有可用的球具資訊',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    backgroundColor: Colors.orange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('排行榜功能即將推出！')),
+                    );
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.leaderboard_outlined, color: Colors.white, size: 28),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '排行榜',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              '查看社群排名（即將推出）',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                       Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(Icons.add_circle_outline, color: Colors.blueAccent),
+                  label: const Text('新增武器到我的球櫃', style: TextStyle(color: Colors.blueAccent)),
+                  onPressed: () => _showAddMethodSelectionDialog(context),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
