@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'weapon_library_home_page.dart';
-import 'match_record_page.dart';
+import 'tournament_record_page.dart';
 import 'analytics_page.dart';
 import 'settings_page.dart';
 
@@ -16,7 +16,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _pages = const [
     WeaponLibraryHomePage(),
-    MatchRecordPage(),
+    TournamentRecordPage(),
     AnalyticsPage(),
     SettingsPage(),
   ];

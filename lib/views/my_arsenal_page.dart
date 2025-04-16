@@ -5,9 +5,19 @@ import '../models/bowling_ball.dart';
 import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
 import 'weapon_library_page.dart'; // <-- Add this import
 
-/// 顯示使用者目前擁有的武器清單頁面
-class MyArsenalPage extends StatelessWidget {
-  const MyArsenalPage({super.key});
+/// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
+class MyArsenalPage extends StatefulWidget { // Changed to StatefulWidget
+  final bool isSelectionMode;
+
+  const MyArsenalPage({super.key, this.isSelectionMode = false});
+
+  @override
+  State<MyArsenalPage> createState() => _MyArsenalPageState(); // Create State
+}
+
+class _MyArsenalPageState extends State<MyArsenalPage> { // State class
+  // State to keep track of selected ball names in selection mode
+  final Set<String> _selectedBallNames = {};
 
   // --- Moved Method: Show Add Method Selection Dialog ---
   void _showAddMethodSelectionDialog(BuildContext context) {
@@ -114,6 +124,7 @@ class MyArsenalPage extends StatelessWidget {
 
   // --- Ball Card Widget ---
   Widget _buildBallCard(BuildContext context, BowlingBall ball, WeaponLibraryViewModel viewModel) {
+    bool isSelected = widget.isSelectionMode && _selectedBallNames.contains(ball.ball);
     bool isMotiv = ball.brand == 'Motiv Bowling';
     bool isStorm = ball.brand == 'Storm Bowling'; // <-- Correct the brand name
     bool hasSpecialBackground = isMotiv || isStorm; // <-- Helper for common styling
@@ -142,104 +153,141 @@ class MyArsenalPage extends StatelessWidget {
        // Keep consistent shadow for special backgrounds
     );
 
-    Widget cardContent = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Left part (Image, Brand, Date)
-        SizedBox(
-          width: 100,
-          child: Column(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                   color: hasSpecialBackground ? Colors.black.withOpacity(0.2) : Colors.grey[300],
-                   borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(child: Text('圖片', style: TextStyle(color: Colors.white70))),
-              ),
-              const SizedBox(height: 4),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  ball.brand,
-                  style: smallTextStyle.copyWith(fontWeight: hasSpecialBackground ? FontWeight.w500 : FontWeight.normal),
-                ),
-              ),
-              Text(
-                ball.releaseDate,
-                style: smallTextStyle,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Right part (Details)
-        Expanded(
-          child: Column(
+    Widget cardContent = InkWell(
+      onTap: widget.isSelectionMode
+          ? () {
+              // Toggle selection state
+              setState(() {
+                if (isSelected) {
+                  _selectedBallNames.remove(ball.ball);
+                } else {
+                  _selectedBallNames.add(ball.ball);
+                }
+              });
+            }
+          : () {
+              // Normal mode action
+              showBallActionDialog(context, ball, () {
+                // Optional: Callback if dialog modifies ball state directly
+              });
+            },
+      child: Stack( // Use Stack to overlay checkmark
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Ball Name and Delete Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      ball.ball,
-                      style: boldTextStyle,
+              // Left part (Image, Brand, Date)
+              SizedBox(
+                width: 100,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                         color: hasSpecialBackground ? Colors.black.withOpacity(0.2) : Colors.grey[300],
+                         borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(child: Text('圖片', style: TextStyle(color: Colors.white70))),
                     ),
-                  ),
-                  // Delete Button
-                  InkWell(
-                     onTap: () => viewModel.removeBallFromArsenal(ball),
-                     child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                           color: hasSpecialBackground ? Colors.black.withOpacity(0.4) : Colors.transparent,
-                           shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                           Icons.delete_outline,
-                           color: hasSpecialBackground ? Colors.white : Colors.redAccent,
-                           size: 20,
-                        ),
-                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        ball.brand,
+                        style: smallTextStyle.copyWith(fontWeight: hasSpecialBackground ? FontWeight.w500 : FontWeight.normal),
+                      ),
+                    ),
+                    Text(
+                      ball.releaseDate,
+                      style: smallTextStyle,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 10),
-              // Core, Coverstock, Stats
-              Text('Core: ${viewModel.getCoreCategory(ball.core)}', style: detailTextStyle, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 4),
-              Text('Cover: ${ball.coverstockcategory}', style: detailTextStyle, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 6),
-              Text('RG: ${ball.rg} / Diff: ${ball.diff} / MB: ${ball.mbDiff}', style: detailTextStyle.copyWith(fontSize: 13), overflow: TextOverflow.ellipsis),
-              // Layout Info
-              if (ball.handType != null &&
-                  ball.layoutType != null &&
-                  ball.layoutValues != null) ...[
-                const SizedBox(height: 10),
-                Divider(color: hasSpecialBackground ? Colors.white30 : Colors.grey[300], height: 1),
-                const SizedBox(height: 10),
-                Text(
-                  '${ball.handType} • '
-                  '${ball.layoutType == 'Duel' ? 'Duel Angle Layout' : 'VLS/2LS Layout'}',
-                  style: layoutHeaderStyle,
+              const SizedBox(width: 12),
+              // Right part (Details)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Ball Name and Delete Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            ball.ball,
+                            style: boldTextStyle,
+                          ),
+                        ),
+                        // Delete Button (Hide in selection mode)
+                        if (!widget.isSelectionMode)
+                          InkWell(
+                            onTap: () => viewModel.removeBallFromArsenal(ball),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: hasSpecialBackground ? Colors.black.withOpacity(0.4) : Colors.transparent,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.delete_outline,
+                                color: hasSpecialBackground ? Colors.white : Colors.redAccent,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    // Core, Coverstock, Stats
+                    Text('Core: ${viewModel.getCoreCategory(ball.core)}', style: detailTextStyle, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 4),
+                    Text('Cover: ${ball.coverstockcategory}', style: detailTextStyle, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 6),
+                    Text('RG: ${ball.rg} / Diff: ${ball.diff} / MB: ${ball.mbDiff}', style: detailTextStyle.copyWith(fontSize: 13), overflow: TextOverflow.ellipsis),
+                    // Layout Info
+                    if (ball.handType != null &&
+                        ball.layoutType != null &&
+                        ball.layoutValues != null) ...[
+                      const SizedBox(height: 10),
+                      Divider(color: hasSpecialBackground ? Colors.white30 : Colors.grey[300], height: 1),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${ball.handType} • '
+                        '${ball.layoutType == 'Duel' ? 'Duel Angle Layout' : 'VLS/2LS Layout'}',
+                        style: layoutHeaderStyle,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        ball.layoutType == 'Duel'
+                            ? '${ball.layoutValues![0]}° X ${ball.layoutValues![1]} X ${ball.layoutValues![2]}°'
+                            : ball.layoutValues!.join(' X '),
+                        style: detailTextStyle,
+                      ),
+                    ]
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  ball.layoutType == 'Duel'
-                      ? '${ball.layoutValues![0]}° X ${ball.layoutValues![1]} X ${ball.layoutValues![2]}°'
-                      : ball.layoutValues!.join(' X '),
-                  style: detailTextStyle,
-                ),
-              ]
+              ),
             ],
           ),
-        ),
-      ],
+          // Overlay Checkmark if selected in selection mode
+          if (isSelected)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
+                  borderRadius: BorderRadius.circular(12), // Match card radius
+                ),
+                child: const Center(
+                  child: Icon(Icons.check_circle, color: Colors.lightGreenAccent, size: 40),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
 
     // Determine background decoration based on brand
@@ -264,26 +312,16 @@ class MyArsenalPage extends StatelessWidget {
       cardDecoration = null;
     }
 
-    return InkWell(
-      onTap: () {
-        showBallActionDialog(context, ball, () {
-          viewModel.notifyListeners();
-        });
-      },
-      child: Card(
-        elevation: hasSpecialBackground ? 5 : 3,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          // side: hasSpecialBackground ? BorderSide(color: Colors.grey.shade700, width: 0.5) : BorderSide.none, // Optional subtle border
-        ),
-        child: Container(
-           decoration: cardDecoration, // <-- Apply dynamic decoration
-           child: Padding(
-             padding: const EdgeInsets.all(12.0),
-             child: cardContent,
-           ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        decoration: cardDecoration,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: cardContent,
         ),
       ),
     );
@@ -296,22 +334,32 @@ class MyArsenalPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我的球櫃'),
+        title: Text(widget.isSelectionMode ? '選擇用球 (複選)' : '我的球櫃'), // Updated title
         actions: [
-          // Use FilledButton.icon for better visibility with its own background
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: FilledButton.icon(
-              icon: const Icon(Icons.add),
-              label: const Text('添加保齡球至球櫃'),
-              onPressed: () => _showAddMethodSelectionDialog(context),
-              // style: FilledButton.styleFrom(
-              //   // You can customize the style further if needed,
-              //   // e.g., backgroundColor, foregroundColor
-              //   // visualDensity: VisualDensity.compact, // Make it slightly smaller if needed
-              // ),
-            ),
-          ),
+          if (widget.isSelectionMode) // Show Confirm button in selection mode
+            TextButton(
+              child: const Text('確定', style: TextStyle(color: Colors.white)), // Adjust style as needed
+              onPressed: () {
+                Navigator.pop(context, _selectedBallNames.toList()); // Pop with the list of selected names
+              },
+            )
+          else // Show Add and Filter buttons in normal mode
+            ...[
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                tooltip: '新增球具',
+                onPressed: () => _showAddMethodSelectionDialog(context),
+              ),
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                tooltip: '篩選',
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('篩選功能待開發')),
+                  );
+                },
+              ),
+            ]
         ],
       ),
       body: Column(
@@ -320,16 +368,18 @@ class MyArsenalPage extends StatelessWidget {
           Expanded(
             child: filteredArsenal.isEmpty
                 ? Center(
-                    child: Text(
-                      viewModel.hasActiveFilters
-                          ? '沒有符合條件的球具\n請調整篩選器或添加新球具'
-                          : '您的球櫃是空的！\n點擊右上角 + 新增球具',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        widget.isSelectionMode 
+                           ? '球櫃中無球可選' 
+                           : '您的球櫃目前是空的，\n點擊右上角的 "+" 從球類資料庫添加吧！',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];

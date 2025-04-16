@@ -234,4 +234,24 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     currentArsenalSearchKeyword = keyword.toLowerCase();
     notifyListeners();
   }
+
+  // Method to get a specific ball from the arsenal by its name
+  BowlingBall? getBallByName(String name) {
+    try {
+      // Find the first ball in myArsenal where the ball name matches.
+      // Use firstWhereOrNull from collection package (imported implicitly via flutter/material?)
+      // Or implement manually:
+      for (final ball in myArsenal) {
+        if (ball.ball == name) {
+          return ball;
+        }
+      }
+      // If no ball is found, return null.
+      return null;
+    } catch (e) {
+      // Handle potential errors, e.g., if myArsenal is not yet initialized (though unlikely with final).
+      print("Error finding ball by name '$name': $e");
+      return null;
+    }
+  }
 }
