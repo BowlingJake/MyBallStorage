@@ -222,6 +222,13 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     // }
   }
 
+  // --- Getter to check if any arsenal filters are active ---
+  bool get hasActiveFilters {
+    return (selectedBrandFilter != null && selectedBrandFilter != allFilterOption) ||
+           (selectedCoreCategoryFilter != null && selectedCoreCategoryFilter != allFilterOption) ||
+           (selectedCoverstockCategoryFilter != null && selectedCoverstockCategoryFilter != allFilterOption);
+  }
+
   // --- Method to update arsenal search keyword ---
   void filterArsenal(String keyword) {
     currentArsenalSearchKeyword = keyword.toLowerCase();

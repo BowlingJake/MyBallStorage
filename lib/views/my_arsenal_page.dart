@@ -9,6 +9,45 @@ import 'weapon_library_page.dart'; // <-- Add this import
 class MyArsenalPage extends StatelessWidget {
   const MyArsenalPage({super.key});
 
+  // --- Moved Method: Show Add Method Selection Dialog ---
+  void _showAddMethodSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('選擇添加方式'),
+          content: const Text('您想要如何添加新的武器？'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('自行輸入數據'),
+              onPressed: null, // Disabled for now
+            ),
+            TextButton(
+              child: const Text('從現有清單添加'),
+              onPressed: () {
+                Navigator.pop(dialogContext); // Close the dialog
+                final viewModel = context.read<WeaponLibraryViewModel>();
+                Navigator.push<List<BowlingBall>>(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WeaponLibraryPage()), // Ensure WeaponLibraryPage is imported
+                ).then((selectedBalls) {
+                  if (selectedBalls != null && selectedBalls.isNotEmpty) {
+                    for (final ball in selectedBalls) {
+                      viewModel.addBallToArsenal(ball);
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('已成功新增 ${selectedBalls.length} 個球具到我的球櫃')),
+                    );
+                  }
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // --- Filter Dropdown Widget ---
   Widget _buildFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
     return Padding(
@@ -253,68 +292,47 @@ class MyArsenalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<WeaponLibraryViewModel>();
-    final myFilteredArsenal = viewModel.filteredArsenal;
+    final filteredArsenal = viewModel.filteredArsenal;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('我的球櫃'),
         actions: [
-            IconButton(
+          // Use FilledButton.icon for better visibility with its own background
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: FilledButton.icon(
               icon: const Icon(Icons.add),
-              tooltip: '添加新武器',
-              onPressed: () {
-                 // Use the existing dialog from home page or navigate to add page
-                 // We need to decide the best UX here. For now, let's assume
-                 // the add button navigates back to the WeaponLibraryPage for selection.
-                 Navigator.push<List<BowlingBall>>(
-                   context,
-                   MaterialPageRoute(builder: (_) => const WeaponLibraryPage()),
-                 ).then((selectedBalls) {
-                   if (selectedBalls != null && selectedBalls.isNotEmpty) {
-                     final viewModel = context.read<WeaponLibraryViewModel>();
-                     for (final ball in selectedBalls) {
-                       viewModel.addBallToArsenal(ball);
-                     }
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(content: Text('已成功新增 ${selectedBalls.length} 個球具')),
-                     );
-                   }
-                 });
-              },
+              label: const Text('添加保齡球至球櫃'),
+              onPressed: () => _showAddMethodSelectionDialog(context),
+              // style: FilledButton.styleFrom(
+              //   // You can customize the style further if needed,
+              //   // e.g., backgroundColor, foregroundColor
+              //   // visualDensity: VisualDensity.compact, // Make it slightly smaller if needed
+              // ),
             ),
-         ]
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            child: TextField(
-              onChanged: (keyword) => viewModel.filterArsenal(keyword), // Ensure filterArsenal exists
-              decoration: const InputDecoration(
-                labelText: '搜尋我的武器',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          // Filter Dropdowns
           _buildFilterDropdown(context, viewModel),
-          // Arsenal List
           Expanded(
-            child: myFilteredArsenal.isEmpty
-                ? const Center(
+            child: filteredArsenal.isEmpty
+                ? Center(
                     child: Text(
-                      '您的球櫃是空的，快去新增吧！',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                      viewModel.hasActiveFilters
+                          ? '沒有符合條件的球具\n請調整篩選器或添加新球具'
+                          : '您的球櫃是空的！\n點擊右上角 + 新增球具',
                       textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-                    itemCount: myFilteredArsenal.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
-                      final ball = myFilteredArsenal[index];
+                      final ball = filteredArsenal[index];
                       return _buildBallCard(context, ball, viewModel);
                     },
                   ),
