@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/weapon_library_viewmodel.dart';
+import 'viewmodels/tournament_viewmodel.dart';
 import 'views/main_page.dart';
 import 'shared/theme.dart';
 
@@ -10,6 +11,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           create: (_) => WeaponLibraryViewModel()..loadBallData(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TournamentViewModel(),
         ),
       ],
       child: const MyApp(),

@@ -1,0 +1,1 @@
+enum TournamentType { open, championship } 

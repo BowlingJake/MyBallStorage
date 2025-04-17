@@ -4,9 +4,13 @@ import 'my_arsenal_page.dart'; // Import MyArsenalPage
 import 'package:provider/provider.dart'; // Import Provider
 import '../viewmodels/weapon_library_viewmodel.dart'; // Import ViewModel
 import '../models/bowling_ball.dart'; // Import BowlingBall model
+import '../models/tournament.dart'; // Assume Tournament model exists
+import '../viewmodels/tournament_viewmodel.dart'; // Assume TournamentViewModel exists
+import 'add_match_record_page.dart'; // Import AddMatchRecordPage
+import '../shared/enums.dart'; // Import the shared enum
 
 // Define an enum for tournament types (can be reused here)
-enum TournamentType { open, championship }
+// enum TournamentType { open, championship } // Removed local definition
 
 class BasicTournamentInfoPage extends StatefulWidget {
   const BasicTournamentInfoPage({super.key});
@@ -45,48 +49,56 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   }
 
   void _saveAndProceed() {
-     FocusScope.of(context).unfocus(); // Dismiss keyboard
-     if (_formKey.currentState!.validate()) {
-        if (_selectedDate == null) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('請選擇賽事日期')),
-           );
-           return;
-        }
-        if (_selectedTournamentType == null) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('請選擇賽事種類')),
-           );
-           return;
-        }
-        // Update validation for selected balls list
-        if (_selectedTournamentBallNames.isEmpty) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('請選擇至少一顆賽事用球')),
-           );
-           return;
-        }
-
-        // Data is valid, print it for now
-        final name = _nameController.text;
-        final location = _locationController.text;
-        final date = _selectedDate!;
-        final type = _selectedTournamentType!;
-        final ballNames = _selectedTournamentBallNames; // Get the list
-
-        print('--- 賽事基本資料 ---');
-        print('名稱: $name');
-        print('地點: $location');
-        print('日期: ${DateFormat('yyyy-MM-dd').format(date)}');
-        print('種類: ${type == TournamentType.open ? '公開賽' : '錦標賽'}');
-        print('選用球: ${ballNames.join(', ')}'); // Print selected ball names
-        print('------------------');
-
-        // TODO: Navigate to the next page based on type, passing the data
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState!.validate()) {
+      if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('基本資料已儲存 (下一步待實作: ${type == TournamentType.open ? '公開賽' : '錦標賽'} 細節頁面)')),
+          const SnackBar(content: Text('請選擇賽事日期')),
         );
-     }
+        return;
+      }
+      if (_selectedTournamentType == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('請選擇賽事種類')),
+        );
+        return;
+      }
+      if (_selectedTournamentBallNames.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('請選擇至少一顆賽事用球')),
+        );
+        return;
+      }
+
+      final name = _nameController.text;
+      final location = _locationController.text;
+      final date = _selectedDate!;
+      final type = _selectedTournamentType!;
+      final ballNames = _selectedTournamentBallNames;
+
+      final newTournament = Tournament(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: name,
+        location: location,
+        date: date,
+        type: type,
+        selectedBallNames: ballNames,
+        games: [],
+      );
+
+      try {
+        final tournamentViewModel = context.read<TournamentViewModel>();
+        tournamentViewModel.addTournament(newTournament);
+
+        Navigator.pop(context);
+
+      } catch (e) {
+        print("Error saving tournament: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('儲存賽事時發生錯誤')),
+        );
+      }
+    }
   }
 
   // --- Helper: Build Small Ball Card ---
@@ -124,8 +136,17 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
     final viewModel = context.watch<WeaponLibraryViewModel>();
     // Find the actual BowlingBall objects based on selected names
     final List<BowlingBall> selectedBalls = _selectedTournamentBallNames
-        .map((name) => viewModel.getBallByName(name)) // Assuming getBallByName exists
-        .where((ball) => ball != null) // Filter out any nulls (shouldn't happen ideally)
+        .map((name) {
+          // Find the ball in the ViewModel's arsenal list
+          try {
+            return viewModel.myArsenal.firstWhere((ball) => ball.ball == name);
+          } catch (e) {
+            // Handle case where ball might not be found (less likely here but good practice)
+            print('Error finding ball: $name in basic info page. Error: $e');
+            return null; // Return null if not found
+          }
+        })
+        .where((ball) => ball != null) // Filter out any nulls
         .cast<BowlingBall>()
         .toList();
 
@@ -269,10 +290,17 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
             const SizedBox(height: 24),
 
             // Save Button
-            ElevatedButton.icon(
-               icon: const Icon(Icons.arrow_forward),
-               label: const Text('儲存並下一步'),
-               onPressed: _saveAndProceed,
+            Padding(
+              padding: const EdgeInsets.only(top: 32.0), // Add space before button
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('儲存並下一步'),
+                onPressed: _saveAndProceed,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
             )
           ],
         ),
