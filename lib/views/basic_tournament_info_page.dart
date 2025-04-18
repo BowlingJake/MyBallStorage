@@ -23,8 +23,12 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
-  DateTime? _selectedDate;
+  DateTime? _selectedStartDate;
+  DateTime? _selectedEndDate;
   TournamentType? _selectedTournamentType;
+  OpenTournamentFormat? _selectedOpenFormat; // Added state for open format
+  int? _selectedMqSessions; // Added state for MQ sessions
+  int? _selectedMqGamesPerSession; // Added state for MQ games per session
   List<String> _selectedTournamentBallNames = []; // Store list of names
 
   @override
@@ -34,16 +38,22 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDateRange(BuildContext context) async {
+    DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      initialDateRange: _selectedStartDate != null && _selectedEndDate != null
+          ? DateTimeRange(start: _selectedStartDate!, end: _selectedEndDate!)
+          : (_selectedStartDate != null 
+              ? DateTimeRange(start: _selectedStartDate!, end: _selectedStartDate!) 
+              : null),
     );
-    if (picked != null && picked != _selectedDate) {
+
+    if (picked != null) {
       setState(() {
-        _selectedDate = picked;
+        _selectedStartDate = picked.start;
+        _selectedEndDate = picked.end;
       });
     }
   }
@@ -51,9 +61,15 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   void _saveAndProceed() {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState!.validate()) {
-      if (_selectedDate == null) {
+      if (_selectedStartDate == null || _selectedEndDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('請選擇賽事日期')),
+          const SnackBar(content: Text('請選擇賽事開始與結束日期')),
+        );
+        return;
+      }
+      if (_selectedEndDate!.isBefore(_selectedStartDate!)) {
+         ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('結束日期不能早於開始日期')),
         );
         return;
       }
@@ -62,6 +78,26 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
           const SnackBar(content: Text('請選擇賽事種類')),
         );
         return;
+      }
+      if (_selectedTournamentType == TournamentType.open && _selectedOpenFormat == null) {
+         ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('請選擇公開賽的賽事形式')),
+        );
+        return;
+      }
+      if (_selectedOpenFormat == OpenTournamentFormat.mq) {
+        if (_selectedMqSessions == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('請選擇 MQ 賽事的合計場數')),
+          );
+          return;
+        }
+        if (_selectedMqGamesPerSession == null) {
+           ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('請選擇 MQ 賽事每場的局數')),
+          );
+          return;
+        }
       }
       if (_selectedTournamentBallNames.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -72,16 +108,24 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
 
       final name = _nameController.text;
       final location = _locationController.text;
-      final date = _selectedDate!;
+      final startDate = _selectedStartDate!;
+      final endDate = _selectedEndDate!;
       final type = _selectedTournamentType!;
+      final openFormat = _selectedOpenFormat;
+      final mqSessions = _selectedMqSessions;
+      final mqGamesPerSession = _selectedMqGamesPerSession;
       final ballNames = _selectedTournamentBallNames;
 
       final newTournament = Tournament(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: name,
         location: location,
-        date: date,
+        startDate: startDate,
+        endDate: endDate,
         type: type,
+        openFormat: openFormat,
+        mqSessions: mqSessions,
+        mqGamesPerSession: mqGamesPerSession,
         selectedBallNames: ballNames,
         games: [],
       );
@@ -176,13 +220,12 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
             ),
             const SizedBox(height: 16),
 
-            // Location and Date Row
+            // Location and Date Row - Now just Location
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 賽事地點
                 Expanded(
-                  flex: 2,
                   child: TextFormField(
                     controller: _locationController,
                     decoration: const InputDecoration(
@@ -193,32 +236,32 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                     // Optional validator
                   ),
                 ),
-                const SizedBox(width: 12),
-                // 賽事日期選擇器
-                Expanded(
-                  flex: 1,
-                  child: InkWell(
-                    onTap: () => _selectDate(context),
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: '賽事日期',
-                        icon: const Icon(Icons.calendar_today),
-                        border: const OutlineInputBorder(),
-                        errorText: _selectedDate == null && _formKey.currentState?.validate() == false ? '必填' : null, // Basic indicator
-                      ),
-                      child: Text(
-                        _selectedDate == null
-                            ? '選擇日期'
-                            : DateFormat('yyyy-MM-dd').format(_selectedDate!),
-                        style: TextStyle(
-                          color: _selectedDate == null ? Colors.grey[600] : null,
-                        ),
-                      ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Date Range Picker Input
+             InkWell(
+                onTap: () => _selectDateRange(context),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: '賽事期間',
+                    icon: const Icon(Icons.date_range),
+                    border: const OutlineInputBorder(),
+                    errorText: (_selectedStartDate == null || _selectedEndDate == null) && _formKey.currentState?.validate() == false 
+                               ? '必填' 
+                               : null, // Basic indicator
+                  ),
+                  child: Text(
+                    _selectedStartDate == null || _selectedEndDate == null
+                        ? '選擇開始與結束日期'
+                        : '${DateFormat('yyyy-MM-dd').format(_selectedStartDate!)} - ${DateFormat('yyyy-MM-dd').format(_selectedEndDate!)}',
+                    style: TextStyle(
+                      color: _selectedStartDate == null ? Colors.grey[600] : null,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
             const SizedBox(height: 16),
 
             // Tournament Type Selection
@@ -249,6 +292,97 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                 const Text('錦標賽'),
               ],
             ),
+            // Conditionally show Open Tournament Format selection
+            if (_selectedTournamentType == TournamentType.open)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, left: 40.0), // Indent slightly
+                child: Row(
+                  children: <Widget>[
+                    const Text('賽事形式:', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 8),
+                    Radio<OpenTournamentFormat?>(
+                      value: OpenTournamentFormat.mq,
+                      groupValue: _selectedOpenFormat,
+                      onChanged: (OpenTournamentFormat? value) {
+                        setState(() {
+                          _selectedOpenFormat = value;
+                        });
+                      },
+                    ),
+                    const Text('組合預賽(MQ)'),
+                    const SizedBox(width: 8),
+                    Radio<OpenTournamentFormat?>(
+                      value: OpenTournamentFormat.classic,
+                      groupValue: _selectedOpenFormat,
+                      onChanged: (OpenTournamentFormat? value) {
+                        setState(() {
+                          _selectedOpenFormat = value;
+                        });
+                      },
+                    ),
+                    const Text('經典賽'),
+                  ],
+                ),
+              ),
+            // Conditionally show MQ specific options
+            if (_selectedOpenFormat == OpenTournamentFormat.mq)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, left: 40.0), // Indent same as format row
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start, // Align dropdowns nicely
+                  children: [
+                    // Dropdown for number of sessions
+                    Expanded(
+                      child: DropdownButtonFormField<int?>(
+                        value: _selectedMqSessions,
+                        hint: const Text('幾場合計'),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          isDense: true,
+                        ),
+                        items: [1, 2, 3].map((int value) {
+                          return DropdownMenuItem<int?>(
+                            value: value,
+                            child: Text(value.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            _selectedMqSessions = newValue;
+                          });
+                        },
+                        validator: (value) => value == null ? '必選' : null,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Dropdown for games per session
+                    Expanded(
+                       child: DropdownButtonFormField<int?>(
+                        value: _selectedMqGamesPerSession,
+                        hint: const Text('每場局數'),
+                         decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                           isDense: true,
+                        ),
+                        items: [3, 4, 5, 6].map((int value) {
+                          return DropdownMenuItem<int?>(
+                            value: value,
+                            child: Text(value.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                             _selectedMqGamesPerSession = newValue;
+                          });
+                        },
+                        validator: (value) => value == null ? '必選' : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             const SizedBox(height: 16),
 
             // Ball Selection Button

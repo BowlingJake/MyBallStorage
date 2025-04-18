@@ -12,8 +12,8 @@ class TournamentViewModel extends ChangeNotifier {
   // Method to add a new tournament
   void addTournament(Tournament tournament) {
     _tournaments.add(tournament);
-    // Optional: Sort tournaments after adding, e.g., by date descending
-    _tournaments.sort((a, b) => b.date.compareTo(a.date)); 
+    // Optional: Sort tournaments after adding, e.g., by start date descending
+    _tournaments.sort((a, b) => b.startDate.compareTo(a.startDate)); 
     notifyListeners(); // Notify listeners about the change
   }
 

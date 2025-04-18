@@ -4,6 +4,7 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 import '../models/bowling_ball.dart';
 import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
 import 'weapon_library_page.dart'; // <-- Add this import
+import 'add_custom_ball_page.dart'; // <-- Add import for the new custom page
 
 /// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
 class MyArsenalPage extends StatefulWidget { // Changed to StatefulWidget
@@ -30,7 +31,13 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
           actions: <Widget>[
             TextButton(
               child: const Text('自行輸入數據'),
-              onPressed: null, // Disabled for now
+              onPressed: () {
+                Navigator.pop(dialogContext); // Close the dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddCustomBallPage()), // Navigate to custom page
+                );
+              },
             ),
             TextButton(
               child: const Text('從現有清單添加'),
@@ -334,61 +341,94 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isSelectionMode ? '選擇用球 (複選)' : '我的球櫃'), // Updated title
+        title: Text(widget.isSelectionMode ? '選擇賽事用球' : '我的球櫃'),
         actions: [
-          if (widget.isSelectionMode) // Show Confirm button in selection mode
-            TextButton(
-              child: const Text('確定', style: TextStyle(color: Colors.white)), // Adjust style as needed
+          // Action button for selection mode (Confirm)
+          if (widget.isSelectionMode)
+            IconButton(
+              icon: const Icon(Icons.check),
+              tooltip: '完成選擇',
               onPressed: () {
-                Navigator.pop(context, _selectedBallNames.toList()); // Pop with the list of selected names
+                  // Return the list of selected ball NAMES
+                  Navigator.pop(context, _selectedBallNames.toList());
               },
-            )
-          else // Show Add and Filter buttons in normal mode
-            ...[
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline),
-                tooltip: '新增球具',
-                onPressed: () => _showAddMethodSelectionDialog(context),
-              ),
-              IconButton(
-                icon: const Icon(Icons.filter_list),
-                tooltip: '篩選',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('篩選功能待開發')),
-                  );
-                },
-              ),
-            ]
+            ),
         ],
       ),
-      body: Column(
+      body: Column( // Use Column to stack filter, button, and list/grid
         children: [
+          // Filter section
           _buildFilterDropdown(context, viewModel),
-          Expanded(
+
+          // Search Bar (only in non-selection mode for now, could be enabled)
+          if (!widget.isSelectionMode)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: TextField(
+                decoration: const InputDecoration(
+                  hintText: '搜尋我的球櫃...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  isDense: true, // Make it more compact
+                ),
+                onChanged: (value) {
+                   viewModel.filterArsenal(value); // Use the dedicated method
+                },
+              ),
+            ),
+          
+          // Add New Ball Button (only in selection mode)
+          if (widget.isSelectionMode)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.add_circle_outline),
+                label: const Text('新增保齡球至我的球櫃'),
+                onPressed: () => _showAddMethodSelectionDialog(context), // Show the dialog
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 40), // Make button wider
+                ),
+              ),
+            ),
+
+          // Ball List/Grid section
+          Expanded( // Make the GridView/ListView take remaining space
             child: filteredArsenal.isEmpty
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Text(
+                        // Simplified message
                         widget.isSelectionMode 
-                           ? '球櫃中無球可選' 
-                           : '您的球櫃目前是空的，\n點擊右上角的 "+" 從球類資料庫添加吧！',
+                           ? '球櫃中無球可選\n點擊上方按鈕新增' // Updated message for selection mode
+                           : (viewModel.hasActiveFilters || viewModel.currentArsenalSearchKeyword.isNotEmpty
+                              ? '沒有符合條件的球具'
+                              : '您的球櫃是空的\n點擊右下角按鈕新增'),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ),
                   )
                 : ListView.builder(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 80.0), // Add padding, esp. bottom for FAB
                     itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];
+                      // Build the card for each ball
                       return _buildBallCard(context, ball, viewModel);
                     },
                   ),
           ),
         ],
       ),
+      // FAB for adding new balls (only in non-selection mode)
+      floatingActionButton: widget.isSelectionMode
+          ? null // No FAB in selection mode
+          : FloatingActionButton(
+              onPressed: () => _showAddMethodSelectionDialog(context),
+              tooltip: '新增武器',
+              child: const Icon(Icons.add),
+            ),
     );
   }
 } 

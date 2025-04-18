@@ -4,25 +4,31 @@ import 'package:provider/provider.dart'; // Import provider
 import '../viewmodels/weapon_library_viewmodel.dart'; // Import ViewModel
 import '../models/bowling_ball.dart'; // Import BowlingBall
 import '../shared/enums.dart'; // Import the shared enum
-// Removed import for WeaponLibraryPage as it's not directly used for navigation FROM here.
+import 'record_scores_page.dart'; // Import the new page
 
 // Define TournamentType enum here or import from a shared location
 // enum TournamentType { open, championship } // Removed local definition
 
 class AddMatchRecordPage extends StatefulWidget {
   // --- Add parameters to receive data ---
+  final String tournamentId; // Need ID to update the correct tournament
   final String tournamentName;
   final String tournamentLocation;
-  final DateTime tournamentDate;
-  final TournamentType tournamentType; // Added tournament type
+  final DateTime tournamentDate; // Keep original date for display
+  final TournamentType tournamentType;
+  final OpenTournamentFormat? openFormat;    // Added format details
+  final int? mqGamesPerSession;             // Added format details
   final List<BowlingBall> selectedBalls;
 
   const AddMatchRecordPage({
     super.key,
+    required this.tournamentId,
     required this.tournamentName,
     required this.tournamentLocation,
     required this.tournamentDate,
-    required this.tournamentType, // Added requirement
+    required this.tournamentType,
+    this.openFormat,
+    this.mqGamesPerSession,
     required this.selectedBalls,
   });
 
@@ -37,7 +43,7 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
   @override
   void initState() {
     super.initState();
-    print('--- AddMatchRecordPage Init: Received ${widget.selectedBalls.length} balls, Type: ${widget.tournamentType} ---');
+    print('--- AddMatchRecordPage Init: Received ${widget.selectedBalls.length} balls, Type: ${widget.tournamentType}, Format: ${widget.openFormat}, MQ Games: ${widget.mqGamesPerSession} ---');
   }
 
   // Dispose is fine as is if no new controllers specific to this state were added
@@ -57,6 +63,30 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
     Navigator.of(context).popUntil((_) => count++ >= 2);
   }
 
+  // Method to determine the number of games per session
+  int _getGamesPerSession() {
+    if (widget.tournamentType == TournamentType.open && widget.openFormat == OpenTournamentFormat.mq) {
+      return widget.mqGamesPerSession ?? 6; // Use MQ setting, default to 6 if null (shouldn't happen with validation)
+    } else {
+      // Default for Championship or Open Classic
+      return 6; // Assuming 6 games for other formats, adjust if needed
+    }
+  }
+
+  void _navigateToRecordScores() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecordScoresPage(
+          tournamentId: widget.tournamentId,
+          tournamentName: widget.tournamentName,
+          gamesPerSession: _getGamesPerSession(),
+          // Pass other necessary info if needed by RecordScoresPage
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // ViewModel might not be needed if card doesn't use it directly, but keep for potential future use
@@ -66,86 +96,90 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('記錄比賽分數 - ${widget.tournamentName}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save), 
-            tooltip: '完成並儲存',
-            onPressed: _saveFullRecord,
-          ),
-        ],
+        // Removed save action from here, saving happens after score entry
       ),
-      body: ListView( // Use ListView for overall scrollability including scores
-        padding: const EdgeInsets.all(16.0),
-        children: <Widget>[
-          // Display Basic Info (Read Only) in Rows
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space out items
-            children: [
-              Expanded( // Allow location to expand if needed
-                child: Text(
-                  '地點: ${widget.tournamentLocation}', 
-                  style: Theme.of(context).textTheme.titleMedium,
-                  overflow: TextOverflow.ellipsis, // Handle long locations
+      body: Column( // Use Column to place button at the bottom
+        children: [
+          Expanded( // Make ListView take available space
+            child: ListView( 
+              padding: const EdgeInsets.all(16.0),
+              children: <Widget>[
+                // Display Basic Info (Read Only) in Rows
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space out items
+                  children: [
+                    Expanded( // Allow location to expand if needed
+                      child: Text(
+                        '地點: ${widget.tournamentLocation}', 
+                        style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis, // Handle long locations
+                      ),
+                    ),
+                    const SizedBox(width: 16), // Add spacing
+                    Text(
+                      '日期: ${DateFormat('yyyy-MM-dd').format(widget.tournamentDate)}', 
+                      style: Theme.of(context).textTheme.titleMedium
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 16), // Add spacing
-              Text(
-                '日期: ${DateFormat('yyyy-MM-dd').format(widget.tournamentDate)}', 
-                style: Theme.of(context).textTheme.titleMedium
-              ),
-            ],
-          ),
-          const SizedBox(height: 8), // Space between rows
-          // Display Tournament Type
-          Text(
-            '類型: ${widget.tournamentType == TournamentType.open ? '公開賽' : '錦標賽'}', 
-            style: Theme.of(context).textTheme.titleMedium
-          ),
-          const SizedBox(height: 16),
-          
-          // Display Selected Balls (using the GridView)
-          Text(
-            '使用球具:',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          // Replace ListView with GridView
-          GridView.builder(
-            shrinkWrap: true, // Important inside ListView
-            physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two items per row
-              crossAxisSpacing: 10.0, // Spacing between columns
-              mainAxisSpacing: 10.0, // Spacing between rows
-              childAspectRatio: 1.8, // Adjust aspect ratio for card look (width > height)
-            ),
-            itemCount: widget.selectedBalls.length,
-            itemBuilder: (context, index) {
-              final ball = widget.selectedBalls[index];
-              // Call the new card builder method
-              return _buildArsenalStyleBallCard(context, ball); 
-            },
-          ),
-          const Divider(height: 32, thickness: 1),
+                const SizedBox(height: 8), // Space between rows
+                // Display Tournament Type and Format
+                Text(
+                  '類型: ${widget.tournamentType == TournamentType.open ? '公開賽' : '錦標賽'}'
+                  + (widget.tournamentType == TournamentType.open && widget.openFormat != null 
+                      ? ' (${widget.openFormat == OpenTournamentFormat.mq ? 'MQ' : '經典賽'})' 
+                      : ''), // Add format if applicable
+                  style: Theme.of(context).textTheme.titleMedium
+                ),
+                const SizedBox(height: 16),
+                
+                // Display Selected Balls (using the GridView)
+                Text(
+                  '使用球具:',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 12),
+                GridView.builder(
+                  shrinkWrap: true, // Important inside ListView
+                  physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // Two items per row
+                    crossAxisSpacing: 10.0, // Spacing between columns
+                    mainAxisSpacing: 10.0, // Spacing between rows
+                    childAspectRatio: 1.8, // Adjust aspect ratio for card look (width > height)
+                  ),
+                  itemCount: widget.selectedBalls.length,
+                  itemBuilder: (context, index) {
+                    final ball = widget.selectedBalls[index];
+                    return _buildArsenalStyleBallCard(context, ball); 
+                  },
+                ),
+                const Divider(height: 32, thickness: 1),
 
-          // --- Add Game Score Input Fields Here ---
-          Text(
-            '輸入各局分數:',
-             style: Theme.of(context).textTheme.titleLarge,
+                // Section title for scores (scores will be added on the next page)
+                Text(
+                  '比賽成績:',
+                   style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                // TODO: Display recorded scores here later (e.g., from TournamentViewModel)
+                const Center(child: Text('尚未登錄成績', style: TextStyle(color: Colors.grey))), 
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          // TODO: Add TextFormFields for each game, potentially dynamically
-          TextFormField(
-             decoration: const InputDecoration(labelText: '第一局分數', border: OutlineInputBorder()),
-             keyboardType: TextInputType.number,
+          // Button to navigate to score recording page
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.edit_note),
+              label: const Text('登錄比賽成績'),
+              onPressed: _navigateToRecordScores,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
-           TextFormField(
-             decoration: const InputDecoration(labelText: '第二局分數', border: OutlineInputBorder()),
-             keyboardType: TextInputType.number,
-          ),
-          // ... add more game inputs ...
-          
         ],
       ),
     );

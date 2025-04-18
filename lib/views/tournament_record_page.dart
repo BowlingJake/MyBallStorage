@@ -92,11 +92,14 @@ class TournamentRecordPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => AddMatchRecordPage(
+                tournamentId: tournament.id,
                 tournamentName: tournament.name,
                 tournamentLocation: tournament.location,
-                tournamentDate: tournament.date,
-                tournamentType: tournament.type, // Pass the actual tournament type
-                selectedBalls: selectedBallObjects, // Pass the list of BowlingBall objects
+                tournamentDate: tournament.startDate,
+                tournamentType: tournament.type,
+                openFormat: tournament.openFormat,
+                mqGamesPerSession: tournament.mqGamesPerSession,
+                selectedBalls: selectedBallObjects,
               ),
             ),
           );
@@ -138,7 +141,10 @@ class TournamentRecordPage extends StatelessWidget {
                         const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
                         const SizedBox(width: 4),
                         Text(
-                          DateFormat('yyyy-MM-dd').format(tournament.date),
+                          // Format date range
+                          tournament.endDate == null || tournament.startDate == tournament.endDate
+                            ? DateFormat('yyyy-MM-dd').format(tournament.startDate) // Single day
+                            : '${DateFormat('yyyy-MM-dd').format(tournament.startDate)} - ${DateFormat('yyyy-MM-dd').format(tournament.endDate!)}', // Date range
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
                         ),
                       ],
