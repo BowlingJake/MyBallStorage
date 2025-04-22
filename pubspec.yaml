@@ -33,6 +33,8 @@ dependencies:
   provider: ^6.1.1
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
+  shared_preferences: ^2.0.15
+  palette_generator: ^0.3.2
 
 dev_dependencies:
   flutter_test:
@@ -58,7 +60,9 @@ flutter:
   assets:
      - assets/bowling_ball_data.json
      - assets/fonts/ # 如果您宣告了整個字體目錄
-     - assets/images/ # 宣告整個圖片目錄，或
+     - assets/images/
+     - assets/images/Jackal EXJ.jpg
+     # 宣告整個圖片目錄，或
      # - assets/images/my_background.jpg # 宣告單個圖片檔案
 
   # To add assets to your application, add an assets section, like this:

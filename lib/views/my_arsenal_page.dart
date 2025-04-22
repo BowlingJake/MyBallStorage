@@ -192,10 +192,13 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                         color: hasSpecialBackground ? Colors.black.withOpacity(0.2) : Colors.grey[300],
-                         borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Center(child: Text('圖片', style: TextStyle(color: Colors.white70))),
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.asset(
+                        'assets/images/Jackal EXJ.jpg',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     FittedBox(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'weapon_library_home_page.dart';
 import 'tournament_record_page.dart';
-import 'analytics_page.dart';
+import 'training_page.dart';
 import 'settings_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = const [
     WeaponLibraryHomePage(),
     TournamentRecordPage(),
-    AnalyticsPage(),
+    TrainingPage(),
     SettingsPage(),
   ];
 
@@ -36,12 +36,12 @@ class _MainPageState extends State<MainPage> {
             label: '武器庫',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event),
+            icon: Icon(Icons.stadium),
             label: '比賽記錄',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: '圖表分析',
+            icon: Icon(Icons.fitness_center),
+            label: '訓練模式',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

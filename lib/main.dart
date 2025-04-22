@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'views/login_page.dart';
 import 'viewmodels/weapon_library_viewmodel.dart';
 import 'viewmodels/tournament_viewmodel.dart';
 import 'views/main_page.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget{
     return MaterialApp(
       title: 'Bowling Arsenal App',
       theme: AppTheme.lightTheme,
-      home: const MainPage(),
+      home: const LoginPage(),
     );
   }
 }
