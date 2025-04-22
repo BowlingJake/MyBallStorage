@@ -5,6 +5,8 @@ import '../models/bowling_ball.dart';
 import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
 import 'weapon_library_page.dart'; // <-- Add this import
 import 'add_custom_ball_page.dart'; // <-- Add import for the new custom page
+import 'package:bowlingarsenal_app/views/ball_card.dart';
+
 
 /// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
 class MyArsenalPage extends StatefulWidget { // Changed to StatefulWidget
@@ -418,7 +420,14 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];
                       // Build the card for each ball
-                      return _buildBallCard(context, ball, viewModel);
+                      return BowlingBallCard(
+                        ballName: ball.ball,
+                        brand: ball.brand,
+                        core: ball.core,
+                        coverstock: ball.coverstockcategory,
+                        releaseDate: ball.releaseDate,
+                        imagePath: 'assets/images/Jackal EXJ.jpg',
+                      );
                     },
                   ),
           ),

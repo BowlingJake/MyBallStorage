@@ -42,12 +42,13 @@ class _BowlingBallCardState extends State<BowlingBallCard> {
       size: const Size(80, 80),
       maximumColorCount: 20,
     );
-    final color = generator.vibrantColor?.color
-        ?? generator.dominantColor?.color
-        ?? Colors.grey[200]!;
-    setState(() => _bgColor = color);
+    final swatches = generator.paletteColors;
+    if (swatches.isNotEmpty) {
+      swatches.sort((a, b) => b.population.compareTo(a.population));
+      setState(() => _bgColor = swatches.first.color);
+      return;
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     final bg = _bgColor ?? Colors.grey[200]!;
