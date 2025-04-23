@@ -21,6 +21,16 @@ class MyArsenalPage extends StatefulWidget { // Changed to StatefulWidget
 class _MyArsenalPageState extends State<MyArsenalPage> { // State class
   // State to keep track of selected ball names in selection mode
   final Set<String> _selectedBallNames = {};
+  bool _hasLoadedData = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasLoadedData) {
+      context.read<WeaponLibraryViewModel>().loadBallData();
+      _hasLoadedData = true;
+    }
+  }
 
   // --- Moved Method: Show Add Method Selection Dialog ---
   void _showAddMethodSelectionDialog(BuildContext context) {
@@ -419,15 +429,20 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                     itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];
-                      // Build the card for each ball
-                      return BowlingBallCard(
-                        ballName: ball.ball,
-                        brand: ball.brand,
-                        core: ball.core,
-                        coverstock: ball.coverstockcategory,
-                        releaseDate: ball.releaseDate,
-                        imagePath: 'assets/images/Jackal EXJ.jpg',
-                      );
+                      if (widget.isSelectionMode) {
+                        return _buildBallCard(context, ball, viewModel);
+                      } else {
+                        return BowlingBallCard(
+                          ballName: ball.ball,
+                          brand: ball.brand,
+                          core: ball.core,
+                          coverstock: ball.coverstockcategory,
+                          releaseDate: ball.releaseDate,
+                          imagePath: ball.ball == 'Jackal EXJ'
+                              ? 'assets/images/Jackal EXJ.jpg'
+                              : '',
+                        );
+                      }
                     },
                   ),
           ),

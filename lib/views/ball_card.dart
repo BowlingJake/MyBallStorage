@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 /// 請同時在 pubspec.yaml 加上：
 /// dependencies:
@@ -11,7 +10,7 @@ class BowlingBallCard extends StatefulWidget {
   final String core;
   final String coverstock;
   final String releaseDate;
-  final String imagePath; // asset 圖片路徑
+  final String imagePath;
 
   const BowlingBallCard({
     super.key,
@@ -28,38 +27,16 @@ class BowlingBallCard extends StatefulWidget {
 }
 
 class _BowlingBallCardState extends State<BowlingBallCard> {
-  Color? _bgColor;
+  // 已移除背景色處理以提升載入效能
 
-  @override
-  void initState() {
-    super.initState();
-    _updatePalette();
-  }
-
-  Future<void> _updatePalette() async {
-    final generator = await PaletteGenerator.fromImageProvider(
-      AssetImage(widget.imagePath),
-      size: const Size(80, 80),
-      maximumColorCount: 20,
-    );
-    final swatches = generator.paletteColors;
-    if (swatches.isNotEmpty) {
-      swatches.sort((a, b) => b.population.compareTo(a.population));
-      setState(() => _bgColor = swatches.first.color);
-      return;
-    }
-  }
   @override
   Widget build(BuildContext context) {
-    final bg = _bgColor ?? Colors.grey[200]!;
-    final lum = bg.computeLuminance();
-    final textColor = lum < 0.5 ? Colors.white : Colors.black87;
+    const textColor = Colors.black87;
 
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: bg,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -72,10 +49,18 @@ class _BowlingBallCardState extends State<BowlingBallCard> {
                 borderRadius: BorderRadius.circular(12),
               ),
               clipBehavior: Clip.hardEdge,
-              child: Image.asset(
-                widget.imagePath,
-                fit: BoxFit.cover,
-              ),
+              child: widget.imagePath.isNotEmpty
+                  ? Image.asset(
+                      widget.imagePath,
+                      fit: BoxFit.cover,
+                    )
+                  : Center(
+                      child: Icon(
+                        Icons.sports_baseball,
+                        size: 50,
+                        color: Colors.grey[400],
+                      ),
+                    ),
             ),
             const SizedBox(width: 16),
             // 文字資訊

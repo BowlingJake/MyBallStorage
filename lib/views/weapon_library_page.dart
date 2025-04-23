@@ -18,6 +18,7 @@ class WeaponLibraryPage extends StatefulWidget {
 
 class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
   final List<BowlingBall> _selectedBalls = [];
+  bool _hasLoadedData = false;
 
   void _showBallDetailsDialog(BuildContext context, BowlingBall ball) {
     showDialog(
@@ -102,6 +103,15 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasLoadedData) {
+      context.read<WeaponLibraryViewModel>().loadBallData();
+      _hasLoadedData = true;
+    }
   }
 
   @override

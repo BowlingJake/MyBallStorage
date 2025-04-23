@@ -103,12 +103,17 @@ class TournamentRecordPage extends StatelessWidget {
               ),
             ),
           );
-          
-          // Remove old logic
-          // print('Tapped on tournament: ${tournament.name}');
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text('查看 ${tournament.name} 詳細記錄 (待實作)')),
-          // );
+        },
+        onLongPress: () {
+          // Navigate to BasicTournamentInfoPage in edit mode
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BasicTournamentInfoPage(
+                tournamentToEdit: tournament,
+              ),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(10),
         child: Padding(

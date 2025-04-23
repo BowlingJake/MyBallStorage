@@ -35,6 +35,7 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.0.15
   palette_generator: ^0.3.2
+  cached_network_image: ^3.3.0
 
 dev_dependencies:
   flutter_test:
@@ -58,12 +59,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-     - assets/bowling_ball_data.json
-     - assets/fonts/ # 如果您宣告了整個字體目錄
-     - assets/images/
-     - assets/images/Jackal EXJ.jpg
-     # 宣告整個圖片目錄，或
-     # - assets/images/my_background.jpg # 宣告單個圖片檔案
+    - assets/bowling_ball_data.json
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import '../shared/enums.dart'; // for TournamentType
 import 'package:intl/intl.dart'; // For date formatting
-import 'my_arsenal_page.dart'; // Import MyArsenalPage
-import 'package:provider/provider.dart'; // Import Provider
-import '../viewmodels/weapon_library_viewmodel.dart'; // Import ViewModel
-import '../models/bowling_ball.dart'; // Import BowlingBall model
-import '../models/tournament.dart'; // Assume Tournament model exists
-import '../viewmodels/tournament_viewmodel.dart'; // Assume TournamentViewModel exists
-import 'add_match_record_page.dart'; // Import AddMatchRecordPage
-import '../shared/enums.dart'; // Import the shared enum
+import 'package:provider/provider.dart';
+import '../models/bowling_ball.dart';
+import '../models/tournament.dart'; // Correct model import
+import '../viewmodels/tournament_viewmodel.dart';
+import '../viewmodels/weapon_library_viewmodel.dart'; // For ball selection
+import 'my_arsenal_page.dart'; // For navigating to ball selection
 
-// Define an enum for tournament types (can be reused here)
-// enum TournamentType { open, championship } // Removed local definition
-
+// Removed TournamentType and OpenTournamentFormat enums if they were defined here
+// Assuming they are defined in tournament_model.dart or elsewhere
 class BasicTournamentInfoPage extends StatefulWidget {
-  const BasicTournamentInfoPage({super.key});
+  final Tournament? tournamentToEdit;
+
+  const BasicTournamentInfoPage({super.key, this.tournamentToEdit});
 
   @override
-  State<BasicTournamentInfoPage> createState() => _BasicTournamentInfoPageState();
+  _BasicTournamentInfoPageState createState() => _BasicTournamentInfoPageState();
 }
 
 class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
@@ -25,11 +25,21 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   final _locationController = TextEditingController();
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
-  TournamentType? _selectedTournamentType;
-  OpenTournamentFormat? _selectedOpenFormat; // Added state for open format
-  int? _selectedMqSessions; // Added state for MQ sessions
-  int? _selectedMqGamesPerSession; // Added state for MQ games per session
-  List<String> _selectedTournamentBallNames = []; // Store list of names
+  List<String> _selectedTournamentBallNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize fields with tournament data if in edit mode
+    if (widget.tournamentToEdit != null) {
+      final tournament = widget.tournamentToEdit!;
+      _nameController.text = tournament.name;
+      _locationController.text = tournament.location;
+      _selectedStartDate = tournament.startDate;
+      _selectedEndDate = tournament.endDate;
+      _selectedTournamentBallNames = List.from(tournament.selectedBallNames);
+    }
+  }
 
   @override
   void dispose() {
@@ -73,69 +83,38 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
         );
         return;
       }
-      if (_selectedTournamentType == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('請選擇賽事種類')),
-        );
-        return;
-      }
-      if (_selectedTournamentType == TournamentType.open && _selectedOpenFormat == null) {
-         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('請選擇公開賽的賽事形式')),
-        );
-        return;
-      }
-      if (_selectedOpenFormat == OpenTournamentFormat.mq) {
-        if (_selectedMqSessions == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('請選擇 MQ 賽事的合計場數')),
-          );
-          return;
-        }
-        if (_selectedMqGamesPerSession == null) {
-           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('請選擇 MQ 賽事每場的局數')),
-          );
-          return;
-        }
-      }
       if (_selectedTournamentBallNames.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('請選擇至少一顆賽事用球')),
         );
         return;
       }
-
       final name = _nameController.text;
       final location = _locationController.text;
       final startDate = _selectedStartDate!;
       final endDate = _selectedEndDate!;
-      final type = _selectedTournamentType!;
-      final openFormat = _selectedOpenFormat;
-      final mqSessions = _selectedMqSessions;
-      final mqGamesPerSession = _selectedMqGamesPerSession;
       final ballNames = _selectedTournamentBallNames;
-
+      
       final newTournament = Tournament(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: widget.tournamentToEdit?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: name,
         location: location,
         startDate: startDate,
         endDate: endDate,
-        type: type,
-        openFormat: openFormat,
-        mqSessions: mqSessions,
-        mqGamesPerSession: mqGamesPerSession,
+        type: TournamentType.open,
         selectedBallNames: ballNames,
-        games: [],
+        games: widget.tournamentToEdit?.games ?? [],
       );
 
       try {
         final tournamentViewModel = context.read<TournamentViewModel>();
-        tournamentViewModel.addTournament(newTournament);
+        if (widget.tournamentToEdit != null) {
+          tournamentViewModel.updateTournament(newTournament);
+        } else {
+          tournamentViewModel.addTournament(newTournament);
+        }
 
         Navigator.pop(context);
-
       } catch (e) {
         print("Error saving tournament: $e");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -260,127 +239,6 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                       color: _selectedStartDate == null ? Colors.grey[600] : null,
                     ),
                   ),
-                ),
-              ),
-            const SizedBox(height: 16),
-
-            // Tournament Type Selection
-            Row(
-              children: <Widget>[
-                const Text('賽事種類:', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 8),
-                Radio<TournamentType?>(
-                  value: TournamentType.open,
-                  groupValue: _selectedTournamentType,
-                  onChanged: (TournamentType? value) {
-                    setState(() {
-                      _selectedTournamentType = value;
-                    });
-                  },
-                ),
-                const Text('公開賽'),
-                const SizedBox(width: 8),
-                Radio<TournamentType?>(
-                  value: TournamentType.championship,
-                  groupValue: _selectedTournamentType,
-                  onChanged: (TournamentType? value) {
-                    setState(() {
-                      _selectedTournamentType = value;
-                    });
-                  },
-                ),
-                const Text('錦標賽'),
-              ],
-            ),
-            // Conditionally show Open Tournament Format selection
-            if (_selectedTournamentType == TournamentType.open)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 40.0), // Indent slightly
-                child: Row(
-                  children: <Widget>[
-                    const Text('賽事形式:', style: TextStyle(fontSize: 16)),
-                    const SizedBox(width: 8),
-                    Radio<OpenTournamentFormat?>(
-                      value: OpenTournamentFormat.mq,
-                      groupValue: _selectedOpenFormat,
-                      onChanged: (OpenTournamentFormat? value) {
-                        setState(() {
-                          _selectedOpenFormat = value;
-                        });
-                      },
-                    ),
-                    const Text('組合預賽(MQ)'),
-                    const SizedBox(width: 8),
-                    Radio<OpenTournamentFormat?>(
-                      value: OpenTournamentFormat.classic,
-                      groupValue: _selectedOpenFormat,
-                      onChanged: (OpenTournamentFormat? value) {
-                        setState(() {
-                          _selectedOpenFormat = value;
-                        });
-                      },
-                    ),
-                    const Text('經典賽'),
-                  ],
-                ),
-              ),
-            // Conditionally show MQ specific options
-            if (_selectedOpenFormat == OpenTournamentFormat.mq)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 40.0), // Indent same as format row
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Align dropdowns nicely
-                  children: [
-                    // Dropdown for number of sessions
-                    Expanded(
-                      child: DropdownButtonFormField<int?>(
-                        value: _selectedMqSessions,
-                        hint: const Text('幾場合計'),
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                          isDense: true,
-                        ),
-                        items: [1, 2, 3].map((int value) {
-                          return DropdownMenuItem<int?>(
-                            value: value,
-                            child: Text(value.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (int? newValue) {
-                          setState(() {
-                            _selectedMqSessions = newValue;
-                          });
-                        },
-                        validator: (value) => value == null ? '必選' : null,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Dropdown for games per session
-                    Expanded(
-                       child: DropdownButtonFormField<int?>(
-                        value: _selectedMqGamesPerSession,
-                        hint: const Text('每場局數'),
-                         decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                           isDense: true,
-                        ),
-                        items: [3, 4, 5, 6].map((int value) {
-                          return DropdownMenuItem<int?>(
-                            value: value,
-                            child: Text(value.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (int? newValue) {
-                          setState(() {
-                             _selectedMqGamesPerSession = newValue;
-                          });
-                        },
-                        validator: (value) => value == null ? '必選' : null,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             const SizedBox(height: 16),

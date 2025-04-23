@@ -17,6 +17,16 @@ class TournamentViewModel extends ChangeNotifier {
     notifyListeners(); // Notify listeners about the change
   }
 
+  // Method to update an existing tournament
+  void updateTournament(Tournament updatedTournament) {
+    final index = _tournaments.indexWhere((t) => t.id == updatedTournament.id);
+    if (index != -1) {
+      _tournaments[index] = updatedTournament;
+      _tournaments.sort((a, b) => b.startDate.compareTo(a.startDate));
+      notifyListeners();
+    }
+  }
+
   // --- Optional: Methods for loading/saving data ---
   // Future<void> loadTournaments() async {
   //   // TODO: Implement loading from SharedPreferences, database, etc.
@@ -43,15 +53,6 @@ class TournamentViewModel extends ChangeNotifier {
   //   _tournaments.removeWhere((t) => t.id == id);
   //   notifyListeners();
   //   // saveTournaments(); // Save after removing
-  // }
-
-  // void updateTournament(Tournament updatedTournament) {
-  //   final index = _tournaments.indexWhere((t) => t.id == updatedTournament.id);
-  //   if (index != -1) {
-  //     _tournaments[index] = updatedTournament;
-  //     notifyListeners();
-  //     // saveTournaments(); // Save after updating
-  //   }
   // }
 
 }
