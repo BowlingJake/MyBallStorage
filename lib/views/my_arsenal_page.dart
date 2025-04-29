@@ -298,7 +298,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
           // Overlay Checkmark if selected in selection mode
           if (isSelected)
             Positioned.fill(
-              child: Container(
+                child: IgnorePointer(
+                  child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
                   borderRadius: BorderRadius.circular(12), // Match card radius
@@ -306,6 +307,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                 child: const Center(
                   child: Icon(Icons.check_circle, color: Colors.lightGreenAccent, size: 40),
                 ),
+                  ),
               ),
             ),
         ],
@@ -429,20 +431,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                     itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];
-                      if (widget.isSelectionMode) {
-                        return _buildBallCard(context, ball, viewModel);
-                      } else {
-                        return BowlingBallCard(
-                          ballName: ball.ball,
-                          brand: ball.brand,
-                          core: ball.core,
-                          coverstock: ball.coverstockcategory,
-                          releaseDate: ball.releaseDate,
-                          imagePath: ball.ball == 'Jackal EXJ'
-                              ? 'assets/images/Jackal EXJ.jpg'
-                              : '',
-                        );
-                      }
+                      // 一律使用有 onTap/onLongPress 的 _buildBallCard
+                      return _buildBallCard(context, ball, viewModel);
                     },
                   ),
           ),
