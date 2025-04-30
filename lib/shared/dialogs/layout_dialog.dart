@@ -4,8 +4,8 @@ import '../../models/bowling_ball.dart';
 enum _DialogView { selection, details, layoutInput }
 
 /// 共用的顯示 Layout 設定與詳細資料的 Dialog
-void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback onUpdated) {
-  _DialogView currentView = _DialogView.selection;
+void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback onUpdated, { bool directToLayout = false }) {
+  _DialogView currentView = directToLayout ? _DialogView.layoutInput : _DialogView.selection;
 
   // Keep track of layout input values within the dialog's state
   String? handType = ball.handType ?? 'One Handed';

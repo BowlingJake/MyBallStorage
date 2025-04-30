@@ -7,6 +7,7 @@ import '../models/tournament.dart'; // Correct model import
 import '../viewmodels/tournament_viewmodel.dart';
 import '../viewmodels/weapon_library_viewmodel.dart'; // For ball selection
 import 'my_arsenal_page.dart'; // For navigating to ball selection
+import '../shared/dialogs/layout_dialog.dart'; // For layout dialog
 
 // Removed TournamentType and OpenTournamentFormat enums if they were defined here
 // Assuming they are defined in tournament_model.dart or elsewhere
@@ -127,27 +128,40 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   // --- Helper: Build Small Ball Card ---
   Widget _buildSmallBallCard(BuildContext context, BowlingBall ball) {
     // Simplified card representation
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Keep column tight
-          children: [
-            // Placeholder for image
-            Container(
-              width: 50, height: 50,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(4),
+    return GestureDetector(
+      onLongPress: () {
+        // Import the layout dialog functionality
+        showBallActionDialog(
+          context,
+          ball,
+          () {
+            setState(() {});
+          },
+          directToLayout: true,
+        );
+      },
+      child: Card(
+        elevation: 2,
+        margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Keep column tight
+            children: [
+              // Placeholder for image
+              Container(
+                width: 50, height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Icon(Icons.sports_baseball_outlined, size: 30, color: Colors.white70),
               ),
-              child: const Icon(Icons.sports_baseball_outlined, size: 30, color: Colors.white70),
-            ),
-            const SizedBox(height: 4),
-            Text(ball.ball, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
-            Text(ball.brand, style: const TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
-          ],
+              const SizedBox(height: 4),
+              Text(ball.ball, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(ball.brand, style: const TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+            ],
+          ),
         ),
       ),
     );
