@@ -190,6 +190,14 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                 // Optional: Callback if dialog modifies ball state directly
               });
             },
+      onLongPress: () {
+        showBallActionDialog(
+          context,
+          ball,
+          () { setState(() {}); },
+          directToLayout: true,
+        );
+      },
       child: Stack( // Use Stack to overlay checkmark
         children: [
           Row(

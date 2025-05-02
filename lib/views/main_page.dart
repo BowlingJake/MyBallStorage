@@ -24,7 +24,40 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Container(
+          color: Colors.white, // Banner 背景色，可自由調整或改成漸層
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              const Spacer(), // 左側空白
+              // 中間 Logo
+              Image.asset(
+                'assets/images/logo_placeholder.png', // 先用預設圖，之後可換
+                height: 40,
+                ),
+                const Spacer(),
+                // 右側鈴鐺按鈕
+                IconButton(
+                  icon: const Icon(Icons.notifications_none),
+                  onPressed: () {
+                    // TODO: 換成你的通知顯示邏輯
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('還沒有新通知')),
+                      );
+               },
+            ),
+           ],
+         ),
+       ),
+     ),
+      body: Column(
+        children: [
+          // appBar 已經在上方，這裡只放內容區
+          Expanded(child: _pages[_currentIndex]),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
