@@ -3,6 +3,8 @@ import 'weapon_library_home_page.dart';
 import 'tournament_record_page.dart';
 import 'training_page.dart';
 import 'settings_page.dart';
+import 'user_info_page.dart';
+
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -18,6 +20,7 @@ class _MainPageState extends State<MainPage> {
     WeaponLibraryHomePage(),
     TournamentRecordPage(),
     TrainingPage(),
+    UserInfoPage(),
     SettingsPage(),
   ];
 
@@ -75,6 +78,10 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
             label: '訓練模式',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: '個人檔案',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
