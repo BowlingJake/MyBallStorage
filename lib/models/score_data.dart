@@ -113,36 +113,42 @@ class BowlingScoreData {
 
     final tenthFrame = frames[9];
     int tenthFrameScore = 0;
-     bool tenthFrameScorable = false;
+    bool tenthFrameScorable = false;
 
     if (tenthFrame.rolls.isNotEmpty) {
-        tenthFrameScore = tenthFrame.rolls.fold(0, (sum, roll) => sum + roll.pinsDown); // 第十局分數是所有投球的擊倒瓶數總和
-        if(tenthFrame.isComplete) {
-             tenthFrameScorable = true;
+      final int first = tenthFrame.rolls[0].pinsDown;
+      final int second = tenthFrame.rolls.length > 1 ? tenthFrame.rolls[1].pinsDown : 0;
+      final int third = tenthFrame.rolls.length > 2 ? tenthFrame.rolls[2].pinsDown : 0;
+
+      if (tenthFrame.rolls.length == 1) {
+        // 只打一球，分數暫不確定
+      } else if (tenthFrame.rolls.length == 2) {
+        if (first == 10) {
+          // 第一球strike，還沒打完三球，分數暫不確定
+        } else if (first + second == 10) {
+          // spare，還沒打完第三球，分數暫不確定
         } else {
-            // 檢查是否至少投了兩球，且不是 Strike/Spare 需要補中
-             if (tenthFrame.rolls.length == 2) {
-                 // 非 Strike 非 Spare 結束，分數確定
-                  if (tenthFrame.rolls[0].pinsDown + tenthFrame.rolls[1].pinsDown < 10) {
-                       tenthFrameScorable = true;
-                  }
-             } else if (tenthFrame.rolls.length == 3) {
-                // 投滿三球，分數確定
-                 tenthFrameScorable = true;
-             }
+          // 只打兩球，直接加總
+          tenthFrameScore = first + second;
+          tenthFrameScorable = true;
         }
+      } else if (tenthFrame.rolls.length == 3) {
+        if (first == 10) {
+          // 第一球strike，三球都加
+          tenthFrameScore = first + second + third;
+          tenthFrameScorable = true;
+        } else if (first + second == 10) {
+          // spare，10+第三球
+          tenthFrameScore = 10 + third;
+          tenthFrameScorable = true;
+        }
+      }
     }
 
-    if(tenthFrameScorable) {
-        cumulativeScore += tenthFrameScore;
-        tenthFrame.totalScore = cumulativeScore;
+    if (tenthFrameScorable) {
+      cumulativeScore += tenthFrameScore;
+      tenthFrame.totalScore = cumulativeScore;
     }
-
-    if (isGameOver && tenthFrame.rolls.isNotEmpty) {
-          tenthFrame.totalScore = cumulativeScore + tenthFrame.rolls.fold(0, (sum, roll) => sum + roll.pinsDown);
-           cumulativeScore = tenthFrame.totalScore!; // 更新最終總分
-    }
-
   }
 
   List<Roll> _getNextRolls(int currentFrameIndex, int count) {

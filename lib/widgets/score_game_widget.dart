@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ScoreFrameWidget extends StatelessWidget {
   final int frameNumber; // 第幾格 (1-10)
@@ -129,6 +130,32 @@ class ScoreFrameWidget extends StatelessWidget {
     bool isRightMost = false,
     required double fontSize,
   }) {
+    Widget displayWidget;
+    
+    if (score == "X") {
+      displayWidget = SvgPicture.asset(
+        'assets/images/strike_symbol.svg',
+        width: width * 0.8,
+        height: height * 0.8,
+        fit: BoxFit.contain,
+      );
+    } else if (score == "/") {
+      displayWidget = SvgPicture.asset(
+        'assets/images/spare_symbol.svg',
+        width: width * 0.8,
+        height: height * 0.8,
+        fit: BoxFit.contain,
+      );
+    } else {
+      displayWidget = Text(
+        score ?? "",
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
     return Container(
       width: width,
       height: height,
@@ -138,15 +165,7 @@ class ScoreFrameWidget extends StatelessWidget {
           right: isRightMost ? BorderSide.none : border,
         ),
       ),
-      child: Center(
-        child: Text(
-          score ?? "",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      child: Center(child: displayWidget),
     );
   }
 }

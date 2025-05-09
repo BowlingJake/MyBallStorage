@@ -154,6 +154,39 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
       ),
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: <Widget>[
+        // 新增快速選擇按鈕
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _newlySelectedPins = HashSet<int>.from(List.generate(10, (i) => i + 1));
+                });
+              },
+              child: const Text('全倒'),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _newlySelectedPins = HashSet<int>.from(List.generate(9, (i) => i + 1)); // 1~9
+                });
+              },
+              child: const Text('留10號'),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _newlySelectedPins = HashSet<int>.from([1,2,3,4,5,6,8,9,10]); // 7號不倒
+                });
+              },
+              child: const Text('留7號'),
+            ),
+          ],
+        ),
+        // 原有重設按鈕
         TextButton(
           child: const Text('重設本次'),
           onPressed: () {
@@ -163,6 +196,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
             });
           },
         ),
+        // 原有取消/確定
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
