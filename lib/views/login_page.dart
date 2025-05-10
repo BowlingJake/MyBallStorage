@@ -55,14 +55,17 @@ class _LoginPageState extends State<LoginPage> {
           fit: StackFit.expand,
           children: [
             // 背景占位
-            Container(color: Colors.blueGrey[50]),
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/login_page.png',
+                fit: BoxFit.cover,
+              ),
+            ),
 
             // 中心內容
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo 占位
-                const FlutterLogo(size: 100),
                 const SizedBox(height: 40),
 
                 if (!_isLoggedIn) ...[

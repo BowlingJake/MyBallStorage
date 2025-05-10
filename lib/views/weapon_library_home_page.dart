@@ -15,9 +15,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
     final viewModel = context.watch<WeaponLibraryViewModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('武器庫'),
-      ),
+      // appBar: AppBar(
+      //   title: const Text('武器庫'),
+      // ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(

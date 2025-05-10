@@ -27,37 +27,33 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: Container(
-          color: Colors.white, // Banner 背景色，可自由調整或改成漸層
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              const Spacer(), // 左側空白
-              // 中間 Logo
-              Image.asset(
-                'assets/images/logo_placeholder.png', // 先用預設圖，之後可換
-                height: 40,
-                ),
-                const Spacer(),
-                // 右側鈴鐺按鈕
-                IconButton(
-                  icon: const Icon(Icons.notifications_none),
-                  onPressed: () {
-                    // TODO: 換成你的通知顯示邏輯
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('還沒有新通知')),
-                      );
-               },
-            ),
-           ],
-         ),
-       ),
-     ),
+      extendBodyBehindAppBar: true,
+      appBar: null,
       body: Column(
         children: [
-          // appBar 已經在上方，這裡只放內容區
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/logo_placeholder.png',
+                  height: 100,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+                Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.notifications_none, size: 32),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('還沒有新通知')),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
           Expanded(child: _pages[_currentIndex]),
         ],
       ),
