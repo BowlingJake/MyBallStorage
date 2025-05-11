@@ -8,6 +8,7 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 import '../models/bowling_ball.dart';
 import 'add_match_record_page.dart';
 import '../shared/enums.dart'; // Import the shared enum
+import '../theme/text_styles.dart';
 
 // Define enum for dialog result (REMOVED)
 // enum AddRecordType { open, championship }
@@ -22,34 +23,84 @@ class TournamentRecordPage extends StatelessWidget {
     final tournaments = tournamentViewModel.tournaments;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('賽事記錄')),
-      body: tournaments.isEmpty
-          // If no tournaments, show a message
-          ? const Center(
-              child: Text(
-                '尚未建立任何賽事紀錄',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ))
-          // If there are tournaments, show them in a list
-          : ListView.builder(
-              padding: const EdgeInsets.all(12.0), // Add padding around the list
+      appBar: AppBar(title: const Text('賽事記錄', style: AppTextStyles.title)),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
               itemCount: tournaments.length,
               itemBuilder: (context, index) {
                 final tournament = tournaments[index];
-                // Build a card for each tournament
-                return _buildTournamentCard(context, tournament);
+                return ListTile(
+                  title: Text(tournament.name, style: AppTextStyles.subtitle),
+                  subtitle: Text(
+                    '${tournament.startDate} - ${tournament.endDate}',
+                    style: AppTextStyles.caption,
+                  ),
+                  trailing: Text(
+                    '已記錄 ${tournament.games.length} 局',
+                    style: AppTextStyles.caption,
+                  ),
+                  onTap: () {
+                    // --- Navigate to AddMatchRecordPage on tap ---
+                    print('Navigating for tournament: ${tournament.name}');
+                    
+                    // Access the ViewModel to get ball objects
+                    final weaponViewModel = context.read<WeaponLibraryViewModel>();
+                    final List<BowlingBall> selectedBallObjects = tournament.selectedBallNames
+                        .map((name) {
+                          // Find the ball in the ViewModel's arsenal list
+                          try {
+                            return weaponViewModel.myArsenal.firstWhere((ball) => ball.ball == name);
+                          } catch (e) {
+                            // Handle case where ball might not be found (e.g., deleted after tournament creation)
+                            print('Error finding ball: $name in tournament record. Error: $e');
+                            return null; // Return null if not found
+                          }
+                        })
+                        .where((ball) => ball != null) // Filter out any nulls
+                        .cast<BowlingBall>()
+                        .toList();
+
+                    // Optional: Check if all balls were found
+                    if (selectedBallObjects.length != tournament.selectedBallNames.length) {
+                       print('Warning: Could not find all ball objects for tournament ${tournament.id}');
+                       // Decide how to handle this - maybe show a message or proceed anyway?
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddMatchRecordPage(
+                          tournamentId: tournament.id,
+                          tournamentName: tournament.name,
+                          tournamentLocation: tournament.location,
+                          tournamentDate: tournament.startDate,
+                          tournamentType: tournament.type,
+                          openFormat: tournament.openFormat,
+                          mqGamesPerSession: tournament.mqGamesPerSession,
+                          selectedBalls: selectedBallObjects,
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
             ),
-      // Keep the FAB to add new tournaments
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const BasicTournamentInfoPage()),
-          );
-        },
-        label: const Text('建立賽事'),
-        icon: const Icon(Icons.add),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BasicTournamentInfoPage()),
+                );
+              },
+              child: const Text('建立賽事', style: AppTextStyles.button),
+            ),
+          ),
+        ],
       ),
     );
   }

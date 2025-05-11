@@ -4,7 +4,10 @@ import '../models/score_data.dart';
 import 'pin_selector_popup_widget.dart';
 
 class BowlingScoreTable extends StatefulWidget {
-  const BowlingScoreTable({super.key});
+  final BowlingScoreData? scoreData;
+  final void Function(BowlingScoreData data)? onScoreChanged;
+
+  const BowlingScoreTable({Key? key, this.scoreData, this.onScoreChanged}) : super(key: key);
 
   @override
   State<BowlingScoreTable> createState() => _BowlingScoreTableState();
@@ -16,7 +19,14 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
   @override
   void initState() {
     super.initState();
-    _scoreData = BowlingScoreData.newGame();
+    _scoreData = widget.scoreData ?? BowlingScoreData.newGame();
+  }
+
+  void _updateAndNotify() {
+    setState(() {});
+    if (widget.onScoreChanged != null) {
+      widget.onScoreChanged!(_scoreData);
+    }
   }
 
   Future<void> _handleFrameTap(int frameIndex, {bool isEdit = false}) async {
@@ -96,6 +106,9 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
         // 重新計算分數
         _scoreData.calculateScores();
       });
+      if (widget.onScoreChanged != null) {
+        widget.onScoreChanged!(_scoreData);
+      }
     }
   }
 
@@ -141,6 +154,9 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           _checkAndAdvanceFrame(frameIndex, isEdit: true);
           _scoreData.calculateScores();
         });
+        if (widget.onScoreChanged != null) {
+          widget.onScoreChanged!(_scoreData);
+        }
       }
     } else {
       // 其他情況（如有兩球或三球），清空該格，重新輸入第一球
@@ -156,6 +172,9 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       setState(() {
         _scoreData.calculateScores();
       });
+      if (widget.onScoreChanged != null) {
+        widget.onScoreChanged!(_scoreData);
+      }
     }
   }
 

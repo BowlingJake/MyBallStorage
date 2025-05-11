@@ -6,6 +6,7 @@ import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
 import 'weapon_library_page.dart'; // <-- Add this import
 import 'add_custom_ball_page.dart'; // <-- Add import for the new custom page
 import 'package:bowlingarsenal_app/views/ball_card.dart';
+import '../theme/text_styles.dart';
 
 
 /// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
@@ -150,13 +151,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.isSelectionMode && !_isMultiSelectMode 
-              ? '選擇賽事用球' // Page's own selection mode
-              : _isMultiSelectMode 
-                  ? '選擇要刪除的球具' // Multi-delete mode
-                  : '我的球櫃' // Normal mode
-        ),
+        title: const Text('我的球櫃', style: AppTextStyles.title),
         actions: [
           // Action button for page's selection mode (Confirm)
           if (widget.isSelectionMode && !_isMultiSelectMode)
@@ -182,56 +177,14 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
             ),
           // Batch delete button (only in multi-select mode and if items are selected)
           if (_isMultiSelectMode && _selectedBallNames.isNotEmpty)
-            TextButton.icon(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              label: Text('刪除 (${_selectedBallNames.length})',
-                  style: const TextStyle(color: Colors.red)),
+            TextButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => AlertDialog(
-                    title: const Text('確認刪除'),
-                    content: Text(
-                        '確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？'),
-                    actions: [
-                      TextButton(
-                        child: const Text('取消'),
-                        onPressed: () => Navigator.pop(dialogContext),
-                      ),
-                      TextButton(
-                        child: const Text('刪除',
-                            style: TextStyle(color: Colors.red)),
-                        onPressed: () {
-                          int deletedCount = 0;
-                          List<String> namesToDelete = List.from(_selectedBallNames); // Create a copy for iteration
-                          for (final ballName in namesToDelete) {
-                            try {
-                              final ball = viewModel.myArsenal.firstWhere(
-                                (b) => b.ball == ballName,
-                              );
-                              viewModel.removeBallFromArsenal(ball);
-                              deletedCount++;
-                            } catch (e) {
-                              // Ball might have been removed by another process or not found
-                              print('Error removing ball $ballName: $e');
-                            }
-                          }
-                          Navigator.pop(dialogContext); // Close the dialog
-                          setState(() {
-                            _isMultiSelectMode = false;
-                            _selectedBallNames.clear();
-                          });
-                          if (deletedCount > 0) {
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(content: Text('已刪除 $deletedCount 個球具')),
-                             );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                );
+                _showDeleteConfirmationDialog();
               },
+              child: Text(
+                '刪除 (${_selectedBallNames.length})',
+                style: AppTextStyles.button.copyWith(color: Colors.red),
+              ),
             ),
         ],
       ),
@@ -258,7 +211,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.add_circle_outline),
-                label: const Text('新增保齡球至我的球櫃'),
+                label: const Text('新增保齡球至我的球櫃', style: AppTextStyles.button),
                 onPressed: () => _showAddMethodSelectionDialog(context),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 40),
@@ -345,6 +298,54 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
               tooltip: '新增武器',
               child: const Icon(Icons.add),
             ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('確認刪除'),
+        content: Text(
+            '確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？'),
+        actions: [
+          TextButton(
+            child: const Text('取消'),
+            onPressed: () => Navigator.pop(dialogContext),
+          ),
+          TextButton(
+            child: const Text('刪除',
+                style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              int deletedCount = 0;
+              List<String> namesToDelete = List.from(_selectedBallNames); // Create a copy for iteration
+              final viewModel = context.read<WeaponLibraryViewModel>();
+              for (final ballName in namesToDelete) {
+                try {
+                  final ball = viewModel.myArsenal.firstWhere(
+                    (b) => b.ball == ballName,
+                  );
+                  viewModel.removeBallFromArsenal(ball);
+                  deletedCount++;
+                } catch (e) {
+                  // Ball might have been removed by another process or not found
+                  print('Error removing ball $ballName: $e');
+                }
+              }
+              Navigator.pop(dialogContext); // Close the dialog
+              setState(() {
+                _isMultiSelectMode = false;
+                _selectedBallNames.clear();
+              });
+              if (deletedCount > 0) {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(content: Text('已刪除 $deletedCount 個球具')),
+                 );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 } 

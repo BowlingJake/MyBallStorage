@@ -5,6 +5,7 @@ import 'weapon_library_page.dart';
 import '../shared/dialogs/layout_dialog.dart';
 import 'package:provider/provider.dart';
 import 'my_arsenal_page.dart';
+import '../theme/text_styles.dart';
 
 /// 武器庫主頁 (顯示導航選項)
 class WeaponLibraryHomePage extends StatelessWidget {
@@ -140,7 +141,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('排行榜功能即將推出！')),
+                                    const SnackBar(content: Text('排行榜功能即將推出！', style: AppTextStyles.subtitle)),
                                   );
                                 },
                                 child: Column(
@@ -183,7 +184,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('此功能待更新！')),
+                                    const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
                                   );
                                 },
                                 child: Column(
@@ -221,7 +222,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('此功能待更新！')),
+                                    const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
                                   );
                                 },
                                 child: Column(
@@ -230,7 +231,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     Icon(Icons.build_circle_outlined, color: Colors.white, size: 28), // 使用工具圖標
                                     SizedBox(height: 8),
                                     Text(
-                                      '待更新 2',
+                                      '球具分析',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16, // Slightly smaller font

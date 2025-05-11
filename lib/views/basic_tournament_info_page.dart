@@ -8,6 +8,7 @@ import '../viewmodels/tournament_viewmodel.dart';
 import '../viewmodels/weapon_library_viewmodel.dart'; // For ball selection
 import 'my_arsenal_page.dart'; // For navigating to ball selection
 import '../shared/dialogs/layout_dialog.dart'; // For layout dialog
+import '../theme/text_styles.dart';
 
 // Removed TournamentType and OpenTournamentFormat enums if they were defined here
 // Assuming they are defined in tournament_model.dart or elsewhere
@@ -188,9 +189,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('建立賽事 - 基本資料'),
-      ),
+      appBar: AppBar(title: const Text('建立賽事 - 基本資料', style: AppTextStyles.title)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -201,6 +200,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: '賽事名稱',
+                labelStyle: AppTextStyles.body,
                 icon: Icon(Icons.emoji_events),
                 border: OutlineInputBorder(),
               ),
@@ -223,6 +223,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                     controller: _locationController,
                     decoration: const InputDecoration(
                       labelText: '賽事地點',
+                      labelStyle: AppTextStyles.body,
                       icon: Icon(Icons.location_on),
                       border: OutlineInputBorder(),
                     ),
@@ -239,6 +240,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                 child: InputDecorator(
                   decoration: InputDecoration(
                     labelText: '賽事期間',
+                    labelStyle: AppTextStyles.body,
                     icon: const Icon(Icons.date_range),
                     border: const OutlineInputBorder(),
                     errorText: (_selectedStartDate == null || _selectedEndDate == null) && _formKey.currentState?.validate() == false 
@@ -260,7 +262,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
             // Ball Selection Button
             ElevatedButton.icon(
               icon: const Icon(Icons.sports_baseball), 
-              label: const Text('選擇賽事用球 (可複選)'), // Updated label
+              label: const Text('選擇賽事用球 (可複選)', style: AppTextStyles.button),
               onPressed: () async {
                   // Expect a List<String> now
                   final selectedNames = await Navigator.push<List<String>?>(
@@ -290,7 +292,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
             else
               Padding(
                  padding: const EdgeInsets.only(left: 16.0), 
-                 child: const Text('尚未選擇賽事用球', style: TextStyle(color: Colors.grey)),
+                 child: const Text('尚未選擇賽事用球', style: AppTextStyles.caption),
               ),
 
             const SizedBox(height: 24),
@@ -300,7 +302,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
               padding: const EdgeInsets.only(top: 32.0), // Add space before button
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.arrow_forward),
-                label: const Text('儲存並下一步'),
+                label: const Text('儲存並下一步', style: AppTextStyles.button),
                 onPressed: _saveAndProceed,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),

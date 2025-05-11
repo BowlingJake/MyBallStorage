@@ -4,6 +4,8 @@ import 'tournament_record_page.dart';
 import 'training_page.dart';
 import 'settings_page.dart';
 import 'user_info_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../theme/text_styles.dart';
 
 
 class MainPage extends StatefulWidget {
@@ -33,21 +35,22 @@ class _MainPageState extends State<MainPage> {
         children: [
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset(
-                  'assets/images/logo_placeholder.png',
-                  height: 100,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
+                Flexible(
+                  child: SvgPicture.asset(
+                    'assets/images/app_logo.svg',
+                    height: 60,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.notifications_none, size: 32),
+                  icon: const Icon(Icons.notifications_none, size: 28),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('還沒有新通知')),
+                      const SnackBar(content: Text('還沒有新通知', style: AppTextStyles.body)),
                     );
                   },
                 ),

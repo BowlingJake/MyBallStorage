@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Roll {
   final int pinsDown;
   final Set<int>? pinsStandingAfterThrow;
@@ -10,8 +12,23 @@ class Roll {
     required this.displayScore,
     required this.pinsStandingBeforeThrow,
   });
-}
 
+  Map<String, dynamic> toJson() => {
+    'pinsDown': pinsDown,
+    'pinsStandingAfterThrow': pinsStandingAfterThrow != null ? pinsStandingAfterThrow!.toList() : null,
+    'displayScore': displayScore,
+    'pinsStandingBeforeThrow': pinsStandingBeforeThrow.toList(),
+  };
+
+  factory Roll.fromJson(Map<String, dynamic> json) => Roll(
+    pinsDown: json['pinsDown'] as int,
+    pinsStandingAfterThrow: json['pinsStandingAfterThrow'] != null
+        ? Set<int>.from(json['pinsStandingAfterThrow'] as List)
+        : null,
+    displayScore: json['displayScore'] as String,
+    pinsStandingBeforeThrow: Set<int>.from(json['pinsStandingBeforeThrow'] as List),
+  );
+}
 
 /// 表示單一局 (Frame) 的記錄
 class Frame {
@@ -36,6 +53,19 @@ class Frame {
     return Frame(frameNumber: frameNumber, rolls: []);
   }
 
+  Map<String, dynamic> toJson() => {
+    'frameNumber': frameNumber,
+    'rolls': rolls.map((r) => r.toJson()).toList(),
+    'totalScore': totalScore,
+    'isComplete': isComplete,
+  };
+
+  factory Frame.fromJson(Map<String, dynamic> json) => Frame(
+    frameNumber: json['frameNumber'] as int,
+    rolls: (json['rolls'] as List).map((r) => Roll.fromJson(r)).toList(),
+    totalScore: json['totalScore'] as int?,
+    isComplete: json['isComplete'] as bool? ?? false,
+  );
 }
 class BowlingScoreData {
   /// 包含 10 局的列表
@@ -59,6 +89,22 @@ class BowlingScoreData {
       frames: List.generate(10, (index) => Frame.empty(index + 1)),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'frames': frames.map((f) => f.toJson()).toList(),
+    'currentFrameIndex': currentFrameIndex,
+    'currentRollIndex': currentRollIndex,
+    'pinsStanding': pinsStanding.toList(),
+    'isGameOver': isGameOver,
+  };
+
+  factory BowlingScoreData.fromJson(Map<String, dynamic> json) => BowlingScoreData(
+    frames: (json['frames'] as List).map((f) => Frame.fromJson(f)).toList(),
+    currentFrameIndex: json['currentFrameIndex'] as int? ?? 0,
+    currentRollIndex: json['currentRollIndex'] as int? ?? 0,
+    pinsStanding: Set<int>.from(json['pinsStanding'] as List),
+    isGameOver: json['isGameOver'] as bool? ?? false,
+  );
 
   /// 計算並更新所有局的累計總分
   /// 這是核心的計分邏輯，需要根據保齡球規則實現

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/user_preferences_service.dart';
+import '../theme/text_styles.dart';
 
 class EditUserPage extends StatefulWidget {
   const EditUserPage({Key? key}) : super(key: key);
@@ -75,7 +76,7 @@ class _EditUserPageState extends State<EditUserPage> {
       pap: combinedPap,
     );
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('使用者資訊已儲存')),
+      SnackBar(content: Text('使用者資訊已儲存', style: AppTextStyles.body)),
     );
     // 儲存完成後返回顯示頁面
     Navigator.pop(context);
@@ -92,18 +93,18 @@ class _EditUserPageState extends State<EditUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('編輯使用者資訊')),
+      appBar: AppBar(title: const Text('編輯使用者資訊', style: AppTextStyles.title)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
               TextFormField(
                 controller: _nicknameController,
                 decoration: const InputDecoration(
-                  labelText: '使用者暱稱',
-                  border: OutlineInputBorder(),
+                  labelText: '暱稱',
+                  labelStyle: AppTextStyles.body,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -117,12 +118,12 @@ class _EditUserPageState extends State<EditUserPage> {
                 value: _preferredHand,
                 decoration: const InputDecoration(
                   labelText: '慣用手',
-                  border: OutlineInputBorder(),
+                  labelStyle: AppTextStyles.body,
                 ),
                 items: _handOptions
                     .map((hand) => DropdownMenuItem(
                           value: hand,
-                          child: Text(hand),
+                          child: Text(hand, style: AppTextStyles.body),
                         ))
                     .toList(),
                 onChanged: (value) => setState(() => _preferredHand = value),
@@ -138,12 +139,12 @@ class _EditUserPageState extends State<EditUserPage> {
                 value: _preferredBallPath,
                 decoration: const InputDecoration(
                   labelText: '慣用球路',
-                  border: OutlineInputBorder(),
+                  labelStyle: AppTextStyles.body,
                 ),
                 items: _ballPathOptions
                     .map((path) => DropdownMenuItem(
                           value: path,
-                          child: Text(path),
+                          child: Text(path, style: AppTextStyles.body),
                         ))
                     .toList(),
                 onChanged: (value) => setState(() => _preferredBallPath = value),
@@ -163,7 +164,7 @@ class _EditUserPageState extends State<EditUserPage> {
                       controller: _papBaseController,
                       decoration: const InputDecoration(
                         labelText: '基本 PAP',
-                        border: OutlineInputBorder(),
+                        labelStyle: AppTextStyles.body,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -180,12 +181,12 @@ class _EditUserPageState extends State<EditUserPage> {
                       value: _papOffsetType,
                       decoration: const InputDecoration(
                         labelText: '偏移',
-                        border: OutlineInputBorder(),
+                        labelStyle: AppTextStyles.body,
                       ),
                       items: const [
-                        DropdownMenuItem(value: '無', child: Text('無')),
-                        DropdownMenuItem(value: '上', child: Text('上')),
-                        DropdownMenuItem(value: '下', child: Text('下')),
+                        DropdownMenuItem(value: '無', child: Text('無', style: AppTextStyles.body)),
+                        DropdownMenuItem(value: '上', child: Text('上', style: AppTextStyles.body)),
+                        DropdownMenuItem(value: '下', child: Text('下', style: AppTextStyles.body)),
                       ],
                       onChanged: (value) => setState(() {
                         _papOffsetType = value!;
@@ -203,7 +204,7 @@ class _EditUserPageState extends State<EditUserPage> {
                         controller: _papOffsetController,
                         decoration: InputDecoration(
                           labelText: _papOffsetType == '上' ? '上偏移量' : '下偏移量',
-                          border: const OutlineInputBorder(),
+                          labelStyle: AppTextStyles.body,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -219,7 +220,7 @@ class _EditUserPageState extends State<EditUserPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _saveProfile,
-                child: const Text('儲存'),
+                child: const Text('儲存', style: AppTextStyles.button),
               ),
             ],
           ),

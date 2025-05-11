@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:collection'; // For HashSet
+import 'primary_button.dart';
+import '../theme/text_styles.dart';
 
 class PinSelectorPopupWidget extends StatefulWidget {
   final Set<int> initialPinsDown; // 本球次前已倒的瓶號 (1-10)
@@ -111,7 +113,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
     final List<double> rowLeftPaddingsInPinUnits = [0.0, 0.1, 0.1, 0.1];
 
     return AlertDialog(
-      title: const Text('選擇擊倒的球瓶'),
+      title: const Text('選擇擊倒的球瓶', style: AppTextStyles.title),
       content: SingleChildScrollView( // 確保內容過多時可以滾動
         child: GestureDetector( // 包裹 Column 以偵測滑動
           onPanStart: (details) {
@@ -164,7 +166,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
                   _newlySelectedPins = HashSet<int>.from(List.generate(10, (i) => i + 1));
                 });
               },
-              child: const Text('全倒'),
+              child: const Text('全倒', style: AppTextStyles.button),
             ),
             const SizedBox(width: 8),
             ElevatedButton(
@@ -173,7 +175,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
                   _newlySelectedPins = HashSet<int>.from(List.generate(9, (i) => i + 1)); // 1~9
                 });
               },
-              child: const Text('留10號'),
+              child: const Text('留10號', style: AppTextStyles.button),
             ),
             const SizedBox(width: 8),
             ElevatedButton(
@@ -182,13 +184,13 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
                   _newlySelectedPins = HashSet<int>.from([1,2,3,4,5,6,8,9,10]); // 7號不倒
                 });
               },
-              child: const Text('留7號'),
+              child: const Text('留7號', style: AppTextStyles.button),
             ),
           ],
         ),
         // 原有重設按鈕
         TextButton(
-          child: const Text('重設本次'),
+          child: const Text('重設本次', style: AppTextStyles.button),
           onPressed: () {
             setState(() {
               _newlySelectedPins.clear();
@@ -201,12 +203,12 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
-              child: const Text('取消'),
+              child: const Text('取消', style: AppTextStyles.button),
               onPressed: () => Navigator.of(context).pop(),
             ),
             const SizedBox(width: 8),
-            ElevatedButton(
-              child: const Text('確定'),
+            MyCustomButton(
+              text: '確定',
               onPressed: () => Navigator.of(context).pop(HashSet<int>.from(_newlySelectedPins)),
             ),
           ],
