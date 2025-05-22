@@ -28,35 +28,52 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color appBarColor = const Color(0xFFA3D5DC);
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: null,
+      appBar: AppBar(
+        backgroundColor: appBarColor,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: SizedBox(
+          height: 44,
+          child: SvgPicture.asset(
+            'assets/images/logo_placeholder.png',
+            fit: BoxFit.contain,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, size: 28),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('還沒有新通知', style: AppTextStyles.body)),
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: SvgPicture.asset(
-                    'assets/images/app_logo.svg',
-                    height: 60,
-                    fit: BoxFit.contain,
+          // 頭像與人名區塊（獨立於AppBar下方）
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.account_circle, size: 32, color: Colors.blueGrey),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.notifications_none, size: 28),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('還沒有新通知', style: AppTextStyles.body)),
-                    );
-                  },
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  const Text('鄭行越', style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
           ),
+          // 主體頁面
           Expanded(child: _pages[_currentIndex]),
         ],
       ),
