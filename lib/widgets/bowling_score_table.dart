@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'score_game_widget.dart';
 import '../models/score_data.dart';
 import 'pin_selector_popup_widget.dart';
+import 'tenth_frame_widget.dart';
 
 class BowlingScoreTable extends StatefulWidget {
   final BowlingScoreData? scoreData;
@@ -49,9 +50,11 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
         }
       } else if (currentFrame.rolls.length == 2) {
         // 第三球
-        if (currentFrame.rolls[0].pinsDown == 10 || 
-            (currentFrame.rolls[0].pinsDown + currentFrame.rolls[1].pinsDown == 10)) {
-          // 第一球X 或 前兩球補中，第三球重置
+        if (currentFrame.rolls[0].pinsDown == 10) {
+          // 第一球全倒，第三球重置
+          initialPinsDown = {};
+        } else if (currentFrame.rolls[0].pinsDown + currentFrame.rolls[1].pinsDown == 10) {
+          // 前兩球補中，第三球重置
           initialPinsDown = {};
         } else {
           // 不應該有第三球
@@ -106,9 +109,7 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
         // 重新計算分數
         _scoreData.calculateScores();
       });
-      if (widget.onScoreChanged != null) {
-        widget.onScoreChanged!(_scoreData);
-      }
+      _updateAndNotify();
     }
   }
 
@@ -194,27 +195,41 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
   String? getTenthFrameDisplayScore(int ballIndex, Frame frame) {
     if (frame.rolls.length <= ballIndex) return null;
     final roll = frame.rolls[ballIndex];
+    
     // 第一球
     if (ballIndex == 0) {
       if (roll.pinsDown == 10) return "X";
       return roll.pinsDown.toString();
     }
+    
     // 第二球
     if (ballIndex == 1) {
       if (roll.pinsDown == 10) return "X";
-      if (frame.rolls.length >= 2 && frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
+      if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
         return "/";
       }
       return roll.pinsDown.toString();
     }
+    
     // 第三球
     if (ballIndex == 2) {
-      if (roll.pinsDown == 10) return "X";
-      if (frame.rolls.length >= 3 && frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
-        return "/";
+      // 如果第一球是全倒，第三球可以顯示
+      if (frame.rolls[0].pinsDown == 10) {
+        if (roll.pinsDown == 10) return "X";
+        if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
+          return "/";
+        }
+        return roll.pinsDown.toString();
       }
-      return roll.pinsDown.toString();
+      // 如果前兩球補中，第三球可以顯示
+      else if (frame.rolls[0].pinsDown + frame.rolls[1].pinsDown == 10) {
+        if (roll.pinsDown == 10) return "X";
+        return roll.pinsDown.toString();
+      }
+      // 其他情況不應該有第三球
+      return null;
     }
+    
     return roll.pinsDown.toString();
   }
 
@@ -235,11 +250,13 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           // 不是Strike也不是Spare，結束
           currentFrame.isComplete = true;
           _scoreData.isGameOver = true;
+          _scoreData.currentFrameIndex = -1; // 設置為 -1 表示沒有當前格
         }
       } else if (currentFrame.rolls.length == 3) {
         // 三球結束
         currentFrame.isComplete = true;
         _scoreData.isGameOver = true;
+        _scoreData.currentFrameIndex = -1; // 設置為 -1 表示沒有當前格
       }
     } else {
       // 前九格
@@ -257,35 +274,54 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 計算每個 frame 的寬度，考慮到 10 個 frame 的總寬度
         final double availableWidth = constraints.maxWidth;
         final double frameWidth = availableWidth / 10;
 
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: List.generate(10, (index) {
+            children: List.generate(9, (index) {
               final frame = _scoreData.frames[index];
-              final bool isTenth = (index == 9);
               final bool isCurrentFrame = (index == _scoreData.currentFrameIndex);
 
               return GestureDetector(
                 onTap: isCurrentFrame ? () => _handleFrameTap(index) : null,
-                onLongPress: (index < _scoreData.currentFrameIndex)
-                    ? () async { await _handleFrameEditTap(index); }
-                    : null,
                 child: ScoreFrameWidget(
                   frameNumber: index + 1,
-                  isTenthFrame: isTenth,
-                  ball1Score: frame.rolls.isNotEmpty ? (isTenth ? getTenthFrameDisplayScore(0, frame) : frame.rolls[0].displayScore) : null,
-                  ball2Score: frame.rolls.length > 1 ? (isTenth ? getTenthFrameDisplayScore(1, frame) : frame.rolls[1].displayScore) : null,
-                  ball3Score: isTenth && frame.rolls.length > 2 ? getTenthFrameDisplayScore(2, frame) : null,
+                  isTenthFrame: false,
+                  ball1Score: frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
+                  ball2Score: frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
+                  ball3Score: null,
                   frameTotalScore: frame.totalScore?.toString(),
                   availableWidth: frameWidth,
                   isCurrentFrame: isCurrentFrame,
                 ),
               );
-            }),
+            })..add(
+              TenthFrameWidget(
+                frame: _scoreData.frames[9],
+                isCurrentFrame: (9 == _scoreData.currentFrameIndex),
+                availableWidth: frameWidth,
+                onFrameUpdated: (frame) {
+                  setState(() {
+                    _scoreData.calculateScores();
+                    // 如果第十格完成，設置遊戲結束，但不設置 currentFrameIndex
+                    if (frame.isComplete) {
+                      _scoreData.isGameOver = true;
+                    }
+                  });
+                  if (widget.onScoreChanged != null) {
+                    widget.onScoreChanged!(_scoreData);
+                  }
+                },
+                onGameComplete: () {
+                  setState(() {
+                    _scoreData.isGameOver = true;
+                    _scoreData.currentFrameIndex = -1; // 遊戲結束，取消高亮
+                  });
+                },
+              ),
+            ),
           ),
         );
       },

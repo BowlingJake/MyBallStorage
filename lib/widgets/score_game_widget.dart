@@ -78,14 +78,14 @@ class ScoreFrameWidget extends StatelessWidget {
                   scoreBoxHeight,
                   borderSide,
                   isLeftMost: true,
-                  fontSize: availableWidth * 0.15,
+                  fontSize: availableWidth * 0.25,
                 ),
                 _buildBallScoreBox(
                   ball2Score,
                   smallBoxWidth,
                   scoreBoxHeight,
                   borderSide,
-                  fontSize: availableWidth * 0.15,
+                  fontSize: availableWidth * 0.25,
                 ),
                 if (isTenthFrame)
                   _buildBallScoreBox(
@@ -94,7 +94,7 @@ class ScoreFrameWidget extends StatelessWidget {
                     scoreBoxHeight,
                     borderSide,
                     isRightMost: true,
-                    fontSize: availableWidth * 0.15,
+                    fontSize: availableWidth * 0.25,
                   ),
               ],
             ),
@@ -110,7 +110,7 @@ class ScoreFrameWidget extends StatelessWidget {
               child: Text(
                 frameTotalScore ?? "",
                 style: TextStyle(
-                  fontSize: availableWidth * 0.15,
+                  fontSize: availableWidth * 0.25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
