@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 
 class ArsenalFilterSection extends StatelessWidget {
   final Map<String, String?> selectedFilters;
@@ -32,7 +33,7 @@ class ArsenalFilterSection extends StatelessWidget {
                     items: ['Storm', 'Hammer', 'Brunswick', 'Roto Grip'],
                     onChanged: (value) => onFilterChanged('brand', value),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 12),
                   _buildDropdown(
                     context: context,
                     label: 'Core',
@@ -40,7 +41,7 @@ class ArsenalFilterSection extends StatelessWidget {
                     items: ['Symmetric', 'Asymmetric'],
                     onChanged: (value) => onFilterChanged('core', value),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 12),
                   _buildDropdown(
                     context: context,
                     label: 'Coverstock',
@@ -67,15 +68,10 @@ class ArsenalFilterSection extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.5)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<String>(
+      constraints: BoxConstraints(minWidth: 120),
+      child: GFDropdown<String>(
         value: value,
         hint: Text(label),
-        underline: SizedBox(),
         items: [
           DropdownMenuItem<String>(
             value: null,
@@ -87,6 +83,15 @@ class ArsenalFilterSection extends StatelessWidget {
           )).toList(),
         ],
         onChanged: onChanged,
+        border: BorderSide(
+          color: theme.colorScheme.outline.withOpacity(0.5),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        dropdownButtonColor: theme.colorScheme.surface,
+        dropdownColor: theme.colorScheme.surface,
+        icon: Icon(Icons.keyboard_arrow_down, color: theme.colorScheme.primary),
       ),
     );
   }
