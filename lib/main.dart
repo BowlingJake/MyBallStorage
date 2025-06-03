@@ -1,41 +1,23 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'views/login_page.dart';
-import 'viewmodels/weapon_library_viewmodel.dart';
-import 'viewmodels/tournament_viewmodel.dart';
-import 'viewmodels/practice_viewmodel.dart';
-import 'views/main_page.dart';
-import 'views/home_page.dart';
-import 'shared/theme.dart';
+import 'home_page.dart'; // 引入您的 home_page.dart
+import 'theme/theme.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => WeaponLibraryViewModel()..loadBallData(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => TournamentViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => PracticeViewModel()..loadRecords(),
-        ),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bowling Arsenal App',
-      theme: AppTheme.lightTheme,
-      home: const LoginPage(),
+      title: 'My Bowling App', // 您的應用程式標題
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      home: const HomePage(), // 將 HomePage 設為首頁
+      debugShowCheckedModeBanner: false, // 移除右上角的 Debug 標籤 (可選)
     );
   }
 }
