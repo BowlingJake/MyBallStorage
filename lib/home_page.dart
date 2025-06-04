@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'widgets/user_info_section.dart';
 import 'widgets/arsenal_section.dart';
 import 'widgets/tournament_section.dart';
-import 'my_arsenal_page.dart';
+import 'ball_library_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       if (index == 1) { // 社群按鈕（索引 1）
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MyArsenalPage()),
+          MaterialPageRoute(builder: (context) => const BallLibraryPage()),
         );
       }
       // 其他導覽邏輯可以在這裡添加

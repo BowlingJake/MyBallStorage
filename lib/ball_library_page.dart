@@ -8,16 +8,18 @@ import 'widgets/arsenal_filter_section.dart';
 import 'widgets/arsenal_sort_section.dart';
 import 'widgets/ball_list_header.dart';
 import 'widgets/ball_list_view.dart';
+import 'widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
+import 'my_training_page.dart';
 
-class MyArsenalPage extends StatefulWidget {
-  const MyArsenalPage({super.key});
+class BallLibraryPage extends StatefulWidget {
+  const BallLibraryPage({super.key});
 
   @override
-  State<MyArsenalPage> createState() => _MyArsenalPageState();
+  State<BallLibraryPage> createState() => _BallLibraryPageState();
 }
 
-class _MyArsenalPageState extends State<MyArsenalPage> {
-  List<BowlingBall> _bowlingBalls = [];
+class _BallLibraryPageState extends State<BallLibraryPage> {
+  List<BowlingBall> _bowlingBalls = <BowlingBall>[];
 
   String _searchText = '';
   Map<String, String?> _selectedFilters = {
@@ -42,6 +44,25 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
     });
   }
 
+  // --- Helper function for brand matching ---
+  bool _matchesBrandFilter(String ballBrand, String? selectedBrand) {
+    if (selectedBrand == null) {
+      return true;
+    }
+    // Support partial matching: "Storm" should match "Storm Bowling"
+    return ballBrand.toLowerCase().contains(selectedBrand.toLowerCase());
+  }
+
+  // --- Helper function for core matching ---
+  bool _matchesCoreFilter(String ballCore, String? selectedCore) {
+    if (selectedCore == null) {
+      return true;
+    }
+    // Extract core category (last word) for matching
+    final coreCategory = ballCore.trim().split(' ').last;
+    return coreCategory.toLowerCase() == selectedCore.toLowerCase();
+  }
+
   // 篩選和排序後的列表
   List<BowlingBall> get _filteredAndSortedBalls {
     List<BowlingBall> items = List.from(_bowlingBalls);
@@ -54,15 +75,15 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
       ).toList();
     }
 
-    // 篩選邏輯
+    // 篩選邏輯 - 使用helper方法進行部分匹配
     if (_selectedFilters['brand'] != null) {
-      items = items.where((ball) => ball.brand == _selectedFilters['brand']).toList();
+      items = items.where((ball) => _matchesBrandFilter(ball.brand, _selectedFilters['brand'])).toList();
     }
     if (_selectedFilters['core'] != null) {
-      items = items.where((ball) => ball.core == _selectedFilters['core']).toList();
+      items = items.where((ball) => _matchesCoreFilter(ball.core, _selectedFilters['core'])).toList();
     }
     if (_selectedFilters['coverstock'] != null) {
-      items = items.where((ball) => ball.coverstock == _selectedFilters['coverstock']).toList();
+      items = items.where((ball) => ball.coverstock.toLowerCase().contains(_selectedFilters['coverstock']!.toLowerCase())).toList();
     }
 
     // 排序邏輯
@@ -93,6 +114,11 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
         Navigator.of(context).pop();
       } else if (index == 1) { 
         print('Already on Arsenal page');
+      } else if (index == 3) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MyTrainingPage()),
+        );
       }
     });
   }
@@ -110,7 +136,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
         appBar: GFAppBar(
           backgroundColor: theme.colorScheme.primaryContainer,
           title: Text(
-            'My Arsenal',
+            'Ball Library',
             style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
           ),
         ),
@@ -153,7 +179,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
                 },
                 onBallLongPress: (ball) {
                   print('Show ball options: ${ball.name}');
-                  // TODO: 顯示選項選單
+                  // 顯示球詳細資訊彈出框
+                  showBallDetails(context, ball);
                 },
               ),
             ),
@@ -169,7 +196,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> {
             BottomNavigationBarItem(icon: Icon(Icons.home), label: '首頁'),
             BottomNavigationBarItem(icon: Icon(Icons.people), label: '社群'),
             BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline, size: 36), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.sports_baseball), label: 'Arsenal'),
+            BottomNavigationBarItem(icon: Icon(Icons.sports_baseball), label: 'Training'),
             BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: '個人'),
           ],
         ),

@@ -4,7 +4,7 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 import 'weapon_library_page.dart';
 import '../shared/dialogs/layout_dialog.dart';
 import 'package:provider/provider.dart';
-import 'my_arsenal_page.dart';
+import 'ball_library_page.dart';
 import '../theme/text_styles.dart';
 
 /// 武器庫主頁 (顯示導航選項)
@@ -46,7 +46,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const MyArsenalPage()),
+                              MaterialPageRoute(builder: (context) => const BallLibraryPage()),
                             );
                           },
                           child: Row(

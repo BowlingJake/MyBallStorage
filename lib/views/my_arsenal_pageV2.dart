@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import '../viewmodels/weapon_library_viewmodel.dart';
 import '../models/bowling_ball.dart';
 import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
@@ -82,61 +83,237 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
 
   // --- Filter Dropdown Widget ---
   Widget _buildFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
+    final theme = Theme.of(context);
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       child: Row(
         children: [
           // Brand Filter
           Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedBrandFilter,
-              hint: const Text('品牌'),
-              items: viewModel.arsenalBrands.map((String brand) {
-                return DropdownMenuItem<String>(
-                  value: brand,
-                  child: Text(brand, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedBrandFilter(newValue);
-              },
+            child: SizedBox(
+              height: 48,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton2<String>(
+                  value: viewModel.selectedBrandFilter,
+                  hint: Text(
+                    '品牌',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  items: viewModel.arsenalBrands.map((String brand) {
+                    return DropdownMenuItem<String>(
+                      value: brand,
+                      child: Text(
+                        brand,
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    viewModel.updateSelectedBrandFilter(newValue);
+                  },
+                  isExpanded: true,
+                  buttonStyleData: ButtonStyleData(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.5),
+                        width: 1,
+                      ),
+                      color: theme.colorScheme.surface,
+                    ),
+                  ),
+                  iconStyleData: IconStyleData(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    maxHeight: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    offset: const Offset(0, 0),
+                    scrollbarTheme: ScrollbarThemeData(
+                      radius: const Radius.circular(40),
+                      thickness: WidgetStateProperty.all(6),
+                      thumbVisibility: WidgetStateProperty.all(true),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
           // Core Category Filter
           Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedCoreCategoryFilter,
-              hint: const Text('Core'),
-              items: viewModel.arsenalCoreCategories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedCoreCategoryFilter(newValue);
-              },
+            child: SizedBox(
+              height: 48,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton2<String>(
+                  value: viewModel.selectedCoreCategoryFilter,
+                  hint: Text(
+                    'Core',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  items: viewModel.arsenalCoreCategories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(
+                        category,
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    viewModel.updateSelectedCoreCategoryFilter(newValue);
+                  },
+                  isExpanded: true,
+                  buttonStyleData: ButtonStyleData(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.5),
+                        width: 1,
+                      ),
+                      color: theme.colorScheme.surface,
+                    ),
+                  ),
+                  iconStyleData: IconStyleData(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    maxHeight: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    offset: const Offset(0, 0),
+                    scrollbarTheme: ScrollbarThemeData(
+                      radius: const Radius.circular(40),
+                      thickness: WidgetStateProperty.all(6),
+                      thumbVisibility: WidgetStateProperty.all(true),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
           // Coverstock Category Filter
           Expanded(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: viewModel.selectedCoverstockCategoryFilter,
-              hint: const Text('Cover'),
-              items: viewModel.arsenalCoverstockCategories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                viewModel.updateSelectedCoverstockCategoryFilter(newValue);
-              },
+            child: SizedBox(
+              height: 48,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton2<String>(
+                  value: viewModel.selectedCoverstockCategoryFilter,
+                  hint: Text(
+                    'Cover',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  items: viewModel.arsenalCoverstockCategories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(
+                        category,
+                        style: TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    viewModel.updateSelectedCoverstockCategoryFilter(newValue);
+                  },
+                  isExpanded: true,
+                  buttonStyleData: ButtonStyleData(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.5),
+                        width: 1,
+                      ),
+                      color: theme.colorScheme.surface,
+                    ),
+                  ),
+                  iconStyleData: IconStyleData(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    maxHeight: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: theme.colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    offset: const Offset(0, 0),
+                    scrollbarTheme: ScrollbarThemeData(
+                      radius: const Radius.circular(40),
+                      thickness: WidgetStateProperty.all(6),
+                      thumbVisibility: WidgetStateProperty.all(true),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

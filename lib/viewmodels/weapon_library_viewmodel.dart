@@ -36,9 +36,39 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     return parts.last; // Return last part (works even if no space)
   }
 
+  // --- Helper function for brand matching ---
+  bool _matchesBrandFilter(String ballBrand, String? selectedBrand) {
+    if (selectedBrand == null || selectedBrand == allFilterOption) {
+      return true;
+    }
+    // Support partial matching: "Storm" should match "Storm Bowling"
+    return ballBrand.toLowerCase().contains(selectedBrand.toLowerCase());
+  }
+
+  // --- Helper function to extract simplified brand name for filter options ---
+  String _getSimplifiedBrandName(String fullBrandName) {
+    // Extract the main brand name from full brand name
+    // e.g., "Storm Bowling" -> "Storm", "Hammer Bowling" -> "Hammer"
+    final Map<String, String> brandMapping = {
+      'Storm Bowling': 'Storm',
+      'Hammer Bowling': 'Hammer', 
+      'Brunswick Bowling': 'Brunswick',
+      'Roto Grip': 'Roto Grip',
+      'Motiv Bowling': 'Motiv',
+      'Columbia 300': 'Columbia 300',
+      'Ebonite': 'Ebonite',
+      '900 Global': '900 Global',
+      'Track Bowling': 'Track',
+      'Radical Bowling': 'Radical',
+      'SWAG Bowling': 'SWAG',
+    };
+    
+    return brandMapping[fullBrandName] ?? fullBrandName;
+  }
+
   // --- Dynamic Filter Options --- 
   List<String> get arsenalBrands {
-    final brands = myArsenal.map((ball) => ball.brand).toSet().toList();
+    final brands = myArsenal.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet().toList();
     brands.sort();
     return [allFilterOption, ...brands];
   }
@@ -63,10 +93,8 @@ class WeaponLibraryViewModel extends ChangeNotifier {
       final keywordMatch = currentArsenalSearchKeyword.isEmpty ||
                            ball.ball.toLowerCase().contains(currentArsenalSearchKeyword);
 
-      // Dropdown filters
-      final brandMatch = selectedBrandFilter == null || 
-                         selectedBrandFilter == allFilterOption || 
-                         ball.brand == selectedBrandFilter;
+      // Dropdown filters - use helper method for brand matching
+      final brandMatch = _matchesBrandFilter(ball.brand, selectedBrandFilter);
       final coreCategoryMatch = selectedCoreCategoryFilter == null || 
                                 selectedCoreCategoryFilter == allFilterOption ||
                                 getCoreCategory(ball.core) == selectedCoreCategoryFilter;
@@ -80,7 +108,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
 
   // --- Dynamic Filter Options for All Balls ---
   List<String> get allAvailableBrands {
-    final brands = allBalls.map((ball) => ball.brand).toSet().toList();
+    final brands = allBalls.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet().toList();
     brands.sort();
     return [allFilterOption, ...brands];
   }
@@ -166,10 +194,8 @@ class WeaponLibraryViewModel extends ChangeNotifier {
       final keywordMatch = currentSearchKeyword.isEmpty ||
                            ball.ball.toLowerCase().contains(currentSearchKeyword);
 
-      // Dropdown filters
-      final brandMatch = selectedBrandFilterForSearch == null ||
-                         selectedBrandFilterForSearch == allFilterOption ||
-                         ball.brand == selectedBrandFilterForSearch;
+      // Dropdown filters - use helper method for brand matching
+      final brandMatch = _matchesBrandFilter(ball.brand, selectedBrandFilterForSearch);
       final coreCategoryMatch = selectedCoreCategoryFilterForSearch == null ||
                                 selectedCoreCategoryFilterForSearch == allFilterOption ||
                                 getCoreCategory(ball.core) == selectedCoreCategoryFilterForSearch;
@@ -185,7 +211,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   // --- Helper function to check and reset filters if selected value is no longer valid ---
   void _validateAndResetFilters() {
     // Regenerate options based on current arsenal to check against
-    final currentBrands = myArsenal.map((ball) => ball.brand).toSet();
+    final currentBrands = myArsenal.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet();
     final currentCoreCategories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet();
     final currentCoverstockCategories = myArsenal.map((ball) => ball.coverstockcategory).toSet();
 

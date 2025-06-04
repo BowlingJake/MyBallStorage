@@ -6,7 +6,7 @@ import '../models/bowling_ball.dart';
 import '../models/tournament.dart'; // Correct model import
 import '../viewmodels/tournament_viewmodel.dart';
 import '../viewmodels/weapon_library_viewmodel.dart'; // For ball selection
-import 'my_arsenal_page.dart'; // For navigating to ball selection
+import 'ball_library_page.dart'; // For navigating to ball selection
 import '../shared/dialogs/layout_dialog.dart'; // For layout dialog
 import '../theme/text_styles.dart';
 
@@ -268,7 +268,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                   final selectedNames = await Navigator.push<List<String>?>(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const MyArsenalPage(isSelectionMode: true),
+                          builder: (context) => const BallLibraryPage(isSelectionMode: true),
                       ),
                   );
                   if (selectedNames != null) {

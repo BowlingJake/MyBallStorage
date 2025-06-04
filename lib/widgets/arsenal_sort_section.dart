@@ -18,11 +18,11 @@ class ArsenalSortSection extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       child: Row(
         children: [
-          Text('Sort By:', style: theme.textTheme.titleSmall),
-          SizedBox(width: 8),
+          Text('Sort By:', style: theme.textTheme.labelMedium),
+          SizedBox(width: 6),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -43,7 +43,7 @@ class ArsenalSortSection extends StatelessWidget {
   Widget _buildSortButton(String field, IconData icon, ThemeData theme) {
     final bool isActive = sortBy == field;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4),
+      margin: EdgeInsets.symmetric(horizontal: 2),
       child: GFButton(
         onPressed: () {
           if (sortBy == field) {
@@ -55,7 +55,7 @@ class ArsenalSortSection extends StatelessWidget {
         text: field,
         icon: Icon(
           isActive ? (sortAscending ? Icons.arrow_upward : Icons.arrow_downward) : icon,
-          size: 16,
+          size: 14,
           color: isActive ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
         ),
         type: isActive ? GFButtonType.solid : GFButtonType.outline,
