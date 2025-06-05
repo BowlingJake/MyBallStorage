@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:clay_containers/clay_containers.dart';
+import 'dart:ui';
+import 'package:glass_kit/glass_kit.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'ball_list_view.dart'; // 導入原有的 BowlingBall 模型
 
 // 從球心名稱提取核心類型的輔助函數
@@ -17,6 +19,14 @@ String getCoreCategory(String coreName) {
   return parts.isNotEmpty ? parts.last : '未知';
 }
 
+// 品牌色對照表，可依需求擴充
+const Map<String, List<Color>> brandGradients = {
+  'Storm Bowling': [Color(0xFF00B4D8), Color(0xFF0077B6)],
+  'Motiv Bowling': [Color(0xFFFFA500), Color(0xFFFC7300)],
+  'Brunswick': [Color(0xFF003049), Color(0xFF669BBC)],
+  // 其他品牌可自行加入
+};
+
 class BowlingBallDetailWidget extends StatelessWidget {
   final BowlingBall ball;
 
@@ -28,213 +38,223 @@ class BowlingBallDetailWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // 定義 neumorphic 基礎顏色
-    const Color baseColor = Color(0xFFE8E8E8);
-    
-    // 安全檢查，確保 ball 對象有效
-    if (ball.name.isEmpty && ball.id.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text('球的資料不完整或載入失敗。'),
-        ),
-      );
-    }
+    final size = MediaQuery.of(context).size;
+    // 取得品牌色漸層，若無則用預設
+    final List<Color> baseColors = brandGradients[ball.brand] ?? [Color(0xFF5F72BE), Color(0xFF9B23EA)];
+    final List<Color> gradientColors = [
+      baseColors[0].withOpacity(0.55),
+      baseColors[1].withOpacity(0.35),
+    ];
 
-    return Container(
-      color: baseColor, // 設置背景顏色匹配 clay containers
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 32.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
           children: [
-            // 1. 球的照片區域 - 使用 ClayContainer
-            ClayContainer(
-              color: baseColor,
-              height: 180,
-              width: 180,
-              borderRadius: 16,
-              depth: 40,
-              spread: 6,
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: Image.network(
-                    ball.imageUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: baseColor,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0, 
-                            color: Colors.grey,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: baseColor,
-                        child: const Center(
-                          child: Icon(
-                            Icons.broken_image_outlined, 
-                            size: 40, 
-                            color: Colors.grey,
-                          ),
-                        ),
-                      );
-                    },
+            // 只在彈窗內容區域顯示品牌色漸層背景
+            Container(
+              width: size.width * 2 / 3,
+              constraints: BoxConstraints(
+                maxWidth: 420,
+                minWidth: 280,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: LinearGradient(
+                  colors: gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.10),
+                    blurRadius: 24,
+                    offset: Offset(0, 8),
                   ),
-                ),
+                ],
               ),
-            ),
-            
-            const SizedBox(height: 16.0),
-
-            // 2. 中間區域 (球名和品牌名) - 使用輕微的 emboss 效果
-            ClayContainer(
-              color: baseColor,
-              borderRadius: 12,
-              depth: 12,
-              spread: 3,
-              emboss: true,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                child: Column(
-                  children: [
-                    Text(
-                      ball.name,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                        fontSize: 18,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        color: Colors.white.withOpacity(0.10),
                       ),
                     ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      ball.brand,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
+                  ),
+                  // 內容
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 上方 X 與愛心
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                                onPressed: () => Navigator.of(context).pop(),
+                                tooltip: '關閉',
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.favorite_border, color: Colors.white, size: 26),
+                                onPressed: () {}, // TODO: 收藏功能
+                                tooltip: '收藏',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // 球主圖
+                        Center(
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.12),
+                            ),
+                            child: ClipOval(
+                              child: ball.imageUrl.isNotEmpty
+                                  ? Image.network(
+                                      ball.imageUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        color: Colors.grey[200],
+                                        child: Icon(Icons.sports_baseball, size: 60, color: Colors.grey[400]),
+                                      ),
+                                    )
+                                  : Icon(Icons.sports_baseball, size: 60, color: Colors.white38),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // 標題
+                        Text(
+                          ball.name,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          ball.brand,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        // 上排兩格（球心、球皮）
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Expanded(child: _StatItem(
+                                svgAsset: 'assets/images/core_logo.svg',
+                                label: '球心',
+                                value: getCoreCategory(ball.core),
+                              )),
+                              Expanded(child: _StatItem(
+                                svgAsset: 'assets/images/cover_logo.svg',
+                                label: '球皮',
+                                value: ball.coverstock,
+                              )),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // 下排三格（RG、RG差、MB diff）
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Expanded(child: _StatItem(
+                                icon: Icons.scatter_plot,
+                                label: 'RG',
+                                value: ball.rg?.toStringAsFixed(3) ?? 'N/A',
+                              )),
+                              Expanded(child: _StatItem(
+                                icon: Icons.trending_up,
+                                label: 'RG差',
+                                value: ball.differential?.toStringAsFixed(3) ?? 'N/A',
+                              )),
+                              Expanded(child: _StatItem(
+                                icon: Icons.balance,
+                                label: 'MB',
+                                value: ball.massBias?.toStringAsFixed(3) ?? 'N/A',
+                              )),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            
-            const SizedBox(height: 16.0),
-
-            // 3. SPEC 區域 - 只保留五個主要規格
-            ClayContainer(
-              color: baseColor,
-              borderRadius: 14,
-              depth: 32,
-              spread: 6,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: _buildSpecContent(context, theme, baseColor),
-              ),
-            ),
-            
-            const SizedBox(height: 8.0),
           ],
         ),
       ),
     );
   }
+}
 
-  // SPEC 項目的 Widget
-  Widget _buildSpecItem(BuildContext context, String label, String value, Color baseColor) {
+class _StatItem extends StatelessWidget {
+  final IconData? icon;
+  final String? svgAsset;
+  final String label;
+  final String value;
+
+  const _StatItem({
+    this.icon,
+    this.svgAsset,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return ClayContainer(
-      color: baseColor,
-      borderRadius: 8,
-      depth: 12,
-      spread: 2,
-      emboss: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold, 
-                color: Colors.grey[800],
-                fontSize: 13,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // SPEC "視窗" 的內部內容
-  Widget _buildSpecContent(BuildContext context, ThemeData theme, Color baseColor) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 標題
-        Center(
-          child: Text(
-            "規格參數",
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-              fontSize: 15,
+        if (svgAsset != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: SizedBox(
+              height: 48,
+              width: 48,
+              child: SvgPicture.asset(
+                svgAsset!,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              ),
             ),
           ),
-        ),
-        
-        const SizedBox(height: 10.0),
-        
-        // 第一排：球心類型 和 球皮類型
-        Row(
-          children: [
-            Expanded(child: _buildSpecItem(context, "球心類型", getCoreCategory(ball.core), baseColor)),
-            const SizedBox(width: 8),
-            Expanded(child: _buildSpecItem(context, "球皮類型", ball.coverstock, baseColor)),
-          ],
-        ),
-        
-        const SizedBox(height: 8.0),
-        
-        // 第二排：RG, RG差, Mass Bias
-        Row(
-          children: [
-            Expanded(child: _buildSpecItem(context, "RG", ball.rg?.toStringAsFixed(3) ?? 'N/A', baseColor)),
-            const SizedBox(width: 6),
-            Expanded(child: _buildSpecItem(context, "RG差", ball.differential?.toStringAsFixed(3) ?? 'N/A', baseColor)),
-            const SizedBox(width: 6),
-            Expanded(child: _buildSpecItem(context, "Mass Bias", ball.massBias?.toStringAsFixed(3) ?? 'N/A', baseColor)),
-          ],
+        if (icon != null && svgAsset == null) 
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Icon(icon, color: Colors.white, size: 36),
+          ),
+        Text(
+          value,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
       ],
     );
@@ -255,13 +275,7 @@ void showBallDetails(BuildContext context, BowlingBall ball) {
       minHeight: 200,
     ),
     builder: (builderContext) {
-      return Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-          color: Color(0xFFE8E8E8), // 匹配 neumorphic 基礎顏色
-        ),
-        child: BowlingBallDetailWidget(ball: ball),
-      );
+      return BowlingBallDetailWidget(ball: ball);
     },
   );
 }
