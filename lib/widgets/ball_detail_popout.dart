@@ -27,7 +27,7 @@ const Map<String, List<Color>> brandGradients = {
   // 其他品牌可自行加入
 };
 
-class BowlingBallDetailWidget extends StatelessWidget {
+class BowlingBallDetailWidget extends StatefulWidget {
   final BowlingBall ball;
 
   const BowlingBallDetailWidget({
@@ -36,11 +36,18 @@ class BowlingBallDetailWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<BowlingBallDetailWidget> createState() => _BowlingBallDetailWidgetState();
+}
+
+class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
+  bool isFavorited = false; // 收藏狀態
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     // 取得品牌色漸層，若無則用預設
-    final List<Color> baseColors = brandGradients[ball.brand] ?? [Color(0xFF5F72BE), Color(0xFF9B23EA)];
+    final List<Color> baseColors = brandGradients[widget.ball.brand] ?? [Color(0xFF5F72BE), Color(0xFF9B23EA)];
     final List<Color> gradientColors = [
       baseColors[0].withOpacity(0.55),
       baseColors[1].withOpacity(0.35),
@@ -101,9 +108,18 @@ class BowlingBallDetailWidget extends StatelessWidget {
                                 tooltip: '關閉',
                               ),
                               IconButton(
-                                icon: Icon(Icons.favorite_border, color: Colors.white, size: 26),
-                                onPressed: () {}, // TODO: 收藏功能
-                                tooltip: '收藏',
+                                icon: Icon(
+                                  isFavorited ? Icons.favorite : Icons.favorite_border,
+                                  color: isFavorited ? Colors.red : Colors.white,
+                                  size: 26,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isFavorited = !isFavorited;
+                                  });
+                                  // TODO: 在這裡添加實際的收藏功能邏輯
+                                },
+                                tooltip: isFavorited ? '取消收藏' : '收藏',
                               ),
                             ],
                           ),
@@ -119,9 +135,9 @@ class BowlingBallDetailWidget extends StatelessWidget {
                               color: Colors.white.withOpacity(0.12),
                             ),
                             child: ClipOval(
-                              child: ball.imageUrl.isNotEmpty
+                              child: widget.ball.imageUrl.isNotEmpty
                                   ? Image.network(
-                                      ball.imageUrl,
+                                      widget.ball.imageUrl,
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) => Container(
                                         color: Colors.grey[200],
@@ -135,7 +151,7 @@ class BowlingBallDetailWidget extends StatelessWidget {
                         const SizedBox(height: 18),
                         // 標題
                         Text(
-                          ball.name,
+                          widget.ball.name,
                           style: theme.textTheme.headlineMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -145,7 +161,7 @@ class BowlingBallDetailWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          ball.brand,
+                          widget.ball.brand,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white70,
                             fontWeight: FontWeight.w500,
@@ -161,12 +177,12 @@ class BowlingBallDetailWidget extends StatelessWidget {
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/core_logo.svg',
                                 label: '球心',
-                                value: getCoreCategory(ball.core),
+                                value: widget.ball.core.isNotEmpty ? widget.ball.core : '未知',
                               )),
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/cover_logo.svg',
                                 label: '球皮',
-                                value: ball.coverstock,
+                                value: widget.ball.coverstockName.isNotEmpty ? widget.ball.coverstockName : '未知',
                               )),
                             ],
                           ),
@@ -178,19 +194,19 @@ class BowlingBallDetailWidget extends StatelessWidget {
                           child: Row(
                             children: [
                               Expanded(child: _StatItem(
-                                icon: Icons.scatter_plot,
+                                svgAsset: 'assets/images/rg_logo.svg',
                                 label: 'RG',
-                                value: ball.rg?.toStringAsFixed(3) ?? 'N/A',
+                                value: widget.ball.rg?.toStringAsFixed(3) ?? 'N/A',
                               )),
                               Expanded(child: _StatItem(
                                 icon: Icons.trending_up,
                                 label: 'RG差',
-                                value: ball.differential?.toStringAsFixed(3) ?? 'N/A',
+                                value: widget.ball.differential?.toStringAsFixed(3) ?? 'N/A',
                               )),
                               Expanded(child: _StatItem(
                                 icon: Icons.balance,
                                 label: 'MB',
-                                value: ball.massBias?.toStringAsFixed(3) ?? 'N/A',
+                                value: widget.ball.massBias?.toStringAsFixed(3) ?? 'N/A',
                               )),
                             ],
                           ),
@@ -230,10 +246,10 @@ class _StatItem extends StatelessWidget {
       children: [
         if (svgAsset != null)
           Padding(
-            padding: const EdgeInsets.only(bottom: 4),
+            padding: const EdgeInsets.only(bottom: 8),
             child: SizedBox(
-              height: 48,
-              width: 48,
+              height: 32,
+              width: 32,
               child: SvgPicture.asset(
                 svgAsset!,
                 colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
@@ -243,18 +259,18 @@ class _StatItem extends StatelessWidget {
         if (icon != null && svgAsset == null) 
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Icon(icon, color: Colors.white, size: 36),
+            child: Icon(icon, color: Colors.white, size: 32),
           ),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 14,
           ),
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
-          maxLines: 1,
+          maxLines: 2,
         ),
       ],
     );

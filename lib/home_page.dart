@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.nightlight_round, color: Theme.of(context).colorScheme.onBackground), 
+          icon: Icon(Icons.nightlight_round, color: Theme.of(context).colorScheme.onSurface), 
           onPressed: () {
             // 狀態切換邏輯
             print('Leading icon pressed');

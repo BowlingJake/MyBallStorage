@@ -31,13 +31,30 @@ final ThemeData lightTheme = ThemeData(
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(20),
       ),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      elevation: 2,
+      shadowColor: Colors.black26,
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: primaryColor, // TextButton 文字顏色
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    ),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: primaryColor,
+      side: BorderSide(color: primaryColor, width: 1.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     ),
   ),
   // 其他如 textTheme, inputDecorationTheme 等等
@@ -52,6 +69,37 @@ final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark, // 明確指定是深色主題
     // 您可以在這裡覆蓋 fromSeed 生成的特定顏色，例如：
     // secondary: Colors.tealAccent,
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      elevation: 2,
+      shadowColor: Colors.black26,
+    ),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      foregroundColor: primaryColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    ),
+  ),
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: primaryColor,
+      side: BorderSide(color: primaryColor, width: 1.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    ),
   ),
   // 針對深色主題的特定 AppBarTheme, ElevatedButtonTheme 等設定
   // appBarTheme: AppBarTheme(

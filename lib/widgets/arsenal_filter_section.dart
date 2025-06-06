@@ -19,7 +19,7 @@ class ArsenalFilterSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
       child: Row(
         children: [
-          Text('Filter:', style: theme.textTheme.labelMedium),
+          Text('Filter', style: theme.textTheme.labelMedium),
           SizedBox(width: 6),
           Expanded(
             child: Row(
@@ -52,7 +52,7 @@ class ArsenalFilterSection extends StatelessWidget {
                     context: context,
                     label: 'Coverstock',
                     value: selectedFilters['coverstock'],
-                    items: ['Solid', 'Pearl', 'Hybrid'],
+                    items: ['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'],
                     onChanged: (value) => onFilterChanged('coverstock', value),
                   ),
                 ),
@@ -113,7 +113,7 @@ class ArsenalFilterSection extends StatelessWidget {
           height: 40,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: theme.colorScheme.outline.withOpacity(0.5),
               width: 1,
@@ -131,7 +131,7 @@ class ArsenalFilterSection extends StatelessWidget {
         dropdownStyleData: DropdownStyleData(
           maxHeight: 200,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(16),
             color: theme.colorScheme.surface,
             boxShadow: [
               BoxShadow(

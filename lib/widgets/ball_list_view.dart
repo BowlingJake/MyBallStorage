@@ -49,7 +49,8 @@ class BowlingBall {
   final String id;
   final String name;
   final String brand;
-  final String coverstock;
+  final String coverstock; // 球皮類型（用於卡片顯示）
+  final String coverstockName; // 球皮完整名稱（用於詳細視窗）
   final String core;
   final String imageUrl; // Not used in the new card design directly
   final double? rg; // RG (徑向迴轉半徑)
@@ -61,6 +62,7 @@ class BowlingBall {
     required this.name,
     required this.brand,
     required this.coverstock,
+    this.coverstockName = '',
     required this.core,
     this.imageUrl = 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball',
     this.rg,
@@ -80,6 +82,7 @@ class BowlingBall {
       name: json['Ball'] ?? '',
       brand: json['Brand'] ?? '',
       coverstock: json['Coverstock Category'] ?? '',
+      coverstockName: json['Coverstock Name'] ?? '',
       core: json['Core'] ?? '',
       imageUrl: '', // 你可以根據需求加上圖片欄位
       rg: parseDouble(json['RG']),

@@ -63,6 +63,34 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
     return coreCategory.toLowerCase() == selectedCore.toLowerCase();
   }
 
+  // --- Helper function for coverstock matching ---
+  bool _matchesCoverstockFilter(String ballCoverstock, String? selectedCoverstock) {
+    if (selectedCoverstock == null) {
+      return true;
+    }
+    
+    final coverLower = ballCoverstock.toLowerCase();
+    final selectedLower = selectedCoverstock.toLowerCase();
+    
+    // Priority matching: Urethane and Polyester take precedence
+    if (selectedLower == 'urethane') {
+      return coverLower.contains('urethane');
+    } else if (selectedLower == 'polyester') {
+      return coverLower.contains('polyester') || coverLower.contains('poly');
+    }
+    
+    // For reactive types, match the category
+    if (selectedLower == 'solid reactive') {
+      return coverLower.contains('solid') && coverLower.contains('reactive');
+    } else if (selectedLower == 'pearl reactive') {
+      return coverLower.contains('pearl') && coverLower.contains('reactive');
+    } else if (selectedLower == 'hybrid reactive') {
+      return coverLower.contains('hybrid') && coverLower.contains('reactive');
+    }
+    
+    return false;
+  }
+
   // 篩選和排序後的列表
   List<BowlingBall> get _filteredAndSortedBalls {
     List<BowlingBall> items = List.from(_bowlingBalls);
@@ -83,7 +111,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
       items = items.where((ball) => _matchesCoreFilter(ball.core, _selectedFilters['core'])).toList();
     }
     if (_selectedFilters['coverstock'] != null) {
-      items = items.where((ball) => ball.coverstock.toLowerCase().contains(_selectedFilters['coverstock']!.toLowerCase())).toList();
+      items = items.where((ball) => _matchesCoverstockFilter(ball.coverstock, _selectedFilters['coverstock'])).toList();
     }
 
     // 排序邏輯
@@ -94,10 +122,25 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
           comparison = a.name.compareTo(b.name);
           break;
         case 'RG':
-          comparison = 0; // 佔位
+          // RG 排序，如果其中一個沒有 RG 值，將其排在後面
+          if (a.rg == null && b.rg == null) {
+            // 如果都沒有 RG 值，按名稱排序
+            comparison = a.name.compareTo(b.name);
+          } else if (a.rg == null) {
+            comparison = 1; // a 排在後面
+          } else if (b.rg == null) {
+            comparison = -1; // b 排在後面
+          } else {
+            // 都有 RG 值，比較 RG
+            comparison = a.rg!.compareTo(b.rg!);
+            // 如果 RG 相同，按名稱排序
+            if (comparison == 0) {
+              comparison = a.name.compareTo(b.name);
+            }
+          }
           break;
         default:
-          comparison = 0;
+          comparison = a.name.compareTo(b.name);
       }
       return _sortAscending ? comparison : -comparison;
     });
