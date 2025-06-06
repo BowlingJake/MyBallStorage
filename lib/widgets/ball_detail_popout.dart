@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:glass_kit/glass_kit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'ball_list_view.dart'; // 導入原有的 BowlingBall 模型
+import '../theme/brand_colors.dart'; // 導入品牌色定義
 
 // 從球心名稱提取核心類型的輔助函數
 String getCoreCategory(String coreName) {
@@ -19,21 +19,13 @@ String getCoreCategory(String coreName) {
   return parts.isNotEmpty ? parts.last : '未知';
 }
 
-// 品牌色對照表，可依需求擴充
-const Map<String, List<Color>> brandGradients = {
-  'Storm Bowling': [Color(0xFF00B4D8), Color(0xFF0077B6)],
-  'Motiv Bowling': [Color(0xFFFFA500), Color(0xFFFC7300)],
-  'Brunswick': [Color(0xFF003049), Color(0xFF669BBC)],
-  // 其他品牌可自行加入
-};
-
 class BowlingBallDetailWidget extends StatefulWidget {
   final BowlingBall ball;
 
   const BowlingBallDetailWidget({
-    Key? key,
+    super.key,
     required this.ball,
-  }) : super(key: key);
+  });
 
   @override
   State<BowlingBallDetailWidget> createState() => _BowlingBallDetailWidgetState();
@@ -46,8 +38,8 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
-    // 取得品牌色漸層，若無則用預設
-    final List<Color> baseColors = brandGradients[widget.ball.brand] ?? [Color(0xFF5F72BE), Color(0xFF9B23EA)];
+    // 取得品牌色漸層，使用完整的品牌色定義
+    final List<Color> baseColors = getGradientColorsForBrand(widget.ball.brand, theme);
     final List<Color> gradientColors = [
       baseColors[0].withOpacity(0.55),
       baseColors[1].withOpacity(0.35),
@@ -80,7 +72,9 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                   ),
                 ],
               ),
+              clipBehavior: Clip.none, // 關鍵：允許內容超出邊界
               child: Stack(
+                clipBehavior: Clip.none, // Stack 也不裁切
                 children: [
                   Positioned.fill(
                     child: BackdropFilter(
@@ -127,24 +121,139 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                         const SizedBox(height: 8),
                         // 球主圖
                         Center(
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.12),
-                            ),
-                            child: ClipOval(
-                              child: widget.ball.imageUrl.isNotEmpty
-                                  ? Image.network(
-                                      widget.ball.imageUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => Container(
-                                        color: Colors.grey[200],
-                                        child: Icon(Icons.sports_baseball, size: 60, color: Colors.grey[400]),
+                          child: Transform.translate(
+                            offset: const Offset(0, -10), // 整體往上移動 10px
+                            child: Stack(
+                              alignment: Alignment.center,
+                              clipBehavior: Clip.none, // 球圖片Stack也不裁切
+                              children: [
+                                // Spotlight 背景光源 - 球正後方的柔光效果
+                                Positioned(
+                                  child: Container(
+                                    width: 130, // 球直徑 × 1.3 (100 × 1.3)
+                                    height: 130,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: RadialGradient(
+                                        center: Alignment.center,
+                                        radius: 0.8,
+                                        colors: [
+                                          Colors.grey.withOpacity(0.15), // 中心淺灰白
+                                          Colors.white.withOpacity(0.08), // 中間層白光
+                                          Colors.transparent, // 邊緣透明
+                                        ],
+                                        stops: [0.0, 0.5, 1.0],
                                       ),
-                                    )
-                                  : Icon(Icons.sports_baseball, size: 60, color: Colors.white38),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.white.withOpacity(0.06),
+                                          blurRadius: 22, // 20-24px 模糊讓光暈更柔和
+                                          spreadRadius: 0,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                // 陰影：使用 Positioned 放在球下方
+                                Positioned(
+                                  bottom: -18, // 放在球底部下方
+                                  child: Container(
+                                    width: 100 * 0.9,
+                                    height: 100 * 0.28,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.05),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          blurRadius: 25,
+                                          spreadRadius: 1,
+                                          offset: const Offset(0, 2),
+                                          color: Colors.black.withOpacity(0.15),
+                                        ),
+                                      ],
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.elliptical(45, 14)), // 橢圓形
+                                    ),
+                                  ),
+                                ),
+                                // 頂層球圖片 - 更明顯的內陰影效果
+                                Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withOpacity(0.12),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // 球圖片
+                                      ClipOval(
+                                        child: widget.ball.imageUrl.isNotEmpty
+                                            ? widget.ball.imageUrl.startsWith('assets/')
+                                                ? Image.asset(
+                                                    widget.ball.imageUrl,
+                                                    fit: BoxFit.cover,
+                                                    filterQuality: FilterQuality.high,
+                                                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                      'assets/images/sample_strikeTrack.png',
+                                                      fit: BoxFit.cover,
+                                                      filterQuality: FilterQuality.high,
+                                                    ),
+                                                  )
+                                                : Image.network(
+                                                    widget.ball.imageUrl,
+                                                    fit: BoxFit.cover,
+                                                    filterQuality: FilterQuality.high,
+                                                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                      'assets/images/sample_strikeTrack.png',
+                                                      fit: BoxFit.cover,
+                                                      filterQuality: FilterQuality.high,
+                                                    ),
+                                                  )
+                                            : Image.asset(
+                                                'assets/images/sample_strikeTrack.png',
+                                                fit: BoxFit.cover,
+                                                filterQuality: FilterQuality.high,
+                                              ),
+                                      ),
+                                      // 接觸陰影 - 球底部內側的窄暗帶（環境遮蔽）
+                                      ClipOval(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: RadialGradient(
+                                              center: Alignment(0, 0.7), // 靠近底部中心
+                                              radius: 0.6,
+                                              colors: [
+                                                Colors.transparent,
+                                                Colors.black.withOpacity(0.25), // 接觸陰影較深
+                                              ],
+                                              stops: [0.7, 1.0], // 只在邊緣很窄的範圍
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // 內陰影疊加層
+                                      ClipOval(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: RadialGradient(
+                                              center: Alignment(-0.3, -0.3), // 左上角偏移
+                                              radius: 0.8,
+                                              colors: [
+                                                Colors.black.withOpacity(0.15), // 更明顯的陰影
+                                                Colors.black.withOpacity(0.05),
+                                                Colors.transparent,
+                                              ],
+                                              stops: [0.0, 0.4, 0.8],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -187,7 +296,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 16),
                         // 下排三格（RG、RG差、MB diff）
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -211,7 +320,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
@@ -241,38 +350,45 @@ class _StatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (svgAsset != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: SizedBox(
-              height: 32,
-              width: 32,
-              child: SvgPicture.asset(
-                svgAsset!,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              ),
+    return SizedBox(
+      height: 110, // 增加高度給文字更多空間
+      child: Column(
+        children: [
+          // 圖示區域固定高度
+          SizedBox(
+            height: 56, // 圖示區域固定高度
+            child: Center(
+              child: svgAsset != null
+                  ? SizedBox(
+                      height: 48,
+                      width: 48,
+                      child: SvgPicture.asset(
+                        svgAsset!,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      ),
+                    )
+                  : (icon != null
+                      ? Icon(icon, color: Colors.white, size: 48)
+                      : SizedBox.shrink()),
             ),
           ),
-        if (icon != null && svgAsset == null) 
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 4),
+          // 文字區域
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
           ),
-        Text(
-          value,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -295,3 +411,4 @@ void showBallDetails(BuildContext context, BowlingBall ball) {
     },
   );
 }
+

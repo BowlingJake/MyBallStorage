@@ -77,6 +77,21 @@ class BowlingBall {
       return double.tryParse(value);
     }
 
+    // Helper function to get image URL based on ball name
+    String getImageUrl(String ballName) {
+      // 檢查是否有對應的本地圖片
+      if (ballName == 'Jackal EXJ') {
+        return 'assets/images/Jackal EXJ.jpg';
+      }
+      // 可以在這裡添加更多球的圖片映射
+      // if (ballName == 'Other Ball Name') {
+      //   return 'assets/images/Other Ball Name.jpg';
+      // }
+      
+      // 如果沒有對應圖片，返回預設的佔位符
+      return 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball';
+    }
+
     return BowlingBall(
       id: json['Ball'] ?? '',
       name: json['Ball'] ?? '',
@@ -84,7 +99,7 @@ class BowlingBall {
       coverstock: json['Coverstock Category'] ?? '',
       coverstockName: json['Coverstock Name'] ?? '',
       core: json['Core'] ?? '',
-      imageUrl: '', // 你可以根據需求加上圖片欄位
+      imageUrl: getImageUrl(json['Ball'] ?? ''),
       rg: parseDouble(json['RG']),
       differential: parseDouble(json['Diff']),
       massBias: parseDouble(json['MB Diff']),
