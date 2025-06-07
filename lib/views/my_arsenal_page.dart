@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/ball_placeholder_card.dart';
+import '../widgets/arsenal_action_buttons.dart';
+import 'package:getwidget/getwidget.dart';
 
 final bottomIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -18,14 +20,29 @@ class MyArsenalPage extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-          ),
-          itemCount: 4,
-          itemBuilder: (context, index) => const BallPlaceholderCard(),
+        child: Column(
+          children: [
+            ArsenalActionButtons(
+              onAddPressed: () {},
+              onAnalyzePressed: () {},
+            ),
+            const SizedBox(height: 16),
+            GFCard(
+              padding: const EdgeInsets.all(8),
+              content: SizedBox(
+                height: 300,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                  ),
+                  itemCount: 4,
+                  itemBuilder: (context, index) => const BallPlaceholderCard(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: NavigationBar(
