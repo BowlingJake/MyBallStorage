@@ -5,6 +5,7 @@ import 'widgets/arsenal_section.dart';
 import 'widgets/tournament_section.dart';
 import 'ball_library_page.dart';
 import 'views/my_arsenal_page.dart';
+import 'demo/brand_palette_demo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePage extends StatefulWidget {
@@ -49,6 +50,25 @@ class _HomePageState extends State<HomePage> {
             print('Leading icon pressed');
           },
         ),
+        actions: [
+          // 調色板示例入口（開發者選項）
+          IconButton(
+            icon: Icon(
+              Icons.palette_outlined, 
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              size: 20,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BrandPaletteDemoPage(),
+                ),
+              );
+            },
+            tooltip: '品牌色調色板示例',
+          ),
+        ],
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,

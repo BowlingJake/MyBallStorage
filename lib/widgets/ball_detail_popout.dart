@@ -38,11 +38,11 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
-    // 取得品牌色漸層，使用完整的品牌色定義
-    final List<Color> baseColors = getGradientColorsForBrand(widget.ball.brand, theme);
+    // 取得品牌色調色板，使用降飽和度的柔和色彩
+    final brandPalette = getBrandTonalPalette(widget.ball.brand, theme);
     final List<Color> gradientColors = [
-      baseColors[0].withOpacity(0.55),
-      baseColors[1].withOpacity(0.35),
+      brandPalette.shade400.withOpacity(0.55),
+      brandPalette.shade500.withOpacity(0.35),
     ];
 
     return Center(

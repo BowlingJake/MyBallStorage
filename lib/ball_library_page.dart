@@ -176,15 +176,40 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
-        appBar: GFAppBar(
-          backgroundColor: theme.colorScheme.primaryContainer,
+        appBar: AppBar(
+          // 改為白底配品牌色圖標的設計
+          backgroundColor: Colors.white,
+          foregroundColor: theme.colorScheme.primary,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           title: Text(
             'Ball Library',
-            style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          // 添加細微的底部邊框
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    theme.colorScheme.outlineVariant.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
         body: Column(
           children: [
+            // 搜尋列
             ArsenalSearchBar(
               searchText: _searchText,
               onSearchChanged: (value) {
@@ -193,6 +218,11 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                 });
               },
             ),
+            
+            // 16dp 間距
+            const SizedBox(height: 16),
+            
+            // 過濾器區域
             ArsenalFilterSection(
               selectedFilters: _selectedFilters,
               onFilterChanged: (filterType, value) {
@@ -201,6 +231,11 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                 });
               },
             ),
+            
+            // 16dp 間距
+            const SizedBox(height: 16),
+            
+            // 排序區域
             ArsenalSortSection(
               sortBy: _sortBy,
               sortAscending: _sortAscending,
@@ -211,7 +246,14 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                 });
               },
             ),
+            
+            // 列表標題
             BallListHeader(),
+            
+            // 16dp 間距
+            const SizedBox(height: 16),
+            
+            // 球列表
             Expanded(
               child: BallListView(
                 balls: _filteredAndSortedBalls,
@@ -229,18 +271,102 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: theme.colorScheme.primary,
-          unselectedItemColor: Colors.grey,
-          currentIndex: _bottomNavIndex,
-          onTap: _onBottomNavTapped,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: '首頁'),
-            BottomNavigationBarItem(icon: Icon(Icons.people), label: '社群'),
-            BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline, size: 36), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.sports_baseball), label: 'Training'),
-            BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: '個人'),
+        bottomNavigationBar: _buildGradientNavigationBar(theme),
+      ),
+    );
+  }
+
+
+
+  /// 漸層效果設計
+  Widget _buildGradientNavigationBar(ThemeData theme) {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.surface,
+            theme.colorScheme.surfaceContainerHighest,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildGradientNavItem(Icons.home, '首頁', 0, theme),
+            _buildGradientNavItem(Icons.people, '社群', 1, theme),
+            _buildGradientNavItem(Icons.add_circle_outline, '', 2, theme, isCenter: true),
+            _buildGradientNavItem(Icons.sports_baseball, 'Training', 3, theme),
+            _buildGradientNavItem(Icons.account_circle, '個人', 4, theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradientNavItem(IconData icon, String label, int index, ThemeData theme, {bool isCenter = false}) {
+    final bool isSelected = _bottomNavIndex == index;
+    return GestureDetector(
+      onTap: () => _onBottomNavTapped(index),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(isCenter ? 12 : 8),
+              decoration: isSelected
+                ? BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        theme.colorScheme.primary,
+                        theme.colorScheme.primary.withOpacity(0.7),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  )
+                : null,
+              child: Icon(
+                icon,
+                color: isSelected 
+                  ? Colors.white
+                  : theme.colorScheme.onSurface.withOpacity(0.6),
+                size: isCenter ? 28 : 24,
+              ),
+            ),
+            if (label.isNotEmpty) ...[
+              SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected 
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
           ],
         ),
       ),

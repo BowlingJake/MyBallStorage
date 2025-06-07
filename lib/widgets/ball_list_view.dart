@@ -21,26 +21,20 @@ Color adjustHue(Color color, double hueDelta) {
 
 // Helper function to create radial gradient overlay for matte effect
 RadialGradient createMatteOverlay(List<Color> brandColors) {
-  // Get the primary brand color (first color in the gradient)
   Color primaryColor = brandColors.first;
-  
-  // Create colors with subtle hue adjustments for natural matte effect
-  Color matteColor1 = adjustHue(primaryColor, 15.0);  // +15度 (恢復原本)
-  Color matteColor2 = adjustHue(primaryColor, -12.0); // -12度 (稍微調整)
-  
-  // Debug: 打印霧面效果顏色
-  print('Natural Matte - Primary: $primaryColor, +15°: $matteColor1, -12°: $matteColor2');
+  Color matteColor1 = adjustHue(primaryColor, 15.0);
+  Color matteColor2 = adjustHue(primaryColor, -12.0);
   
   return RadialGradient(
-    center: Alignment(0.3, -0.2), // 恢復原本位置
-    radius: 1.4, // 適中的範圍
+    center: const Alignment(0.3, -0.2),
+    radius: 1.4,
     colors: [
-      matteColor1.withOpacity(0.18), // 降低透明度避免紋路
-      matteColor2.withOpacity(0.12), // 更自然的疊加
-      primaryColor.withOpacity(0.06), // 微弱的原色疊加
-      Colors.transparent, // 邊緣透明
+      matteColor1.withOpacity(0.18),
+      matteColor2.withOpacity(0.12),
+      primaryColor.withOpacity(0.06),
+      Colors.transparent,
     ],
-    stops: [0.0, 0.4, 0.7, 1.0], // 簡化停止點
+    stops: const [0.0, 0.4, 0.7, 1.0],
   );
 }
 
@@ -71,24 +65,15 @@ class BowlingBall {
   });
 
   factory BowlingBall.fromJson(Map<String, dynamic> json) {
-    // Helper function to parse string to double safely
     double? parseDouble(String? value) {
       if (value == null || value.isEmpty) return null;
       return double.tryParse(value);
     }
 
-    // Helper function to get image URL based on ball name
     String getImageUrl(String ballName) {
-      // 檢查是否有對應的本地圖片
       if (ballName == 'Jackal EXJ') {
         return 'assets/images/Jackal EXJ.jpg';
       }
-      // 可以在這裡添加更多球的圖片映射
-      // if (ballName == 'Other Ball Name') {
-      //   return 'assets/images/Other Ball Name.jpg';
-      // }
-      
-      // 如果沒有對應圖片，返回預設的佔位符
       return 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball';
     }
 
@@ -114,9 +99,9 @@ class _GridPainter extends CustomPainter {
   final double spacing;
 
   _GridPainter({
-    this.gridColor = Colors.white24, // Color of the grid lines
-    this.strokeWidth = 0.5,          // Thickness of the grid lines
-    this.spacing = 8.0,             // Spacing between grid lines
+    this.gridColor = Colors.white24,
+    this.strokeWidth = 0.5,
+    this.spacing = 8.0,
   });
 
   @override
@@ -126,12 +111,10 @@ class _GridPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
-    // Draw vertical lines
     for (double i = spacing; i < size.width; i += spacing) {
       canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
     }
 
-    // Draw horizontal lines
     for (double i = spacing; i < size.height; i += spacing) {
       canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
     }
@@ -145,7 +128,7 @@ class _GridPainter extends CustomPainter {
   }
 }
 
-// Custom Card Item Widget
+// Custom Card Item Widget with Color Ring Design
 class _BallCardItem extends StatelessWidget {
   final BowlingBall ball;
   final ThemeData theme;
@@ -162,167 +145,137 @@ class _BallCardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use brand-specific gradient colors
-    final List<Color> gradientColors = getGradientColorsForBrand(ball.brand, theme);
-    
-    // Debug: 打印品牌名稱和具體顏色值
-    print('Ball: ${ball.name}, Brand: "${ball.brand}"');
-    print('Colors: ${gradientColors.map((c) => c.toString()).join(', ')}');
+    final brandPalette = getBrandTonalPalette(ball.brand, theme);
+    final List<Color> gradientColors = brandPalette.getCardGradient();
+    final bool isWarmColor = brandPalette.isWarmColor();
+    final ringColor = brandPalette.shade600;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18), // 確保內容也遵循圓角
+        border: Border.all(
+          color: ringColor,
+          width: 4,
+        ),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15), // 陰影顏色
-            blurRadius: 6, // 模糊半徑
-            spreadRadius: 0, // 擴散半徑為0，讓陰影更集中乾淨
-            offset: const Offset(0, 3), // 垂直偏移，營造浮起感
+            color: ringColor.withOpacity(0.2),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            spreadRadius: 1,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
       child: Container(
-        // Apply brand gradient to the entire card
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18), // 確保內容也遵循圓角
-          gradient: LinearGradient(
-            colors: gradientColors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Container(
-          // Add radial gradient overlay for matte effect
-          decoration: BoxDecoration(
-            gradient: createMatteOverlay(gradientColors),
-          ),
-          child: Container(
-            // Add very light overlay for better text readability while keeping colors vibrant
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withOpacity(0.10), // 稍微提高可讀性
-                  Colors.white.withOpacity(0.08), // 保持自然
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+          borderRadius: BorderRadius.circular(18),
+          color: Colors.grey[50],
+          // 微灰白色背景，既不刺眼又讓色環突出
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 3,
+              spreadRadius: 0,
+              offset: const Offset(0, 1),
             ),
-            child: InkWell(
-              onTap: onTap,
-              onLongPress: onLongPress,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        ball.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[900],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        ball.brand,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: ringColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6.0),
+                      Row(
                         children: [
-                          // Line 1: Ball Name
-                          Text(
-                            ball.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // 改為白色以在鮮豔背景上更清晰
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(1, 1),
-                                  blurRadius: 3,
-                                  color: Colors.black.withOpacity(0.7),
-                                ),
-                              ],
+                          Expanded(
+                            child: Text(
+                              "Core Type: ${getCoreCategory(ball.core)}",
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4.0),
-                          // Line 2: Brand Name
-                          Text(
-                            ball.brand,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withOpacity(0.95),
-                              fontWeight: FontWeight.w500,
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(1, 1),
-                                  blurRadius: 2,
-                                  color: Colors.black.withOpacity(0.6),
-                                ),
-                              ],
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 1,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(0.5),
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 6.0),
-                          // Line 3: Core Type | Cover Type
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "Core Type: ${getCoreCategory(ball.core)}",
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: Colors.white.withOpacity(0.9),
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1, 1),
-                                        blurRadius: 2,
-                                        color: Colors.black.withOpacity(0.6),
-                                      ),
-                                    ],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Cover Type: ${ball.coverstock}",
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
                               ),
-                              const SizedBox(width: 8),
-                              // 精緻的垂直分隔線
-                              Container(
-                                width: 1,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.25),
-                                  borderRadius: BorderRadius.circular(0.5),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  "Cover Type: ${ball.coverstock}",
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: Colors.white.withOpacity(0.9),
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(1, 1),
-                                        blurRadius: 2,
-                                        color: Colors.black.withOpacity(0.6),
-                                      ),
-                                    ],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    // Add a subtle brand color indicator on the right
-                    Container(
-                      width: 4,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: gradientColors,
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                Container(
+                  width: 6,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: ringColor,
+                    borderRadius: BorderRadius.circular(3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ringColor.withOpacity(0.3),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -358,23 +311,48 @@ class BallListView extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
-      itemCount: balls.length,
-      itemBuilder: (context, index) {
-        final ball = balls[index];
-        return _BallCardItem(
-          ball: ball,
-          theme: theme,
-          onTap: () {
-            onBallTap?.call(ball);
-            print('Tapped on ${ball.name}');
+    return Stack(
+      children: [
+        ListView.builder(
+          padding: const EdgeInsets.only(bottom: 32.0),
+          itemCount: balls.length,
+          itemBuilder: (context, index) {
+            final ball = balls[index];
+            return _BallCardItem(
+              ball: ball,
+              theme: theme,
+              onTap: () {
+                onBallTap?.call(ball);
+                print('Tapped on ${ball.name}');
+              },
+              onLongPress: () {
+                onBallLongPress?.call(ball);
+                print('Long pressed on ${ball.name}');
+              },
+            );
           },
-          onLongPress: () {
-            onBallLongPress?.call(ball);
-            print('Long pressed on ${ball.name}');
-          },
-        );
-      },
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 40,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  theme.colorScheme.surface.withOpacity(0.0),
+                  theme.colorScheme.surface.withOpacity(0.8),
+                  theme.colorScheme.surface,
+                ],
+                stops: const [0.0, 0.7, 1.0],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
