@@ -4,6 +4,8 @@ import 'widgets/user_info_section.dart';
 import 'widgets/arsenal_section.dart';
 import 'widgets/tournament_section.dart';
 import 'ball_library_page.dart';
+import 'views/my_arsenal_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -66,8 +68,14 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 24),
               ArsenalSection(
                 onSeeAllPressed: () {
-                  print('Navigate to Arsenal Page');
-                  // TODO: 導航到武器庫頁面
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProviderScope(
+                        child: MyArsenalPage(),
+                      ),
+                    ),
+                  );
                 },
                 onItemPressed: (index) {
                   print('Arsenal Item $index pressed');
