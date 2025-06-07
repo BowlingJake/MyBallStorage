@@ -25,6 +25,9 @@ class ArsenalActionButtons extends StatelessWidget {
             size: GFSize.MEDIUM,
             color: colorScheme.primary,
             textColor: colorScheme.onPrimary,
+            borderShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -37,6 +40,9 @@ class ArsenalActionButtons extends StatelessWidget {
             size: GFSize.MEDIUM,
             color: colorScheme.primary,
             textColor: colorScheme.primary,
+            borderShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
         ),
       ],

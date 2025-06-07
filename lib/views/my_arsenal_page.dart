@@ -1,10 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../widgets/ball_placeholder_card.dart';
 import '../widgets/arsenal_action_buttons.dart';
-import 'package:getwidget/getwidget.dart';
+import '../widgets/arsenal_ball_card.dart';
 
 final bottomIndexProvider = StateProvider<int>((ref) => 0);
+
+/// Mock data for the arsenal grid.
+final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
+      const ArsenalBall(
+        name: 'Jackal EXJ',
+        core: 'Predator V2',
+        cover: 'Propulsion HVH',
+        layout: '4x4x2',
+        imagePath: 'assets/images/Jackal EXJ.jpg',
+      ),
+      const ArsenalBall(
+        name: 'Jackal EXJ',
+        core: 'Predator V2',
+        cover: 'Propulsion HVH',
+        layout: '4x4x2',
+        imagePath: 'assets/images/Jackal EXJ.jpg',
+      ),
+      const ArsenalBall(
+        name: 'Jackal EXJ',
+        core: 'Predator V2',
+        cover: 'Propulsion HVH',
+        layout: '4x4x2',
+        imagePath: 'assets/images/Jackal EXJ.jpg',
+      ),
+      const ArsenalBall(
+        name: 'Jackal EXJ',
+        core: 'Predator V2',
+        cover: 'Propulsion HVH',
+        layout: '4x4x2',
+        imagePath: 'assets/images/Jackal EXJ.jpg',
+      ),
+    ]);
 
 /// A simple page showing the user's arsenal.
 class MyArsenalPage extends ConsumerWidget {
@@ -13,6 +44,8 @@ class MyArsenalPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(bottomIndexProvider);
+
+    final balls = ref.watch(userBallsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -27,19 +60,17 @@ class MyArsenalPage extends ConsumerWidget {
               onAnalyzePressed: () {},
             ),
             const SizedBox(height: 16),
-            GFCard(
-              padding: const EdgeInsets.all(8),
-              content: SizedBox(
-                height: 300,
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                  ),
-                  itemCount: 4,
-                  itemBuilder: (context, index) => const BallPlaceholderCard(),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.75,
                 ),
+                itemCount: balls.length,
+                itemBuilder: (context, index) =>
+                    ArsenalBallCard(ball: balls[index]),
               ),
             ),
           ],
