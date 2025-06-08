@@ -9,6 +9,8 @@ import 'widgets/arsenal_sort_section.dart';
 import 'widgets/ball_list_header.dart';
 import 'widgets/ball_list_view.dart';
 import 'widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
+import 'widgets/filter_popout.dart'; // 導入篩選彈窗
+import 'widgets/modern_bottom_navigation.dart'; // 導入現代化底部導覽列
 import 'my_training_page.dart';
 
 class BallLibraryPage extends StatefulWidget {
@@ -148,22 +150,62 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
     return items;
   }
 
+  // 篩選按鈕輔助方法
+  bool _hasActiveFilters() {
+    return _selectedFilters.values.any((filter) => filter != null);
+  }
+  
+  String _getFilterButtonText() {
+    if (!_hasActiveFilters()) {
+      return 'Filter';
+    }
+    
+    int activeCount = _selectedFilters.values.where((filter) => filter != null).length;
+    return 'Filter ($activeCount)';
+  }
+
   // 底部導覽列相關狀態和方法
-  int _bottomNavIndex = 1;
+  int _bottomNavIndex = 1; // Ball Library在第1個位置（社群）
+  
   void _onBottomNavTapped(int index) {
-    setState(() {
-      _bottomNavIndex = index;
-      if (index == 0) {
-        Navigator.of(context).pop();
-      } else if (index == 1) { 
-        print('Already on Arsenal page');
-      } else if (index == 3) {
+    switch (index) {
+      case 0: // 首頁
+        Navigator.of(context).pop(); // 返回首頁
+        break;
+      case 1: // 社群 (Ball Library)
+        // 已經在Ball Library頁面，不需要導航
+        setState(() {
+          _bottomNavIndex = 1;
+        });
+        break;
+      case 2: // 中央按鈕 (新增)
+        setState(() {
+          _bottomNavIndex = index;
+        });
+        print('Add button tapped in Ball Library');
+        // TODO: 實現新增球的功能
+        break;
+      case 3: // 訓練
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MyTrainingPage()),
-        );
-      }
-    });
+        ).then((_) {
+          // 返回時重置選中狀態為Ball Library
+          setState(() {
+            _bottomNavIndex = 1;
+          });
+        });
+        break;
+      case 4: // 個人
+        setState(() {
+          _bottomNavIndex = index;
+        });
+        print('Profile button tapped in Ball Library');
+        // TODO: 導航到個人頁面
+        break;
+    }
+    
+    print('Bottom Nav Tapped in Ball Library: $index');
   }
 
   @override
@@ -222,29 +264,199 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
             // 16dp 間距
             const SizedBox(height: 16),
             
-            // 過濾器區域
-            ArsenalFilterSection(
-              selectedFilters: _selectedFilters,
-              onFilterChanged: (filterType, value) {
-                setState(() {
-                  _selectedFilters[filterType] = value;
-                });
-              },
-            ),
-            
-            // 16dp 間距
-            const SizedBox(height: 16),
-            
-            // 排序區域
-            ArsenalSortSection(
-              sortBy: _sortBy,
-              sortAscending: _sortAscending,
-              onSortChanged: (sortField, ascending) {
-                setState(() {
-                  _sortBy = sortField;
-                  _sortAscending = ascending;
-                });
-              },
+            // 篩選和排序區域
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  // 篩選按鈕
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 44, // 統一固定高度
+                      child: OutlinedButton(
+                        onPressed: () {
+                          showFilterPopout(
+                            context,
+                            _selectedFilters,
+                            (filterType, value) {
+                              setState(() {
+                                _selectedFilters[filterType] = value;
+                              });
+                            },
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // 移除vertical padding
+                          minimumSize: Size.zero, // 移除最小尺寸限制
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊區域
+                          side: BorderSide(
+                            color: theme.colorScheme.primary.withOpacity(0.5),
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          backgroundColor: _hasActiveFilters() 
+                            ? theme.colorScheme.primary.withOpacity(0.1)
+                            : Colors.transparent,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
+                          children: [
+                            Icon(
+                              Icons.tune,
+                              size: 18,
+                              color: theme.colorScheme.primary,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              _getFilterButtonText(),
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                height: 1.2, // 統一行高
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(width: 8),
+                  
+                  // 排序下拉選單按鈕
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 44, // 統一固定高度
+                      child: PopupMenuButton<String>(
+                        onSelected: (value) {
+                          setState(() {
+                            if (value.contains('_desc')) {
+                              _sortBy = value.replaceAll('_desc', '');
+                              _sortAscending = false;
+                            } else {
+                              _sortBy = value;
+                              _sortAscending = true;
+                            }
+                          });
+                        },
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem(
+                            value: 'Name',
+                            child: Row(
+                              children: [
+                                Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
+                                SizedBox(width: 8),
+                                Text('Name (A-Z)'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'Name_desc',
+                            child: Row(
+                              children: [
+                                Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
+                                SizedBox(width: 8),
+                                Text('Name (Z-A)'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'RG',
+                            child: Row(
+                              children: [
+                                Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
+                                SizedBox(width: 8),
+                                Text('RG (Low-High)'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'RG_desc',
+                            child: Row(
+                              children: [
+                                Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
+                                SizedBox(width: 8),
+                                Text('RG (High-Low)'),
+                              ],
+                            ),
+                          ),
+                        ],
+                        child: Container(
+                          width: double.infinity,
+                          height: double.infinity, // 填滿SizedBox的高度
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: theme.colorScheme.primary.withOpacity(0.5),
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
+                            children: [
+                              Icon(
+                                _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                size: 18,
+                                color: theme.colorScheme.primary,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Sort: $_sortBy',
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  height: 1.2, // 統一行高
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(width: 4),
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 18,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // 清除篩選按鈕
+                  if (_hasActiveFilters()) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _selectedFilters['brand'] = null;
+                          _selectedFilters['core'] = null;
+                          _selectedFilters['coverstock'] = null;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.clear,
+                        color: theme.colorScheme.error,
+                        size: 18,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: theme.colorScheme.error.withOpacity(0.1),
+                        padding: EdgeInsets.all(6),
+                      ),
+                      tooltip: 'Clear all filters',
+                    ),
+                  ],
+                ],
+              ),
             ),
             
             // 列表標題
@@ -271,7 +483,10 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
             ),
           ],
         ),
-        bottomNavigationBar: _buildGradientNavigationBar(theme),
+        bottomNavigationBar: ModernBottomNavigation(
+          currentIndex: _bottomNavIndex,
+          onTap: _onBottomNavTapped,
+        ),
       ),
     );
   }

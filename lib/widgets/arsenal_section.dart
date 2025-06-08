@@ -20,28 +20,30 @@ class ArsenalSection extends ConsumerStatefulWidget {
 
 class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
   late ScrollController _scrollController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _scrollToNext() {
-    final double cardWidth = 120 + 12; // 卡片寬度 + margin
-    final double scrollDistance = cardWidth * 3; // 一次滑動3張卡片的距離
-    
-    _scrollController.animateTo(
-      _scrollController.offset + scrollDistance,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+  void _onScroll() {
+    final cardWidth = 120.0 + 12.0; // 卡片寬度 + 間距
+    final currentIndex = (_scrollController.offset / cardWidth).round();
+    if (currentIndex != _currentIndex) {
+      setState(() {
+        _currentIndex = currentIndex;
+      });
+    }
   }
 
   @override
@@ -61,56 +63,67 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onBackground,
             )),
-            Row(
-              children: [
-                if (arsenalBalls.length > 3) // 只有當球數超過6個時才顯示滑動提示
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: GestureDetector(
-                      onTap: _scrollToNext,
-                      child: Icon(
-                        Icons.keyboard_double_arrow_right,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                TextButton(
-                  onPressed: widget.onSeeAllPressed ?? () => print('See All Arsenal'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                  ),
-                  child: Text('See All'),
-                ),
-              ],
+            TextButton(
+              onPressed: widget.onSeeAllPressed ?? () => print('See All Arsenal'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text('See All'),
             ),
           ],
         ),
         SizedBox(height: 16),
-        SizedBox(
-          height: 180,
-          child: ListView.builder(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            itemCount: arsenalBalls.length, // 顯示所有球，而不只是前6個
-            itemBuilder: (context, index) {
-              final ball = arsenalBalls[index];
-              return HomeArsenalCard(
-                ball: ball,
-                onTap: () {
-                  if (widget.onItemPressed != null) {
-                    widget.onItemPressed!(index);
-                  } else {
-                    print('View Arsenal Item ${index + 1}: ${ball.name}');
-                  }
-                },
-              );
-            },
+        if (arsenalBalls.isEmpty)
+          const Center(
+            child: Text('Your arsenal is empty.'),
+          )
+        else ...[
+          SizedBox(
+            height: 160,
+            child: ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              itemCount: arsenalBalls.length,
+              itemBuilder: (context, index) {
+                final ball = arsenalBalls[index];
+                return HomeArsenalCard(
+                  ball: ball,
+                  onTap: () {
+                    if (widget.onItemPressed != null) {
+                      widget.onItemPressed!(index);
+                    } else {
+                      print('View Arsenal Item ${index + 1}: ${ball.name}');
+                    }
+                  },
+                );
+              },
+            ),
           ),
-        ),
+          
+          // 分頁指示器
+          const SizedBox(height: 8),
+          if (arsenalBalls.length > 1)
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  arsenalBalls.length,
+                  (index) => Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: _currentIndex == index ? 8 : 6,
+                    height: _currentIndex == index ? 8 : 6,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentIndex == index 
+                        ? const Color(0xFFf39c12)
+                        : Colors.grey.withOpacity(0.4),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ],
     );
   }
-
-
 } 
