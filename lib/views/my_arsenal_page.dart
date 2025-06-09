@@ -14,7 +14,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
       ArsenalBall(
         name: 'Jackal EXJ',
         core: 'Predator V2',
-        cover: 'Propulsion HVH',
+        cover: 'Propulsion HVH Hybrid Reactive',
         layout: '4x4x2',
         imagePath: 'assets/images/Jackal EXJ.jpg',
         brand: 'Motiv',
@@ -24,7 +24,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
       ArsenalBall(
         name: 'Phaze II',
         core: 'R2S Pearl',
-        cover: 'Hybrid Reactive',
+        cover: 'R2S Pearl Reactive',
         layout: '5x3x3',
         imagePath: 'assets/images/Jackal EXJ.jpg',
         brand: 'Storm',
@@ -34,7 +34,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
       ArsenalBall(
         name: 'IQ Tour',
         core: 'C3 Centripetal Control Core',
-        cover: 'R2S Solid',
+        cover: 'R2S Solid Reactive',
         layout: '4.5x4x2',
         imagePath: 'assets/images/Jackal EXJ.jpg',
         brand: 'Storm',
@@ -44,7 +44,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
       ArsenalBall(
         name: 'Hustle Ink',
         core: 'VTC-P18',
-        cover: 'VTC-S19',
+        cover: 'VTC-S19 Solid Reactive',
         layout: '5x4x3',
         imagePath: 'assets/images/Jackal EXJ.jpg',
         brand: 'Roto Grip',
@@ -54,7 +54,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
       ArsenalBall(
         name: 'Code Black',
         core: 'RAD4 Core',
-        cover: 'HK22 Solid',
+        cover: 'HK22 Solid Reactive',
         layout: '4.5x3.5x3',
         imagePath: 'assets/images/Jackal EXJ.jpg',
         brand: 'Motiv',

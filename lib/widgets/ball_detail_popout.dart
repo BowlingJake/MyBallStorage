@@ -19,6 +19,47 @@ String getCoreCategory(String coreName) {
   return parts.isNotEmpty ? parts.last : '未知';
 }
 
+// 組合球皮名稱和類別的輔助函數
+String _getCombinedCoverstockInfo(BowlingBall ball) {
+  if (ball.coverstockName.isEmpty && ball.coverstock.isEmpty) {
+    return '未知';
+  }
+  
+  final name = ball.coverstockName;
+  final category = ball.coverstock;
+  
+  if (name.isEmpty) {
+    return category.isNotEmpty ? category : '未知';
+  }
+  
+  if (category.isEmpty) {
+    return name;
+  }
+  
+  // 檢查名稱是否已經包含類別信息
+  final lowerName = name.toLowerCase();
+  final lowerCategory = category.toLowerCase();
+  
+  if (lowerName.contains('reactive') || lowerName.contains('urethane') || lowerName.contains('polyester')) {
+    return name; // 名稱已經包含類別信息
+  }
+  
+  // 智能組合名稱和類別，避免重複
+  if (lowerCategory.contains('pearl') && lowerName.contains('pearl')) {
+    // 例如 "Reactor Pearl" + "Pearl Reactive" → "Reactor Pearl Reactive"
+    return '$name Reactive';
+  } else if (lowerCategory.contains('solid') && lowerName.contains('solid')) {
+    // 例如 "HK22 Solid" + "Solid Reactive" → "HK22 Solid Reactive"
+    return '$name Reactive';
+  } else if (lowerCategory.contains('hybrid') && lowerName.contains('hybrid')) {
+    // 例如 "R2S Hybrid" + "Hybrid Reactive" → "R2S Hybrid Reactive"
+    return '$name Reactive';
+  } else {
+    // 一般情況，直接組合
+    return '$name $category';
+  }
+}
+
 class BowlingBallDetailWidget extends StatefulWidget {
   final BowlingBall ball;
 
@@ -291,7 +332,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/cover_logo.svg',
                                 label: '球皮',
-                                value: widget.ball.coverstockName.isNotEmpty ? widget.ball.coverstockName : '未知',
+                                value: _getCombinedCoverstockInfo(widget.ball),
                               )),
                             ],
                           ),

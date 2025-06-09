@@ -92,6 +92,41 @@ class BowlingBall {
   }
 }
 
+// Helper class for metal texture background
+class _MetalTexturePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey[400]!.withOpacity(0.08)
+      ..style = PaintingStyle.fill;
+
+    // 創建細微的點狀紋理
+    for (double x = 0; x < size.width; x += 16) {
+      for (double y = 0; y < size.height; y += 16) {
+        if ((x / 16 + y / 16) % 3 == 0) {
+          canvas.drawCircle(Offset(x, y), 0.8, paint);
+        }
+      }
+    }
+
+    // 添加細微的對角線紋理
+    final linePaint = Paint()
+      ..color = Colors.grey[300]!.withOpacity(0.05)
+      ..strokeWidth = 0.5;
+
+    for (double i = -size.height; i < size.width + size.height; i += 24) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        linePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 // Helper class for the grid pattern on the card
 class _GridPainter extends CustomPainter {
   final Color gridColor;
@@ -153,33 +188,53 @@ class _BallCardItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: ringColor,
-          width: 4,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey[300]!.withOpacity(0.6), // 淡灰色高光
+            ringColor.withOpacity(0.9), // 品牌色
+            ringColor, // 主色
+            ringColor.withOpacity(0.7), // 較深的品牌色
+            Colors.grey[800]!.withOpacity(0.8), // 深灰陰影
+            Colors.black.withOpacity(0.6), // 黑色邊緣
+          ],
+          stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
         ),
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
+          // 主要色彩光暈
           BoxShadow(
-            color: ringColor.withOpacity(0.2),
-            blurRadius: 12,
+            color: ringColor.withOpacity(0.25),
+            blurRadius: 14,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 5),
           ),
+          // 深色金屬反射（頂部）
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.grey[400]!.withOpacity(0.3),
+            blurRadius: 3,
+            spreadRadius: 0,
+            offset: const Offset(-1, -2),
+          ),
+          // 主要深度陰影
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 15,
+            spreadRadius: 1,
+            offset: const Offset(2, 5),
+          ),
+          // 邊緣陰影
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
             spreadRadius: 0,
-            offset: const Offset(0, 2),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
-            spreadRadius: 1,
-            offset: const Offset(0, 1),
+            offset: const Offset(1, 3),
           ),
         ],
       ),
       child: Container(
+        margin: const EdgeInsets.all(4.0), // 4px 邊框寬度
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           color: Colors.grey[50],
@@ -193,7 +248,6 @@ class _BallCardItem extends StatelessWidget {
             ),
           ],
         ),
-        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           onLongPress: onLongPress,
@@ -263,16 +317,60 @@ class _BallCardItem extends StatelessWidget {
                   width: 6,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: ringColor,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.grey[300]!.withOpacity(0.7), // 淡灰色高光
+                        ringColor.withOpacity(0.95), // 品牌色
+                        ringColor, // 主色
+                        ringColor.withOpacity(0.8), // 較深品牌色
+                        Colors.grey[700]!.withOpacity(0.9), // 深灰
+                        Colors.black.withOpacity(0.7), // 黑色底部
+                      ],
+                      stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+                    ),
                     borderRadius: BorderRadius.circular(3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ringColor.withOpacity(0.3),
-                        blurRadius: 4,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                                          boxShadow: [
+                        // 主要陰影
+                        BoxShadow(
+                          color: ringColor.withOpacity(0.3),
+                          blurRadius: 6,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 2),
+                        ),
+                        // 深色金屬反射
+                        BoxShadow(
+                          color: Colors.grey[400]!.withOpacity(0.4),
+                          blurRadius: 2,
+                          spreadRadius: 0,
+                          offset: const Offset(-1, -1),
+                        ),
+                        // 深度陰影
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                          offset: const Offset(1, 3),
+                        ),
+                      ],
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                                             // 添加內部深色金屬線條
+                       gradient: LinearGradient(
+                         begin: Alignment.centerLeft,
+                         end: Alignment.centerRight,
+                         colors: [
+                           Colors.grey[400]!.withOpacity(0.5), // 左側灰色高光
+                           Colors.transparent, // 中間透明
+                           Colors.transparent, // 中間透明
+                           Colors.black.withOpacity(0.4), // 右側深色陰影
+                         ],
+                         stops: const [0.0, 0.3, 0.7, 1.0],
+                       ),
+                    ),
                   ),
                 ),
               ],
@@ -313,6 +411,28 @@ class BallListView extends StatelessWidget {
 
     return Stack(
       children: [
+        // 背景層 - 淡藍灰質感背景配搭金屬卡片
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFF5F7FA), // 非常淡的藍灰
+                Color(0xFFE8EDF4), // 淡藍灰
+                Color(0xFFF5F7FA), // 非常淡的藍灰
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
+        // 添加細微的點狀紋理效果
+        Container(
+          child: CustomPaint(
+            painter: _MetalTexturePainter(),
+            size: Size.infinite,
+          ),
+        ),
         ListView.builder(
           padding: const EdgeInsets.only(bottom: 32.0),
           itemCount: balls.length,
@@ -343,9 +463,9 @@ class BallListView extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  theme.colorScheme.surface.withOpacity(0.0),
-                  theme.colorScheme.surface.withOpacity(0.8),
-                  theme.colorScheme.surface,
+                  Colors.transparent,
+                  Color(0xFFF5F7FA).withOpacity(0.8),
+                  Color(0xFFF5F7FA),
                 ],
                 stops: const [0.0, 0.7, 1.0],
               ),
@@ -356,3 +476,4 @@ class BallListView extends StatelessWidget {
     );
   }
 }
+
