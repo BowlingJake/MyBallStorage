@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import '../models/arsenal_ball.dart';
 import '../models/ball_bag_type.dart';
 import '../widgets/action_button_pair.dart';
 import '../widgets/bag_selector_widget.dart';
 import '../widgets/ball_grid_widget.dart';
+import '../widgets/ball_bag_options_dialog.dart';
 
 final bottomIndexProvider = StateProvider<int>((ref) => 0);
 final selectedBagTypeProvider = StateProvider<BallBagType>((ref) => BallBagType.all);
@@ -92,34 +94,138 @@ class MyArsenalPage extends ConsumerWidget {
         backgroundColor: theme.colorScheme.surface,
         elevation: 1,
       ),
-            body: Column(
+      body: Column(
         children: [
-          // Bag selector dropdown
-          BagSelectorWidget(
-            selectedBagType: selectedBagType,
-            onChanged: (BallBagType? value) {
-              if (value != null) {
-                ref.read(selectedBagTypeProvider.notifier).state = value;
-              }
-            },
-          ),
-          const SizedBox(height: 8),
-          // Action buttons
+          // Bag selector and create ball bag button row
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ActionButtonPair(
-              primaryButtonText: 'Add from Library',
-              secondaryButtonText: 'Analyze Chart',
-              onPrimaryPressed: () {},
-              onSecondaryPressed: () {},
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Row(
+              children: [
+                // Bag selector dropdown (縮短)
+                Expanded(
+                  flex: 3,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<BallBagType>(
+                      value: selectedBagType,
+                      hint: Text(
+                        '選擇球袋',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                      items: BallBagType.values.map((bagType) {
+                        return DropdownMenuItem<BallBagType>(
+                          value: bagType,
+                          child: Text(
+                            bagType.displayName,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (BallBagType? value) {
+                        if (value != null) {
+                          ref.read(selectedBagTypeProvider.notifier).state = value;
+                        }
+                      },
+                      isExpanded: true,
+                      buttonStyleData: ButtonStyleData(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withOpacity(0.5),
+                            width: 1,
+                          ),
+                          color: theme.colorScheme.surface,
+                        ),
+                      ),
+                      iconStyleData: IconStyleData(
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: theme.colorScheme.primary,
+                          size: 16,
+                        ),
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        maxHeight: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: theme.colorScheme.surface,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        offset: const Offset(0, -4),
+                        scrollbarTheme: ScrollbarThemeData(
+                          radius: const Radius.circular(40),
+                          thickness: WidgetStateProperty.all(6),
+                          thumbVisibility: WidgetStateProperty.all(true),
+                        ),
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Create ball bag button
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showBallBagOptionsDialog(context, ref);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      child: const Text(
+                        'Create Ball Bag',
+                        style: TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           // Balls grid
           Expanded(
             child: BallGridWidget(balls: balls),
           ),
         ],
+      ),
+      // Analyze Chart 浮動按鈕在右下角（圓形）
+      floatingActionButton: Tooltip(
+        message: 'Analyze Chart',
+        child: FloatingActionButton(
+          onPressed: () {
+            // TODO: 實現分析圖表功能
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Analyze Chart功能待實現')),
+            );
+          },
+          backgroundColor: theme.colorScheme.secondary,
+          foregroundColor: theme.colorScheme.onSecondary,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.insights, size: 28),
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
@@ -133,4 +239,19 @@ class MyArsenalPage extends ConsumerWidget {
       ),
     );
   }
+
+
+
+  void _showBallBagOptionsDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.7),
+      builder: (BuildContext context) {
+        return const BallBagOptionsDialog();
+      },
+    );
+  }
+
+
 }
