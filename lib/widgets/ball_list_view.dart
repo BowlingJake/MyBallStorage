@@ -11,6 +11,14 @@ String getCoreCategory(String coreName) {
   return parts.last; // Return last part (works even if no space)
 }
 
+// Helper function to clean brand name (remove "bowling" word)
+String cleanBrandName(String brandName) {
+  return brandName
+      .replaceAll(RegExp(r'\bbowling\b', caseSensitive: false), '')
+      .trim()
+      .replaceAll(RegExp(r'\s+'), ' '); // Remove extra spaces
+}
+
 // Helper function to adjust hue of a color by specified degrees
 Color adjustHue(Color color, double hueDelta) {
   HSVColor hsvColor = HSVColor.fromColor(color);
@@ -186,7 +194,7 @@ class _BallCardItem extends StatelessWidget {
     final ringColor = brandPalette.shade600;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0), // 減少間距從 8.0 到 4.0
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -238,7 +246,6 @@ class _BallCardItem extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           color: Colors.grey[50],
-          // 微灰白色背景，既不刺眼又讓色環突出
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -252,101 +259,113 @@ class _BallCardItem extends StatelessWidget {
           onTap: onTap,
           onLongPress: onLongPress,
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // 減少垂直padding
+            child: Stack(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        ball.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[900],
+                // 主要內容 - 兩行佈局
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 第一行：球名
+                    Text(
+                      ball.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[900],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6.0),
+                    // 第二行：Core Type 和 Cover Type
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Core Type: ${getCoreCategory(ball.core)}",
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4.0),
-                      Text(
-                        ball.brand,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: ringColor,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(0.5),
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Cover Type: ${ball.coverstock}",
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                // 右上角品牌標籤（橢圓形，無框線）
+                Positioned(
+                  top: 0,
+                  right: 20, // 距離右邊20px，避免與色條碰撞
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
+                    decoration: BoxDecoration(
+                      color: ringColor.withOpacity(0.15), // 15%透明度的品牌色背景
+                      borderRadius: BorderRadius.circular(14.0), // 橢圓形
+                    ),
+                    child: Text(
+                      cleanBrandName(ball.brand),
+                      style: TextStyle(
+                        color: ringColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(height: 6.0),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Core Type: ${getCoreCategory(ball.core)}",
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 1,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[400],
-                              borderRadius: BorderRadius.circular(0.5),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "Cover Type: ${ball.coverstock}",
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-                Container(
-                  width: 6,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.grey[300]!.withOpacity(0.7), // 淡灰色高光
-                        ringColor.withOpacity(0.95), // 品牌色
-                        ringColor, // 主色
-                        ringColor.withOpacity(0.8), // 較深品牌色
-                        Colors.grey[700]!.withOpacity(0.9), // 深灰
-                        Colors.black.withOpacity(0.7), // 黑色底部
-                      ],
-                      stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-                    ),
-                    borderRadius: BorderRadius.circular(3),
-                                          boxShadow: [
-                        // 主要陰影
+                // 右側色條
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 6,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.grey[300]!.withOpacity(0.7),
+                          ringColor.withOpacity(0.95),
+                          ringColor,
+                          ringColor.withOpacity(0.8),
+                          Colors.grey[700]!.withOpacity(0.9),
+                          Colors.black.withOpacity(0.7),
+                        ],
+                        stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+                      ),
+                      borderRadius: BorderRadius.circular(3),
+                      boxShadow: [
                         BoxShadow(
                           color: ringColor.withOpacity(0.3),
                           blurRadius: 6,
                           spreadRadius: 0,
                           offset: const Offset(0, 2),
                         ),
-                        // 深色金屬反射
                         BoxShadow(
                           color: Colors.grey[400]!.withOpacity(0.4),
                           blurRadius: 2,
                           spreadRadius: 0,
                           offset: const Offset(-1, -1),
                         ),
-                        // 深度陰影
                         BoxShadow(
                           color: Colors.black.withOpacity(0.5),
                           blurRadius: 8,
@@ -354,22 +373,22 @@ class _BallCardItem extends StatelessWidget {
                           offset: const Offset(1, 3),
                         ),
                       ],
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(3),
-                                             // 添加內部深色金屬線條
-                       gradient: LinearGradient(
-                         begin: Alignment.centerLeft,
-                         end: Alignment.centerRight,
-                         colors: [
-                           Colors.grey[400]!.withOpacity(0.5), // 左側灰色高光
-                           Colors.transparent, // 中間透明
-                           Colors.transparent, // 中間透明
-                           Colors.black.withOpacity(0.4), // 右側深色陰影
-                         ],
-                         stops: const [0.0, 0.3, 0.7, 1.0],
-                       ),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.grey[400]!.withOpacity(0.5),
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                          stops: const [0.0, 0.3, 0.7, 1.0],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -451,26 +470,6 @@ class BallListView extends StatelessWidget {
               },
             );
           },
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 40,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Color(0xFFF5F7FA).withOpacity(0.8),
-                  Color(0xFFF5F7FA),
-                ],
-                stops: const [0.0, 0.7, 1.0],
-              ),
-            ),
-          ),
         ),
       ],
     );
