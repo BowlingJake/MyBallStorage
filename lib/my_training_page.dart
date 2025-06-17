@@ -7,8 +7,10 @@ import 'widgets/training/create_training_record_dialog.dart';
 import 'widgets/training/training_session_card.dart';
 import 'widgets/training/delete_confirmation_dialog.dart';
 import 'widgets/training/training_detail_dialog.dart';
+import 'widgets/training/training_empty_state.dart';
 import 'widgets/modern_bottom_navigation.dart';
 import 'ball_library_page.dart';
+import 'views/training_card_test_page.dart';
 
 class MyTrainingPage extends StatefulWidget {
   const MyTrainingPage({Key? key}) : super(key: key);
@@ -69,7 +71,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     showCreateTrainingRecordDialog(context, _onRecordCreated);
   }
 
-  void _onRecordCreated(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern) {
+  void _onRecordCreated(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod) {
     final newSession = TrainingSession(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
@@ -78,6 +80,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       oilPatternName: oilPatternName,
       oilPatternLength: oilPatternLength,
       isHousePattern: isHousePattern,
+      scoringMethod: scoringMethod, // 添加計分方式
       createdAt: DateTime.now(),
     );
 
@@ -86,9 +89,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     });
   }
 
-  void _editSession(String sessionId) {
-    showTrainingDetailDialog(context, sessionId);
-  }
+
 
   void _deleteSession(String sessionId) {
     showDeleteConfirmationDialog(
@@ -113,76 +114,6 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     print('查看記錄詳情: ${record.id}');
   }
 
-  Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-    
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 圖示
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: Icon(
-                Icons.sports,
-                size: 60,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // 標題
-            Text(
-              'Start Your Bowling Journey',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // 描述
-            Text(
-              'Record your training sessions\nTrack your progress',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            
-            const SizedBox(height: 40),
-            
-            // Add Record 按鈕
-            GFButton(
-              onPressed: _showCreateRecordDialog,
-              text: "Add Training Record",
-              icon: Icon(
-                Icons.add_circle_outline,
-                color: Colors.white,
-              ),
-              type: GFButtonType.solid,
-              color: theme.colorScheme.primary,
-              size: GFSize.LARGE,
-              shape: GFButtonShape.pills,
-              fullWidthButton: false,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -202,6 +133,24 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
+        actions: [
+          // 測試按鈕
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TrainingCardTestPage(),
+                ),
+              );
+            },
+            icon: Icon(
+              Icons.design_services,
+              color: theme.colorScheme.primary,
+            ),
+            tooltip: 'Card Design Test',
+          ),
+        ],
         // 添加細微的底部邊框
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
@@ -220,7 +169,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         ),
       ),
       body: _trainingSessions.isEmpty 
-        ? _buildEmptyState()
+        ? TrainingEmptyState(onAddRecord: _showCreateRecordDialog)
         : Column(
             children: [
               // 新增訓練按鈕
@@ -248,7 +197,6 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
                                       return TrainingSessionCard(
                     session: session,
                     onTap: () => print('Tap session: ${session.title}'),
-                    onEdit: () => _editSession(session.id),
                     onDelete: () => _deleteSession(session.id),
                   );
                   },
