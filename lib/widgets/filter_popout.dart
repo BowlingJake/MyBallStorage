@@ -161,33 +161,8 @@ class _FilterPopoutState extends State<FilterPopout> {
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         child: Row(
                           children: [
-                            // 清除按鈕
+                            // 應用按鈕 - 修改為透明背景且全寬
                             Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _localFilters['brand']!.clear();
-                                    _localFilters['core']!.clear();
-                                    _localFilters['coverstock']!.clear();
-                                  });
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: Text('Clear All'),
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 12),
-                            
-                            // 應用按鈕
-                            Expanded(
-                              flex: 2,
                               child: ElevatedButton(
                                 onPressed: () {
                                   // 應用篩選 - 多選品牌支持，其他保持單選相容性
@@ -197,9 +172,10 @@ class _FilterPopoutState extends State<FilterPopout> {
                                   Navigator.of(context).pop();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: theme.colorScheme.primary,
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
                                   elevation: 0,
+                                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -236,67 +212,68 @@ class _FilterPopoutState extends State<FilterPopout> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 區段標題
-        Text(
-          'Brand',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        // 區段標題和小型 Select All 按鈕
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Brand',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (_localFilters['brand']!.isEmpty) {
+                    // 如果目前沒有選擇，就全選
+                    _localFilters['brand']!.addAll(brandGroups.values.expand((list) => list));
+                  } else {
+                    // 如果有選擇，就清除所有
+                    _localFilters['brand']!.clear();
+                  }
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _localFilters['brand']!.isNotEmpty
+                      ? Colors.white.withOpacity(0.25)
+                      : Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: _localFilters['brand']!.isNotEmpty
+                        ? Colors.white.withOpacity(0.9)
+                        : Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _localFilters['brand']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
+                      color: Colors.white.withOpacity(_localFilters['brand']!.isNotEmpty ? 1.0 : 0.7),
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      _localFilters['brand']!.isNotEmpty ? 'Clear All' : 'Select All',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(_localFilters['brand']!.isNotEmpty ? 1.0 : 0.8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        
-                 // Select All 按鈕 - 全版寬度
-         GestureDetector(
-           onTap: () {
-             setState(() {
-               if (_localFilters['brand']!.isEmpty) {
-                 // 如果目前沒有選擇，就全選
-                 _localFilters['brand']!.addAll(brandGroups.values.expand((list) => list));
-               } else {
-                 // 如果有選擇，就清除所有
-                 _localFilters['brand']!.clear();
-               }
-             });
-           },
-           child: Container(
-             width: double.infinity,
-             padding: EdgeInsets.symmetric(vertical: 12),
-             margin: EdgeInsets.only(bottom: 16),
-             decoration: BoxDecoration(
-               color: _localFilters['brand']!.isNotEmpty
-                   ? Colors.white.withOpacity(0.25)
-                   : Colors.white.withOpacity(0.08),
-               border: Border.all(
-                 color: _localFilters['brand']!.isNotEmpty
-                     ? Colors.white.withOpacity(0.9)
-                     : Colors.white.withOpacity(0.3),
-                 width: _localFilters['brand']!.isNotEmpty ? 2 : 1,
-               ),
-               borderRadius: BorderRadius.circular(20),
-             ),
-             child: Row(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Icon(
-                   _localFilters['brand']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
-                   color: Colors.white.withOpacity(_localFilters['brand']!.isNotEmpty ? 1.0 : 0.7),
-                   size: 16,
-                 ),
-                 SizedBox(width: 8),
-                 Text(
-                   _localFilters['brand']!.isNotEmpty ? 'Clear All' : 'Select All',
-                   style: TextStyle(
-                     color: Colors.white.withOpacity(_localFilters['brand']!.isNotEmpty ? 1.0 : 0.8),
-                     fontSize: 14,
-                     fontWeight: _localFilters['brand']!.isNotEmpty ? FontWeight.w600 : FontWeight.w500,
-                   ),
-                 ),
-               ],
-             ),
-           ),
-         ),
         
         // 各品牌集團
         ...brandGroups.entries.map((entry) => _buildBrandGroup(entry.key, entry.value)).toList(),
@@ -436,65 +413,66 @@ class _FilterPopoutState extends State<FilterPopout> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 區段標題
-        Text(
-          'Core',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        // 區段標題和小型 Select All 按鈕
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Core',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (_localFilters['core']!.isEmpty) {
+                    _localFilters['core']!.addAll(['Symmetric', 'Asymmetric']);
+                  } else {
+                    _localFilters['core']!.clear();
+                  }
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _localFilters['core']!.isNotEmpty
+                      ? Colors.white.withOpacity(0.25)
+                      : Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: _localFilters['core']!.isNotEmpty
+                        ? Colors.white.withOpacity(0.9)
+                        : Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _localFilters['core']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
+                      color: Colors.white.withOpacity(_localFilters['core']!.isNotEmpty ? 1.0 : 0.7),
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      _localFilters['core']!.isNotEmpty ? 'Clear All' : 'Select All',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(_localFilters['core']!.isNotEmpty ? 1.0 : 0.8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        
-        // Select All 按鈕 - 全版寬度
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              if (_localFilters['core']!.isEmpty) {
-                _localFilters['core']!.addAll(['Symmetric', 'Asymmetric']);
-              } else {
-                _localFilters['core']!.clear();
-              }
-            });
-          },
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12),
-            margin: EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: _localFilters['core']!.isNotEmpty
-                  ? Colors.white.withOpacity(0.25)
-                  : Colors.white.withOpacity(0.08),
-              border: Border.all(
-                color: _localFilters['core']!.isNotEmpty
-                    ? Colors.white.withOpacity(0.9)
-                    : Colors.white.withOpacity(0.3),
-                width: _localFilters['core']!.isNotEmpty ? 2 : 1,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _localFilters['core']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: Colors.white.withOpacity(_localFilters['core']!.isNotEmpty ? 1.0 : 0.7),
-                  size: 16,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  _localFilters['core']!.isNotEmpty ? 'Clear All' : 'Select All',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(_localFilters['core']!.isNotEmpty ? 1.0 : 0.8),
-                    fontSize: 14,
-                    fontWeight: _localFilters['core']!.isNotEmpty ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
         
                  // Core 選項 - 兩個選項等寬並排
          Row(
@@ -563,65 +541,66 @@ class _FilterPopoutState extends State<FilterPopout> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 區段標題
-        Text(
-          'Cover',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        // 區段標題和小型 Select All 按鈕
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Cover',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (_localFilters['coverstock']!.isEmpty) {
+                    _localFilters['coverstock']!.addAll(['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester']);
+                  } else {
+                    _localFilters['coverstock']!.clear();
+                  }
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _localFilters['coverstock']!.isNotEmpty
+                      ? Colors.white.withOpacity(0.25)
+                      : Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: _localFilters['coverstock']!.isNotEmpty
+                        ? Colors.white.withOpacity(0.9)
+                        : Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _localFilters['coverstock']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
+                      color: Colors.white.withOpacity(_localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.7),
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      _localFilters['coverstock']!.isNotEmpty ? 'Clear All' : 'Select All',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(_localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.8),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        
-        // Select All 按鈕 - 全版寬度
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              if (_localFilters['coverstock']!.isEmpty) {
-                _localFilters['coverstock']!.addAll(['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester']);
-              } else {
-                _localFilters['coverstock']!.clear();
-              }
-            });
-          },
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12),
-            margin: EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: _localFilters['coverstock']!.isNotEmpty
-                  ? Colors.white.withOpacity(0.25)
-                  : Colors.white.withOpacity(0.08),
-              border: Border.all(
-                color: _localFilters['coverstock']!.isNotEmpty
-                    ? Colors.white.withOpacity(0.9)
-                    : Colors.white.withOpacity(0.3),
-                width: _localFilters['coverstock']!.isNotEmpty ? 2 : 1,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _localFilters['coverstock']!.isNotEmpty ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: Colors.white.withOpacity(_localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.7),
-                  size: 16,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  _localFilters['coverstock']!.isNotEmpty ? 'Clear All' : 'Select All',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(_localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.8),
-                    fontSize: 14,
-                    fontWeight: _localFilters['coverstock']!.isNotEmpty ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
         
                  // Cover 選項 - 等寬Grid布局
          Column(
