@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:intl/intl.dart';
 import 'package:iconsax/iconsax.dart';
-import 'dart:ui';
 import 'add_games_dialog.dart';
 
 // 訓練記錄數據模型
@@ -116,12 +115,10 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
         ? '${widget.session.title.substring(0, 20)}...' 
         : widget.session.title;
 
-    // Popout style 漸變色彩
-    final List<Color> gradientColors = [
-      theme.colorScheme.primary.withOpacity(0.7),
-      theme.colorScheme.secondary.withOpacity(0.5),
-      theme.colorScheme.tertiary?.withOpacity(0.3) ?? Colors.purple.withOpacity(0.3),
-    ];
+    // 分層色塊風格 (Layered Tints) - 使用更飽和的藍綠色主色調
+    final Color primaryTint = theme.colorScheme.primary.withOpacity(0.4);   // 增加到 40% 透明度
+    final Color secondaryTint = theme.colorScheme.primary.withOpacity(0.3); // 30% 透明度作為第二層
+    final Color accentTint = theme.colorScheme.primary.withOpacity(0.2);    // 20% 透明度作為基底
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -134,45 +131,58 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
           duration: Duration(milliseconds: 400),
           curve: Curves.easeInOutCubic,
           height: _isExpanded ? 200 : 120,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
+          child: Container(
+            decoration: BoxDecoration(
+              // 使用分層色塊而非漸變
+              color: primaryTint,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.5),
+                width: 1.8,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
             child: Stack(
               children: [
-                // 背景漸變
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                // 第二層色塊 - 增加層次感
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 60,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: secondaryTint,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(28),
+                        topRight: Radius.circular(28),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: Offset(0, 8),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
                   ),
                 ),
-                // 玻璃擬態效果
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1.5,
-                        ),
+                // 第三層色塊 - 左上角裝飾
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  width: 120,
+                  height: 40,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: accentTint,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(28),
+                        bottomRight: Radius.circular(20),
                       ),
                     ),
                   ),
@@ -201,9 +211,9 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                       fontSize: 18,
                                       shadows: [
                                         Shadow(
-                                          offset: Offset(1, 1),
-                                          blurRadius: 2,
-                                          color: Colors.black.withOpacity(0.3),
+                                          offset: Offset(0, 1),
+                                          blurRadius: 3,
+                                          color: theme.colorScheme.primary.withOpacity(0.7),
                                         ),
                                       ],
                                     ),
@@ -260,7 +270,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                         color: Colors.white.withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: Colors.white.withOpacity(0.3),
+                                          color: Colors.white.withOpacity(0.4),
                                           width: 1,
                                         ),
                                       ),
@@ -341,7 +351,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                                 size: 16,
                                               ),
                                               type: GFButtonType.solid,
-                                              color: Colors.white.withOpacity(0.2),
+                                              color: Colors.white.withOpacity(0.25),
                                               size: GFSize.SMALL,
                                               shape: GFButtonShape.pills,
                                               fullWidthButton: true,

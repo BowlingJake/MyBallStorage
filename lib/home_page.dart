@@ -6,8 +6,10 @@ import 'widgets/tournament_section.dart';
 import 'widgets/modern_tournament_section.dart';
 import 'ball_library_page.dart';
 import 'views/my_arsenal_page.dart';
+import 'views/settings_page.dart';
 import 'my_training_page.dart';
 import 'demo/brand_palette_demo.dart';
+import 'demo/style_showcase_page.dart';
 
 import 'widgets/modern_bottom_navigation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,12 +62,16 @@ class _HomePageState extends State<HomePage> {
           });
         });
         break;
-      case 4: // 個人
-        setState(() {
-          _selectedIndex = index;
+      case 4: // 個人/設定
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsPage()),
+        ).then((_) {
+          // 返回時重置選中狀態為首頁
+          setState(() {
+            _selectedIndex = 0;
+          });
         });
-        print('Profile button tapped');
-        // TODO: 導航到個人頁面
         break;
     }
     
@@ -85,6 +91,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
+          // 設定按鈕
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: _buildSettingsButton(context),
+          ),
           // 通知按鈕
           Container(
             margin: const EdgeInsets.only(right: 16),
@@ -140,29 +151,71 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               
               // 開發者選項 - 移到內容區域的底部
-              Center(
-                child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BrandPaletteDemoPage(),
+              Column(
+                children: [
+                  // 風格展示按鈕 - 主要功能
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StyleShowcasePage(),
+                          ),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.dashboard_customize,
+                        size: 20,
                       ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.palette_outlined, 
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                    size: 18,
-                  ),
-                  label: Text(
-                    '品牌色調色板示例',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                      fontSize: 12,
+                      label: Text(
+                        'APP 風格展示',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // 品牌色板示例 - 次要功能
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BrandPaletteDemoPage(),
+                          ),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.palette_outlined, 
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                        size: 18,
+                      ),
+                      label: Text(
+                        '品牌色調色板示例',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
             ],
@@ -172,6 +225,38 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: ModernBottomNavigation(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+      ),
+    );
+  }
+
+  // 頂端導航列的設定按鈕
+  Widget _buildSettingsButton(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsPage()),
+        );
+      },
+      child: Container(
+        height: 40,
+        width: 40,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.primary.withOpacity(0.1),
+          border: Border.all(
+            color: theme.colorScheme.primary.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.settings_outlined,
+            color: theme.colorScheme.primary,
+            size: 20,
+          ),
+        ),
       ),
     );
   }
