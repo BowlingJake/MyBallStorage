@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'glassmorphism_sports_style.dart';
 import 'cyberpunk_tech_style.dart';
 import 'digital_dashboard_style.dart';
-import 'wood_background_style.dart';
+import 'dark_tech_style.dart';
 
 class StyleShowcasePage extends StatelessWidget {
   const StyleShowcasePage({super.key});
@@ -31,7 +30,7 @@ class StyleShowcasePage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '三種專業級風格，包含最新科技感和數據可視化設計，使用現代第三方插件增強效果',
+              '三種精選專業風格，專為運動數據APP設計，融合現代科技感與數據可視化',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
@@ -41,23 +40,7 @@ class StyleShowcasePage extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
-                  _buildStyleCard(
-                    context,
-                    title: 'Glassmorphism Sports',
-                    subtitle: '運動玻璃態風格',
-                    description: '玻璃態毛玻璃效果 + 運動感漸變背景\n流暢動畫 + 發光閃光元素\n適合年輕、時尚、追求視覺衝擊的用戶',
-                    icon: Iconsax.glass,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                    ),
-                    features: ['✨ 玻璃態效果', '🎮 動態動畫', '💫 閃光元素', '🎨 漸變背景'],
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const GlassmorphismSportsStyle()),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 25),
+
                   
                   _buildStyleCard(
                     context,
@@ -95,19 +78,21 @@ class StyleShowcasePage extends StatelessWidget {
                   
                   const SizedBox(height: 25),
                   
+
+                  
                   _buildStyleCard(
                     context,
-                    title: 'Wood Background',
-                    subtitle: '木質背景風格',
-                    description: '溫暖自然的木質紋理背景 + 柔和色調\n舒適的視覺體驗 + 長時間使用不疲勞\n適合追求自然質感和溫馨感的用戶',
-                    icon: Iconsax.tree,
+                    title: 'Professional Dark',
+                    subtitle: '專業深色風格',
+                    description: '專業運動數據分析界面 + 清晰數據可視化\n深色護眼設計 + 專業圖表展示\n適合專業球員和數據分析需求',
+                    icon: Iconsax.chart_2,
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF8B4513), Color(0xFF5D4037)],
+                      colors: [Color(0xFF121212), Color(0xFF1E88E5)],
                     ),
-                    features: ['🌳 木質紋理', '🎨 自然色調', '👁️ 護眼設計', '🏠 溫馨感'],
+                    features: ['📊 運動數據', '🎯 專業分析', '👁️ 護眼深色', '📈 成績追蹤'],
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const WoodBackgroundStyle()),
+                      MaterialPageRoute(builder: (_) => const DarkTechStyle()),
                     ),
                   ),
                 ],
