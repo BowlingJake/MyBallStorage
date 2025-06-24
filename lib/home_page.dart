@@ -4,6 +4,7 @@ import 'widgets/user_info_section.dart';
 import 'widgets/arsenal_section.dart';
 import 'widgets/tournament_section.dart';
 import 'widgets/modern_tournament_section.dart';
+import 'widgets/professional_dark_background.dart';
 import 'ball_library_page.dart';
 import 'views/my_arsenal_page.dart';
 import 'views/settings_page.dart';
@@ -80,151 +81,161 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // 恢復頂端導航列，只放通知按鈕
-      appBar: AppBar(
-        title: Text(
-          '保齡球裝備庫',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        actions: [
-          // 設定按鈕
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: _buildSettingsButton(context),
-          ),
-          // 通知按鈕
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: _buildNotificationButton(context),
-          ),
-        ],
+    return ProfessionalDarkBackground(
+      backgroundImage: 'images/Sport_Tech_Background.png',
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 用戶資訊區塊 - 現在是可滾動的四方圓角卡片
-              const UserInfoSection(
-                userName: '打保齡遊戲玩國',
-                location: 'New York',
-                // userPhotoUrl: 'your_photo_url_here', // 可選
-              ),
-              
-              const SizedBox(height: 24),
-              
-              ArsenalSection(
-                onSeeAllPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ProviderScope(
-                        child: MyArsenalPage(),
-                      ),
-                    ),
-                  );
-                },
-                onItemPressed: (index) {
-                  print('Arsenal Item $index pressed');
-                  // TODO: 導航到球詳細頁面
-                },
-              ),
-              const SizedBox(height: 24),
-              ModernTournamentSection(
-                onSeeAllPressed: () {
-                  print('Navigate to Tournament Page');
-                  // TODO: 導航到錦標賽頁面
-                },
-                onTournamentPressed: (tournament) {
-                  print('Tournament ${tournament.name} pressed');
-                  // TODO: 導航到錦標賽詳細頁面
-                },
-              ),
-              const SizedBox(height: 20),
-              
-              // 開發者選項 - 移到內容區域的底部
-              Column(
-                children: [
-                  // 風格展示按鈕 - 主要功能
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const StyleShowcasePage(),
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        Icons.dashboard_customize,
-                        size: 20,
-                      ),
-                      label: Text(
-                        'APP 風格展示',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
+        // 恢復頂端導航列，只放通知按鈕
+        appBar: AppBar(
+          title: Text(
+            'StrikeTrack',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          actions: [
+            // 設定按鈕
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              child: _buildSettingsButton(context),
+            ),
+            // 通知按鈕
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              child: _buildNotificationButton(context),
+            ),
+          ],
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 用戶資訊區塊 - 現在是可滾動的四方圓角卡片
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: 400), // 直接約束最大寬度
+                    child: const UserInfoSection(
+                      userName: 'Jake Cheng',
+                      location: 'Taipei, Taiwan',
+                      // userPhotoUrl: 'your_photo_url_here', // 可選
                     ),
                   ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // 品牌色板示例 - 次要功能
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BrandPaletteDemoPage(),
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        Icons.palette_outlined, 
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                        size: 18,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                ArsenalSection(
+                  onSeeAllPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProviderScope(
+                          child: MyArsenalPage(),
+                        ),
                       ),
-                      label: Text(
-                        '品牌色調色板示例',
-                        style: TextStyle(
+                    );
+                  },
+                  onItemPressed: (index) {
+                    print('Arsenal Item $index pressed');
+                    // TODO: 導航到球詳細頁面
+                  },
+                ),
+                const SizedBox(height: 24),
+                ModernTournamentSection(
+                  onSeeAllPressed: () {
+                    print('Navigate to Tournament Page');
+                    // TODO: 導航到錦標賽頁面
+                  },
+                  onTournamentPressed: (tournament) {
+                    print('Tournament ${tournament.name} pressed');
+                    // TODO: 導航到錦標賽詳細頁面
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                // 開發者選項 - 移到內容區域的底部
+                Column(
+                  children: [
+                    // 風格展示按鈕 - 主要功能
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StyleShowcasePage(),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.dashboard_customize,
+                          size: 20,
+                        ),
+                        label: Text(
+                          'APP 風格展示',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // 品牌色板示例 - 次要功能
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BrandPaletteDemoPage(),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.palette_outlined, 
                           color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                          fontSize: 12,
+                          size: 18,
+                        ),
+                        label: Text(
+                          '品牌色調色板示例',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: ModernBottomNavigation(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        bottomNavigationBar: ModernBottomNavigation(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

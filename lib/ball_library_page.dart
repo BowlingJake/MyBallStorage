@@ -11,6 +11,7 @@ import 'widgets/ball_list_view.dart';
 import 'widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
 import 'widgets/filter_popout.dart'; // 導入篩選彈窗
 import 'widgets/modern_bottom_navigation.dart'; // 導入現代化底部導覽列
+import 'widgets/professional_dark_background.dart'; // 導入Professional Dark背景
 import 'my_training_page.dart';
 
 class BallLibraryPage extends StatefulWidget {
@@ -214,203 +215,108 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          // 改為白底配品牌色圖標的設計
-          backgroundColor: Colors.white,
-          foregroundColor: theme.colorScheme.primary,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            'Ball Library',
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
+      child: ProfessionalDarkBackground(
+        backgroundImage: 'images/Sport_Tech_Background.png',
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            // Professional Dark 風格的透明AppBar
+            backgroundColor: Colors.transparent,
+            foregroundColor: theme.colorScheme.onSurface,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            title: Text(
+              'Ball Library',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          // 添加細微的底部邊框
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(1),
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    theme.colorScheme.outlineVariant.withOpacity(0.3),
-                    Colors.transparent,
-                  ],
+            // 添加細微的底部邊框
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(1),
+              child: Container(
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      theme.colorScheme.outlineVariant.withOpacity(0.3),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        body: Column(
-          children: [
-            // 搜尋列
-            ArsenalSearchBar(
-              searchText: _searchText,
-              onSearchChanged: (value) {
-                setState(() {
-                  _searchText = value;
-                });
-              },
-            ),
-            
-            // 16dp 間距
-            const SizedBox(height: 16),
-            
-            // 篩選和排序區域
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  // 篩選按鈕
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 44, // 統一固定高度
-                      child: OutlinedButton(
-                        onPressed: () {
-                          showFilterPopout(
-                            context,
-                            _selectedFilters,
-                            (filterType, value) {
-                              setState(() {
-                                _selectedFilters[filterType] = value;
-                              });
-                            },
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // 移除vertical padding
-                          minimumSize: Size.zero, // 移除最小尺寸限制
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊區域
-                          side: BorderSide(
-                            color: theme.colorScheme.primary.withOpacity(0.5),
-                            width: 1.5,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          backgroundColor: _hasActiveFilters() 
-                            ? theme.colorScheme.primary.withOpacity(0.1)
-                            : Colors.transparent,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
-                          children: [
-                            Icon(
-                              Icons.tune,
-                              size: 18,
-                              color: theme.colorScheme.primary,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              _getFilterButtonText(),
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                height: 1.2, // 統一行高
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(width: 8),
-                  
-                  // 排序下拉選單按鈕
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 44, // 統一固定高度
-                      child: PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() {
-                            if (value.contains('_desc')) {
-                              _sortBy = value.replaceAll('_desc', '');
-                              _sortAscending = false;
-                            } else {
-                              _sortBy = value;
-                              _sortAscending = true;
-                            }
-                          });
-                        },
-                        itemBuilder: (BuildContext context) => [
-                          PopupMenuItem(
-                            value: 'Name',
-                            child: Row(
-                              children: [
-                                Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                SizedBox(width: 8),
-                                Text('Name (A-Z)'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'Name_desc',
-                            child: Row(
-                              children: [
-                                Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                SizedBox(width: 8),
-                                Text('Name (Z-A)'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'RG',
-                            child: Row(
-                              children: [
-                                Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                SizedBox(width: 8),
-                                Text('RG (Low-High)'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'RG_desc',
-                            child: Row(
-                              children: [
-                                Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                SizedBox(width: 8),
-                                Text('RG (High-Low)'),
-                              ],
-                            ),
-                          ),
-                        ],
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity, // 填滿SizedBox的高度
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(
+          body: Column(
+            children: [
+              // 搜尋列
+              ArsenalSearchBar(
+                searchText: _searchText,
+                onSearchChanged: (value) {
+                  setState(() {
+                    _searchText = value;
+                  });
+                },
+              ),
+              
+              // 16dp 間距
+              const SizedBox(height: 16),
+              
+              // 篩選和排序區域
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    // 篩選按鈕
+                    Expanded(
+                      flex: 2,
+                      child: SizedBox(
+                        height: 44, // 統一固定高度
+                        child: OutlinedButton(
+                          onPressed: () {
+                            showFilterPopout(
+                              context,
+                              _selectedFilters,
+                              (filterType, value) {
+                                setState(() {
+                                  _selectedFilters[filterType] = value;
+                                });
+                              },
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // 移除vertical padding
+                            minimumSize: Size.zero, // 移除最小尺寸限制
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊區域
+                            side: BorderSide(
                               color: theme.colorScheme.primary.withOpacity(0.5),
                               width: 1.5,
                             ),
-                            borderRadius: BorderRadius.circular(20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            backgroundColor: _hasActiveFilters() 
+                              ? theme.colorScheme.primary.withOpacity(0.1)
+                              : Colors.transparent,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
                             children: [
                               Icon(
-                                _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                Icons.tune,
                                 size: 18,
                                 color: theme.colorScheme.primary,
                               ),
                               SizedBox(width: 4),
                               Text(
-                                'Sort: $_sortBy',
+                                _getFilterButtonText(),
                                 style: TextStyle(
                                   color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w500,
@@ -419,73 +325,172 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(width: 4),
-                              Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 18,
-                                color: theme.colorScheme.primary,
-                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  
-                  // 清除篩選按鈕
-                  if (_hasActiveFilters()) ...[
+                    
                     const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedFilters['brand'] = null;
-                          _selectedFilters['core'] = null;
-                          _selectedFilters['coverstock'] = null;
-                        });
-                      },
-                      icon: Icon(
-                        Icons.clear,
-                        color: theme.colorScheme.error,
-                        size: 18,
+                    
+                    // 排序下拉選單按鈕
+                    Expanded(
+                      flex: 2,
+                      child: SizedBox(
+                        height: 44, // 統一固定高度
+                        child: PopupMenuButton<String>(
+                          onSelected: (value) {
+                            setState(() {
+                              if (value.contains('_desc')) {
+                                _sortBy = value.replaceAll('_desc', '');
+                                _sortAscending = false;
+                              } else {
+                                _sortBy = value;
+                                _sortAscending = true;
+                              }
+                            });
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem(
+                              value: 'Name',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
+                                  SizedBox(width: 8),
+                                  Text('Name (A-Z)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'Name_desc',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
+                                  SizedBox(width: 8),
+                                  Text('Name (Z-A)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'RG',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
+                                  SizedBox(width: 8),
+                                  Text('RG (Low-High)'),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'RG_desc',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
+                                  SizedBox(width: 8),
+                                  Text('RG (High-Low)'),
+                                ],
+                              ),
+                            ),
+                          ],
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity, // 填滿SizedBox的高度
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: theme.colorScheme.primary.withOpacity(0.5),
+                                width: 1.5,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
+                              children: [
+                                Icon(
+                                  _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                  size: 18,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Sort: $_sortBy',
+                                  style: TextStyle(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    height: 1.2, // 統一行高
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 18,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: theme.colorScheme.error.withOpacity(0.1),
-                        padding: EdgeInsets.all(6),
-                      ),
-                      tooltip: 'Clear all filters',
                     ),
+                    
+                    // 清除篩選按鈕
+                    if (_hasActiveFilters()) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedFilters['brand'] = null;
+                            _selectedFilters['core'] = null;
+                            _selectedFilters['coverstock'] = null;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.clear,
+                          color: theme.colorScheme.error,
+                          size: 18,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: theme.colorScheme.error.withOpacity(0.1),
+                          padding: EdgeInsets.all(6),
+                        ),
+                        tooltip: 'Clear all filters',
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-            
-            // 列表標題
-            BallListHeader(),
-            
-            // 16dp 間距
-            const SizedBox(height: 16),
-            
-            // 球列表
-            Expanded(
-              child: BallListView(
-                balls: _filteredAndSortedBalls,
-                searchText: _searchText,
-                onBallTap: (ball) {
-                  print('Navigate to ball detail: ${ball.name}');
-                  // TODO: 導航到球詳細頁面
-                },
-                onBallLongPress: (ball) {
-                  print('Show ball options: ${ball.name}');
-                  // 顯示球詳細資訊彈出框
-                  showBallDetails(context, ball);
-                },
+              
+              // 列表標題
+              BallListHeader(),
+              
+              // 16dp 間距
+              const SizedBox(height: 16),
+              
+              // 球列表
+              Expanded(
+                child: BallListView(
+                  balls: _filteredAndSortedBalls,
+                  searchText: _searchText,
+                  onBallTap: (ball) {
+                    print('Navigate to ball detail: ${ball.name}');
+                    // TODO: 導航到球詳細頁面
+                  },
+                  onBallLongPress: (ball) {
+                    print('Show ball options: ${ball.name}');
+                    // 顯示球詳細資訊彈出框
+                    showBallDetails(context, ball);
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: ModernBottomNavigation(
-          currentIndex: _bottomNavIndex,
-          onTap: _onBottomNavTapped,
+            ],
+          ),
+          bottomNavigationBar: ModernBottomNavigation(
+            currentIndex: _bottomNavIndex,
+            onTap: _onBottomNavTapped,
+          ),
         ),
       ),
     );

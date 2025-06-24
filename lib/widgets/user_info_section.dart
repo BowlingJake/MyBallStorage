@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-// import 'package:glass_kit/glass_kit.dart'; // 暫時註解掉有問題的插件
+import 'package:iconsax/iconsax.dart';
+import 'dart:ui'; // For ImageFilter.blur
 
 class UserInfoSection extends StatelessWidget {
   final String userName;
@@ -9,217 +10,157 @@ class UserInfoSection extends StatelessWidget {
 
   const UserInfoSection({
     Key? key,
-    this.userName = '打保齡遊戲玩國',
-    this.location = '@Location',
+    this.userName = 'Jake Cheng',
+    this.location = 'Taipei, Taiwan',
     this.userPhotoUrl,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+    final accentColor = theme.colorScheme.primary;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-      decoration: BoxDecoration(
-        // 更大的圓角
-        borderRadius: BorderRadius.circular(32),
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.85),
-            theme.colorScheme.primary.withOpacity(0.7),
-            theme.colorScheme.secondary.withOpacity(0.6),
-            theme.colorScheme.primary.withOpacity(0.75),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          stops: const [0.0, 0.4, 0.7, 1.0],
-        ),
-        boxShadow: [
-          // 主要陰影
-          BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-            spreadRadius: 3,
-          ),
-          // 深層陰影
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-            spreadRadius: -5,
-          ),
-          // 內部光暈
-          BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-            spreadRadius: 1,
-          ),
-        ],
-      ),
+      height: 120,
       child: Stack(
         children: [
-          // 背景裝飾圓圈
+          // 1. 背景光暈和點綴
           Positioned(
-            top: -20,
-            right: -20,
+            top: 10,
+            left: 20,
             child: Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.3),
+                    blurRadius: 40,
+                    spreadRadius: 10,
+                  ),
+                ],
               ),
             ),
-          ),
-          Positioned(
-            bottom: -30,
-            left: -30,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.03),
+          ).animate().fadeIn(duration: 900.ms).scale(begin: Offset(0.5, 0.5)),
+
+          // 2. 主要的玻璃擬態卡片
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24.0),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(24.0),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-          
-          // 主要內容
-          Padding(
-            padding: const EdgeInsets.all(20), // 減少 padding
-            child: Row(
-              children: [
-                // 左側用戶資訊
-                Expanded(
-                  child: Column(
+          ).animate().slideY(begin: 0.2, duration: 600.ms, curve: Curves.easeOut).fadeIn(),
+
+          // 3. 內容
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 左側資訊
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // 問候語
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Hi, ',
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: Colors.white.withOpacity(0.9),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                height: 1.2,
-                              ),
-                            ),
-                            TextSpan(
-                              text: userName,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 18,
-                                height: 1.2,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        userName,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(blurRadius: 8, color: accentColor.withOpacity(0.5))
+                          ]
                         ),
-                      ).animate().fadeIn(delay: 200.ms, duration: 600.ms).slideX(begin: -0.2),
-                      
-                      const SizedBox(height: 4), // 非常緊密的間距
-                      
-                      // 位置資訊
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Icon(
-                              Icons.location_on_outlined,
-                              color: Colors.white.withOpacity(0.9),
-                              size: 14,
-                            ),
-                          ),
+                          Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
                           const SizedBox(width: 6),
                           Text(
                             location,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.85),
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.3,
-                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.7),
                             ),
-                          ).animate().fadeIn(delay: 400.ms, duration: 600.ms),
+                          ),
                         ],
-                      ),
+                      ).animate().fadeIn(delay: 600.ms),
                     ],
                   ),
-                ),
-                
-                const SizedBox(width: 12), // 縮緊與頭像的間距
-                
-                // 用戶頭像
-                _buildUserAvatar(theme).animate()
-                    .fadeIn(delay: 300.ms, duration: 600.ms)
-                    .scale(begin: const Offset(0.8, 0.8)),
-              ],
+
+                  // 右側頭像
+                  _buildUserAvatar(theme, accentColor)
+                    .animate()
+                    .fadeIn(delay: 400.ms)
+                    .scale(begin: Offset(0.7, 0.7), curve: Curves.elasticOut),
+                ],
+              ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
 
-  // 增強的用戶頭像
-  Widget _buildUserAvatar(ThemeData theme) {
+  Widget _buildUserAvatar(ThemeData theme, Color accentColor) {
     return Container(
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.4),
-            Colors.white.withOpacity(0.2),
+            accentColor.withOpacity(0.6),
+            Colors.white.withOpacity(0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-            spreadRadius: 1,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 10,
+            offset: const Offset(4, 4),
           ),
           BoxShadow(
-            color: Colors.white.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(-2, -2),
-            spreadRadius: 1,
+            color: accentColor.withOpacity(0.3),
+            blurRadius: 15,
+            spreadRadius: 2,
           ),
         ],
       ),
-      padding: const EdgeInsets.all(3),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withOpacity(0.6),
-            width: 2,
-          ),
-        ),
-        child: CircleAvatar(
-          radius: 26,
-          backgroundColor: Colors.white,
-          backgroundImage: userPhotoUrl != null ? NetworkImage(userPhotoUrl!) : null,
-          child: userPhotoUrl == null
-              ? Icon(
-                  Icons.person,
-                  size: 30,
-                  color: theme.colorScheme.primary,
-                )
-              : null,
-        ),
-      ),
+      child: userPhotoUrl != null
+          ? ClipOval(
+              child: Image.network(
+                userPhotoUrl!,
+                fit: BoxFit.cover,
+                width: 64,
+                height: 64,
+              ),
+            )
+          : Center(
+              child: Icon(
+                Iconsax.user,
+                color: Colors.white.withOpacity(0.9),
+                size: 32,
+              ),
+            ),
     );
   }
 } 

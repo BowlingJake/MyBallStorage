@@ -28,17 +28,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return provider.Consumer<ThemeService>(
-      builder: (context, themeService, child) {
-        return MaterialApp(
-          title: 'My Bowling App', // 您的應用程式標題
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: themeService.themeMode, // 使用主題服務的設定
-          home: const HomePage(), // 將 HomePage 設為首頁
-          debugShowCheckedModeBanner: false, // 移除右上角的 Debug 標籤 (可選)
-        );
-      },
+    // 直接使用並固定為深色主題
+    return MaterialApp(
+      title: 'My Bowling App', // 您的應用程式標題
+      theme: darkTheme, // 固定使用深色主題
+      // darkTheme: darkTheme, // 不需要分別設定
+      // themeMode: themeService.themeMode, // 不需要主題模式切換
+      home: const HomePage(), // 將 HomePage 設為首頁
+      debugShowCheckedModeBanner: false, // 移除右上角的 Debug 標籤 (可選)
     );
   }
 }

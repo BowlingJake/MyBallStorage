@@ -8,6 +8,7 @@ import 'widgets/training/training_session_card.dart';
 import 'widgets/training/delete_confirmation_dialog.dart';
 import 'widgets/training/training_detail_dialog.dart';
 import 'widgets/training/training_empty_state.dart';
+import 'widgets/professional_dark_background.dart';
 import 'widgets/modern_bottom_navigation.dart';
 import 'ball_library_page.dart';
 import 'views/training_card_test_page.dart';
@@ -118,11 +119,14 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        // 參考 Ball Library 的設計
-        backgroundColor: Colors.white,
-        foregroundColor: theme.colorScheme.primary,
+    return ProfessionalDarkBackground(
+      backgroundImage: 'images/Sport_Tech_Background.png',
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          // Professional Dark 風格的透明AppBar
+          backgroundColor: Colors.transparent,
+          foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
         shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -207,6 +211,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       bottomNavigationBar: ModernBottomNavigation(
         currentIndex: _bottomNavIndex,
         onTap: _onBottomNavTapped,
+      ),
       ),
     );
   }

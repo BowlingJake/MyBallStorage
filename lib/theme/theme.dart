@@ -11,11 +11,11 @@ import 'package:google_fonts/google_fonts.dart';
 /// 強調色，用於所有可互動的元素和圖表，柔和的護眼藍綠色
 const Color accentColor = Color(0xFF4A9EAF); // 柔和的藍綠色
 
-/// App 的主要背景色，更深的暗色以減少眼睛疲勞
-const Color darkBackgroundColor = Color(0xFF0F1419);
+/// App 的主要背景色，Professional Dark風格的深色背景
+const Color darkBackgroundColor = Color(0xFF0F0F0F);
 
 /// 卡片、對話框等元件的表面顏色，比背景稍亮以創造層次
-const Color darkSurfaceColor = Color(0xFF1C2128);
+const Color darkSurfaceColor = Color(0xFF1E1E1E);
 
 
 // --- 淺色主題用的顏色 (來自你的原始檔案) ---
@@ -33,51 +33,51 @@ final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
 
   // --- 核心顏色配置 ---
-  scaffoldBackgroundColor: darkBackgroundColor,
+  scaffoldBackgroundColor: Colors.transparent, // 背景由 ProfessionalDarkBackground 提供
   colorScheme: const ColorScheme.dark(
     primary: accentColor,
-    onPrimary: Color(0xFF0F1419), // 在柔和強調色上，用深色文字
-    secondary: accentColor, // 輔助色也用同一個，保持簡潔
-    onSecondary: Color(0xFF0F1419),
+    onPrimary: Color(0xFFFFFFFF), // 在強調色上的文字改為純白
+    secondary: accentColor, 
+    onSecondary: Color(0xFFFFFFFF), // 在強調色上的文字改為純白
     background: darkBackgroundColor,
-    onBackground: Color(0xFFE1E5E9), // 使用柔和的灰白色
+    onBackground: Color(0xFFF5F5F5), // 主要文字改為更亮的灰白
     surface: darkSurfaceColor,
-    onSurface: Color(0xFFD1D5DA), // 使用稍暗的灰白色
-    error: Color(0xFFE06C75), // 更柔和的紅色
-    onError: Color(0xFFE1E5E9),
+    onSurface: Color(0xFFFFFFFF), // 卡片上的文字改為純白
+    error: Color(0xFFE57373), // 稍亮的紅色以提高可見度
+    onError: Color(0xFF000000), // 錯誤訊息上的文字用黑色
   ),
 
   // --- 文字排版主題 ---
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.lato(fontSize: 57, fontWeight: FontWeight.bold, color: const Color(0xFFE1E5E9)),
-    displayMedium: GoogleFonts.lato(fontSize: 45, fontWeight: FontWeight.bold, color: const Color(0xFFE1E5E9)),
-    displaySmall: GoogleFonts.lato(fontSize: 36, fontWeight: FontWeight.bold, color: const Color(0xFFE1E5E9)),
+    displayLarge: GoogleFonts.lato(fontSize: 57, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
+    displayMedium: GoogleFonts.lato(fontSize: 45, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
+    displaySmall: GoogleFonts.lato(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
     
-    headlineLarge: GoogleFonts.lato(fontSize: 32, fontWeight: FontWeight.bold, color: const Color(0xFFE1E5E9)),
-    headlineMedium: GoogleFonts.lato(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFFE1E5E9)),
-    headlineSmall: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.w500, color: const Color(0xFFE1E5E9)),
+    headlineLarge: GoogleFonts.lato(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
+    headlineMedium: GoogleFonts.lato(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
+    headlineSmall: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.w500, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
 
-    titleLarge: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w500, color: const Color(0xFFD1D5DA)),
-    titleMedium: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 0.15, color: const Color(0xFFD1D5DA)),
-    titleSmall: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1, color: const Color(0xFFD1D5DA)),
+    titleLarge: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w500, color: const Color(0xFFF5F5F5)),
+    titleMedium: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 0.15, color: const Color(0xFFF5F5F5)),
+    titleSmall: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1, color: const Color(0xFFF5F5F5)),
 
-    bodyLarge: GoogleFonts.lato(fontSize: 16, color: const Color(0xFFB3B8C1)),
-    bodyMedium: GoogleFonts.lato(fontSize: 14, color: const Color(0xFFB3B8C1)),
-    bodySmall: GoogleFonts.lato(fontSize: 12, color: const Color(0xFF8B949E)),
+    bodyLarge: GoogleFonts.lato(fontSize: 16, color: const Color(0xFFE0E0E0)),
+    bodyMedium: GoogleFonts.lato(fontSize: 14, color: const Color(0xFFE0E0E0)),
+    bodySmall: GoogleFonts.lato(fontSize: 12, color: const Color(0xFFBDBDBD)),
 
     // 這是關鍵：為「數據」和需要精準對齊的標籤建立一個專門的樣式
-    labelLarge: GoogleFonts.robotoMono(fontSize: 14, fontWeight: FontWeight.w500, color: accentColor),
-    labelMedium: GoogleFonts.robotoMono(fontSize: 12, color: const Color(0xFF8B949E)),
-    labelSmall: GoogleFonts.robotoMono(fontSize: 11, color: const Color(0xFF8B949E)),
+    labelLarge: GoogleFonts.robotoMono(fontSize: 14, fontWeight: FontWeight.w500, color: accentColor, shadows: [const Shadow(blurRadius: 2, color: accentColor)]),
+    labelMedium: GoogleFonts.robotoMono(fontSize: 12, color: const Color(0xFFBDBDBD)),
+    labelSmall: GoogleFonts.robotoMono(fontSize: 11, color: const Color(0xFFBDBDBD)),
   ),
 
   // --- 元件主題 ---
 
   // App Bar
   appBarTheme: const AppBarTheme(
-    backgroundColor: darkBackgroundColor,
+    backgroundColor: Colors.transparent, // AppBar 背景設為透明
     elevation: 0,
-    foregroundColor: Color(0xFFE1E5E9), // 使用柔和的灰白色
+    foregroundColor: Colors.white, // AppBar 上的圖示和文字顏色
   ),
 
   // 卡片
