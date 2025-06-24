@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
-import 'dart:ui'; // For ImageFilter.blur
+import 'package:bowlingarsenal_app/widgets/standard_app_card.dart'; // 導入新的標準卡片
 
 class UserInfoSection extends StatelessWidget {
   final String userName;
@@ -20,108 +20,57 @@ class UserInfoSection extends StatelessWidget {
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
 
-    return Container(
-      height: 120,
-      child: Stack(
+    // 使用新的標準卡片作為基底
+    return StandardAppCard(
+      // 移除卡片預設的垂直邊距，因為外部容器會處理
+      margin: EdgeInsets.zero, 
+      // 增加內部 padding 以提供足夠的呼吸空間
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0), 
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 1. 背景光暈和點綴
-          Positioned(
-            top: 10,
-            left: 20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: accentColor.withOpacity(0.3),
-                    blurRadius: 40,
-                    spreadRadius: 10,
-                  ),
-                ],
+          // 左側資訊
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                userName,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ).animate().fadeIn(duration: 900.ms).scale(begin: Offset(0.5, 0.5)),
-
-          // 2. 主要的玻璃擬態卡片
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24.0),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(24.0),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.15),
-                      width: 1.5,
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
+                  const SizedBox(width: 6),
+                  Text(
+                    location,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.7),
                     ),
                   ),
-                ),
-              ),
-            ),
-          ).animate().slideY(begin: 0.2, duration: 600.ms, curve: Curves.easeOut).fadeIn(),
-
-          // 3. 內容
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // 左側資訊
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(blurRadius: 8, color: accentColor.withOpacity(0.5))
-                          ]
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
-                          const SizedBox(width: 6),
-                          Text(
-                            location,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                          ),
-                        ],
-                      ).animate().fadeIn(delay: 600.ms),
-                    ],
-                  ),
-
-                  // 右側頭像
-                  _buildUserAvatar(theme, accentColor)
-                    .animate()
-                    .fadeIn(delay: 400.ms)
-                    .scale(begin: Offset(0.7, 0.7), curve: Curves.elasticOut),
                 ],
               ),
-            ),
-          )
+            ],
+          ),
+
+          // 右側頭像
+          _buildUserAvatar(theme, accentColor),
         ],
       ),
     );
   }
 
   Widget _buildUserAvatar(ThemeData theme, Color accentColor) {
+    // 保持頭像原有的精緻設計，它與新卡片風格是協調的
     return Container(
-      width: 64,
-      height: 64,
+      width: 52,
+      height: 52,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
@@ -150,15 +99,15 @@ class UserInfoSection extends StatelessWidget {
               child: Image.network(
                 userPhotoUrl!,
                 fit: BoxFit.cover,
-                width: 64,
-                height: 64,
+                width: 52,
+                height: 52,
               ),
             )
           : Center(
               child: Icon(
                 Iconsax.user,
                 color: Colors.white.withOpacity(0.9),
-                size: 32,
+                size: 28,
               ),
             ),
     );

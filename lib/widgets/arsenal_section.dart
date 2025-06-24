@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/arsenal_ball.dart';
 import '../views/my_arsenal_page.dart';
-import 'home_arsenal_card.dart';
+import 'arsenal_card.dart';
 
 class ArsenalSection extends ConsumerStatefulWidget {
   final VoidCallback? onSeeAllPressed;
@@ -37,7 +37,7 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
   }
 
   void _onScroll() {
-    final cardWidth = 120.0 + 12.0; // 卡片寬度 + 間距
+    final cardWidth = 130.0 + 16.0; // 卡片寬度 + 間距
     final currentIndex = (_scrollController.offset / cardWidth).round();
     if (currentIndex != _currentIndex) {
       setState(() {
@@ -49,6 +49,8 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
   @override
   Widget build(BuildContext context) {
     final List<ArsenalBall> arsenalBalls = ref.watch(userBallsProvider);
+    final theme = Theme.of(context);
+    final accentColor = theme.colorScheme.primary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,37 +58,37 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('My Arsenal', style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ) ?? TextStyle(
-              fontSize: 20, 
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onBackground,
-            )),
+            Text('My Arsenal', style: theme.textTheme.headlineMedium),
             TextButton(
               onPressed: widget.onSeeAllPressed ?? () => print('See All Arsenal'),
               style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: accentColor,
               ),
-              child: Text('See All'),
+              child: const Row(
+                children: [
+                  Text('See All'),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_ios, size: 14),
+                ],
+              ),
             ),
           ],
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         if (arsenalBalls.isEmpty)
           const Center(
             child: Text('Your arsenal is empty.'),
           )
         else ...[
           SizedBox(
-            height: 160,
+            height: 180,
             child: ListView.builder(
               controller: _scrollController,
               scrollDirection: Axis.horizontal,
               itemCount: arsenalBalls.length,
               itemBuilder: (context, index) {
                 final ball = arsenalBalls[index];
-                return HomeArsenalCard(
+                return ArsenalCard(
                   ball: ball,
                   onTap: () {
                     if (widget.onItemPressed != null) {
@@ -100,23 +102,24 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
             ),
           ),
           
-          // 分頁指示器
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           if (arsenalBalls.length > 1)
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: List.generate(
                   arsenalBalls.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: _currentIndex == index ? 8 : 6,
-                    height: _currentIndex == index ? 8 : 6,
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: _currentIndex == index ? 16 : 6,
+                    height: 6,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(3),
                       color: _currentIndex == index 
-                        ? const Color(0xFFf39c12)
-                        : Colors.grey.withOpacity(0.4),
+                        ? accentColor 
+                        : Colors.white.withOpacity(0.3),
                     ),
                   ),
                 ),
