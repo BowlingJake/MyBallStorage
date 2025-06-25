@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'dart:ui'; // For BackdropFilter and ImageFilter
+import 'package:iconsax/iconsax.dart';
 
 /// 浮動中心按鈕底部導覽列
 /// 特色：中心按鈕浮動且有凹槽效果
@@ -240,195 +242,101 @@ class _BottomNavPainter extends CustomPainter {
 class AnimatedFloatingBottomNavigation extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
-  final Color? backgroundColor;
-  final Color? centerButtonColor;
 
   const AnimatedFloatingBottomNavigation({
     super.key,
     required this.currentIndex,
     required this.onTap,
-    this.backgroundColor,
-    this.centerButtonColor,
   });
 
   @override
-  State<AnimatedFloatingBottomNavigation> createState() => _AnimatedFloatingBottomNavigationState();
+  State<AnimatedFloatingBottomNavigation> createState() =>
+      _AnimatedFloatingBottomNavigationState();
 }
 
-class _AnimatedFloatingBottomNavigationState extends State<AnimatedFloatingBottomNavigation>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _rotationAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.elasticOut,
-    ));
-    
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 0.125, // 45度旋轉
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-  }
-
-  @override
-  void didUpdateWidget(AnimatedFloatingBottomNavigation oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.currentIndex == 2 && oldWidget.currentIndex != 2) {
-      _controller.forward();
-    } else if (widget.currentIndex != 2) {
-      _controller.reverse();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _AnimatedFloatingBottomNavigationState
+    extends State<AnimatedFloatingBottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = widget.backgroundColor ?? Colors.white;
-    final centerColor = widget.centerButtonColor ?? theme.colorScheme.primary;
+    const double navBarHeight = 70.0;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.bottomCenter,
-      children: [
-        // 底部導覽列主體
-        CustomPaint(
-          size: Size(MediaQuery.of(context).size.width, 70),
-          painter: _BottomNavPainter(
-            color: bgColor,
-            notchMargin: 8.0,
-          ),
-          child: Container(
-            height: 70,
-            child: SafeArea(
-              child: Row(
-                children: [
-                  _buildNavItem(Icons.home_rounded, '首頁', 0, theme),
-                  _buildNavItem(Icons.people_rounded, '社群', 1, theme),
-                  const Expanded(child: SizedBox()),
-                  _buildNavItem(Icons.sports_baseball_rounded, '訓練', 3, theme),
-                  _buildNavItem(Icons.account_circle_rounded, '個人', 4, theme),
-                ],
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          height: navBarHeight + MediaQuery.of(context).padding.bottom,
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withOpacity(0.1),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withOpacity(0.2),
+                width: 0.5,
               ),
             ),
           ),
-        ),
-        
-        // 動畫浮動中心按鈕
-        Positioned(
-          bottom: 25,
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Transform.rotate(
-                  angle: _rotationAnimation.value * 2 * math.pi,
-                  child: GestureDetector(
-                    onTap: () => widget.onTap(2),
-                    child: Container(
-                      width: 65,
-                      height: 65,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [centerColor, centerColor.withOpacity(0.8)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: centerColor.withOpacity(0.4),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        widget.currentIndex == 2 ? Icons.close : Icons.add,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
+          child: Row(
+            children: [
+              _buildNavItem(Iconsax.home_2, '首頁', 0, theme),
+              _buildNavItem(Iconsax.people, '社群', 1, theme),
+              _buildNavItem(Iconsax.add_square, '新增', 2, theme, isCenter: true),
+              _buildNavItem(Iconsax.cup, '訓練', 3, theme),
+              _buildNavItem(Iconsax.user, '個人', 4, theme),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme) {
+  Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme,
+      {bool isCenter = false}) {
     final bool isSelected = widget.currentIndex == index;
-    
+    final Color selectedColor = theme.colorScheme.primary;
+    final Color unselectedColor = Colors.white.withOpacity(0.7);
+
     return Expanded(
       child: GestureDetector(
         onTap: () => widget.onTap(index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(6),
-                decoration: isSelected
-                  ? BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    )
-                  : null,
+        behavior: HitTestBehavior.translucent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: const EdgeInsets.all(4), // Give some space for the shadow
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: selectedColor.withOpacity(0.7),
+                    blurRadius: 15,
+                    spreadRadius: 3,
+                  ),
+                ] : [],
+              ),
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 250),
+                scale: isSelected ? 1.2 : 1.0,
                 child: Icon(
                   icon,
-                  color: isSelected 
-                    ? theme.colorScheme.primary
-                    : Colors.grey.shade500,
-                  size: 24,
+                  color: isSelected ? selectedColor : unselectedColor,
+                  size: isCenter ? 30 : 22,
                 ),
               ),
-              const SizedBox(height: 2),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: TextStyle(
-                  color: isSelected 
-                    ? theme.colorScheme.primary
-                    : Colors.grey.shade500,
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-                child: Text(label),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? selectedColor : unselectedColor,
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

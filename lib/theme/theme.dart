@@ -82,7 +82,7 @@ final ThemeData darkTheme = ThemeData(
 
   // 卡片
   cardTheme: CardTheme(
-    color: darkSurfaceColor,
+    color: Colors.transparent, // 全域卡片背景設為透明
     elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
@@ -157,3 +157,38 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
 );
+
+// ===========================================================================
+// 4. 設計 Token：Glow 效果
+// 建立統一的光暈效果，確保整個App的視覺一致性
+// ===========================================================================
+class AppGlows {
+  static final Color _glowColor = accentColor.withOpacity(0.3);
+
+  /// 小光暈 - 用於按鈕等小型元件
+  static List<BoxShadow> get small => [
+    BoxShadow(
+      color: _glowColor,
+      blurRadius: 8,
+      spreadRadius: 2,
+    ),
+  ];
+
+  /// 中光暈 - 用於卡片、彈窗等中型元件
+  static List<BoxShadow> get medium => [
+    BoxShadow(
+      color: _glowColor.withOpacity(0.2), // 稍微降低不透明度
+      blurRadius: 16,
+      spreadRadius: 5,
+    ),
+  ];
+
+  /// 大光暈 - 用於頁面背景或需要強烈視覺效果的場景
+  static List<BoxShadow> get large => [
+    BoxShadow(
+      color: _glowColor.withOpacity(0.15),
+      blurRadius: 30,
+      spreadRadius: 10,
+    ),
+  ];
+}

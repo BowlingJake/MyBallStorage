@@ -50,7 +50,7 @@ class ArsenalSearchBar extends StatelessWidget {
             ),
           ),
           filled: true,
-          fillColor: theme.colorScheme.surface,
+          fillColor: Colors.transparent,
           contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
         style: TextStyle(

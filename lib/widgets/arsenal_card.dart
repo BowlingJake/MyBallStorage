@@ -21,6 +21,7 @@ class ArsenalCard extends StatelessWidget {
       width: 130, // 給定一個固定寬度以在 ListView 中正常顯示
       margin: const EdgeInsets.only(right: 16),
       child: StandardAppCard(
+        variant: StandardAppCardVariant.nested, // 使用嵌套變體以獲得更好的視覺對比
         onTap: onTap,
         margin: EdgeInsets.zero, // 父容器已處理 margin
         padding: const EdgeInsets.all(12),

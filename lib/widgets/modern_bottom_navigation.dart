@@ -6,15 +6,11 @@ import 'floating_bottom_navigation.dart';
 class ModernBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
-  final Color? backgroundColor;
-  final Color? centerButtonColor;
-  
+
   const ModernBottomNavigation({
     super.key,
     required this.currentIndex,
     required this.onTap,
-    this.backgroundColor,
-    this.centerButtonColor,
   });
 
   @override
@@ -22,11 +18,8 @@ class ModernBottomNavigation extends StatelessWidget {
     return AnimatedFloatingBottomNavigation(
       currentIndex: currentIndex,
       onTap: onTap,
-      backgroundColor: backgroundColor,
-      centerButtonColor: centerButtonColor,
     );
   }
-
 }
 
  

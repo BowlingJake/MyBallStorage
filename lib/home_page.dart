@@ -1,10 +1,13 @@
 // lib/home_page.dart
 import 'package:flutter/material.dart';
+import 'dart:ui'; // For BackdropFilter
+import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 import 'widgets/user_info_section.dart';
 import 'widgets/arsenal_section.dart';
 import 'widgets/tournament_section.dart';
 import 'widgets/modern_tournament_section.dart';
 import 'widgets/professional_dark_background.dart';
+import 'widgets/section_container.dart'; // 導入新的容器元件
 import 'ball_library_page.dart';
 import 'views/my_arsenal_page.dart';
 import 'views/settings_page.dart';
@@ -24,6 +27,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0; // 用於 BottomNavigationBar
+  final _userCardKey = GlobalKey(); // 1. 建立一個 GlobalKey 來追蹤使用者卡片
+  Rect? _userCardRect; // 2. 用於儲存卡片的矩形區域
+
+  @override
+  void initState() {
+    super.initState();
+    // 3. 在第一幀渲染結束後，計算卡片的 Rect
+    WidgetsBinding.instance.addPostFrameCallback((_) => _calculateUserCardRect());
+  }
+
+  void _calculateUserCardRect() {
+    final RenderBox? renderBox = _userCardKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      final size = renderBox.size;
+      final position = renderBox.localToGlobal(Offset.zero);
+      final newRect = Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
+
+      // 檢查是否需要更新，避免不必要的重繪
+      if (_userCardRect != newRect) {
+        setState(() {
+          _userCardRect = newRect;
+        });
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     // 導覽邏輯
@@ -83,10 +111,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return ProfessionalDarkBackground(
       backgroundImage: 'images/Sport_Tech_Background.png',
+      cutoutRects: _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        // 恢復頂端導航列，只放通知按鈕
         appBar: AppBar(
+          centerTitle: true, // 將標題置中
           title: Text(
             'StrikeTrack',
             style: TextStyle(
@@ -94,37 +123,28 @@ class _HomePageState extends State<HomePage> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          actions: [
-            // 設定按鈕
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              child: _buildSettingsButton(context),
-            ),
-            // 通知按鈕
-            Container(
-              margin: const EdgeInsets.only(right: 16),
-              child: _buildNotificationButton(context),
-            ),
-          ],
+          // 移除 actions
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
+        drawer: _buildAppDrawer(context), // 加入抽屜選單
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 用戶資訊區塊 - 現在是可滾動的四方圓角卡片
+                // 將 Key 附加到一個非 const 的父元件上
                 Align(
                   alignment: Alignment.center,
                   child: Container(
-                    constraints: BoxConstraints(maxWidth: 400), // 直接約束最大寬度
+                    key: _userCardKey, // 把 Key "貼" 在這裡
+                    constraints: const BoxConstraints(maxWidth: 400),
                     child: const UserInfoSection(
+                      // 保持 UserInfoSection 為 const 以獲得性能優化
                       userName: 'Jake Cheng',
                       location: 'Taipei, Taiwan',
-                      // userPhotoUrl: 'your_photo_url_here', // 可選
                     ),
                   ),
                 ),
@@ -240,87 +260,115 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // 頂端導航列的設定按鈕
-  Widget _buildSettingsButton(BuildContext context) {
+  // 建立抽屜選單 (Drawer)
+  Widget _buildAppDrawer(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SettingsPage()),
-        );
-      },
-      child: Container(
-        height: 40,
-        width: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.primary.withOpacity(0.1),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.settings_outlined,
-            color: theme.colorScheme.primary,
-            size: 20,
+    return ClipRRect(
+      // 抽屜的右側邊緣使用圓角
+      borderRadius: const BorderRadius.only(
+        topRight: Radius.circular(25),
+        bottomRight: Radius.circular(25),
+      ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Drawer(
+          backgroundColor: theme.colorScheme.surface.withOpacity(0.2),
+          elevation: 0,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              // 抽屜頂部
+              SizedBox(
+                height: 150,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.transparent, // 背景由BackdropFilter提供
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'StrikeTrack',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // 功能列表
+              _buildDrawerItem(
+                context,
+                icon: Iconsax.setting_2,
+                title: 'Settings',
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  );
+                },
+              ),
+              _buildDrawerItem(
+                context,
+                icon: Iconsax.notification,
+                title: 'Notifications',
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Navigate to Notifications Page
+                  print('Navigate to Notifications');
+                },
+              ),
+              const Divider(color: Colors.white24, indent: 20, endIndent: 20),
+              _buildDrawerItem(
+                context,
+                icon: Iconsax.info_circle,
+                title: 'About',
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Show About Dialog
+                  print('Show About Dialog');
+                },
+              ),
+              _buildDrawerItem(
+                context,
+                icon: Iconsax.logout,
+                title: 'Logout',
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Implement Logout Logic
+                  print('Logout Tapped');
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // 頂端導航列的通知按鈕
-  Widget _buildNotificationButton(BuildContext context) {
+  // 建立抽屜選單的項目
+  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap}) {
     final theme = Theme.of(context);
-    return Container(
-      height: 40,
-      width: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: theme.colorScheme.primary.withOpacity(0.1),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-          width: 1,
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: theme.colorScheme.onSurface.withOpacity(0.8),
+      ),
+      title: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: theme.colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
         ),
       ),
-      child: Stack(
-        children: [
-          Center(
-            child: Icon(
-              Icons.notifications_outlined,
-              color: theme.colorScheme.primary,
-              size: 20,
-            ),
-          ),
-          // 通知紅點
-          Positioned(
-            right: 6,
-            top: 6,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.red.withOpacity(0.4),
-                    blurRadius: 4,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+      onTap: onTap,
+      splashColor: theme.colorScheme.primary.withOpacity(0.2),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gradient_borders/gradient_borders.dart';
 import '../theme/brand_colors.dart';
 // import 'package:getwidget/getwidget.dart'; // GFListTile is no longer used
 
@@ -189,77 +190,65 @@ class _BallCardItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brandPalette = getBrandTonalPalette(ball.brand, theme);
-    final List<Color> gradientColors = brandPalette.getCardGradient();
-    final bool isWarmColor = brandPalette.isWarmColor();
     final ringColor = brandPalette.shade600;
 
+    // 根據品牌主色動態產生金屬光澤的漸層
+    final Color brandColor = brandPalette.primary;
+    final HSVColor hsvColor = HSVColor.fromColor(brandColor);
+
+    final Color highlightColor = hsvColor.withValue( (hsvColor.value + 0.3).clamp(0.0, 1.0) ).withSaturation( (hsvColor.saturation - 0.2).clamp(0.0, 1.0) ).toColor();
+    final Color shadowColor = hsvColor.withValue( (hsvColor.value - 0.4).clamp(0.0, 1.0) ).toColor();
+
+
+    final brandGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        highlightColor,
+        brandColor,
+        shadowColor,
+        brandColor,
+        highlightColor,
+      ],
+      stops: const [0.0, 0.3, 0.6, 0.8, 1.0],
+    );
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0), // 減少間距從 8.0 到 4.0
+      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.grey[300]!.withOpacity(0.6), // 淡灰色高光
-            ringColor.withOpacity(0.9), // 品牌色
-            ringColor, // 主色
-            ringColor.withOpacity(0.7), // 較深的品牌色
-            Colors.grey[800]!.withOpacity(0.8), // 深灰陰影
-            Colors.black.withOpacity(0.6), // 黑色邊緣
-          ],
-          stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+        borderRadius: BorderRadius.circular(18),
+        border: GradientBoxBorder(
+          gradient: brandGradient,
+          width: 3, // 邊框寬度
         ),
-        borderRadius: BorderRadius.circular(22),
         boxShadow: [
-          // 主要色彩光暈
+          // 主要深度陰影，讓卡片浮起來
           BoxShadow(
-            color: ringColor.withOpacity(0.25),
-            blurRadius: 14,
-            spreadRadius: 0,
-            offset: const Offset(0, 5),
-          ),
-          // 深色金屬反射（頂部）
-          BoxShadow(
-            color: Colors.grey[400]!.withOpacity(0.3),
-            blurRadius: 3,
-            spreadRadius: 0,
-            offset: const Offset(-1, -2),
-          ),
-          // 主要深度陰影
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 15,
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 12,
             spreadRadius: 1,
-            offset: const Offset(2, 5),
+            offset: const Offset(4, 4),
           ),
-          // 邊緣陰影
+          // 品牌色光暈效果
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            spreadRadius: 0,
-            offset: const Offset(1, 3),
+            color: brandColor.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 0),
           ),
         ],
       ),
       child: Container(
-        margin: const EdgeInsets.all(4.0), // 4px 邊框寬度
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          color: Colors.grey[50],
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 3,
-              spreadRadius: 0,
-              offset: const Offset(0, 1),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(15), // 內層圓角需比外層小
+          color: theme.colorScheme.surface,
         ),
         child: InkWell(
           onTap: onTap,
           onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(15), // 確保點擊效果也被裁切
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // 減少垂直padding
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Stack(
               children: [
                 // 主要內容 - 兩行佈局
@@ -271,7 +260,7 @@ class _BallCardItem extends StatelessWidget {
                       ball.name,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[900],
+                        color: theme.colorScheme.onSurface,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -283,7 +272,7 @@ class _BallCardItem extends StatelessWidget {
                           child: Text(
                             "Core Type: ${getCoreCategory(ball.core)}",
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.8),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -293,7 +282,7 @@ class _BallCardItem extends StatelessWidget {
                           width: 1,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: Colors.grey[400],
+                            color: theme.colorScheme.onSurface.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(0.5),
                           ),
                         ),
@@ -302,7 +291,7 @@ class _BallCardItem extends StatelessWidget {
                           child: Text(
                             "Cover Type: ${ball.coverstock}",
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.8),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -314,12 +303,12 @@ class _BallCardItem extends StatelessWidget {
                 // 右上角品牌標籤（橢圓形，無框線）
                 Positioned(
                   top: 0,
-                  right: 20, // 距離右邊20px，避免與色條碰撞
+                  right: 0, 
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
                     decoration: BoxDecoration(
-                      color: ringColor.withOpacity(0.15), // 15%透明度的品牌色背景
-                      borderRadius: BorderRadius.circular(14.0), // 橢圓形
+                      color: ringColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(14.0),
                     ),
                     child: Text(
                       cleanBrandName(ball.brand),
@@ -327,67 +316,6 @@ class _BallCardItem extends StatelessWidget {
                         color: ringColor,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                // 右側色條
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 6,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.grey[300]!.withOpacity(0.7),
-                          ringColor.withOpacity(0.95),
-                          ringColor,
-                          ringColor.withOpacity(0.8),
-                          Colors.grey[700]!.withOpacity(0.9),
-                          Colors.black.withOpacity(0.7),
-                        ],
-                        stops: const [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-                      ),
-                      borderRadius: BorderRadius.circular(3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ringColor.withOpacity(0.3),
-                          blurRadius: 6,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 2),
-                        ),
-                        BoxShadow(
-                          color: Colors.grey[400]!.withOpacity(0.4),
-                          blurRadius: 2,
-                          spreadRadius: 0,
-                          offset: const Offset(-1, -1),
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 8,
-                          spreadRadius: 0,
-                          offset: const Offset(1, 3),
-                        ),
-                      ],
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.grey[400]!.withOpacity(0.5),
-                            Colors.transparent,
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.4),
-                          ],
-                          stops: const [0.0, 0.3, 0.7, 1.0],
-                        ),
                       ),
                     ),
                   ),
@@ -430,21 +358,6 @@ class BallListView extends StatelessWidget {
 
     return Stack(
       children: [
-        // 背景層 - 淡藍灰質感背景配搭金屬卡片
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFF5F7FA), // 非常淡的藍灰
-                Color(0xFFE8EDF4), // 淡藍灰
-                Color(0xFFF5F7FA), // 非常淡的藍灰
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-        ),
         // 添加細微的點狀紋理效果
         Container(
           child: CustomPaint(

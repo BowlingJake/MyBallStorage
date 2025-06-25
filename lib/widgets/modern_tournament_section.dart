@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tournament.dart';
 import 'tournament_card.dart'; // 導入新的 TournamentCard
 import '../shared/enums.dart'; // 導入共享的 enum
+import 'section_container.dart'; // 導入新的容器元件
 
 /// 現代化Tournament區塊
 /// 垂直列表顯示錦標賽卡片
@@ -48,46 +49,26 @@ class ModernTournamentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('My Tournament', style: theme.textTheme.headlineMedium),
-            TextButton(
-              onPressed: onSeeAllPressed,
-              style: TextButton.styleFrom(
-                foregroundColor: theme.colorScheme.primary,
-              ),
-              child: const Row(
-                children: [
-                  Text('See All'),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_forward_ios, size: 14),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _tournaments.length,
-          itemBuilder: (context, index) {
-            final tournament = _tournaments[index];
-            return TournamentCard(
+    return SectionContainer(
+      title: 'My Tournament',
+      onSeeAllPressed: onSeeAllPressed,
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _tournaments.length,
+        itemBuilder: (context, index) {
+          final tournament = _tournaments[index];
+          return Padding(
+            padding: EdgeInsets.only(bottom: index < _tournaments.length - 1 ? 12.0 : 0),
+            child: TournamentCard(
               tournament: tournament,
               onTap: onTournamentPressed != null
                   ? () => onTournamentPressed!(tournament)
                   : null,
-            );
-          },
-        )
-      ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

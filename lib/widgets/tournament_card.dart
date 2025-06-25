@@ -22,6 +22,7 @@ class TournamentCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return StandardAppCard(
+      variant: StandardAppCardVariant.nested, // 使用嵌套變體以獲得更好的視覺對比
       onTap: onTap,
       padding: const EdgeInsets.all(16), // 增加 padding
       child: Row(

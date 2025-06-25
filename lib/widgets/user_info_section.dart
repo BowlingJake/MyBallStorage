@@ -7,12 +7,14 @@ class UserInfoSection extends StatelessWidget {
   final String userName;
   final String location;
   final String? userPhotoUrl;
+  final BoxConstraints? constraints;
 
   const UserInfoSection({
     Key? key,
     this.userName = 'Jake Cheng',
     this.location = 'Taipei, Taiwan',
     this.userPhotoUrl,
+    this.constraints,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,8 @@ class UserInfoSection extends StatelessWidget {
 
     // 使用新的標準卡片作為基底
     return StandardAppCard(
+      constraints: constraints,
+      enableGlow: false, // 關閉光暈效果，讓卡片完全透明
       // 移除卡片預設的垂直邊距，因為外部容器會處理
       margin: EdgeInsets.zero, 
       // 增加內部 padding 以提供足夠的呼吸空間

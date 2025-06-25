@@ -317,7 +317,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               SizedBox(width: 4),
                               Text(
                                 _getFilterButtonText(),
-                                style: TextStyle(
+                                style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
@@ -339,6 +339,16 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                       child: SizedBox(
                         height: 44, // 統一固定高度
                         child: PopupMenuButton<String>(
+                          offset: Offset(0, 50), // 調整選單位置，讓它出現在按鈕下方
+                          color: theme.colorScheme.surface.withOpacity(0.95), // 半透明背景
+                          elevation: 8, // 增加陰影深度
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12), // 圓角
+                            side: BorderSide(
+                              color: theme.colorScheme.primary.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
                           onSelected: (value) {
                             setState(() {
                               if (value.contains('_desc')) {
@@ -356,8 +366,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 8),
-                                  Text('Name (A-Z)'),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Name (A-Z)',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -366,8 +381,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 8),
-                                  Text('Name (Z-A)'),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Name (Z-A)',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -376,8 +396,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 8),
-                                  Text('RG (Low-High)'),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'RG (Low-High)',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -386,8 +411,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 8),
-                                  Text('RG (High-Low)'),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'RG (High-Low)',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -415,7 +445,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                                 SizedBox(width: 4),
                                 Text(
                                   'Sort: $_sortBy',
-                                  style: TextStyle(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.primary,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
