@@ -45,17 +45,19 @@ class TrainingRecordListItem extends StatelessWidget {
               shape: GFAvatarShape.circle,
             ),
             title: Text(
-              "${record.date.year}.${record.date.month.toString().padLeft(2, '0')}.${record.date.day.toString().padLeft(2, '0')} @ ${record.centerName}",
+              "${record.date.year}.${record.date.month.toString().padLeft(2, '0')}.${record.date.day.toString().padLeft(2, '0')} - ${record.title}",
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
               ),
             ),
             subTitle: Text(
-              "球道油型: ${record.oilPattern}",
+              "Score: ${record.score} | ${record.notes}",
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             icon: Icon(Icons.chevron_right, color: theme.colorScheme.outline),
             color: Colors.transparent,

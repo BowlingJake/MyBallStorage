@@ -26,11 +26,37 @@ const Color primaryColorLight = Color(0xFFA3D5DC);
 // ===========================================================================
 // 2. 深色主題 (Dark Theme)：數據驅動機能美學
 // ===========================================================================
+
+// --- 混合字體主題 ---
+// 建立一個基礎的 TextTheme，英文字體使用 Inter，並將 Noto Sans TC 作為備用
+TextTheme _buildTextTheme(TextTheme base) {
+  return base.copyWith(
+    displayLarge: GoogleFonts.inter(textStyle: base.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
+    displayMedium: GoogleFonts.inter(textStyle: base.displayMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
+    displaySmall: GoogleFonts.inter(textStyle: base.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
+    headlineLarge: GoogleFonts.inter(textStyle: base.headlineLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
+    headlineMedium: GoogleFonts.inter(textStyle: base.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
+    headlineSmall: GoogleFonts.inter(textStyle: base.headlineSmall?.copyWith(fontWeight: FontWeight.w500, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
+    titleLarge: GoogleFonts.inter(textStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w500, color: const Color(0xFFF5F5F5))),
+    titleMedium: GoogleFonts.inter(textStyle: base.titleMedium?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.15, color: const Color(0xFFF5F5F5))),
+    titleSmall: GoogleFonts.inter(textStyle: base.titleSmall?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.1, color: const Color(0xFFF5F5F5))),
+    bodyLarge: GoogleFonts.inter(textStyle: base.bodyLarge?.copyWith(color: const Color(0xFFE0E0E0))),
+    bodyMedium: GoogleFonts.inter(textStyle: base.bodyMedium?.copyWith(color: const Color(0xFFE0E0E0))),
+    bodySmall: GoogleFonts.inter(textStyle: base.bodySmall?.copyWith(color: const Color(0xFFBDBDBD))),
+    labelLarge: GoogleFonts.robotoMono(textStyle: base.labelLarge?.copyWith(fontWeight: FontWeight.w500, color: accentColor, shadows: [const Shadow(blurRadius: 2, color: accentColor)])),
+    labelMedium: GoogleFonts.robotoMono(textStyle: base.labelMedium?.copyWith(color: const Color(0xFFBDBDBD))),
+    labelSmall: GoogleFonts.robotoMono(textStyle: base.labelSmall?.copyWith(color: const Color(0xFFBDBDBD))),
+  );
+}
+
 final ThemeData darkTheme = ThemeData(
   // 啟用 Material 3 設計語言
   useMaterial3: true,
   // 明確指定主題亮度為深色
   brightness: Brightness.dark,
+  // 這裡設定主要字體，Noto Sans TC 作為後備
+  fontFamily: 'Inter',
+  fontFamilyFallback: const ['Noto Sans TC'],
 
   // --- 核心顏色配置 ---
   scaffoldBackgroundColor: Colors.transparent, // 背景由 ProfessionalDarkBackground 提供
@@ -48,27 +74,24 @@ final ThemeData darkTheme = ThemeData(
   ),
 
   // --- 文字排版主題 ---
-  textTheme: TextTheme(
-    displayLarge: GoogleFonts.lato(fontSize: 57, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
-    displayMedium: GoogleFonts.lato(fontSize: 45, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
-    displaySmall: GoogleFonts.lato(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)]),
-    
-    headlineLarge: GoogleFonts.lato(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
-    headlineMedium: GoogleFonts.lato(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
-    headlineSmall: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.w500, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)]),
-
-    titleLarge: GoogleFonts.lato(fontSize: 22, fontWeight: FontWeight.w500, color: const Color(0xFFF5F5F5)),
-    titleMedium: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 0.15, color: const Color(0xFFF5F5F5)),
-    titleSmall: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1, color: const Color(0xFFF5F5F5)),
-
-    bodyLarge: GoogleFonts.lato(fontSize: 16, color: const Color(0xFFE0E0E0)),
-    bodyMedium: GoogleFonts.lato(fontSize: 14, color: const Color(0xFFE0E0E0)),
-    bodySmall: GoogleFonts.lato(fontSize: 12, color: const Color(0xFFBDBDBD)),
-
-    // 這是關鍵：為「數據」和需要精準對齊的標籤建立一個專門的樣式
-    labelLarge: GoogleFonts.robotoMono(fontSize: 14, fontWeight: FontWeight.w500, color: accentColor, shadows: [const Shadow(blurRadius: 2, color: accentColor)]),
-    labelMedium: GoogleFonts.robotoMono(fontSize: 12, color: const Color(0xFFBDBDBD)),
-    labelSmall: GoogleFonts.robotoMono(fontSize: 11, color: const Color(0xFFBDBDBD)),
+  textTheme: _buildTextTheme(
+    ThemeData.dark().textTheme.copyWith(
+      displayLarge: const TextStyle(fontSize: 57),
+      displayMedium: const TextStyle(fontSize: 45),
+      displaySmall: const TextStyle(fontSize: 36),
+      headlineLarge: const TextStyle(fontSize: 32),
+      headlineMedium: const TextStyle(fontSize: 28),
+      headlineSmall: const TextStyle(fontSize: 24),
+      titleLarge: const TextStyle(fontSize: 22),
+      titleMedium: const TextStyle(fontSize: 16),
+      titleSmall: const TextStyle(fontSize: 14),
+      bodyLarge: const TextStyle(fontSize: 16),
+      bodyMedium: const TextStyle(fontSize: 14),
+      bodySmall: const TextStyle(fontSize: 12),
+      labelLarge: const TextStyle(fontSize: 14),
+      labelMedium: const TextStyle(fontSize: 12),
+      labelSmall: const TextStyle(fontSize: 11),
+    )
   ),
 
   // --- 元件主題 ---

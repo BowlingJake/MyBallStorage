@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as provider;
-import 'home_page.dart'; // 引入您的 home_page.dart
+import 'app_router.dart'; // 引入新的應用路由器
 import 'theme/theme.dart';
 import 'services/theme_service.dart';
 
@@ -28,14 +28,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 直接使用並固定為深色主題
     return MaterialApp(
-      title: 'My Bowling App', // 您的應用程式標題
+      title: 'StrikeTrack - 保齡球管理應用',
       theme: darkTheme, // 固定使用深色主題
-      // darkTheme: darkTheme, // 不需要分別設定
-      // themeMode: themeService.themeMode, // 不需要主題模式切換
-      home: const HomePage(), // 將 HomePage 設為首頁
-      debugShowCheckedModeBanner: false, // 移除右上角的 Debug 標籤 (可選)
+      home: const AppRouter(), // 使用智能路由器作為首頁
+      onGenerateRoute: AppRoutes.generateRoute, // 設定路由生成器
+      debugShowCheckedModeBanner: false,
     );
   }
 }

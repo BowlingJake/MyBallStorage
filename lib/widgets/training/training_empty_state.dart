@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
+import '../app_standard_button.dart';
 
 class TrainingEmptyState extends StatelessWidget {
   final VoidCallback onAddRecord;
@@ -60,19 +60,11 @@ class TrainingEmptyState extends StatelessWidget {
             
             const SizedBox(height: 40),
             
-            // Add Record 按鈕
-            GFButton(
-              onPressed: onAddRecord,
+            // Add Record 按鈕 - 使用 AppStandardButton
+            AppStandardButton(
               text: "Add Training Record",
-              icon: Icon(
-                Icons.add_circle_outline,
-                color: Colors.white,
-              ),
-              type: GFButtonType.solid,
-              color: theme.colorScheme.primary,
-              size: GFSize.LARGE,
-              shape: GFButtonShape.pills,
-              fullWidthButton: false,
+              icon: Icons.add_circle_outline,
+              onPressed: onAddRecord,
             ),
           ],
         ),

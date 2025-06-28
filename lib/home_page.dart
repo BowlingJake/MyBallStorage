@@ -12,8 +12,7 @@ import 'ball_library_page.dart';
 import 'views/my_arsenal_page.dart';
 import 'views/settings_page.dart';
 import 'my_training_page.dart';
-import 'demo/brand_palette_demo.dart';
-import 'demo/style_showcase_page.dart';
+import 'views/developer_page.dart';
 
 import 'widgets/modern_bottom_navigation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -123,7 +122,18 @@ class _HomePageState extends State<HomePage> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          // 移除 actions
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.developer_mode_outlined),
+              color: Theme.of(context).colorScheme.onSurface,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DeveloperPage()),
+                );
+              },
+            ),
+          ],
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
@@ -178,76 +188,7 @@ class _HomePageState extends State<HomePage> {
                     // TODO: 導航到錦標賽詳細頁面
                   },
                 ),
-                const SizedBox(height: 20),
-                
-                // 開發者選項 - 移到內容區域的底部
-                Column(
-                  children: [
-                    // 風格展示按鈕 - 主要功能
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StyleShowcasePage(),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.dashboard_customize,
-                          size: 20,
-                        ),
-                        label: Text(
-                          'APP 風格展示',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // 品牌色板示例 - 次要功能
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const BrandPaletteDemoPage(),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.palette_outlined, 
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                          size: 18,
-                        ),
-                        label: Text(
-                          '品牌色調色板示例',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 80), // 增加底部空間以確保內容不被導航欄遮擋
               ],
             ),
           ),

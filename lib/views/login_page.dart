@@ -1,107 +1,231 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'main_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sign_in_button/sign_in_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../providers/providers.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _userCtrl = TextEditingController();
-  final TextEditingController _passCtrl = TextEditingController();
-  bool _isLoggedIn = false;
-  bool _loading = true;
+class _LoginPageState extends ConsumerState<LoginPage> {
+  bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLogin();
+  // Placeholder for Google Sign-In logic
+  Future<void> _signInWithGoogle() async {
+    // This would call your auth provider's Google sign-in method
+    // For now, it's a placeholder.
+    print("Attempting Google Sign-In...");
+    // You would typically set loading state and handle success/error
   }
 
-  Future<void> _checkLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final logged = prefs.getBool('isLoggedIn') ?? false;
+  // Placeholder for Apple Sign-In logic
+  Future<void> _signInWithApple() async {
+    print("Attempting Apple Sign-In...");
+  }
+  
+  // Placeholder for Phone Sign-In logic
+  Future<void> _signInWithPhone() async {
+    print("Attempting Phone Sign-In...");
+  }
+
+  Future<void> _doGuestLogin() async {
     setState(() {
-      _isLoggedIn = logged;
-      _loading = false;
+      _isLoading = true;
     });
-  }
 
-  Future<void> _doLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainPage()),
-    );
+    try {
+      // 以訪客身份登入
+      await ref.read(authProvider.notifier).loginAsGuest();
+      
+      // 登入成功後，AppRouter 會自動導航到主頁（跳過 Onboarding）
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('訪客登入失敗：$e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _doLogin,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // 背景占位
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/login_page.png',
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/Sport_Tech_Background.png'),
                 fit: BoxFit.cover,
               ),
             ),
+          ),
 
-            // 中心內容
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          // Loading Indicator
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          
+          // Login UI
+          SafeArea(
+            child: Column(
               children: [
-                const SizedBox(height: 40),
+                // Top section with Logo and Title
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo_placeholder.png',
+                        height: 120,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'StrikeTrack',
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                          shadows: [
+                            const Shadow(
+                              color: Colors.black54,
+                              blurRadius: 15,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '您的專業保齡球數據庫',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.85),
+                          letterSpacing: 1.2,
+                           shadows: [
+                            const Shadow(
+                              color: Colors.black38,
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                if (!_isLoggedIn) ...[
-                  // 未登入：顯示帳號／密碼輸入框
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-                    child: TextField(
-                      controller: _userCtrl,
-                      decoration: const InputDecoration(labelText: '帳號'),
+                // Bottom Frosted Glass Container
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30.0),
+                    topRight: Radius.circular(30.0),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(30.0),
+                          topRight: Radius.circular(30.0),
+                        ),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Custom Google Sign-in Button
+                          SignInButtonBuilder(
+                            text: "使用 Google 帳戶登入",
+                            icon: Icons.circle_outlined,
+                            onPressed: _isLoading ? () {} : _signInWithGoogle,
+                            backgroundColor: Colors.white,
+                            textColor: Colors.black.withOpacity(0.8),
+                            iconColor: Colors.black.withOpacity(0.8),
+                            fontSize: 16,
+                            height: 50,
+                            width: double.infinity,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Custom Apple Sign-in Button
+                          SignInButtonBuilder(
+                            text: "使用 Apple 帳戶登入",
+                            icon: Icons.apple,
+                            onPressed: _isLoading ? () {} : _signInWithApple,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            iconColor: Colors.white,
+                            fontSize: 16,
+                            height: 50,
+                            width: double.infinity,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Custom Phone Sign-in Button
+                          SignInButtonBuilder(
+                            text: "使用手機號碼登入",
+                            icon: Icons.phone_iphone,
+                            onPressed: _isLoading ? () {} : _signInWithPhone,
+                            backgroundColor: theme.colorScheme.primary.withOpacity(0.9),
+                            textColor: Colors.white,
+                            iconColor: Colors.white,
+                            fontSize: 16,
+                            height: 50,
+                            width: double.infinity,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          GestureDetector(
+                            onTap: _isLoading ? null : _doGuestLogin,
+                            child: Text(
+                              '以訪客身份繼續',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-                    child: TextField(
-                      controller: _passCtrl,
-                      decoration: const InputDecoration(labelText: '密碼'),
-                      obscureText: true,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // 提示文字：點任意處登入
-                  const Text(
-                    '點任意處登入',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ] else ...[
-                  // 已登入：提示點任意處開始
-                  const Text(
-                    '點任意處開始',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
+                ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

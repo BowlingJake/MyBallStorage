@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
+import '../app_standard_button.dart';
 import 'dart:ui';
 
 // 刪除確認對話框
@@ -62,11 +62,13 @@ class DeleteConfirmationDialog extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              title,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             IconButton(
@@ -90,31 +92,58 @@ class DeleteConfirmationDialog extends StatelessWidget {
                         
                         const SizedBox(height: 32),
                         
-                        // 按鈕
+                        // 按鈕 - 使用 AppStandardButton
                         Row(
                           children: [
                             Expanded(
-                              child: GFButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                              child: AppStandardButton(
                                 text: "Cancel",
-                                type: GFButtonType.outline,
-                                color: Colors.white,
-                                size: GFSize.MEDIUM,
-                                shape: GFButtonShape.pills,
+                                onPressed: () => Navigator.of(context).pop(),
                               ),
                             ),
                             SizedBox(width: 12),
                             Expanded(
-                              child: GFButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  onConfirm();
-                                },
-                                text: "Delete",
-                                type: GFButtonType.outline,
-                                color: Colors.red,
-                                size: GFSize.MEDIUM,
-                                shape: GFButtonShape.pills,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.red.withOpacity(0.8),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                      onConfirm();
+                                    },
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Container(
+                                      height: 44,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.delete_outline,
+                                            size: 18,
+                                            color: Colors.red.withOpacity(0.9),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "Delete",
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              color: Colors.red.withOpacity(0.9),
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],

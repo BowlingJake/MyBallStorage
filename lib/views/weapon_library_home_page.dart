@@ -4,7 +4,7 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 import 'weapon_library_page.dart';
 import '../shared/dialogs/layout_dialog.dart';
 import 'package:provider/provider.dart';
-import 'ball_library_page.dart';
+import '../ball_library_page.dart';
 import '../theme/text_styles.dart';
 
 /// 武器庫主頁 (顯示導航選項)
