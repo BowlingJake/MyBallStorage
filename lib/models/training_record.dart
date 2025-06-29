@@ -1,3 +1,18 @@
+// 球具簡化資訊（用於訓練記錄）
+class BallInfo {
+  final String id;
+  final String name;
+  final String brand;
+  final String brandColor; // 品牌主色
+  
+  const BallInfo({
+    required this.id,
+    required this.name,
+    required this.brand,
+    required this.brandColor,
+  });
+}
+
 // 單局記錄模型
 class GameRecord {
   final String id;
@@ -8,6 +23,7 @@ class GameRecord {
   final int spares;
   final String? notes; // 備註
   final DateTime timestamp;
+  final BallInfo? ballUsed; // 使用的球具資訊
 
   GameRecord({
     required this.id,
@@ -18,6 +34,7 @@ class GameRecord {
     required this.spares,
     this.notes,
     required this.timestamp,
+    this.ballUsed, // 新增球具參數
   });
 
   factory GameRecord.fromJson(Map<String, dynamic> json) {
@@ -30,6 +47,14 @@ class GameRecord {
       spares: json['spares'] ?? 0,
       notes: json['notes'],
       timestamp: DateTime.parse(json['timestamp']),
+      ballUsed: json['ballUsed'] != null 
+        ? BallInfo(
+            id: json['ballUsed']['id'] ?? '',
+            name: json['ballUsed']['name'] ?? '',
+            brand: json['ballUsed']['brand'] ?? '',
+            brandColor: json['ballUsed']['brandColor'] ?? '#000000',
+          )
+        : null,
     );
   }
 
@@ -43,6 +68,14 @@ class GameRecord {
       'spares': spares,
       'notes': notes,
       'timestamp': timestamp.toIso8601String(),
+      'ballUsed': ballUsed != null 
+        ? {
+            'id': ballUsed!.id,
+            'name': ballUsed!.name,
+            'brand': ballUsed!.brand,
+            'brandColor': ballUsed!.brandColor,
+          }
+        : null,
     };
   }
 }
@@ -50,6 +83,7 @@ class GameRecord {
 // 訓練日摘要模型
 class TrainingDaySummary {
   final String id;
+  final String title; // 新增標題字段
   final DateTime date;
   final String center;
   final String? oilPatternName;
@@ -61,6 +95,7 @@ class TrainingDaySummary {
 
   TrainingDaySummary({
     required this.id,
+    required this.title, // 新增標題字段
     required this.date,
     required this.center,
     this.oilPatternName,
@@ -98,6 +133,39 @@ class TrainingDaySummary {
     ? 0.0 
     : (totalSpares / (totalGames * 10)) * 100;
 
+  // 獲取所有使用的球具及其使用的局數
+  Map<BallInfo, List<int>> get equipmentUsage {
+    final Map<BallInfo, List<int>> usage = {};
+    
+    for (final game in games) {
+      if (game.ballUsed != null) {
+        // 使用球具的 ID 作為 key 來避免重複
+        final existingBall = usage.keys.firstWhere(
+          (ball) => ball.id == game.ballUsed!.id,
+          orElse: () => game.ballUsed!,
+        );
+        
+        if (usage.containsKey(existingBall)) {
+          usage[existingBall]!.add(game.gameNumber);
+        } else {
+          usage[game.ballUsed!] = [game.gameNumber];
+        }
+      }
+    }
+    
+    return usage;
+  }
+
+  // 獲取主要使用的球具（使用最多局數的）
+  BallInfo? get primaryBall {
+    final usage = equipmentUsage;
+    if (usage.isEmpty) return null;
+    
+    return usage.entries
+        .reduce((a, b) => a.value.length > b.value.length ? a : b)
+        .key;
+  }
+
   String get oilPatternDisplay {
     if (isHousePattern) {
       return 'House Pattern';
@@ -118,6 +186,7 @@ class TrainingDaySummary {
   factory TrainingDaySummary.fromJson(Map<String, dynamic> json) {
     return TrainingDaySummary(
       id: json['id'] ?? '',
+      title: json['title'] ?? 'Training Session', // 默認標題
       date: DateTime.parse(json['date']),
       center: json['center'] ?? '',
       oilPatternName: json['oilPatternName'],
@@ -134,6 +203,7 @@ class TrainingDaySummary {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'title': title, // 新增標題到 JSON
       'date': date.toIso8601String(),
       'center': center,
       'oilPatternName': oilPatternName,

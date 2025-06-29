@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import '../app_standard_button.dart';
 
 /// 毛玻璃效果對話框基底組件
 class GlassDialogBase extends StatelessWidget {
@@ -124,46 +125,13 @@ class DialogButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    Widget button = isPrimary
-        ? ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: theme.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 16),
-              elevation: 0,
-            ),
-            onPressed: onPressed,
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          )
-        : OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.white.withOpacity(0.5)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 16),
-            ),
-            onPressed: onPressed,
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          );
+    Widget button = AppStandardButton(
+      text: text,
+      onPressed: onPressed,
+      customColor: isPrimary ? Colors.white : Colors.white.withOpacity(0.8),
+      isPrimary: isPrimary,
+      height: 50,
+    );
 
     return isExpanded ? Expanded(child: button) : button;
   }

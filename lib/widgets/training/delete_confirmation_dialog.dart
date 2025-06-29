@@ -103,47 +103,14 @@ class DeleteConfirmationDialog extends StatelessWidget {
                             ),
                             SizedBox(width: 12),
                             Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.red.withOpacity(0.8),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      onConfirm();
-                                    },
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Container(
-                                      height: 44,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.delete_outline,
-                                            size: 18,
-                                            color: Colors.red.withOpacity(0.9),
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            "Delete",
-                                            style: theme.textTheme.bodyMedium?.copyWith(
-                                              color: Colors.red.withOpacity(0.9),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              child: AppStandardButton(
+                                text: "Delete",
+                                icon: Icons.delete_outline,
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  onConfirm();
+                                },
+                                customColor: Colors.red,
                               ),
                             ),
                           ],

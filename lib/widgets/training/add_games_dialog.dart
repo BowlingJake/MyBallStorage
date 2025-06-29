@@ -3,6 +3,7 @@ import '../score_game_widget.dart';
 import '../tenth_frame_widget.dart';
 import '../pin_selector_popup_widget.dart';
 import '../../models/score_data.dart';
+import '../app_standard_button.dart';
 
 class AddGamesDialog extends StatefulWidget {
   final String trainingId;
@@ -155,14 +156,15 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(
+                AppStandardButton(
+                  text: '取消',
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('取消'),
                 ),
                 SizedBox(width: 8),
-                ElevatedButton(
+                AppStandardButton(
+                  text: '完成',
                   onPressed: _onGameComplete,
-                  child: Text('完成'),
+                  isPrimary: true,
                 ),
               ],
             ),

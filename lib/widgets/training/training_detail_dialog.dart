@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
 import 'dart:ui';
+import '../app_standard_button.dart';
 
 // 訓練詳細資訊彈窗
 class TrainingDetailDialog extends StatefulWidget {
@@ -350,24 +350,19 @@ class _ActionButtons extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: GFButton(
-            onPressed: () => Navigator.of(context).pop(),
+          child: AppStandardButton(
             text: "Cancel",
-            type: GFButtonType.outline,
-            color: Colors.white,
-            size: GFSize.MEDIUM,
-            shape: GFButtonShape.pills,
+            onPressed: () => Navigator.of(context).pop(),
+            customColor: Colors.white,
           ),
         ),
         SizedBox(width: 12),
         Expanded(
-          child: GFButton(
-            onPressed: onSave,
+          child: AppStandardButton(
             text: "Save",
-            type: GFButtonType.outline,
-            color: Colors.white,
-            size: GFSize.MEDIUM,
-            shape: GFButtonShape.pills,
+            onPressed: onSave,
+            customColor: Colors.white,
+            isPrimary: true,
           ),
         ),
       ],

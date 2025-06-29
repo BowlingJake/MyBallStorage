@@ -8,11 +8,14 @@ import 'widgets/training/training_day_summary_card.dart';
 import 'widgets/training/delete_confirmation_dialog.dart';
 import 'widgets/training/training_detail_dialog.dart';
 import 'widgets/training/training_empty_state.dart';
+import 'widgets/training/game_detail_dialog.dart';
+import 'widgets/training/add_game_simple_dialog.dart';
+import 'widgets/training/add_game_advanced_dialog.dart';
+import 'widgets/training/edit_training_record_dialog.dart';
 import 'widgets/professional_dark_background.dart';
 import 'widgets/modern_bottom_navigation.dart';
 import 'widgets/app_standard_button.dart';
 import 'ball_library_page.dart';
-import 'views/training_card_test_page.dart';
 
 class MyTrainingPage extends StatefulWidget {
   const MyTrainingPage({Key? key}) : super(key: key);
@@ -40,9 +43,33 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
 
   // 創建示例資料來展示新設計
   void _loadMockData() {
+    // 只有當沒有訓練記錄時才載入Mock數據
+    if (_trainingDays.isNotEmpty) return;
+    
     final now = DateTime.now();
     
-    // 示例：今天練了5局
+    // 示例：今天練了5局，使用不同球具
+    final phaseII = BallInfo(
+      id: 'ball_1',
+      name: 'Phaze II',
+      brand: 'Storm',
+      brandColor: '#FF6B35', // Storm 橘色
+    );
+    
+    final purpleHammer = BallInfo(
+      id: 'ball_2',
+      name: 'Purple Hammer',
+      brand: 'Hammer',
+      brandColor: '#8B5A96', // Hammer 紫色
+    );
+    
+    final idol = BallInfo(
+      id: 'ball_3',
+      name: 'Idol',
+      brand: 'Roto Grip',
+      brandColor: '#E31F26', // Roto Grip 紅色
+    );
+
     final todayGames = [
       GameRecord(
         id: 'game_1',
@@ -53,6 +80,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 3,
         notes: 'Good start, need to work on 7-10 split',
         timestamp: now.subtract(Duration(hours: 2)),
+        ballUsed: phaseII,
       ),
       GameRecord(
         id: 'game_2',
@@ -63,6 +91,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 2,
         notes: 'Great improvement on strikes',
         timestamp: now.subtract(Duration(hours: 1, minutes: 45)),
+        ballUsed: phaseII,
       ),
       GameRecord(
         id: 'game_3',
@@ -73,6 +102,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 4,
         notes: 'Focus on spare conversion',
         timestamp: now.subtract(Duration(hours: 1, minutes: 30)),
+        ballUsed: purpleHammer,
       ),
       GameRecord(
         id: 'game_4',
@@ -83,6 +113,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 2,
         notes: 'Consistent performance',
         timestamp: now.subtract(Duration(hours: 1, minutes: 15)),
+        ballUsed: purpleHammer,
       ),
       GameRecord(
         id: 'game_5',
@@ -93,11 +124,13 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 1,
         notes: 'Personal best today!',
         timestamp: now.subtract(Duration(hours: 1)),
+        ballUsed: phaseII,
       ),
     ];
 
     final todaySummary = TrainingDaySummary(
       id: 'day_today',
+      title: 'Morning Practice', // 添加標題
       date: now,
       center: 'Bowl City Lanes',
       oilPatternName: 'House Pattern',
@@ -108,7 +141,14 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       createdAt: now,
     );
 
-    // 示例：昨天練了3局
+    // 示例：昨天練了3局，使用不同球具
+    final astroPhysix = BallInfo(
+      id: 'ball_4',
+      name: 'Astro PhysiX',
+      brand: 'Storm',
+      brandColor: '#FF6B35', // Storm 橘色
+    );
+
     final yesterdayGames = [
       GameRecord(
         id: 'game_y1',
@@ -119,6 +159,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 5,
         notes: 'Working on consistency',
         timestamp: now.subtract(Duration(days: 1, hours: 3)),
+        ballUsed: idol,
       ),
       GameRecord(
         id: 'game_y2',
@@ -129,6 +170,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 3,
         notes: 'Better approach timing',
         timestamp: now.subtract(Duration(days: 1, hours: 2, minutes: 45)),
+        ballUsed: astroPhysix,
       ),
       GameRecord(
         id: 'game_y3',
@@ -139,11 +181,13 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
         spares: 1,
         notes: 'Great finish!',
         timestamp: now.subtract(Duration(days: 1, hours: 2, minutes: 30)),
+        ballUsed: astroPhysix,
       ),
     ];
 
     final yesterdaySummary = TrainingDaySummary(
       id: 'day_yesterday',
+      title: 'Evening Tournament Prep', // 添加標題
       date: now.subtract(Duration(days: 1)),
       center: 'Strike Zone Pro',
       oilPatternName: 'Cheetah',
@@ -201,6 +245,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
   void _onRecordCreated(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod) {
     final newDay = TrainingDaySummary(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title, // 使用用戶輸入的標題
       date: date,
       center: center,
       oilPatternName: oilPatternName,
@@ -213,6 +258,42 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
 
     setState(() {
       _trainingDays.insert(0, newDay); // 新記錄放在最前面
+    });
+  }
+
+  void _showEditRecordDialog(String dayId) {
+    final day = _trainingDays.firstWhere((d) => d.id == dayId);
+    showEditTrainingRecordDialog(
+      context,
+      day,
+      (title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod) {
+        _onRecordUpdated(dayId, title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod);
+      },
+    );
+  }
+
+  void _onRecordUpdated(String dayId, String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod) {
+    setState(() {
+      final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
+      if (dayIndex != -1) {
+        final originalDay = _trainingDays[dayIndex];
+        
+        // 創建更新的訓練日，保留原有的遊戲記錄
+        final updatedDay = TrainingDaySummary(
+          id: originalDay.id,
+          title: title,
+          date: date,
+          center: center,
+          oilPatternName: oilPatternName,
+          oilPatternLength: oilPatternLength,
+          isHousePattern: isHousePattern,
+          scoringMethod: scoringMethod,
+          games: originalDay.games, // 保留原有的遊戲記錄
+          createdAt: originalDay.createdAt,
+        );
+        
+        _trainingDays[dayIndex] = updatedDay;
+      }
     });
   }
 
@@ -306,19 +387,381 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     );
   }
 
-  void _addGameToDay(String dayId) {
-    // TODO: 實現新增遊戲功能
-    print('Add game to day: $dayId');
+  void _addGameToDay(String dayId) async {
+    final day = _trainingDays.firstWhere((d) => d.id == dayId);
+    final nextGameNumber = day.games.length + 1;
+
+    // 顯示選擇對話框
+    final choice = await _showAddGameChoiceDialog(nextGameNumber);
+    if (choice == null) return;
+
+    GameRecord? newGame;
+    
+    try {
+      if (choice == 'simple') {
+        newGame = await showAddGameSimpleDialog(
+          context,
+          dayId,
+          nextGameNumber,
+        );
+      } else if (choice == 'advanced') {
+        newGame = await showAddGameAdvancedDialog(
+          context,
+          dayId,
+          nextGameNumber,
+        );
+      }
+
+      if (newGame != null) {
+        setState(() {
+          final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
+          if (dayIndex != -1) {
+            // 創建新的遊戲列表
+            final updatedGames = <GameRecord>[..._trainingDays[dayIndex].games, newGame!];
+            
+            // 創建更新的訓練日
+            final updatedDay = TrainingDaySummary(
+              id: _trainingDays[dayIndex].id,
+              title: _trainingDays[dayIndex].title,
+              date: _trainingDays[dayIndex].date,
+              center: _trainingDays[dayIndex].center,
+              oilPatternName: _trainingDays[dayIndex].oilPatternName,
+              oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
+              isHousePattern: _trainingDays[dayIndex].isHousePattern,
+              scoringMethod: _trainingDays[dayIndex].scoringMethod,
+              games: updatedGames,
+              createdAt: _trainingDays[dayIndex].createdAt,
+            );
+            
+            _trainingDays[dayIndex] = updatedDay;
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('第 $nextGameNumber 局已新增成功！總共 ${day.games.length + 1} 局'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('新增遊戲時發生錯誤：$e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _onGameTap(GameRecord game) {
-    // TODO: 導航到遊戲詳情頁面
-    print('View game details: ${game.id}');
+    showGameDetailDialog(
+      context,
+      game,
+      onGameUpdated: (updatedGame) {
+        _updateGameInDay(updatedGame);
+      },
+      onGameDeleted: (deletedGame) {
+        _removeGameFromDay(deletedGame);
+      },
+    );
   }
 
   void _onGameDelete(GameRecord game) {
-    // TODO: 實現刪除單局功能
-    print('Delete game: ${game.id}');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('刪除遊戲'),
+        content: Text('確定要刪除第${game.gameNumber}局嗎？此操作無法復原。'),
+        actions: [
+          AppStandardButton(
+            text: '取消',
+            onPressed: () => Navigator.pop(context),
+          ),
+          AppStandardButton(
+            text: '刪除',
+            onPressed: () {
+              Navigator.pop(context);
+              _removeGameFromDay(game);
+            },
+            customColor: Colors.red,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _updateGameInDay(GameRecord updatedGame) {
+    setState(() {
+      for (int dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
+        final dayGames = _trainingDays[dayIndex].games;
+        final gameIndex = dayGames.indexWhere((g) => g.id == updatedGame.id);
+        
+        if (gameIndex != -1) {
+          final updatedGames = <GameRecord>[...dayGames];
+          updatedGames[gameIndex] = updatedGame;
+          
+          final updatedDay = TrainingDaySummary(
+            id: _trainingDays[dayIndex].id,
+            title: _trainingDays[dayIndex].title,
+            date: _trainingDays[dayIndex].date,
+            center: _trainingDays[dayIndex].center,
+            oilPatternName: _trainingDays[dayIndex].oilPatternName,
+            oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
+            isHousePattern: _trainingDays[dayIndex].isHousePattern,
+            scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            games: updatedGames,
+            createdAt: _trainingDays[dayIndex].createdAt,
+          );
+          
+          _trainingDays[dayIndex] = updatedDay;
+          break;
+        }
+      }
+    });
+  }
+
+  void _removeGameFromDay(GameRecord gameToRemove) {
+    setState(() {
+      for (int dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
+        final dayGames = _trainingDays[dayIndex].games;
+        final gameIndex = dayGames.indexWhere((g) => g.id == gameToRemove.id);
+        
+        if (gameIndex != -1) {
+          final updatedGames = <GameRecord>[...dayGames];
+          updatedGames.removeAt(gameIndex);
+          
+          // 重新編號剩餘的遊戲
+          for (int i = 0; i < updatedGames.length; i++) {
+            updatedGames[i] = GameRecord(
+              id: updatedGames[i].id,
+              gameNumber: i + 1,
+              score: updatedGames[i].score,
+              frameScores: updatedGames[i].frameScores,
+              strikes: updatedGames[i].strikes,
+              spares: updatedGames[i].spares,
+              notes: updatedGames[i].notes,
+              timestamp: updatedGames[i].timestamp,
+            );
+          }
+          
+          final updatedDay = TrainingDaySummary(
+            id: _trainingDays[dayIndex].id,
+            title: _trainingDays[dayIndex].title,
+            date: _trainingDays[dayIndex].date,
+            center: _trainingDays[dayIndex].center,
+            oilPatternName: _trainingDays[dayIndex].oilPatternName,
+            oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
+            isHousePattern: _trainingDays[dayIndex].isHousePattern,
+            scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            games: updatedGames,
+            createdAt: _trainingDays[dayIndex].createdAt,
+          );
+          
+          _trainingDays[dayIndex] = updatedDay;
+          break;
+        }
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('遊戲已刪除'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  Future<String?> _showAddGameChoiceDialog(int gameNumber) async {
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.7),
+      builder: (BuildContext context) {
+        final theme = Theme.of(context);
+        
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 標題
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '選擇新增方式',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 8),
+
+                Text(
+                  '為第 $gameNumber 局選擇輸入方式',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
+                  ),
+                ),
+
+                SizedBox(height: 24),
+
+                // 快速輸入選項
+                _buildChoiceOption(
+                  context,
+                  icon: Icons.speed,
+                  title: '快速輸入',
+                  subtitle: '只輸入總分、Strikes、Spares',
+                  description: '適合快速記錄基本數據',
+                  color: Colors.blue,
+                  onTap: () => Navigator.pop(context, 'simple'),
+                ),
+
+                SizedBox(height: 16),
+
+                // 詳細計分選項
+                _buildChoiceOption(
+                  context,
+                  icon: Icons.grid_on,
+                  title: '詳細計分',
+                  subtitle: '使用完整分數表逐格輸入',
+                  description: '獲得完整的分數統計和分析',
+                  color: Colors.purple,
+                  onTap: () => Navigator.pop(context, 'advanced'),
+                ),
+
+                SizedBox(height: 24),
+
+                // 說明文字
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.blue.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.blue,
+                        size: 16,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '建議使用詳細計分獲得更準確的統計資料',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade300,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildChoiceOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String description,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: color,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white60,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white54,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -386,23 +829,6 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
                   color: Colors.red,
                 ),
                 tooltip: 'Delete Selected',
-              ),
-            ] else ...[
-              // 測試按鈕
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TrainingCardTestPage(),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.design_services,
-                  color: theme.colorScheme.primary,
-                ),
-                tooltip: 'Card Design Test',
               ),
             ],
           ],
@@ -472,6 +898,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
                           : () => print('Tap day: ${day.id}'),
                         onDelete: () => _deleteDay(day.id),
                         onAddGame: () => _addGameToDay(day.id),
+                        onEdit: () => _showEditRecordDialog(day.id), // 新增編輯回調
                         onGameTap: _onGameTap,
                         onGameDelete: _onGameDelete,
                         onSelectionChanged: (selected) {

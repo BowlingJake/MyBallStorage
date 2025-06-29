@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
+import 'app_standard_button.dart';
 
 /// Two action buttons shown on the MyArsenalPage.
 class ArsenalActionButtons extends StatelessWidget {
@@ -18,31 +18,20 @@ class ArsenalActionButtons extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: GFButton(
-            onPressed: onAddPressed,
+          child: AppStandardButton(
             text: 'Add from Library',
-            shape: GFButtonShape.standard,
-            size: GFSize.MEDIUM,
-            color: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            borderShape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            onPressed: onAddPressed ?? () {},
+            customColor: colorScheme.primary,
+            isPrimary: true,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: GFButton(
-            onPressed: onAnalyzePressed,
+          child: AppStandardButton(
             text: 'Analyze Chart',
-            type: GFButtonType.outline,
-            shape: GFButtonShape.standard,
-            size: GFSize.MEDIUM,
-            color: colorScheme.primary,
-            textColor: colorScheme.primary,
-            borderShape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            onPressed: onAnalyzePressed ?? () {},
+            customColor: colorScheme.primary,
+            isPrimary: false,
           ),
         ),
       ],
