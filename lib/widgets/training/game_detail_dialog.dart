@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:ui';
 import '../../models/training_record.dart';
 import '../app_standard_button.dart';
 import '../../models/score_data.dart';
@@ -133,18 +134,18 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('刪除遊戲'),
-        content: Text('確定要刪除第${widget.game.gameNumber}局嗎？此操作無法復原。'),
+        title: Text('Delete Game'),
+        content: Text('Are you sure you want to delete Game ${widget.game.gameNumber}? This action cannot be undone.'),
         actions: [
           AppStandardButton(
-            text: '取消',
+            text: 'Cancel',
             onPressed: () => Navigator.pop(context),
           ),
           AppStandardButton(
-            text: '刪除',
+            text: 'Delete',
             onPressed: () {
-              Navigator.pop(context); // 關閉確認對話框
-              Navigator.pop(context); // 關閉詳情對話框
+              Navigator.pop(context); // Close confirmation dialog
+              Navigator.pop(context); // Close details dialog
               widget.onGameDeleted?.call(widget.game);
             },
             customColor: Colors.red,
@@ -160,16 +161,20 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.95,
-        padding: EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.95,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +184,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '第 ${widget.game.gameNumber} 局詳情',
+                  'Game ${widget.game.gameNumber} Details',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -204,10 +209,10 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatItem('總分', widget.game.score.toString(), theme),
+                  _buildStatItem('Total Score', widget.game.score.toString(), theme),
                   _buildStatItem('Strikes', widget.game.strikes.toString(), theme),
                   _buildStatItem('Spares', widget.game.spares.toString(), theme),
-                  _buildStatItem('時間', DateFormat('HH:mm').format(widget.game.timestamp), theme),
+                  _buildStatItem('Time', DateFormat('HH:mm').format(widget.game.timestamp), theme),
                 ],
               ),
             ),
@@ -216,7 +221,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
 
             // 詳細分數表
             Text(
-              '分數詳情',
+              'Score Details',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -287,7 +292,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '備註',
+                  'Notes',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -318,7 +323,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                     maxLines: 3,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: '添加備註...',
+                      hintText: 'Add notes...',
                       hintStyle: TextStyle(color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -341,7 +346,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                     children: [
                       Expanded(
                         child: AppStandardButton(
-                          text: '保存備註',
+                          text: 'Save Notes',
                           onPressed: _saveNotes,
                           isPrimary: true,
                         ),
@@ -361,7 +366,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                 child: Text(
                   widget.game.notes?.isNotEmpty == true 
                     ? widget.game.notes!
-                    : '暫無備註',
+                    : 'No notes yet',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: widget.game.notes?.isNotEmpty == true 
                       ? Colors.white
@@ -375,24 +380,26 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
             // 底部按鈕
             Row(
               children: [
-                Expanded(
-                  child: AppStandardButton(
-                    text: '刪除',
-                    onPressed: _deleteGame,
-                    customColor: Colors.red,
+                                  Expanded(
+                    child: AppStandardButton(
+                      text: 'Delete',
+                      onPressed: _deleteGame,
+                      customColor: Colors.red,
+                    ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: AppStandardButton(
-                    text: '關閉',
-                    onPressed: () => Navigator.pop(context),
-                    isPrimary: true,
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: AppStandardButton(
+                      text: 'Close',
+                      onPressed: () => Navigator.pop(context),
+                      isPrimary: true,
+                    ),
                   ),
-                ),
               ],
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

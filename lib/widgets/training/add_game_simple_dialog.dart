@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
 import '../../models/training_record.dart';
 import '../app_standard_button.dart';
 
@@ -66,16 +67,20 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        padding: EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -87,7 +92,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '新增第 ${widget.nextGameNumber} 局',
+                    'Add Game ${widget.nextGameNumber}',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -105,7 +110,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
               // 分數輸入
               _buildNumberField(
                 controller: _scoreController,
-                label: '總分',
+                label: 'Total Score',
                 hint: '0-300',
                 maxValue: 300,
                 isRequired: true,
@@ -146,9 +151,9 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 maxLines: 3,
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: '備註（選填）',
+                  labelText: 'Notes (Optional)',
                   labelStyle: TextStyle(color: Colors.white70),
-                  hintText: '本局表現、心得...',
+                  hintText: 'Performance, thoughts...',
                   hintStyle: TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -174,7 +179,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 children: [
                   Expanded(
                     child: AppStandardButton(
-                      text: '取消',
+                      text: 'Cancel',
                       onPressed: () => Navigator.pop(context),
                       customColor: Colors.white,
                     ),
@@ -182,7 +187,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                   SizedBox(width: 12),
                   Expanded(
                     child: AppStandardButton(
-                      text: '保存',
+                      text: 'Save',
                       onPressed: _saveGame,
                       customColor: theme.colorScheme.primary,
                       isPrimary: true,
@@ -191,6 +196,8 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 ],
               ),
             ],
+          ),
+        ),
           ),
         ),
       ),
@@ -234,15 +241,15 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
       ),
       validator: (value) {
         if (isRequired && (value == null || value.isEmpty)) {
-          return '請輸入$label';
+          return 'Please enter $label';
         }
         if (value != null && value.isNotEmpty) {
           final intValue = int.tryParse(value);
           if (intValue == null) {
-            return '請輸入有效數字';
+            return 'Please enter a valid number';
           }
           if (intValue < 0 || intValue > maxValue) {
-            return '$label 應在 0-$maxValue 之間';
+            return '$label should be between 0-$maxValue';
           }
         }
         return null;

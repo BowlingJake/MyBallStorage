@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Drawer(
-          backgroundColor: theme.colorScheme.surface.withOpacity(0.2),
+          backgroundColor: const Color(0x33000000), // 20% 不透明度的純黑色
           elevation: 0,
           child: ListView(
             padding: EdgeInsets.zero,

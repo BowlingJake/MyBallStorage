@@ -16,6 +16,9 @@ import 'widgets/professional_dark_background.dart';
 import 'widgets/modern_bottom_navigation.dart';
 import 'widgets/app_standard_button.dart';
 import 'ball_library_page.dart';
+import 'views/training/add_game_choice_dialog.dart';
+import 'views/training/training_page_app_bar_actions.dart';
+import 'views/training/training_page_body.dart';
 
 class MyTrainingPage extends StatefulWidget {
   const MyTrainingPage({Key? key}) : super(key: key);
@@ -392,65 +395,44 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     final nextGameNumber = day.games.length + 1;
 
     // 顯示選擇對話框
-    final choice = await _showAddGameChoiceDialog(nextGameNumber);
-    if (choice == null) return;
+    final newGame = await showDialog<GameRecord>(
+      context: context,
+      builder: (context) => AddGameChoiceDialog(
+        gameNumber: nextGameNumber,
+        dayId: dayId,
+      ),
+    );
 
-    GameRecord? newGame;
-    
-    try {
-      if (choice == 'simple') {
-        newGame = await showAddGameSimpleDialog(
-          context,
-          dayId,
-          nextGameNumber,
-        );
-      } else if (choice == 'advanced') {
-        newGame = await showAddGameAdvancedDialog(
-          context,
-          dayId,
-          nextGameNumber,
-        );
-      }
+    if (newGame != null) {
+      setState(() {
+        final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
+        if (dayIndex != -1) {
+          // 創建新的遊戲列表
+          final updatedGames = <GameRecord>[..._trainingDays[dayIndex].games, newGame!];
+          
+          // 創建更新的訓練日
+          final updatedDay = TrainingDaySummary(
+            id: _trainingDays[dayIndex].id,
+            title: _trainingDays[dayIndex].title,
+            date: _trainingDays[dayIndex].date,
+            center: _trainingDays[dayIndex].center,
+            oilPatternName: _trainingDays[dayIndex].oilPatternName,
+            oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
+            isHousePattern: _trainingDays[dayIndex].isHousePattern,
+            scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            games: updatedGames,
+            createdAt: _trainingDays[dayIndex].createdAt,
+          );
+          
+          _trainingDays[dayIndex] = updatedDay;
+        }
+      });
 
-      if (newGame != null) {
-        setState(() {
-          final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
-          if (dayIndex != -1) {
-            // 創建新的遊戲列表
-            final updatedGames = <GameRecord>[..._trainingDays[dayIndex].games, newGame!];
-            
-            // 創建更新的訓練日
-            final updatedDay = TrainingDaySummary(
-              id: _trainingDays[dayIndex].id,
-              title: _trainingDays[dayIndex].title,
-              date: _trainingDays[dayIndex].date,
-              center: _trainingDays[dayIndex].center,
-              oilPatternName: _trainingDays[dayIndex].oilPatternName,
-              oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
-              isHousePattern: _trainingDays[dayIndex].isHousePattern,
-              scoringMethod: _trainingDays[dayIndex].scoringMethod,
-              games: updatedGames,
-              createdAt: _trainingDays[dayIndex].createdAt,
-            );
-            
-            _trainingDays[dayIndex] = updatedDay;
-          }
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('第 $nextGameNumber 局已新增成功！總共 ${day.games.length + 1} 局'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('新增遊戲時發生錯誤：$e'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
+          content: Text('第 $nextGameNumber 局已新增成功！總共 ${day.games.length + 1} 局'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
         ),
       );
     }
@@ -574,196 +556,6 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     );
   }
 
-  Future<String?> _showAddGameChoiceDialog(int gameNumber) async {
-    return await showDialog<String>(
-      context: context,
-      barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.7),
-      builder: (BuildContext context) {
-        final theme = Theme.of(context);
-        
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.85,
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.3),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 標題
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '選擇新增方式',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close, color: Colors.white),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 8),
-
-                Text(
-                  '為第 $gameNumber 局選擇輸入方式',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
-                  ),
-                ),
-
-                SizedBox(height: 24),
-
-                // 快速輸入選項
-                _buildChoiceOption(
-                  context,
-                  icon: Icons.speed,
-                  title: '快速輸入',
-                  subtitle: '只輸入總分、Strikes、Spares',
-                  description: '適合快速記錄基本數據',
-                  color: Colors.blue,
-                  onTap: () => Navigator.pop(context, 'simple'),
-                ),
-
-                SizedBox(height: 16),
-
-                // 詳細計分選項
-                _buildChoiceOption(
-                  context,
-                  icon: Icons.grid_on,
-                  title: '詳細計分',
-                  subtitle: '使用完整分數表逐格輸入',
-                  description: '獲得完整的分數統計和分析',
-                  color: Colors.purple,
-                  onTap: () => Navigator.pop(context, 'advanced'),
-                ),
-
-                SizedBox(height: 24),
-
-                // 說明文字
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.blue.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: Colors.blue,
-                        size: 16,
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '建議使用詳細計分獲得更準確的統計資料',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.blue.shade300,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildChoiceOption(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String description,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: color,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white60,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white54,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -805,32 +597,15 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
                 ),
               ),
           actions: [
-            if (_isSelectionMode) ...[
-              // 全選按鈕
-              IconButton(
-                onPressed: _selectedDayIds.length == _trainingDays.length 
-                  ? _clearAllSelections 
-                  : _selectAllDays,
-                icon: Icon(
-                  _selectedDayIds.length == _trainingDays.length 
-                    ? Icons.deselect 
-                    : Icons.select_all,
-                  color: theme.colorScheme.primary,
-                ),
-                tooltip: _selectedDayIds.length == _trainingDays.length 
-                  ? 'Deselect All' 
-                  : 'Select All',
-              ),
-              // 刪除按鈕
-              IconButton(
-                onPressed: _deleteSelectedDays,
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red,
-                ),
-                tooltip: 'Delete Selected',
-              ),
-            ],
+            TrainingPageAppBarActions(
+              isSelectionMode: _isSelectionMode,
+              selectedCount: _selectedDayIds.length,
+              totalCount: _trainingDays.length,
+              onClearAll: _clearAllSelections,
+              onSelectAll: _selectAllDays,
+              onDeleteSelected: _deleteSelectedDays,
+              onToggleSelectionMode: _toggleSelectionMode,
+            ),
           ],
           // 添加細微的底部邊框
           bottom: PreferredSize(
@@ -849,72 +624,29 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
             ),
           ),
         ),
-        body: _trainingDays.isEmpty 
-          ? TrainingEmptyState(onAddRecord: _showCreateRecordDialog)
-          : Column(
-              children: [
-                // 按鈕區域
-                if (!_isSelectionMode)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        // Add Training Record 按鈕
-                        Expanded(
-                          child: AppStandardButton(
-                            text: "Add Training Day",
-                            icon: Icons.add_circle_outline,
-                            onPressed: _showCreateRecordDialog,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        // Delete Training Record 按鈕
-                        Expanded(
-                          child: AppStandardButton(
-                            text: "Delete Days",
-                            icon: Icons.delete_outline,
-                            onPressed: _toggleSelectionMode,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                
-                // 訓練日列表
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                    itemCount: _trainingDays.length,
-                    itemBuilder: (context, index) {
-                      final day = _trainingDays[index];
-                      final isSelected = _selectedDayIds.contains(day.id);
-                      
-                      return TrainingDaySummaryCard(
-                        summary: day,
-                        isSelectionMode: _isSelectionMode,
-                        isSelected: isSelected,
-                        onTap: _isSelectionMode 
-                          ? () => _toggleDaySelection(day.id)
-                          : () => print('Tap day: ${day.id}'),
-                        onDelete: () => _deleteDay(day.id),
-                        onAddGame: () => _addGameToDay(day.id),
-                        onEdit: () => _showEditRecordDialog(day.id), // 新增編輯回調
-                        onGameTap: _onGameTap,
-                        onGameDelete: _onGameDelete,
-                        onSelectionChanged: (selected) {
-                          if (selected) {
-                            _selectedDayIds.add(day.id);
-                          } else {
-                            _selectedDayIds.remove(day.id);
-                          }
-                          setState(() {});
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+        body: _trainingDays.isEmpty
+            ? TrainingEmptyState(onAddRecord: _showCreateRecordDialog)
+            : TrainingPageBody(
+                trainingDays: _trainingDays,
+                selectedDayIds: _selectedDayIds,
+                isSelectionMode: _isSelectionMode,
+                onAddRecord: _showCreateRecordDialog,
+                onToggleSelectionMode: _toggleSelectionMode,
+                onToggleDaySelection: _toggleDaySelection,
+                onDeleteDay: _deleteDay,
+                onAddGame: _addGameToDay,
+                onEditRecord: _showEditRecordDialog,
+                onGameTap: _onGameTap,
+                onGameDelete: _onGameDelete,
+                onSelectionChanged: (dayId, selected) {
+                  if (selected) {
+                    _selectedDayIds.add(dayId);
+                  } else {
+                    _selectedDayIds.remove(dayId);
+                  }
+                  setState(() {});
+                },
+              ),
         bottomNavigationBar: ModernBottomNavigation(
           currentIndex: _bottomNavIndex,
           onTap: _onBottomNavTapped,

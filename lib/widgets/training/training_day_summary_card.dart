@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../models/training_record.dart';
 import '../app_standard_button.dart';
 import 'components/training_day_equipment.dart';
@@ -15,6 +14,7 @@ enum InfoVisibility {
 
 // 分頁類型枚舉
 enum TabType {
+  games,       // 遊戲列表頁籤  
   equipment,   // 球具頁籤
   statistics,  // 統計頁籤
 }
@@ -56,7 +56,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
   late Animation<double> _animation;
   bool _isExpanded = false;
   InfoVisibility _infoVisibility = InfoVisibility.visible; // 資訊顯示狀態
-  TabType _selectedTab = TabType.equipment; // 當前選中的分頁
+  TabType _selectedTab = TabType.games; // 當前選中的分頁，默認顯示遊戲列表
 
   @override
   void initState() {
@@ -103,11 +103,11 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
     return Tooltip(
       message: tooltip,
       child: Container(
-        width: 28,
-        height: 28,
+        width: 32, // 恢復按鈕尺寸，讓它們更容易點擊
+        height: 32, // 恢復按鈕尺寸，讓它們更容易點擊
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: color.withOpacity(0.3),
             width: 1,
@@ -117,20 +117,20 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             child: rotation != null
                 ? AnimatedRotation(
                     turns: rotation,
                     duration: Duration(milliseconds: 300),
                     child: Icon(
                       icon,
-                      size: 16,
+                      size: 18, // 恢復圖標尺寸
                       color: color.withOpacity(0.8),
                     ),
                   )
                 : Icon(
                     icon,
-                    size: 16,
+                    size: 18, // 恢復圖標尺寸
                     color: color.withOpacity(0.8),
                   ),
           ),
@@ -323,9 +323,10 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                             style: theme.textTheme.titleLarge?.copyWith(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
-                              fontSize: 18,
+                              fontSize: 16, // 減小標題字體
                             ),
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 1, // 限制標題為一行
                           ),
                         ],
                       ),
@@ -333,14 +334,14 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                     
                     // 遊戲數量徽章
                     Container(
-                      margin: EdgeInsets.only(top: 2, right: 8),
+                      margin: EdgeInsets.only(top: 2, left: 8, right: 4),
                       padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        '${widget.summary.totalGames} Games',
+                        '${widget.summary.totalGames} games',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -371,7 +372,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               ? '隱藏資訊' 
                               : '顯示資訊',
                           ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 8), // 恢復間距
                           // 刪除按鈕
                           if (widget.onDelete != null)
                             _buildControlButton(
@@ -380,7 +381,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               onTap: widget.onDelete!,
                               tooltip: '刪除訓練日',
                             ),
-                          SizedBox(width: 6),
+                          SizedBox(width: 8), // 恢復間距
                           // 展開/收起指示器
                           _buildControlButton(
                             icon: Icons.keyboard_arrow_down,
@@ -402,8 +403,8 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                 // 日期、地點和油型（等比例排列）
                 _buildInfoRow(theme),
 
-                // 展開內容：遊戲列表
-                if (!widget.isSelectionMode)
+                // 展開內容：額外的操作按鈕（如果需要的話）
+                if (!widget.isSelectionMode && _isExpanded)
                   ClipRect(
                     child: SizeTransition(
                       sizeFactor: _animation,
@@ -427,23 +428,28 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               ),
                             ),
 
-                            // 遊戲列表
-                            if (widget.summary.games.isNotEmpty) ...[
-                              ...widget.summary.games.map((game) => 
-                                GameListItem(
-                                  game: game,
-                                  theme: theme,
-                                  onGameTap: widget.onGameTap,
-                                  onGameDelete: widget.onGameDelete,
-                                )),
-                              SizedBox(height: 12),
-                            ],
-
-                            // 新增遊戲按鈕
-                            AppStandardButton(
-                              text: "Add Game",
-                              icon: Icons.add_circle_outline,
-                              onPressed: widget.onAddGame ?? () {},
+                            // 額外操作區域
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: AppStandardButton(
+                                    text: "Edit Training Day",
+                                    icon: Icons.edit,
+                                    onPressed: widget.onEdit ?? () {},
+                                    height: 32,
+                                    isPrimary: false,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: AppStandardButton(
+                                    text: "Add games",
+                                    icon: Icons.add_chart,
+                                    onPressed: widget.onAddGame ?? () {},
+                                    height: 32,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -501,16 +507,26 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
   // 構建一體化分頁標籤標題
   Widget _buildIntegratedTabHeader(ThemeData theme) {
     return Container(
-      height: 36,
+      height: 42, // 增加高度以獲得更好的視覺效果
       child: Row(
         children: [
+          // Games 分頁
+          Expanded(
+            child: _buildIntegratedTab(
+              theme,
+              TabType.games,
+              null, // 移除圖標
+              'Games',
+              _selectedTab == TabType.games,
+            ),
+          ),
           // Equipment 分頁
           Expanded(
             child: _buildIntegratedTab(
               theme,
               TabType.equipment,
-              Icons.sports_baseball,
-              'Equipment',
+              null, // 移除圖標
+              'Equipment', // 改回 Equipment
               _selectedTab == TabType.equipment,
             ),
           ),
@@ -519,8 +535,8 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
             child: _buildIntegratedTab(
               theme,
               TabType.statistics,
-              Icons.analytics,
-              'Statistics',
+              null, // 移除圖標
+              'Statistics', // 改回 Statistics
               _selectedTab == TabType.statistics,
             ),
           ),
@@ -529,61 +545,101 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
     );
   }
 
-  // 構建一體化分頁標籤（透明背景）
-  Widget _buildIntegratedTab(ThemeData theme, TabType tabType, IconData icon, String label, bool isSelected) {
+    // 構建一體化分頁標籤（只顯示文字）
+  Widget _buildIntegratedTab(ThemeData theme, TabType tabType, IconData? icon, String label, bool isSelected) {
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedTab = tabType;
         });
       },
-      child: Container(
-        height: 36,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        height: 42,
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.transparent, // 完全透明背景
+          color: isSelected 
+            ? theme.colorScheme.primary.withOpacity(0.1)
+            : Colors.transparent,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
+        child: Center(
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: isSelected 
                 ? theme.colorScheme.primary 
                 : theme.colorScheme.onSurface.withOpacity(0.6),
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontSize: 12, // 增大字體，因為沒有圖標了
             ),
-            SizedBox(width: 8),
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: isSelected 
-                  ? theme.colorScheme.primary 
-                  : theme.colorScheme.onSurface.withOpacity(0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                fontSize: 13,
-              ),
-            ),
-          ],
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
   }
 
-  // 構建分頁內容
+  /// 根據選擇的分頁來構建對應的內容
   Widget _buildTabContent(ThemeData theme) {
     switch (_selectedTab) {
+      case TabType.games:
+        return _buildGamesList(theme);
       case TabType.equipment:
-        return TrainingDayEquipment(
-          summary: widget.summary,
-          theme: theme,
-        );
+        return TrainingDayEquipment(summary: widget.summary, theme: theme);
       case TabType.statistics:
-        return TrainingDayStats(
-          summary: widget.summary,
-          theme: theme,
-        );
+        return TrainingDayStats(summary: widget.summary, theme: theme);
+      default:
+        return SizedBox.shrink();
     }
+  }
+
+  /// 構建遊戲列表
+  Widget _buildGamesList(ThemeData theme) {
+    final games = widget.summary.games;
+
+    if (games.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        child: Column(
+          children: [
+            Icon(
+              Icons.format_list_numbered,
+              size: 40,
+              color: theme.colorScheme.onSurface.withOpacity(0.4),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "No games recorded for this day yet.",
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // 當有遊戲記錄時，顯示列表
+    return Column(children: [
+      ListView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: games.length,
+        itemBuilder: (context, index) {
+          final game = games[index];
+          return GameListItem(
+            game: game,
+            theme: theme,
+            onGameTap: (g) => widget.onGameTap?.call(g),
+            onGameDelete: (g) => widget.onGameDelete?.call(g),
+          );
+        },
+      ),
+    ]);
   }
 }
 
@@ -607,42 +663,67 @@ class TabContentBorderPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
-    final tabHeight = 36.0;
-    final halfWidth = size.width / 2;
+    final tabHeight = 42.0; // 更新分頁高度
+    final thirdWidth = size.width / 3;
     final radius = 8.0;
 
     // 根據選中的分頁繪製不同的邊框路徑
-    if (selectedTab == TabType.equipment) {
-      // Equipment 分頁選中 - 左側分頁與內容連接
-      path.moveTo(0, tabHeight);
-      path.lineTo(0, radius);
-      path.quadraticBezierTo(0, 0, radius, 0);
-      path.lineTo(halfWidth - radius, 0);
-      path.quadraticBezierTo(halfWidth, 0, halfWidth, radius);
-      path.lineTo(halfWidth, tabHeight - radius);
-      path.quadraticBezierTo(halfWidth, tabHeight, halfWidth + radius, tabHeight);
-      path.lineTo(size.width - radius, tabHeight);
-      path.quadraticBezierTo(size.width, tabHeight, size.width, tabHeight + radius);
-      path.lineTo(size.width, size.height - radius);
-      path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
-      path.lineTo(radius, size.height);
-      path.quadraticBezierTo(0, size.height, 0, size.height - radius);
-      path.close();
-    } else {
-      // Statistics 分頁選中 - 右側分頁與內容連接
-      path.moveTo(0, tabHeight + radius);
-      path.quadraticBezierTo(0, tabHeight, radius, tabHeight);
-      path.lineTo(halfWidth - radius, tabHeight);
-      path.quadraticBezierTo(halfWidth, tabHeight, halfWidth, tabHeight - radius);
-      path.lineTo(halfWidth, radius);
-      path.quadraticBezierTo(halfWidth, 0, halfWidth + radius, 0);
-      path.lineTo(size.width - radius, 0);
-      path.quadraticBezierTo(size.width, 0, size.width, radius);
-      path.lineTo(size.width, size.height - radius);
-      path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
-      path.lineTo(radius, size.height);
-      path.quadraticBezierTo(0, size.height, 0, size.height - radius);
-      path.close();
+    switch (selectedTab) {
+      case TabType.games:
+        // Games 分頁選中 - 左側分頁與內容連接
+        path.moveTo(0, tabHeight);
+        path.lineTo(0, radius);
+        path.quadraticBezierTo(0, 0, radius, 0);
+        path.lineTo(thirdWidth - radius, 0);
+        path.quadraticBezierTo(thirdWidth, 0, thirdWidth, radius);
+        path.lineTo(thirdWidth, tabHeight - radius);
+        path.quadraticBezierTo(thirdWidth, tabHeight, thirdWidth + radius, tabHeight);
+        path.lineTo(size.width - radius, tabHeight);
+        path.quadraticBezierTo(size.width, tabHeight, size.width, tabHeight + radius);
+        path.lineTo(size.width, size.height - radius);
+        path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
+        path.lineTo(radius, size.height);
+        path.quadraticBezierTo(0, size.height, 0, size.height - radius);
+        path.close();
+        break;
+        
+      case TabType.equipment:
+        // Equipment 分頁選中 - 中間分頁與內容連接
+        path.moveTo(0, tabHeight + radius);
+        path.quadraticBezierTo(0, tabHeight, radius, tabHeight);
+        path.lineTo(thirdWidth - radius, tabHeight);
+        path.quadraticBezierTo(thirdWidth, tabHeight, thirdWidth, tabHeight - radius);
+        path.lineTo(thirdWidth, radius);
+        path.quadraticBezierTo(thirdWidth, 0, thirdWidth + radius, 0);
+        path.lineTo(thirdWidth * 2 - radius, 0);
+        path.quadraticBezierTo(thirdWidth * 2, 0, thirdWidth * 2, radius);
+        path.lineTo(thirdWidth * 2, tabHeight - radius);
+        path.quadraticBezierTo(thirdWidth * 2, tabHeight, thirdWidth * 2 + radius, tabHeight);
+        path.lineTo(size.width - radius, tabHeight);
+        path.quadraticBezierTo(size.width, tabHeight, size.width, tabHeight + radius);
+        path.lineTo(size.width, size.height - radius);
+        path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
+        path.lineTo(radius, size.height);
+        path.quadraticBezierTo(0, size.height, 0, size.height - radius);
+        path.close();
+        break;
+        
+      case TabType.statistics:
+        // Statistics 分頁選中 - 右側分頁與內容連接
+        path.moveTo(0, tabHeight + radius);
+        path.quadraticBezierTo(0, tabHeight, radius, tabHeight);
+        path.lineTo(thirdWidth * 2 - radius, tabHeight);
+        path.quadraticBezierTo(thirdWidth * 2, tabHeight, thirdWidth * 2, tabHeight - radius);
+        path.lineTo(thirdWidth * 2, radius);
+        path.quadraticBezierTo(thirdWidth * 2, 0, thirdWidth * 2 + radius, 0);
+        path.lineTo(size.width - radius, 0);
+        path.quadraticBezierTo(size.width, 0, size.width, radius);
+        path.lineTo(size.width, size.height - radius);
+        path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
+        path.lineTo(radius, size.height);
+        path.quadraticBezierTo(0, size.height, 0, size.height - radius);
+        path.close();
+        break;
     }
 
     canvas.drawPath(path, paint);

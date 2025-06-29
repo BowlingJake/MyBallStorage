@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../models/training_record.dart';
 import 'add_game_simple_dialog.dart';
 import 'add_game_advanced_dialog.dart';
@@ -20,16 +21,20 @@ class AddGameSelectorDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.85,
-        padding: EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -38,7 +43,7 @@ class AddGameSelectorDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '選擇新增方式',
+                  'Choose Adding Method',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -54,7 +59,7 @@ class AddGameSelectorDialog extends StatelessWidget {
             SizedBox(height: 8),
 
             Text(
-              '為第 ${nextGameNumber} 局選擇輸入方式',
+              'Choose input method for Game ${nextGameNumber}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white70,
               ),
@@ -66,9 +71,9 @@ class AddGameSelectorDialog extends StatelessWidget {
             _buildOptionCard(
               context,
               icon: Icons.speed,
-              title: '快速輸入',
-              subtitle: '只輸入總分、Strikes、Spares',
-              description: '適合快速記錄基本數據',
+              title: 'Quick Input',
+              subtitle: 'Only input total score, Strikes, Spares',
+              description: 'Suitable for quick basic data recording',
               color: Colors.blue,
               onTap: () => _showSimpleDialog(context),
             ),
@@ -78,9 +83,9 @@ class AddGameSelectorDialog extends StatelessWidget {
             _buildOptionCard(
               context,
               icon: Icons.grid_on,
-              title: '詳細計分',
-              subtitle: '使用完整分數表逐格輸入',
-              description: '獲得完整的分數統計和分析',
+              title: 'Detailed Scoring',
+              subtitle: 'Use complete score table frame-by-frame input',
+              description: 'Get complete score statistics and analysis',
               color: Colors.purple,
               onTap: () => _showAdvancedDialog(context),
             ),
@@ -106,8 +111,8 @@ class AddGameSelectorDialog extends StatelessWidget {
                   ),
                   SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      '建議使用詳細計分獲得更準確的統計資料',
+                    child:                     Text(
+                      'Recommend using detailed scoring for more accurate statistics',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.blue.shade300,
                       ),
@@ -117,6 +122,8 @@ class AddGameSelectorDialog extends StatelessWidget {
               ),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

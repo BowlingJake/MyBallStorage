@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../models/training_record.dart';
 import '../../models/score_data.dart';
 import '../bowling_score_table.dart';
@@ -87,17 +88,21 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.98,
-        height: MediaQuery.of(context).size.height * 0.85,
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.98,
+            height: MediaQuery.of(context).size.height * 0.85,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -108,7 +113,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '新增第 ${widget.nextGameNumber} 局',
+                      'Add Game ${widget.nextGameNumber}',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -116,7 +121,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      isGameComplete ? '遊戲完成' : '進行中...',
+                      isGameComplete ? 'Game Complete' : 'In Progress...',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isGameComplete ? Colors.green : Colors.orange,
                       ),
@@ -131,7 +136,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
             ),
             SizedBox(height: 20),
             Text(
-              '點擊格子輸入分數：',
+              'Click frames to enter scores:',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -169,15 +174,15 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildQuickStat('當前分數', '${_scoreData.frames.lastWhere((f) => f.totalScore != null, orElse: () => Frame.empty(1)).totalScore ?? 0}', theme),
+                    _buildQuickStat('Current Score', '${_scoreData.frames.lastWhere((f) => f.totalScore != null, orElse: () => Frame.empty(1)).totalScore ?? 0}', theme),
                     _buildQuickStat('Strikes', '${_scoreData.frames.where((f) => f.rolls.isNotEmpty && f.rolls[0].pinsDown == 10).length}', theme),
-                    _buildQuickStat('格數', '${_scoreData.frames.where((f) => f.isComplete).length}/10', theme),
+                    _buildQuickStat('Frames', '${_scoreData.frames.where((f) => f.isComplete).length}/10', theme),
                   ],
                 ),
               ),
             SizedBox(height: 20),
             Text(
-              '備註：',
+              'Notes:',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -189,7 +194,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
               maxLines: 3,
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: '記錄本局的表現、心得...',
+                hintText: 'Record performance, thoughts...',
                 hintStyle: TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -210,30 +215,32 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
             Spacer(),
             Row(
               children: [
-                Expanded(
-                  child: AppStandardButton(
-                    text: '取消',
-                    onPressed: () => Navigator.pop(context),
-                    customColor: Colors.white,
-                    height: 50,
+                                  Expanded(
+                    child: AppStandardButton(
+                      text: 'Cancel',
+                      onPressed: () => Navigator.pop(context),
+                      customColor: Colors.white,
+                      height: 50,
+                    ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: AppStandardButton(
-                    text: isGameComplete ? '保存遊戲' : '請完成遊戲',
-                    onPressed: isGameComplete ? _saveGame : () {},
-                    customColor: isGameComplete 
-                      ? theme.colorScheme.primary 
-                      : Colors.grey,
-                    isPrimary: isGameComplete,
-                    enabled: isGameComplete,
-                    height: 50,
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: AppStandardButton(
+                      text: isGameComplete ? 'Save Game' : 'Please Complete Game',
+                      onPressed: isGameComplete ? _saveGame : () {},
+                      customColor: isGameComplete 
+                        ? theme.colorScheme.primary 
+                        : Colors.grey,
+                      isPrimary: isGameComplete,
+                      enabled: isGameComplete,
+                      height: 50,
+                    ),
                   ),
-                ),
               ],
             ),
           ],
+        ),
+          ),
         ),
       ),
     );
