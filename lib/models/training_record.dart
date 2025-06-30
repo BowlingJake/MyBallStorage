@@ -90,6 +90,7 @@ class TrainingDaySummary {
   final String? oilPatternLength;
   final bool isHousePattern;
   final String scoringMethod;
+  final String inputMethod; // 新增：輸入方式 (simple/advanced)
   final List<GameRecord> games;
   final DateTime createdAt;
 
@@ -102,6 +103,7 @@ class TrainingDaySummary {
     this.oilPatternLength,
     required this.isHousePattern,
     required this.scoringMethod,
+    required this.inputMethod,
     required this.games,
     required this.createdAt,
   });
@@ -193,6 +195,7 @@ class TrainingDaySummary {
       oilPatternLength: json['oilPatternLength'],
       isHousePattern: json['isHousePattern'] ?? true,
       scoringMethod: json['scoringMethod'] ?? 'Standard',
+      inputMethod: json['inputMethod'] ?? 'simple', // 預設為 simple
       games: (json['games'] as List?)
           ?.map((game) => GameRecord.fromJson(game))
           .toList() ?? [],
@@ -210,6 +213,7 @@ class TrainingDaySummary {
       'oilPatternLength': oilPatternLength,
       'isHousePattern': isHousePattern,
       'scoringMethod': scoringMethod,
+      'inputMethod': inputMethod,
       'games': games.map((game) => game.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
     };

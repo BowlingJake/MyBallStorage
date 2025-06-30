@@ -140,6 +140,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       oilPatternLength: null,
       isHousePattern: true,
       scoringMethod: 'Standard',
+      inputMethod: 'simple', // 示例數據預設為 simple
       games: todayGames,
       createdAt: now,
     );
@@ -197,6 +198,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       oilPatternLength: '35',
       isHousePattern: false,
       scoringMethod: 'Standard',
+      inputMethod: 'advanced', // 示例數據使用 advanced
       games: yesterdayGames,
       createdAt: now.subtract(Duration(days: 1)),
     );
@@ -245,7 +247,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     showCreateTrainingRecordDialog(context, _onRecordCreated);
   }
 
-  void _onRecordCreated(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod) {
+  void _onRecordCreated(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod) {
     final newDay = TrainingDaySummary(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title, // 使用用戶輸入的標題
@@ -255,6 +257,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
       oilPatternLength: oilPatternLength,
       isHousePattern: isHousePattern,
       scoringMethod: scoringMethod,
+      inputMethod: inputMethod, // 使用傳入的輸入方式
       games: [], // 開始時沒有遊戲記錄
       createdAt: DateTime.now(),
     );
@@ -269,13 +272,13 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     showEditTrainingRecordDialog(
       context,
       day,
-      (title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod) {
-        _onRecordUpdated(dayId, title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod);
+      (title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod, inputMethod) {
+        _onRecordUpdated(dayId, title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod, inputMethod);
       },
     );
   }
 
-  void _onRecordUpdated(String dayId, String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod) {
+  void _onRecordUpdated(String dayId, String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod) {
     setState(() {
       final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
       if (dayIndex != -1) {
@@ -291,6 +294,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
           oilPatternLength: oilPatternLength,
           isHousePattern: isHousePattern,
           scoringMethod: scoringMethod,
+          inputMethod: inputMethod, // 使用傳入的輸入方式
           games: originalDay.games, // 保留原有的遊戲記錄
           createdAt: originalDay.createdAt,
         );
@@ -394,14 +398,27 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     final day = _trainingDays.firstWhere((d) => d.id == dayId);
     final nextGameNumber = day.games.length + 1;
 
-    // 顯示選擇對話框
-    final newGame = await showDialog<GameRecord>(
-      context: context,
-      builder: (context) => AddGameChoiceDialog(
-        gameNumber: nextGameNumber,
-        dayId: dayId,
-      ),
-    );
+    // 根據訓練日的 inputMethod 直接跳過選擇，自動建立對應的對話框
+    final GameRecord? newGame;
+    if (day.inputMethod == 'simple') {
+      // 直接顯示簡易輸入對話框
+      newGame = await showDialog<GameRecord>(
+        context: context,
+        builder: (context) => AddGameSimpleDialog(
+          dayId: dayId,
+          nextGameNumber: nextGameNumber,
+        ),
+      );
+    } else {
+      // 直接顯示詳細計分對話框
+      newGame = await showDialog<GameRecord>(
+        context: context,
+        builder: (context) => AddGameAdvancedDialog(
+          dayId: dayId,
+          nextGameNumber: nextGameNumber,
+        ),
+      );
+    }
 
     if (newGame != null) {
       setState(() {
@@ -420,6 +437,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
             oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
             isHousePattern: _trainingDays[dayIndex].isHousePattern,
             scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            inputMethod: _trainingDays[dayIndex].inputMethod, // 保留原有的輸入方式
             games: updatedGames,
             createdAt: _trainingDays[dayIndex].createdAt,
           );
@@ -494,6 +512,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
             oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
             isHousePattern: _trainingDays[dayIndex].isHousePattern,
             scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            inputMethod: _trainingDays[dayIndex].inputMethod, // 保留原有的輸入方式
             games: updatedGames,
             createdAt: _trainingDays[dayIndex].createdAt,
           );
@@ -538,6 +557,7 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
             oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
             isHousePattern: _trainingDays[dayIndex].isHousePattern,
             scoringMethod: _trainingDays[dayIndex].scoringMethod,
+            inputMethod: _trainingDays[dayIndex].inputMethod, // 保留原有的輸入方式
             games: updatedGames,
             createdAt: _trainingDays[dayIndex].createdAt,
           );

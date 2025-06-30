@@ -5,7 +5,7 @@ import '../app_standard_button.dart';
 
 // 重構的新增訓練記錄彈窗 - 遵循APP標準視覺風格
 class CreateTrainingRecordDialog extends StatefulWidget {
-  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod)? onRecordCreated;
+  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordCreated;
 
   const CreateTrainingRecordDialog({
     Key? key,
@@ -28,8 +28,9 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
   DateTime _selectedDate = DateTime.now();
   bool _isHousePattern = true;
   String _selectedScoringMethod = 'traditional';
+  String _selectedInputMethod = 'simple'; // 新增：輸入方式
   
-  // 2步表單流程狀態
+  // 3步表單流程狀態
   int _currentStep = 0;
   final PageController _pageController = PageController();
   
@@ -109,7 +110,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
       return;
     }
     
-    if (_currentStep < 1) {
+    if (_currentStep < 2) {
       setState(() {
         _currentStep++;
       });
@@ -153,6 +154,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           _oilPatternLengthController.text.isEmpty ? null : _oilPatternLengthController.text,
           _isHousePattern,
           _selectedScoringMethod,
+          _selectedInputMethod, // 新增參數
         );
       
       Navigator.of(context).pop();
@@ -314,7 +316,8 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
   String _getStepTitle() {
     switch (_currentStep) {
       case 0: return 'Session & Location Details';
-      case 1: return 'Advanced Settings';
+      case 1: return 'Oil Pattern Settings';
+      case 2: return 'Scoring Preferences';
       default: return '';
     }
   }
@@ -326,7 +329,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         children: [
-          for (int i = 0; i < 2; i++) ...[
+          for (int i = 0; i < 3; i++) ...[
             Expanded(
               child: Container(
                 height: 3,
@@ -338,7 +341,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 ),
               ),
             ),
-            if (i < 1) SizedBox(width: 8),
+            if (i < 2) SizedBox(width: 8),
           ],
         ],
       ),
@@ -356,6 +359,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           children: [
             _buildStep1(),
             _buildStep2(),
+            _buildStep3(),
           ],
         ),
       ),
@@ -422,9 +426,9 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         
         // 步驟標題
         _buildStepHeader(
-          icon: Icons.settings,
-          title: 'Advanced Settings',
-          subtitle: 'Optional configurations',
+          icon: Icons.water_drop,
+          title: 'Oil Pattern',
+          subtitle: 'Lane conditions',
         ),
         
         SizedBox(height: 16),
@@ -432,10 +436,68 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         // 油圖設定
         _buildOilPatternSelector(),
         
+        Spacer(),
+      ],
+    );
+  }
+
+  Widget _buildStep3() {
+    final theme = Theme.of(context);
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8),
+        
+        // 步驟標題
+        _buildStepHeader(
+          icon: Icons.settings,
+          title: 'Scoring Setup',
+          subtitle: 'Choose your input method and scoring system',
+        ),
+        
         SizedBox(height: 16),
         
-        // 計分方式設定
-        _buildScoringMethodSelector(),
+        // 輸入方式選擇
+        _buildInputMethodSelector(),
+        
+        SizedBox(height: 16),
+        
+        // 計分系統選擇
+        _buildScoringSystemSelector(),
+        
+        SizedBox(height: 16),
+        
+        // 建議說明（放在底部）
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.lightbulb_outline,
+                color: theme.colorScheme.primary,
+                size: 14,
+              ),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Advanced scoring provides more detailed statistics',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         
         Spacer(),
       ],
@@ -549,7 +611,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
       onTap: () => _selectDate(context),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -670,7 +732,62 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     );
   }
 
-  Widget _buildScoringMethodSelector() {
+  Widget _buildInputMethodSelector() {
+    final theme = Theme.of(context);
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.input,
+              color: theme.colorScheme.primary,
+              size: 16,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Input Method',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        
+        SizedBox(height: 8),
+        
+        Row(
+          children: [
+            Expanded(
+              child: _buildInputMethodCard(
+                'Simple',
+                'Only input total score',
+                'Quick basic recording',
+                Icons.speed,
+                _selectedInputMethod == 'simple',
+                () => setState(() => _selectedInputMethod = 'simple'),
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _buildInputMethodCard(
+                'Advanced',
+                'Frame-by-frame input',
+                'Complete statistics',
+                Icons.grid_on,
+                _selectedInputMethod == 'advanced',
+                () => setState(() => _selectedInputMethod = 'advanced'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScoringSystemSelector() {
     final theme = Theme.of(context);
     
     return Column(
@@ -685,7 +802,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
             ),
             SizedBox(width: 8),
             Text(
-              'Scoring Method',
+              'Scoring System',
               style: theme.textTheme.titleSmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
@@ -716,6 +833,87 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildInputMethodCard(
+    String title,
+    String subtitle,
+    String description,
+    IconData icon,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected 
+            ? theme.colorScheme.primary.withOpacity(0.1)
+            : Colors.transparent,
+          border: Border.all(
+            color: isSelected 
+              ? theme.colorScheme.primary
+              : theme.colorScheme.onSurface.withOpacity(0.3),
+            width: isSelected ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected 
+                    ? theme.colorScheme.primary 
+                    : theme.colorScheme.onSurface.withOpacity(0.7),
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: isSelected 
+                        ? theme.colorScheme.primary 
+                        : theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isSelected 
+                  ? theme.colorScheme.primary 
+                  : theme.colorScheme.onSurface.withOpacity(0.8),
+                fontSize: 10,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 2),
+            Text(
+              description,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                fontSize: 9,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -775,10 +973,10 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           // 下一步/完成按鈕
           Expanded(
             child: AppStandardButton(
-              text: _currentStep == 1 ? 'Create Session' : 'Next',
-              icon: _currentStep == 1 ? Icons.check : Icons.arrow_forward,
+              text: _currentStep == 2 ? 'Create Session' : 'Next',
+              icon: _currentStep == 2 ? Icons.check : Icons.arrow_forward,
               onPressed: (_currentStep == 0 ? _step1Valid : true) 
-                ? (_currentStep == 1 ? _saveRecord : _nextStep)
+                ? (_currentStep == 2 ? _saveRecord : _nextStep)
                 : () {},
               enabled: _currentStep == 0 ? _step1Valid : true,
               isPrimary: true,
@@ -794,7 +992,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 // 顯示新增訓練記錄彈窗的輔助函數
 void showCreateTrainingRecordDialog(
   BuildContext context, 
-  Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod)? onRecordCreated,
+  Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordCreated,
 ) {
   showDialog(
     context: context,

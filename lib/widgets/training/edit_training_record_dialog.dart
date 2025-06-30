@@ -6,7 +6,7 @@ import '../../models/training_record.dart';
 // 編輯訓練記錄彈窗 - 樣式與新增彈窗同步
 class EditTrainingRecordDialog extends StatefulWidget {
   final TrainingDaySummary summary;
-  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod)? onRecordUpdated;
+  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated;
 
   const EditTrainingRecordDialog({
     Key? key,
@@ -30,6 +30,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
   late DateTime _selectedDate;
   late bool _isHousePattern;
   late String _selectedScoringMethod;
+  late String _selectedInputMethod;
   
   // 2步表單流程狀態
   int _currentStep = 0;
@@ -53,6 +54,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     _selectedDate = widget.summary.date;
     _isHousePattern = widget.summary.isHousePattern;
     _selectedScoringMethod = widget.summary.scoringMethod;
+    _selectedInputMethod = widget.summary.inputMethod;
     
     _initAnimations();
     _validateStep1();
@@ -164,6 +166,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
           _oilPatternLengthController.text.isEmpty ? null : _oilPatternLengthController.text,
           _isHousePattern,
           _selectedScoringMethod,
+          _selectedInputMethod, // 使用從模型中獲取的輸入方式
         );
       
       Navigator.of(context).pop();
@@ -744,7 +747,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
 void showEditTrainingRecordDialog(
   BuildContext context, 
   TrainingDaySummary summary,
-  Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod)? onRecordUpdated,
+  Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated,
 ) {
   showDialog(
     context: context,
