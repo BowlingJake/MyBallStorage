@@ -29,8 +29,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
   late final TextEditingController _oilPatternLengthController;
   late DateTime _selectedDate;
   late bool _isHousePattern;
-  late String _selectedScoringMethod;
-  late String _selectedInputMethod;
+  // 移除計分方式和輸入方式的變數，因為不允許編輯
   
   // 2步表單流程狀態
   int _currentStep = 0;
@@ -53,8 +52,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     _oilPatternLengthController = TextEditingController(text: widget.summary.oilPatternLength ?? '');
     _selectedDate = widget.summary.date;
     _isHousePattern = widget.summary.isHousePattern;
-    _selectedScoringMethod = widget.summary.scoringMethod;
-    _selectedInputMethod = widget.summary.inputMethod;
+    // 不再需要初始化計分方式和輸入方式變數，因為不允許編輯
     
     _initAnimations();
     _validateStep1();
@@ -165,8 +163,8 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
           _oilPatternNameController.text.isEmpty ? null : _oilPatternNameController.text,
           _oilPatternLengthController.text.isEmpty ? null : _oilPatternLengthController.text,
           _isHousePattern,
-          _selectedScoringMethod,
-          _selectedInputMethod, // 使用從模型中獲取的輸入方式
+          widget.summary.scoringMethod, // 保持原有的計分方式，不允許編輯
+          widget.summary.inputMethod, // 保持原有的輸入方式，不允許編輯
         );
       
       Navigator.of(context).pop();
@@ -422,8 +420,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
         ),
         const SizedBox(height: 16),
         _buildOilPatternSelector(),
-        const SizedBox(height: 16),
-        _buildScoringMethodSelector(),
+        // 移除計分方式選擇器 - 使用者無法在編輯時更動計分邏輯
         const Spacer(),
       ],
     );
@@ -629,34 +626,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     );
   }
 
-  Widget _buildScoringMethodSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(icon: Icons.calculate, title: 'Scoring Method'),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _buildToggleButton(
-                'Traditional',
-                _selectedScoringMethod == 'traditional',
-                () => setState(() => _selectedScoringMethod = 'traditional'),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _buildToggleButton(
-                'Current',
-                _selectedScoringMethod == 'current',
-                () => setState(() => _selectedScoringMethod = 'current'),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // _buildScoringMethodSelector 方法已移除 - 不允許編輯計分方式
 
   Widget _buildSectionTitle({required IconData icon, required String title}) {
     final theme = Theme.of(context);

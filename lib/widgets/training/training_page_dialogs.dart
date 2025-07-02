@@ -6,7 +6,8 @@ import 'create_training_record_dialog.dart';
 import 'edit_training_record_dialog.dart';
 import 'delete_confirmation_dialog.dart';
 import 'game_detail_dialog.dart';
-import '../../views/training/add_game_choice_dialog.dart';
+import 'add_game_simple_dialog.dart';
+import 'add_game_advanced_dialog.dart';
 
 mixin TrainingPageDialogs<T extends StatefulWidget> on State<T> {
   
@@ -188,34 +189,40 @@ mixin TrainingPageDialogs<T extends StatefulWidget> on State<T> {
     final record = controller.getTrainingDay(dayId);
     if (record == null) return;
 
-    final result = await showDialog<GameRecord>(
-      context: context,
-      builder: (context) => AddGameChoiceDialog(
-        dayId: dayId, 
-        gameNumber: record.games.length + 1,
-      ),
+    // 直接創建空白的遊戲記錄並添加到列表中
+    final newGameNumber = record.games.length + 1;
+    final blankGame = GameRecord(
+      id: '${dayId}_game_${DateTime.now().millisecondsSinceEpoch}',
+      gameNumber: newGameNumber,
+      score: 0,
+      frameScores: List.filled(10, 0), // 10格空白分數
+      strikes: 0,
+      spares: 0,
+      notes: null,
+      timestamp: DateTime.now(),
+      ballUsed: null,
     );
-    
-    if (result != null && mounted) {
-      try {
-        final success = await controller.addGameRecordToDay(dayId, result);
-        if (mounted && success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('遊戲已新增'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('新增遊戲時發生錯誤: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+
+    // 將空白遊戲記錄添加到訓練日
+    try {
+      final success = await controller.addGameRecordToDay(dayId, blankGame);
+      if (mounted && success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('已添加新的遊戲卡片，請編輯分數'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('添加遊戲時發生錯誤: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
