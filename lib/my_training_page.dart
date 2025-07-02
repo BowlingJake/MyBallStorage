@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'models/training_record.dart';
 import 'widgets/training/training_record_list_item.dart';
 import 'widgets/training/training_dashboard_card.dart';
@@ -394,65 +395,175 @@ class _MyTrainingPageState extends State<MyTrainingPage> {
     );
   }
 
-  void _addGameToDay(String dayId) async {
+  void _addGameToDay(String dayId) {
     final day = _trainingDays.firstWhere((d) => d.id == dayId);
     final nextGameNumber = day.games.length + 1;
 
-    // 根據訓練日的 inputMethod 直接跳過選擇，自動建立對應的對話框
-    final GameRecord? newGame;
-    if (day.inputMethod == 'simple') {
-      // 直接顯示簡易輸入對話框
-      newGame = await showDialog<GameRecord>(
-        context: context,
-        builder: (context) => AddGameSimpleDialog(
-          dayId: dayId,
-          nextGameNumber: nextGameNumber,
-        ),
-      );
+    // 直接創建預設的遊戲記錄，不顯示對話框
+    final newGame = _createDefaultGame(dayId, nextGameNumber);
+
+    setState(() {
+      final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
+      if (dayIndex != -1) {
+        // 創建新的遊戲列表
+        final updatedGames = <GameRecord>[..._trainingDays[dayIndex].games, newGame];
+        
+        // 創建更新的訓練日
+        final updatedDay = TrainingDaySummary(
+          id: _trainingDays[dayIndex].id,
+          title: _trainingDays[dayIndex].title,
+          date: _trainingDays[dayIndex].date,
+          center: _trainingDays[dayIndex].center,
+          oilPatternName: _trainingDays[dayIndex].oilPatternName,
+          oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
+          isHousePattern: _trainingDays[dayIndex].isHousePattern,
+          scoringMethod: _trainingDays[dayIndex].scoringMethod,
+          inputMethod: _trainingDays[dayIndex].inputMethod, // 保留原有的輸入方式
+          games: updatedGames,
+          createdAt: _trainingDays[dayIndex].createdAt,
+        );
+        
+        _trainingDays[dayIndex] = updatedDay;
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('第 $nextGameNumber 局已新增成功！總共 ${day.games.length + 1} 局'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  // 創建預設的遊戲記錄
+  GameRecord _createDefaultGame(String dayId, int gameNumber) {
+    final now = DateTime.now();
+    
+    // 生成模擬的隨機分數資料
+    final random = math.Random();
+    final scores = [150, 165, 178, 185, 192, 201, 210, 225, 240, 255];
+    final score = scores[random.nextInt(scores.length)];
+    
+    // 根據分數生成相應的 strikes 和 spares
+    int strikes = 0;
+    int spares = 0;
+    
+    if (score >= 240) {
+      strikes = random.nextInt(3) + 8; // 8-10 strikes
+      spares = random.nextInt(2); // 0-1 spares
+    } else if (score >= 200) {
+      strikes = random.nextInt(3) + 5; // 5-7 strikes
+      spares = random.nextInt(3) + 1; // 1-3 spares
+    } else if (score >= 170) {
+      strikes = random.nextInt(3) + 3; // 3-5 strikes
+      spares = random.nextInt(4) + 2; // 2-5 spares
     } else {
-      // 直接顯示詳細計分對話框
-      newGame = await showDialog<GameRecord>(
-        context: context,
-        builder: (context) => AddGameAdvancedDialog(
-          dayId: dayId,
-          nextGameNumber: nextGameNumber,
-        ),
-      );
+      strikes = random.nextInt(3) + 1; // 1-3 strikes
+      spares = random.nextInt(5) + 3; // 3-7 spares
     }
+    
+    // 生成簡化的 frame scores
+    final averagePerFrame = score / 10;
+    final frameScores = List.generate(10, (index) => averagePerFrame.round());
+    
+    // 生成隨機備註
+    final notes = _generateRandomNote(score, strikes, spares);
+    
+    // 生成隨機球具
+    final ballUsed = _generateRandomBall(random);
+    
+    return GameRecord(
+      id: '${dayId}_game_${now.millisecondsSinceEpoch}',
+      gameNumber: gameNumber,
+      score: score,
+      frameScores: frameScores,
+      strikes: strikes,
+      spares: spares,
+      notes: notes,
+      timestamp: now,
+      ballUsed: ballUsed,
+    );
+  }
 
-    if (newGame != null) {
-      setState(() {
-        final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
-        if (dayIndex != -1) {
-          // 創建新的遊戲列表
-          final updatedGames = <GameRecord>[..._trainingDays[dayIndex].games, newGame!];
-          
-          // 創建更新的訓練日
-          final updatedDay = TrainingDaySummary(
-            id: _trainingDays[dayIndex].id,
-            title: _trainingDays[dayIndex].title,
-            date: _trainingDays[dayIndex].date,
-            center: _trainingDays[dayIndex].center,
-            oilPatternName: _trainingDays[dayIndex].oilPatternName,
-            oilPatternLength: _trainingDays[dayIndex].oilPatternLength,
-            isHousePattern: _trainingDays[dayIndex].isHousePattern,
-            scoringMethod: _trainingDays[dayIndex].scoringMethod,
-            inputMethod: _trainingDays[dayIndex].inputMethod, // 保留原有的輸入方式
-            games: updatedGames,
-            createdAt: _trainingDays[dayIndex].createdAt,
-          );
-          
-          _trainingDays[dayIndex] = updatedDay;
-        }
-      });
+  // 生成隨機球具
+  BallInfo _generateRandomBall(math.Random random) {
+    final balls = [
+      BallInfo(
+        id: 'ball_1',
+        name: 'Phaze II',
+        brand: 'Storm',
+        brandColor: '#FF6B35',
+      ),
+      BallInfo(
+        id: 'ball_2',
+        name: 'Purple Hammer',
+        brand: 'Hammer',
+        brandColor: '#8B5A96',
+      ),
+      BallInfo(
+        id: 'ball_3',
+        name: 'Idol',
+        brand: 'Roto Grip',
+        brandColor: '#E31F26',
+      ),
+      BallInfo(
+        id: 'ball_4',
+        name: 'Astro PhysiX',
+        brand: 'Storm',
+        brandColor: '#FF6B35',
+      ),
+      BallInfo(
+        id: 'ball_5',
+        name: 'Hustle Ink',
+        brand: 'Roto Grip',
+        brandColor: '#E31F26',
+      ),
+      BallInfo(
+        id: 'ball_6',
+        name: 'IQ Tour Emerald',
+        brand: 'Storm',
+        brandColor: '#FF6B35',
+      ),
+    ];
+    
+    return balls[random.nextInt(balls.length)];
+  }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('第 $nextGameNumber 局已新增成功！總共 ${day.games.length + 1} 局'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+  // 生成隨機備註
+  String _generateRandomNote(int score, int strikes, int spares) {
+    final excellentNotes = [
+      'Personal best today!',
+      'Great improvement!',
+      'Excellent performance',
+      'Amazing consistency',
+      'Perfect timing!'
+    ];
+    
+    final goodNotes = [
+      'Great improvement on strikes',
+      'Consistent performance',
+      'Good ball control',
+      'Nice spare conversions',
+      'Solid fundamentals'
+    ];
+    
+    final averageNotes = [
+      'Good start, need to work on 7-10 split',
+      'Focus on spare conversion',
+      'Working on consistency',
+      'Better approach timing',
+      'Need more practice on spares'
+    ];
+    
+    final random = math.Random();
+    
+    if (score >= 200) {
+      return excellentNotes[random.nextInt(excellentNotes.length)];
+    } else if (score >= 170) {
+      return goodNotes[random.nextInt(goodNotes.length)];
+    } else {
+      return averageNotes[random.nextInt(averageNotes.length)];
     }
   }
 

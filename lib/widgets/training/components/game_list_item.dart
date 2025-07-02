@@ -52,39 +52,24 @@ class GameListItem extends StatelessWidget {
           ),
           SizedBox(width: 12),
 
-          // 分數和統計
+          // 分數和球具記錄
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      '${game.score}',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Text(
-                      'S: ${game.strikes}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'SP: ${game.spares}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
+                // 只顯示分數
+                Text(
+                  '${game.score}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                if (game.notes?.isNotEmpty == true)
+                SizedBox(height: 4),
+                // 顯示使用的球具
+                if (game.ballUsed != null)
                   Text(
-                    game.notes!,
+                    game.ballUsed!.name,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 11,
@@ -94,44 +79,6 @@ class GameListItem extends StatelessWidget {
                   ),
               ],
             ),
-          ),
-
-          // 時間和操作
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                DateFormat('HH:mm').format(game.timestamp),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
-                ),
-              ),
-              SizedBox(height: 4),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 查看詳情
-                  GestureDetector(
-                    onTap: () => onGameTap?.call(game),
-                    child: Icon(
-                      Icons.visibility_outlined,
-                      size: 16,
-                      color: theme.colorScheme.primary.withOpacity(0.7),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  // 刪除
-                  GestureDetector(
-                    onTap: () => onGameDelete?.call(game),
-                    child: Icon(
-                      Icons.delete_outline,
-                      size: 16,
-                      color: Colors.red.withOpacity(0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
         ],
       ),
