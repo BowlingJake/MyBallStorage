@@ -155,6 +155,16 @@ class TrainingController extends ChangeNotifier {
     if (success) notifyListeners();
     return success;
   }
+
+  /// 新增指定遊戲記錄到訓練日
+  Future<bool> addGameRecordToDay(String dayId, GameRecord game) async {
+    // 模擬網路延遲
+    await Future.delayed(Duration.zero);
+    
+    final success = _dataService.addGameToDay(dayId, game);
+    if (success) notifyListeners();
+    return success;
+  }
   
   /// 更新遊戲記錄
   Future<bool> updateGame(GameRecord updatedGame) async {

@@ -1,5 +1,7 @@
 // my_arsenal_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
 import 'package:getwidget/getwidget.dart';
 import 'dart:convert';
@@ -201,7 +203,9 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
         setState(() {
           _bottomNavIndex = index;
         });
-        print('Profile button tapped in Ball Library');
+        if (kDebugMode) {
+          log('Profile button tapped in Ball Library');
+        }
         // TODO: 導航到個人頁面
         break;
     }

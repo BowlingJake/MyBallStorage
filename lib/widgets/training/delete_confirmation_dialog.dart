@@ -128,8 +128,8 @@ class DeleteConfirmationDialog extends StatelessWidget {
   }
 }
 
-// 顯示刪除確認對話框的輔助函數
-void showDeleteConfirmationDialog(
+// 顯示訓練相關刪除確認對話框的輔助函數
+void showTrainingDeleteDialog(
   BuildContext context, {
   required String title,
   required String message,
