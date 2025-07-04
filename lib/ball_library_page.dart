@@ -15,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // 用於 SystemUiOverlayStyle
 
+import 'package:bowlingarsenal_app/widgets/ball_library_controls.dart'; // 引入新的 Widget
+
 class BallLibraryPage extends ConsumerStatefulWidget {
   const BallLibraryPage({super.key});
 
@@ -73,15 +75,6 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     final ballListAsync = ref.watch(ballListProvider);
     // 監聽新的計算後的 Provider 來獲取要顯示的資料
     final filteredBalls = ref.watch(filteredBallListProvider);
-    // 監聽篩選和排序的狀態，用於 UI 顯示
-    final searchText = ref.watch(ballSearchTextProvider);
-    final selectedFilters = ref.watch(ballFiltersProvider);
-    final sortCriteria = ref.watch(ballSortProvider);
-
-    // 輔助方法，現在直接在 build 方法中計算
-    final hasActiveFilters = selectedFilters.values.any((f) => f != null);
-    final activeFilterCount = selectedFilters.values.where((f) => f != null).length;
-    final filterButtonText = hasActiveFilters ? 'Filter ($activeFilterCount)' : 'Filter';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -128,84 +121,8 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
             data: (_) { // 原始資料載入成功後，我們就使用 filteredBalls
               return Column(
                 children: [
-                  // 搜尋和篩選控制項
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: ArsenalSearchBar(
-                      searchText: searchText,
-                      onSearchChanged: (text) {
-                        // 直接更新 Provider
-                        ref.read(ballSearchTextProvider.notifier).state = text;
-                      },
-                    ),
-                  ),
-                  // Filter and Sort buttons
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.filter_list),
-                            label: Text(filterButtonText),
-                            onPressed: () async {
-                              await showDialog<void>(
-                                context: context,
-                                builder: (context) => FilterPopout(
-                                  // 傳入目前的篩選狀態
-                                  selectedFilters: selectedFilters,
-                                  onFilterChanged: (type, value) {
-                                    // 更新 Provider 的狀態
-                                    ref.read(ballFiltersProvider.notifier).update((state) {
-                                      final newState = Map<String, String?>.from(state);
-                                      newState[type] = value;
-                                      return newState;
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: PopupMenuButton<SortCriterion>(
-                            onSelected: (criterion) {
-                              // 更新 Provider
-                              ref.read(ballSortProvider.notifier).state = criterion;
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<SortCriterion>>[
-                                  const PopupMenuItem<SortCriterion>(
-                                    value: SortCriterion(field: SortField.name, ascending: true),
-                                    child: Text('Name (A-Z)'),
-                                  ),
-                                  const PopupMenuItem<SortCriterion>(
-                                    value: SortCriterion(field: SortField.name, ascending: false),
-                                    child: Text('Name (Z-A)'),
-                                  ),
-                                  const PopupMenuItem<SortCriterion>(
-                                    value: SortCriterion(field: SortField.rg, ascending: true),
-                                    child: Text('RG (Low-High)'),
-                                  ),
-                                  const PopupMenuItem<SortCriterion>(
-                                    value: SortCriterion(field: SortField.rg, ascending: false),
-                                    child: Text('RG (High-Low)'),
-                                  ),
-                                ],
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.sort),
-                              label: Text('Sort: ${sortCriteria.displayName}'),
-                              onPressed: null, // PopupMenuButton handles tap
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // 搜尋和篩選控制項，現在由一個獨立的 widget 負責
+                  const BallLibraryControls(),
                   // 球列表
                   Expanded(
                     child: BallListView(
