@@ -2,28 +2,29 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/my_training_page.dart';
+import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_search_bar.dart';
-import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
+import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/widgets/ball_list_header.dart';
 import 'package:bowlingarsenal_app/widgets/ball_list_view.dart';
-import 'package:bowlingarsenal_app/widgets/filter_popout.dart'; // 導入篩選彈窗
-import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart'; // 導入現代化底部導覽列
-import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart'; // 導入Professional Dark背景
+import 'package:bowlingarsenal_app/widgets/filter_popout.dart';
+import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 用於 SystemUiOverlayStyle
 
-class BallLibraryPage extends StatefulWidget {
+class BallLibraryPage extends ConsumerStatefulWidget {
   const BallLibraryPage({super.key});
 
   @override
-  State<BallLibraryPage> createState() => _BallLibraryPageState();
+  ConsumerState<BallLibraryPage> createState() => _BallLibraryPageState();
 }
 
-class _BallLibraryPageState extends State<BallLibraryPage> {
-  List<BowlingBall> _bowlingBalls = <BowlingBall>[];
-
+class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
   String _searchText = '';
   final Map<String, String?> _selectedFilters = {
     'brand': null,
@@ -32,20 +33,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   };
   String _sortBy = 'Name';
   bool _sortAscending = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMockData();
-  }
-
-  Future<void> _loadMockData() async {
-    final jsonString = await rootBundle.loadString('assets/bowling_ball_data.json');
-    final List<dynamic> jsonList = json.decode(jsonString);
-    setState(() {
-      _bowlingBalls = jsonList.map((e) => BowlingBall.fromJson(e)).toList();
-    });
-  }
 
   // --- Helper function for brand matching ---
   bool _matchesBrandFilter(String ballBrand, String? selectedBrand) {
@@ -95,8 +82,8 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   }
 
   // 篩選和排序後的列表
-  List<BowlingBall> get _filteredAndSortedBalls {
-    var items = List<BowlingBall>.from(_bowlingBalls);
+  List<BowlingBall> _getFilteredAndSortedBalls(List<BowlingBall> allBalls) {
+    var items = List<BowlingBall>.from(allBalls);
 
     // 搜尋邏輯
     if (_searchText.isNotEmpty) {
@@ -207,6 +194,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ballListAsync = ref.watch(ballListProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -247,268 +235,91 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
               ),
             ),
           ),
-          body: Column(
-            children: [
-              // 搜尋列
-              ArsenalSearchBar(
-                searchText: _searchText,
-                onSearchChanged: (value) {
-                  setState(() {
-                    _searchText = value;
-                  });
-                },
-              ),
-              
-              // 16dp 間距
-              const SizedBox(height: 16),
-              
-              // 篩選和排序區域
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    // 篩選按鈕
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(
-                        height: 44, // 統一固定高度
-                        child: OutlinedButton(
-                          onPressed: () {
-                            showFilterPopout(
-                              context,
-                              _selectedFilters,
-                              (filterType, value) {
+          body: ballListAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error: $err')),
+            data: (allBalls) {
+              final filteredBalls = _getFilteredAndSortedBalls(allBalls);
+              return Column(
+                children: [
+                  // 搜尋和篩選控制項
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: ArsenalSearchBar(
+                      searchText: _searchText,
+                      onSearchChanged: (text) {
+                        setState(() {
+                          _searchText = text;
+                        });
+                      },
+                    ),
+                  ),
+                  // Filter and Sort buttons
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.filter_list),
+                            label: Text(_getFilterButtonText()),
+                            onPressed: () async {
+                              final result = await showDialog<Map<String, String?>>(
+                                context: context,
+                                builder: (context) => FilterPopout(
+                                  selectedFilters: _selectedFilters,
+                                  onFilterChanged: (type, value) {
+                                    setState(() {
+                                      _selectedFilters[type] = value;
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: PopupMenuButton<String>(
+                            onSelected: (value) {
                                 setState(() {
-                                  _selectedFilters[filterType] = value;
+                                  final parts = value.split(' ');
+                                  _sortBy = parts[0];
+                                  _sortAscending = !value.contains('High-Low') && !value.contains('Z-A');
                                 });
-                              },
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 12), // 移除vertical padding
-                            minimumSize: Size.zero, // 移除最小尺寸限制
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊區域
-                            side: BorderSide(
-                              color: theme.colorScheme.primary.withOpacity(0.5),
-                              width: 1.5,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            backgroundColor: _hasActiveFilters() 
-                              ? theme.colorScheme.primary.withOpacity(0.1)
-                              : Colors.transparent,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
-                            children: [
-                              Icon(
-                                Icons.tune,
-                                size: 18,
-                                color: theme.colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _getFilterButtonText(),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  height: 1.2, // 統一行高
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            },
+                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                              const PopupMenuItem<String>(value: 'Name A-Z', child: Text('Name (A-Z)')),
+                              const PopupMenuItem<String>(value: 'Name Z-A', child: Text('Name (Z-A)')),
+                              const PopupMenuItem<String>(value: 'RG Low-High', child: Text('RG (Low-High)')),
+                              const PopupMenuItem<String>(value: 'RG High-Low', child: Text('RG (High-Low)')),
                             ],
+                            child: OutlinedButton.icon(
+                              icon: const Icon(Icons.sort),
+                              label: Text('Sort: $_sortBy'),
+                              onPressed: null, // PopupMenuButton handles tap
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    
-                    const SizedBox(width: 8),
-                    
-                    // 排序下拉選單按鈕
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(
-                        height: 44, // 統一固定高度
-                        child: PopupMenuButton<String>(
-                          offset: const Offset(0, 50), // 調整選單位置，讓它出現在按鈕下方
-                          color: theme.colorScheme.surface.withOpacity(0.95), // 半透明背景
-                          elevation: 8, // 增加陰影深度
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12), // 圓角
-                            side: BorderSide(
-                              color: theme.colorScheme.primary.withOpacity(0.3),
-                            ),
-                          ),
-                          onSelected: (value) {
-                            setState(() {
-                              if (value.contains('_desc')) {
-                                _sortBy = value.replaceAll('_desc', '');
-                                _sortAscending = false;
-                              } else {
-                                _sortBy = value;
-                                _sortAscending = true;
-                              }
-                            });
-                          },
-                          itemBuilder: (BuildContext context) => [
-                            PopupMenuItem(
-                              value: 'Name',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Name (A-Z)',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'Name_desc',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Name (Z-A)',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'RG',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'RG (Low-High)',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'RG_desc',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'RG (High-Low)',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                          child: Container(
-                            width: double.infinity,
-                            height: double.infinity, // 填滿SizedBox的高度
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: theme.colorScheme.primary.withOpacity(0.5),
-                                width: 1.5,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center, // 置中對齊
-                              children: [
-                                Icon(
-                                  _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                                  size: 18,
-                                  color: theme.colorScheme.primary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Sort: $_sortBy',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.primary,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                    height: 1.2, // 統一行高
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 18,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+                  // 球列表
+                  Expanded(
+                    child: BallListView(
+                      bowlingBalls: filteredBalls,
+                      onBallTapped: (ball) {
+                        // 彈出球的詳細資訊
+                        showDialog(
+                          context: context,
+                          builder: (context) => BowlingBallDetailWidget(ball: ball),
+                        );
+                      },
                     ),
-                    
-                    // 清除篩選按鈕
-                    if (_hasActiveFilters()) ...[
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedFilters['brand'] = null;
-                            _selectedFilters['core'] = null;
-                            _selectedFilters['coverstock'] = null;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.clear,
-                          color: theme.colorScheme.error,
-                          size: 18,
-                        ),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.error.withOpacity(0.1),
-                          padding: const EdgeInsets.all(6),
-                        ),
-                        tooltip: 'Clear all filters',
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              
-              // 列表標題
-              const BallListHeader(),
-              
-              // 16dp 間距
-              const SizedBox(height: 16),
-              
-              // 球列表
-              Expanded(
-                child: BallListView(
-                  balls: _filteredAndSortedBalls,
-                  searchText: _searchText,
-                  onBallTap: (ball) {
-                    print('Navigate to ball detail: ${ball.name}');
-                    // TODO: 導航到球詳細頁面
-                  },
-                  onBallLongPress: (ball) {
-                    print('Show ball options: ${ball.name}');
-                    // 顯示球詳細資訊彈出框
-                    showBallDetails(context, ball);
-                  },
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
           bottomNavigationBar: ModernBottomNavigation(
             currentIndex: _bottomNavIndex,
@@ -518,8 +329,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
       ),
     );
   }
-
-
 
   /// 漸層效果設計
   Widget _buildGradientNavigationBar(ThemeData theme) {

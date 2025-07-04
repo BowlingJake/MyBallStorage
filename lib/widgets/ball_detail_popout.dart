@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart'; // 導入品牌色定義
 import 'package:bowlingarsenal_app/widgets/ball_list_view.dart'; // 導入原有的 BowlingBall 模型
 import 'package:flutter/material.dart';
@@ -348,12 +349,12 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                               Expanded(child: _StatItem(
                                 icon: Icons.trending_up,
                                 label: 'RG差',
-                                value: widget.ball.differential?.toStringAsFixed(3) ?? 'N/A',
+                                value: widget.ball.diff?.toStringAsFixed(3) ?? 'N/A',
                               ),),
                               Expanded(child: _StatItem(
                                 icon: Icons.balance,
                                 label: 'MB',
-                                value: widget.ball.massBias?.toStringAsFixed(3) ?? 'N/A',
+                                value: widget.ball.intDiff?.toStringAsFixed(3) ?? 'N/A',
                               ),),
                             ],
                           ),

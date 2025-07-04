@@ -48,6 +48,22 @@ class BrandTonalPalette {  // 最深
   final Color shade800;
   final Color shade900;
 
+  /// 獲取所有色調的列表
+  List<Color> getAllShades() {
+    return [
+      shade50,
+      shade100,
+      shade200,
+      shade300,
+      shade400,
+      shade500,
+      shade600,
+      shade700,
+      shade800,
+      shade900,
+    ];
+  }
+
   /// 獲取適合背景的漸層色
   List<Color> getBackgroundGradient() {
     return [shade300, shade400];

@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/gradient_borders.dart';
@@ -30,7 +31,7 @@ Color adjustHue(Color color, double hueDelta) {
 
 // Helper function to create radial gradient overlay for matte effect
 RadialGradient createMatteOverlay(List<Color> brandColors) {
-  final primaryColor = brandColors.first;
+  final primaryColor = brandColors.isNotEmpty ? brandColors.first : Colors.grey;
   final matteColor1 = adjustHue(primaryColor, 15);
   final matteColor2 = adjustHue(primaryColor, -12);
   
@@ -45,59 +46,6 @@ RadialGradient createMatteOverlay(List<Color> brandColors) {
     ],
     stops: const [0.0, 0.4, 0.7, 1.0],
   );
-}
-
-// 保齡球資料模型
-class BowlingBall { // MB Diff (質量偏心)
-
-  BowlingBall({
-    required this.id,
-    required this.name,
-    required this.brand,
-    required this.coverstock,
-    required this.core, this.coverstockName = '',
-    this.imageUrl = 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball',
-    this.rg,
-    this.differential,
-    this.massBias,
-  });
-
-  factory BowlingBall.fromJson(Map<String, dynamic> json) {
-    double? parseDouble(String? value) {
-      if (value == null || value.isEmpty) return null;
-      return double.tryParse(value);
-    }
-
-    String getImageUrl(String ballName) {
-      if (ballName == 'Jackal EXJ') {
-        return 'assets/images/Jackal EXJ.jpg';
-      }
-      return 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball';
-    }
-
-    return BowlingBall(
-      id: json['Ball'] ?? '',
-      name: json['Ball'] ?? '',
-      brand: json['Brand'] ?? '',
-      coverstock: json['Coverstock Category'] ?? '',
-      coverstockName: json['Coverstock Name'] ?? '',
-      core: json['Core'] ?? '',
-      imageUrl: getImageUrl(json['Ball'] ?? ''),
-      rg: parseDouble(json['RG']),
-      differential: parseDouble(json['Diff']),
-      massBias: parseDouble(json['MB Diff']),
-    );
-  }
-  final String id;
-  final String name;
-  final String brand;
-  final String coverstock; // 球皮類型（用於卡片顯示）
-  final String coverstockName; // 球皮完整名稱（用於詳細視窗）
-  final String core;
-  final String imageUrl; // Not used in the new card design directly
-  final double? rg; // RG (徑向迴轉半徑)
-  final double? differential; // Diff (差動值)
-  final double? massBias;
 }
 
 // Helper class for metal texture background
@@ -167,6 +115,93 @@ class _GridPainter extends CustomPainter {
     return oldDelegate.gridColor != gridColor ||
            oldDelegate.strokeWidth != strokeWidth ||
            oldDelegate.spacing != spacing;
+  }
+}
+
+class _SpecValue extends StatelessWidget {
+  const _SpecValue({required this.label, required this.value, required this.theme});
+
+  final String label;
+  final String value;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 9,
+          ),
+        ),
+        const SizedBox(height: 1),
+        Text(
+          value,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SpecDivider extends StatelessWidget {
+  const _SpecDivider({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 20,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      color: color.withOpacity(0.5),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.theme,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.4), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -248,71 +283,157 @@ class _BallCardItem extends StatelessWidget {
             child: Stack(
               children: [
                 // 主要內容 - 兩行佈局
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    // 第一行：球名
-                    Text(
-                      ball.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
+                    // 左側球的圖片
+                    SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // 光暈背景
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ringColor.withOpacity(0.5),
+                                  blurRadius: 15,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 球體圖片
+                          ClipOval(
+                            child: Image.network(
+                              ball.imageUrl,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              // 圖片載入時顯示佔位符
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    strokeWidth: 2,
+                                  ),
+                                );
+                              },
+                              // 圖片載入失敗時顯示錯誤圖示
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error_outline, color: Colors.grey, size: 40),
+                            ),
+                          ),
+                           // 添加霧面效果的 overlay
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: createMatteOverlay(brandPalette.getAllShades()),
+                            ),
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
-                    // 第二行：Core Type 和 Cover Type
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Core Type: ${getCoreCategory(ball.core)}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.8),
+
+                    const SizedBox(width: 12),
+
+                    // 右側球的資訊
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // 球名
+                          Text(
+                            ball.name,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onSurface,
+                              letterSpacing: 0.5,
                             ),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 1,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(0.5),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Cover Type: ${ball.coverstock}',
-                            style: theme.textTheme.bodySmall?.copyWith(
+                          
+                          const SizedBox(height: 4),
+
+                          // 品牌
+                          Text(
+                            cleanBrandName(ball.brand),
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 8),
+                          
+                          // 核心和球皮資訊
+                          Row(
+                            children: [
+                              _InfoChip(
+                                icon: Icons.settings,
+                                label: getCoreCategory(ball.core),
+                                color: brandPalette.shade400,
+                                theme: theme,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _InfoChip(
+                                  icon: Icons.layers,
+                                  label: ball.coverstock,
+                                  color: brandPalette.shade400,
+                                  theme: theme,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                // 右上角品牌標籤（橢圓形，無框線）
+                // 右上角的規格數據
                 Positioned(
                   top: 0,
-                  right: 0, 
+                  right: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: ringColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      cleanBrandName(ball.brand),
-                      style: TextStyle(
-                        color: ringColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                      color: ringColor.withOpacity(0.2),
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(15),
+                        bottomLeft: Radius.circular(8),
                       ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SpecValue(
+                          label: 'RG',
+                          value: ball.rg?.toStringAsFixed(3) ?? 'N/A',
+                          theme: theme,
+                        ),
+                        _SpecDivider(color: ringColor),
+                        _SpecValue(
+                          label: 'Diff',
+                          value: ball.diff?.toStringAsFixed(3) ?? 'N/A',
+                          theme: theme,
+                        ),
+                        if (ball.intDiff != null && ball.intDiff! > 0) ...[
+                          _SpecDivider(color: ringColor),
+                          _SpecValue(
+                            label: 'IntDiff',
+                            value: ball.intDiff!.toStringAsFixed(3),
+                            theme: theme,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
@@ -328,21 +449,19 @@ class _BallCardItem extends StatelessWidget {
 class BallListView extends StatelessWidget {
 
   const BallListView({
-    required this.balls, super.key,
+    required this.bowlingBalls, super.key,
     this.searchText = '',
-    this.onBallTap,
-    this.onBallLongPress,
+    required this.onBallTapped,
   });
-  final List<BowlingBall> balls;
+  final List<BowlingBall> bowlingBalls;
   final String searchText;
-  final Function(BowlingBall)? onBallTap;
-  final Function(BowlingBall)? onBallLongPress;
+  final void Function(BowlingBall) onBallTapped;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    if (balls.isEmpty) {
+    if (bowlingBalls.isEmpty) {
       return Center(
         child: Text(
           searchText.isNotEmpty ? 'No balls match your search.' : 'No balls in your arsenal yet.',
@@ -362,19 +481,21 @@ class BallListView extends StatelessWidget {
         ),
         ListView.builder(
           padding: const EdgeInsets.only(bottom: 32),
-          itemCount: balls.length,
+          itemCount: bowlingBalls.length,
           itemBuilder: (context, index) {
-            final ball = balls[index];
+            final ball = bowlingBalls[index];
             return _BallCardItem(
               ball: ball,
               theme: theme,
-              onTap: () {
-                onBallTap?.call(ball);
-                print('Tapped on ${ball.name}');
-              },
+              onTap: () => onBallTapped(ball),
               onLongPress: () {
-                onBallLongPress?.call(ball);
-                print('Long pressed on ${ball.name}');
+                // 長按事件可以自訂，例如彈出快速操作選單
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Long-pressed on ${ball.name}'),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
               },
             );
           },
