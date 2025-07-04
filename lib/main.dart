@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:bowlingarsenal_app/app_router.dart';
 import 'package:bowlingarsenal_app/core/error/error_handler.dart';
+import 'package:bowlingarsenal_app/providers/theme_provider.dart';
 import 'package:bowlingarsenal_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,16 +20,18 @@ void main() {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+
     return MaterialApp(
       title: 'StrikeTrack - 保齡球管理應用',
-      theme: darkTheme, // Always use dark theme
+      theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: ThemeMode.dark, // Force dark mode
+      themeMode: themeMode,
       home: const AppRouter(),
       onGenerateRoute: AppRoutes.generateRoute,
       debugShowCheckedModeBanner: false,

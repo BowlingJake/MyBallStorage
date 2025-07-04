@@ -3,6 +3,7 @@ import 'dart:ui'; // For BackdropFilter
 
 import 'package:bowlingarsenal_app/ball_library_page.dart';
 import 'package:bowlingarsenal_app/my_training_page.dart';
+import 'package:bowlingarsenal_app/providers/theme_provider.dart';
 import 'package:bowlingarsenal_app/views/developer_page.dart';
 import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
@@ -15,14 +16,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _selectedIndex = 0; // 用於 BottomNavigationBar
   final _userCardKey = GlobalKey(); // 1. 建立一個 GlobalKey 來追蹤使用者卡片
   Rect? _userCardRect; // 2. 用於儲存卡片的矩形區域
@@ -101,6 +102,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(themeProvider);
+
     return ProfessionalDarkBackground(
       cutoutRects: _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
       child: Scaffold(
@@ -115,6 +118,16 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           actions: [
+            IconButton(
+              icon: Icon(
+                themeMode == ThemeMode.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              ),
+              color: Theme.of(context).colorScheme.onSurface,
+              onPressed: () {
+                ref.read(themeProvider.notifier).toggleTheme();
+              },
+              tooltip: 'Toggle Theme',
+            ),
             IconButton(
               icon: const Icon(Icons.developer_mode_outlined),
               color: Theme.of(context).colorScheme.onSurface,

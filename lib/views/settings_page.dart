@@ -1,5 +1,4 @@
 import 'package:bowlingarsenal_app/providers/theme_provider.dart';
-import 'package:bowlingarsenal_app/services/theme_service.dart';
 import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,6 +23,16 @@ class SettingsPage extends ConsumerWidget {
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
+          children: [
+            _buildSectionTitle(theme, '外觀'),
+            _buildSettingsCard(
+              theme: theme,
+              leadingIcon: Iconsax.brush_1,
+              title: '主題',
+              subtitle: Text(_getThemeModeDisplayName(themeState)),
+              onTap: () => _showThemeDialog(context, ref),
+            ),
+          ],
         ),
       ),
     );
@@ -43,7 +52,7 @@ class SettingsPage extends ConsumerWidget {
               RadioListTile<ThemeMode>(
                 title: const Text('淺色'),
                 value: ThemeMode.light,
-                groupValue: themeState.themeMode,
+                groupValue: themeState,
                 onChanged: (value) {
                   if (value != null) {
                     ref.read(themeProvider.notifier).setThemeMode(value);
@@ -54,7 +63,7 @@ class SettingsPage extends ConsumerWidget {
               RadioListTile<ThemeMode>(
                 title: const Text('深色'),
                 value: ThemeMode.dark,
-                groupValue: themeState.themeMode,
+                groupValue: themeState,
                 onChanged: (value) {
                   if (value != null) {
                     ref.read(themeProvider.notifier).setThemeMode(value);
@@ -65,7 +74,7 @@ class SettingsPage extends ConsumerWidget {
               RadioListTile<ThemeMode>(
                 title: const Text('跟隨系統'),
                 value: ThemeMode.system,
-                groupValue: themeState.themeMode,
+                groupValue: themeState,
                 onChanged: (value) {
                   if (value != null) {
                     ref.read(themeProvider.notifier).setThemeMode(value);

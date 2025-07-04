@@ -7,33 +7,40 @@ class ThemeState {
   final ThemeMode themeMode;
 }
 
-/// Manages the theme state of the application, forcing dark mode.
-class ThemeNotifier extends StateNotifier<ThemeState> {
-  ThemeNotifier() : super(const ThemeState(ThemeMode.dark)); // Always start in dark mode
+/// Manages the theme mode of the application.
+///
+/// This notifier holds the current [ThemeMode] and provides a method to toggle
+/// between dark and light mode.
+class ThemeNotifier extends StateNotifier<ThemeMode> {
+  ThemeNotifier() : super(ThemeMode.dark); // Default to dark mode
 
-  /// This method is now redundant but kept for API consistency if needed later.
-  /// It will always set the theme to dark mode.
-  Future<void> setThemeMode(ThemeMode mode) async {
-    if (state.themeMode == ThemeMode.dark) return;
-    state = const ThemeState(ThemeMode.dark);
+  void toggleTheme() {
+    state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+  }
+
+  void setThemeMode(ThemeMode mode) {
+    state = mode;
   }
 }
 
-/// Provider for accessing the ThemeNotifier.
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeState>((ref) {
+/// Provides the [ThemeNotifier] to the widget tree.
+///
+/// Widgets can use this provider to access the [ThemeNotifier] instance
+/// to read the current theme mode or to call the `toggleTheme` method.
+final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
   return ThemeNotifier();
 });
 
 /// 便利的計算型 Provider - 獲取當前主題模式
 final currentThemeModeProvider = Provider<ThemeMode>((ref) {
   final themeState = ref.watch(themeProvider);
-  return themeState.themeMode;
+  return themeState;
 });
 
 /// 便利的計算型 Provider - 檢查是否為深色模式
 final isDarkModeProvider = Provider.family<bool, BuildContext>((ref, context) {
   final themeState = ref.watch(themeProvider);
-  switch (themeState.themeMode) {
+  switch (themeState) {
     case ThemeMode.light:
       return false;
     case ThemeMode.dark:
