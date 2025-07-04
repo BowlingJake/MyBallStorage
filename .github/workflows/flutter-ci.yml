@@ -1,0 +1,58 @@
+# To enable branch protection, go to your repository's settings > Branches.
+# Add a branch protection rule for the 'main' branch.
+# Enable "Require status checks to pass before merging",
+# and select the "build" job from this workflow.
+# This will ensure all pull requests to main must pass this CI check.
+
+name: Flutter CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        if: success()
+
+      - uses: subosito/flutter-action@v2
+        if: success()
+        with:
+          flutter-version: "3.22.x"
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        if: success()
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/pub
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - run: flutter pub get
+        name: Install dependencies
+        if: success()
+
+      - run: dart format --set-exit-if-changed .
+        name: Format check
+        if: success()
+
+      - run: dart analyze --fatal-infos
+        name: Analyze
+        if: success()
+
+      - run: flutter test --coverage
+        name: Run tests
+        if: success()
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: success()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info
