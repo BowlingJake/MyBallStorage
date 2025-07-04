@@ -1,21 +1,20 @@
 import 'dart:ui';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FilterPopout extends StatefulWidget {
+class FilterPopout extends ConsumerStatefulWidget {
   const FilterPopout({
     required this.filters,
-    required this.onFilterChanged,
     super.key,
   });
   final BallFilters filters;
-  final void Function(FilterField field, String? value) onFilterChanged;
 
   @override
-  State<FilterPopout> createState() => _FilterPopoutState();
+  ConsumerState<FilterPopout> createState() => _FilterPopoutState();
 }
 
-class _FilterPopoutState extends State<FilterPopout> {
+class _FilterPopoutState extends ConsumerState<FilterPopout> {
   // 本地狀態，用於 UI 互動
   late BallFilters _localFilters;
 
@@ -168,16 +167,8 @@ class _FilterPopoutState extends State<FilterPopout> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // Apply all local changes to the provider
-                                  if (_localFilters.brand != widget.filters.brand) {
-                                    widget.onFilterChanged(FilterField.brand, _localFilters.brand);
-                                  }
-                                  if (_localFilters.core != widget.filters.core) {
-                                    widget.onFilterChanged(FilterField.core, _localFilters.core);
-                                  }
-                                  if (_localFilters.coverstock != widget.filters.coverstock) {
-                                    widget.onFilterChanged(FilterField.coverstock, _localFilters.coverstock);
-                                  }
+                                  // 直接使用本地狀態更新 Provider
+                                  ref.read(ballFiltersProvider.notifier).state = _localFilters;
                                   Navigator.of(context).pop();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -330,7 +321,6 @@ class _FilterPopoutState extends State<FilterPopout> {
 void showFilterPopout(
   BuildContext context,
   BallFilters filters,
-  void Function(FilterField field, String? value) onFilterChanged,
 ) {
   showDialog(
     context: context,
@@ -340,7 +330,6 @@ void showFilterPopout(
         type: MaterialType.transparency,
         child: FilterPopout(
           filters: filters,
-          onFilterChanged: onFilterChanged,
         ),
       );
     },

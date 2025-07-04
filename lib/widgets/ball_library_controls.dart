@@ -46,20 +46,6 @@ class BallLibraryControls extends ConsumerWidget {
                       context: context,
                       builder: (context) => FilterPopout(
                         filters: filters,
-                        onFilterChanged: (field, value) {
-                          ref
-                              .read(ballFiltersProvider.notifier)
-                              .update((state) {
-                            switch (field) {
-                              case FilterField.brand:
-                                return state.copyWith(brand: value);
-                              case FilterField.core:
-                                return state.copyWith(core: value);
-                              case FilterField.coverstock:
-                                return state.copyWith(coverstock: value);
-                            }
-                          });
-                        },
                       ),
                     );
                   },
