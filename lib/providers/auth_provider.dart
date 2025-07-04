@@ -12,6 +12,8 @@ class AuthState {
   final String? userId;
   final String? error;
 
+  bool get isAuthenticated => status == AuthStatus.authenticated;
+
   AuthState copyWith({AuthStatus? status, String? userId, String? error}) {
     return AuthState(
       status: status ?? this.status,
