@@ -1,192 +1,140 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' as provider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:bowlingarsenal_app/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/text_styles.dart';
 import '../services/theme_service.dart';
 
 /// 通用設定頁範例，可直接放在 lib/views/settings_page.dart
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final themeState = ref.watch(themeProvider);
 
-class _SettingsPageState extends State<SettingsPage> {
-  bool _notifications = true;
-  String _language = '中文';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPreferences();
+    return ProfessionalDarkBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text('設定'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            // The theme settings card is now removed.
+            // _buildSectionTitle(theme, '外觀'),
+            // _buildSettingsCard(
+            //   theme: theme,
+            //   leadingIcon: Iconsax.moon,
+            //   title: '主題模式',
+            //   subtitle: Text('深色模式'), // Always dark
+            //   onTap: null, // No action needed
+            // ),
+            // ... Other settings ...
+          ],
+        ),
+      ),
+    );
   }
 
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _notifications = prefs.getBool('notifications') ?? true;
-      _language = prefs.getString('language') ?? '中文';
-    });
+  void _showThemeDialog(BuildContext context, WidgetRef ref) {
+    final themeState = ref.read(themeProvider);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('選擇主題'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<ThemeMode>(
+                title: const Text('淺色'),
+                value: ThemeMode.light,
+                groupValue: themeState.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('深色'),
+                value: ThemeMode.dark,
+                groupValue: themeState.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('跟隨系統'),
+                value: ThemeMode.system,
+                groupValue: themeState.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> _updateBool(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
+  Widget _buildSectionTitle(ThemeData theme, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24.0, bottom: 8.0, left: 8.0),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 
-  Future<void> _updateLanguage(String newLang) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language', newLang);
+  Widget _buildSettingsCard({
+    required ThemeData theme,
+    required IconData leadingIcon,
+    required String title,
+    Widget? subtitle,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: Icon(leadingIcon, color: theme.colorScheme.secondary),
+        title: Text(title),
+        subtitle: subtitle,
+        onTap: onTap,
+        trailing: const Icon(Iconsax.arrow_right_3, size: 18),
+      ),
+    );
   }
 
   String _getThemeModeDisplayName(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.light:
-        return '淺色模式';
+        return '淺色';
       case ThemeMode.dark:
-        return '深色模式';
+        return '深色';
       case ThemeMode.system:
         return '跟隨系統';
     }
-  }
-
-  void _showThemeDialog(BuildContext context, ThemeService themeService) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('選擇主題模式'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<ThemeMode>(
-              title: const Text('淺色模式'),
-              value: ThemeMode.light,
-              groupValue: themeService.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeService.setThemeMode(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: const Text('深色模式'),
-              value: ThemeMode.dark,
-              groupValue: themeService.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeService.setThemeMode(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: const Text('跟隨系統'),
-              value: ThemeMode.system,
-              groupValue: themeService.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeService.setThemeMode(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeService = provider.Provider.of<ThemeService>(context);
-    
-    return Scaffold(
-      appBar: AppBar(title: const Text('設定', style: AppTextStyles.title)),
-      body: ListView(
-        children: [
-          // 主題模式選擇
-          ListTile(
-            title: const Text('主題模式', style: AppTextStyles.body),
-            subtitle: Text(_getThemeModeDisplayName(themeService.themeMode)),
-            trailing: const Icon(Icons.brightness_6),
-            onTap: () => _showThemeDialog(context, themeService),
-          ),
-
-          // 推播通知切換
-          ListTile(
-            title: const Text('推播通知', style: AppTextStyles.body),
-            trailing: Switch(
-              value: _notifications,
-              onChanged: (value) {
-                setState(() {
-                  _notifications = value;
-                  _updateBool('notifications', value);
-                });
-              },
-            ),
-          ),
-
-          // 語言選擇
-          ListTile(
-            title: const Text('語言', style: AppTextStyles.body),
-            trailing: const Text('繁體中文', style: AppTextStyles.caption),
-            onTap: () async {
-              final selected = await showModalBottomSheet<String>(
-                context: context,
-                builder: (ctx) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: ['中文', 'English', '日本語']
-                      .map((lang) => ListTile(
-                            title: Text(lang),
-                            onTap: () => Navigator.pop(ctx, lang),
-                          ))
-                      .toList(),
-                ),
-              );
-              if (selected != null) {
-                setState(() => _language = selected);
-                _updateLanguage(selected);
-              }
-            },
-          ),
-
-          const Divider(),
-
-          // 關於
-          ListTile(
-            title: const Text('關於', style: AppTextStyles.body),
-            subtitle: const Text('版本 1.0.0', style: AppTextStyles.caption),
-            onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'My Ball Storage',
-                applicationVersion: '1.0.0',
-                applicationLegalese: '© 2025 Jake Cheng',
-              );
-            },
-          ),
-
-          // 登出
-          ListTile(
-            title: const Text('登出', style: AppTextStyles.body),
-            textColor: Colors.red,
-            onTap: () async {
-              // 清除登入狀態並跳回 LoginPage
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
-    );
   }
 }
