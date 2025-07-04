@@ -1,17 +1,15 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class GlowBorderButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final double width;
-  final double height;
 
   const GlowBorderButton({
-    super.key,
-    required this.onTap,
+    required this.onTap, super.key,
     this.width = 220.0,
     this.height = 44.0,
   });
+  final VoidCallback onTap;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +21,7 @@ class GlowBorderButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           side: BorderSide(
             color: theme.colorScheme.primary.withOpacity(0.5),
             width: 1.5,

@@ -1,20 +1,17 @@
+import 'package:bowlingarsenal_app/models/practice_record.dart';
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/practice_viewmodel.dart';
+import 'package:bowlingarsenal_app/widgets/bowling_score_table.dart';
+import 'package:bowlingarsenal_app/widgets/editable_bowling_score_table.dart';
+import 'package:bowlingarsenal_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme/text_styles.dart';
-import '../widgets/primary_button.dart';
-import '../widgets/bowling_score_table.dart';
-import '../widgets/score_game_widget.dart';
-import '../models/score_data.dart';
-import '../models/practice_record.dart';
-import '../viewmodels/practice_viewmodel.dart';
-import '../widgets/pin_selector_popup_widget.dart';
-import 'dart:async';
-import '../widgets/editable_bowling_score_table.dart';
 
 class PracticeRecordCard extends StatefulWidget {
+  const PracticeRecordCard({required this.record, required this.index, super.key});
   final PracticeRecord record;
   final int index;
-  const PracticeRecordCard({super.key, required this.record, required this.index});
 
   @override
   State<PracticeRecordCard> createState() => _PracticeRecordCardState();
@@ -31,15 +28,15 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
   late BowlingScoreData _originalGameData;
   late BowlingScoreData _modifiedGameData;
   bool _hasBeenModified = false;
-  List<bool> _framesModified = List.filled(10, false);
-  Set<int> _modifiedFrames = {};
+  final List<bool> _framesModified = List.filled(10, false);
+  final Set<int> _modifiedFrames = {};
   BowlingScoreData? _editingGameData;
-  Set<int> _editingModifiedFrames = {};
+  final Set<int> _editingModifiedFrames = {};
 
   @override
   void initState() {
     super.initState();
-    _games = widget.record.games.map((g) => BowlingScoreData.fromJson(g)).toList();
+    _games = widget.record.games.map(BowlingScoreData.fromJson).toList();
   }
 
   void _addNewGameTable() {
@@ -106,8 +103,8 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
 
   void _showEditDialogForSelectedGame() {
     if (_selectedGameForEdit < 0) return;
-    BowlingScoreData editingData = BowlingScoreData.fromJson(_games[_selectedGameForEdit].toJson());
-    Set<int> modifiedFrames = {};
+    final var editingData = BowlingScoreData.fromJson(_games[_selectedGameForEdit].toJson());
+    final modifiedFrames = <int>{};
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -169,7 +166,7 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
 
   void _deleteSelectedGames() {
     if (!_isDeleteMode) return;
-    for (int i = _selectedGamesToDelete.length - 1; i >= 0; i--) {
+    for (var i = _selectedGamesToDelete.length - 1; i >= 0; i--) {
       if (_selectedGamesToDelete[i]) {
         _games.removeAt(i);
       }
@@ -248,14 +245,14 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
                               onPressed: _isLastGameTableComplete() ? _addNewGameTable : null,
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
+                              padding: const EdgeInsets.only(left: 8),
                               child: MyCustomButton(
                                 text: '修改成績',
                                 onPressed: _toggleEditMode,
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
+                              padding: const EdgeInsets.only(left: 8),
                               child: MyCustomButton(
                                 text: '刪除成績',
                                 onPressed: _toggleDeleteMode,
@@ -270,15 +267,15 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       alignment: Alignment.centerLeft,
-                      child: Text('尚無練習成績', style: AppTextStyles.caption),
+                      child: const Text('尚無練習成績', style: AppTextStyles.caption),
                     )
                   else
                     Column(
                       children: List.generate(_games.length, (gameIdx) {
-                        final bool isSelected = _isDeleteMode 
+                        final isSelected = _isDeleteMode 
                           ? (_selectedGamesToDelete.length > gameIdx && _selectedGamesToDelete[gameIdx])
                           : (_isEditMode && _selectedGameForEdit == gameIdx);
-                        final bool isModified = _isEditMode && _selectedGameForEdit == gameIdx && _hasBeenModified;
+                        final isModified = _isEditMode && _selectedGameForEdit == gameIdx && _hasBeenModified;
 
                         return GestureDetector(
                           onTap: _isDeleteMode
@@ -291,7 +288,7 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
                                 }
                               : (_isEditMode && _selectedGameForEdit < 0 ? () => _selectGameForEdit(gameIdx) : null),
                           child: Container(
-                            margin: const EdgeInsets.only(top: 0, bottom: 0),
+                            margin: const EdgeInsets.only(),
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             decoration: BoxDecoration(
                               color: isSelected ? Colors.blue.withOpacity(0.3) : null,
@@ -309,7 +306,7 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
                                       Text('第${gameIdx + 1}局', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold)),
                                       if (isModified)
                                         Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
+                                          padding: const EdgeInsets.only(left: 8),
                                           child: Text('(已修改)', style: AppTextStyles.caption.copyWith(color: Colors.red)),
                                         ),
                                     ],
@@ -329,9 +326,9 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
                       }),
                     ),
                   if (_isEditMode)
-                    Column(
+                    const Column(
                       children: [
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                       ],
                     ),
                 ],
@@ -347,18 +344,18 @@ class _PracticeRecordCardState extends State<PracticeRecordCard> {
     final roll = frame.rolls[ballIndex];
     
     if (ballIndex == 0) {
-      if (roll.pinsDown == 10) return "X";
+      if (roll.pinsDown == 10) return 'X';
       return roll.pinsDown.toString();
     } else if (ballIndex == 1) {
-      if (roll.pinsDown == 10) return "X";
+      if (roll.pinsDown == 10) return 'X';
       if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return roll.pinsDown.toString();
     } else {
-      if (roll.pinsDown == 10) return "X";
+      if (roll.pinsDown == 10) return 'X';
       if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return roll.pinsDown.toString();
     }

@@ -1,9 +1,9 @@
 import 'dart:ui';
+
+import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sign_in_button/sign_in_button.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import '../providers/providers.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -19,18 +19,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _signInWithGoogle() async {
     // This would call your auth provider's Google sign-in method
     // For now, it's a placeholder.
-    print("Attempting Google Sign-In...");
+    print('Attempting Google Sign-In...');
     // You would typically set loading state and handle success/error
   }
 
   // Placeholder for Apple Sign-In logic
   Future<void> _signInWithApple() async {
-    print("Attempting Apple Sign-In...");
+    print('Attempting Apple Sign-In...');
   }
   
   // Placeholder for Phone Sign-In logic
   Future<void> _signInWithPhone() async {
-    print("Attempting Phone Sign-In...");
+    print('Attempting Phone Sign-In...');
   }
 
   Future<void> _doGuestLogin() async {
@@ -77,7 +77,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
           // Loading Indicator
           if (_isLoading)
-            Container(
+            ColoredBox(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
                 child: CircularProgressIndicator(),
@@ -135,18 +135,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // Bottom Frosted Glass Container
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          topRight: Radius.circular(30.0),
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
                         ),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.2),
@@ -158,7 +158,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         children: [
                           // Custom Google Sign-in Button
                           SignInButtonBuilder(
-                            text: "使用 Google 帳戶登入",
+                            text: '使用 Google 帳戶登入',
                             icon: Icons.circle_outlined,
                             onPressed: _isLoading ? () {} : _signInWithGoogle,
                             backgroundColor: Colors.white,
@@ -175,12 +175,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           
                           // Custom Apple Sign-in Button
                           SignInButtonBuilder(
-                            text: "使用 Apple 帳戶登入",
+                            text: '使用 Apple 帳戶登入',
                             icon: Icons.apple,
                             onPressed: _isLoading ? () {} : _signInWithApple,
                             backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
                             fontSize: 16,
                             height: 50,
                             width: double.infinity,
@@ -192,12 +190,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                           // Custom Phone Sign-in Button
                           SignInButtonBuilder(
-                            text: "使用手機號碼登入",
+                            text: '使用手機號碼登入',
                             icon: Icons.phone_iphone,
                             onPressed: _isLoading ? () {} : _signInWithPhone,
                             backgroundColor: theme.colorScheme.primary.withOpacity(0.9),
-                            textColor: Colors.white,
-                            iconColor: Colors.white,
                             fontSize: 16,
                             height: 50,
                             width: double.infinity,

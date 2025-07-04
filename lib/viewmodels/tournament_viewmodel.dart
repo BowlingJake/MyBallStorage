@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:collection'; // For UnmodifiableListView
-import '../models/tournament.dart'; // Import the Tournament model
+
+import 'package:bowlingarsenal_app/models/tournament.dart'; // Import the Tournament model
+import 'package:flutter/material.dart';
 
 class TournamentViewModel extends ChangeNotifier {
   // Private list to store tournaments

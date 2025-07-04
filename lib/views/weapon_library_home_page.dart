@@ -1,11 +1,9 @@
+import 'package:bowlingarsenal_app/ball_library_page.dart';
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
+import 'package:bowlingarsenal_app/views/weapon_library_page.dart';
 import 'package:flutter/material.dart';
-import '../models/bowling_ball.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
-import 'weapon_library_page.dart';
-import '../shared/dialogs/layout_dialog.dart';
 import 'package:provider/provider.dart';
-import '../ball_library_page.dart';
-import '../theme/text_styles.dart';
 
 /// 武器庫主頁 (顯示導航選項)
 class WeaponLibraryHomePage extends StatelessWidget {
@@ -20,7 +18,7 @@ class WeaponLibraryHomePage extends StatelessWidget {
       //   title: const Text('武器庫'),
       // ),
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Expanded(
@@ -106,9 +104,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                child: Column(
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
-                                  children: const [
+                                  children: [
                                     Icon(Icons.list_alt_outlined, color: Colors.white, size: 28),
                                     SizedBox(height: 8),
                                     Text(
@@ -144,9 +142,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     const SnackBar(content: Text('排行榜功能即將推出！', style: AppTextStyles.subtitle)),
                                   );
                                 },
-                                child: Column(
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
-                                  children: const [
+                                  children: [
                                     Icon(Icons.leaderboard_outlined, color: Colors.white, size: 28),
                                     SizedBox(height: 8),
                                     Text(
@@ -187,9 +185,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
                                   );
                                 },
-                                child: Column(
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
-                                  children: const [
+                                  children: [
                                     Icon(Icons.help_outline, color: Colors.white, size: 28), // 使用問號圖標
                                     SizedBox(height: 8),
                                     Text(
@@ -225,9 +223,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
                                   );
                                 },
-                                child: Column(
+                                child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
-                                  children: const [
+                                  children: [
                                     Icon(Icons.build_circle_outlined, color: Colors.white, size: 28), // 使用工具圖標
                                     SizedBox(height: 8),
                                     Text(

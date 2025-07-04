@@ -1,9 +1,10 @@
+import 'dart:ui';
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'dart:ui';
+import 'package:shimmer/shimmer.dart';
 
 class GlassmorphismSportsStyle extends StatelessWidget {
   const GlassmorphismSportsStyle({super.key});
@@ -91,7 +92,6 @@ class GlassmorphismSportsStyle extends StatelessWidget {
             ),
             border: Border.all(
               color: Colors.white.withOpacity(0.2),
-              width: 1,
             ),
           ),
           child: child,
@@ -118,7 +118,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(
-                    blurRadius: 10.0,
+                    blurRadius: 10,
                     color: Colors.black.withOpacity(0.3),
                     offset: const Offset(0, 2),
                   ),
@@ -190,7 +190,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          blurRadius: 8.0,
+                          blurRadius: 8,
                           color: Colors.black.withOpacity(0.3),
                           offset: const Offset(0, 1),
                         ),
@@ -265,7 +265,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Iconsax.box,
               color: Colors.white,
               size: 24,
@@ -279,7 +279,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(
-                    blurRadius: 8.0,
+                    blurRadius: 8,
                     color: Colors.black.withOpacity(0.3),
                     offset: const Offset(0, 1),
                   ),
@@ -304,7 +304,6 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                 child: _buildGlassContainer(
                   height: 140,
                   width: 110,
-                  borderRadius: 20,
                   child: Padding(
                     padding: const EdgeInsets.all(15),
                     child: Column(
@@ -317,13 +316,13 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
                               colors: [
-                                (ball['color'] as Color),
-                                (ball['color'] as Color).withOpacity(0.7),
+                                (ball['color']! as Color),
+                                (ball['color']! as Color).withOpacity(0.7),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: (ball['color'] as Color).withOpacity(0.4),
+                                color: (ball['color']! as Color).withOpacity(0.4),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
@@ -334,7 +333,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         const SizedBox(height: 12),
                         
                         Text(
-                          ball['name'] as String,
+                          ball['name']! as String,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -348,7 +347,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         const SizedBox(height: 4),
                         
                         Text(
-                          ball['brand'] as String,
+                          ball['brand']! as String,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.7),
                             fontSize: 10,
@@ -379,7 +378,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Iconsax.award,
               color: Colors.white,
               size: 24,
@@ -393,7 +392,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(
-                    blurRadius: 8.0,
+                    blurRadius: 8,
                     color: Colors.black.withOpacity(0.3),
                     offset: const Offset(0, 1),
                   ),
@@ -414,7 +413,6 @@ class GlassmorphismSportsStyle extends StatelessWidget {
             child: _buildGlassContainer(
               height: 80,
               width: double.infinity,
-              borderRadius: 20,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -439,7 +437,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         ],
                       ),
                       child: Icon(
-                        achievement['icon'] as IconData,
+                        achievement['icon']! as IconData,
                         color: Colors.white,
                         size: 20,
                       ),
@@ -453,7 +451,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            achievement['title'] as String,
+                            achievement['title']! as String,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -462,7 +460,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           LinearProgressIndicator(
-                            value: achievement['progress'] as double,
+                            value: achievement['progress']! as double,
                             backgroundColor: Colors.white.withOpacity(0.2),
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Colors.amber.withOpacity(0.8),
@@ -474,7 +472,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                     ),
                     
                     Text(
-                      '${((achievement['progress'] as double) * 100).toInt()}%',
+                      '${((achievement['progress']! as double) * 100).toInt()}%',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
@@ -486,7 +484,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
               ),
             ),
           ).animate(delay: (650 + index * 100).ms).fadeIn().slideX(begin: 0.3);
-        }).toList(),
+        }),
       ],
     );
   }
@@ -501,14 +499,14 @@ class GlassmorphismSportsStyle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 Icon(
                   Iconsax.chart,
                   color: Colors.white,
                   size: 20,
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Text(
                   '分數趨勢',
                   style: TextStyle(
@@ -523,8 +521,8 @@ class GlassmorphismSportsStyle extends StatelessWidget {
             Expanded(
               child: LineChart(
                 LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(show: false),
+                  gridData: const FlGridData(show: false),
+                  titlesData: const FlTitlesData(show: false),
                   borderData: FlBorderData(show: false),
                   lineBarsData: [
                     LineChartBarData(
@@ -546,7 +544,6 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                       barWidth: 4,
                       isStrokeCapRound: true,
                       dotData: FlDotData(
-                        show: true,
                         getDotPainter: (spot, percent, barData, index) {
                           return FlDotCirclePainter(
                             radius: 6,
@@ -588,14 +585,14 @@ class GlassmorphismSportsStyle extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 Icon(
                   Iconsax.brush,
                   color: Colors.white,
                   size: 24,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Text(
                   'Glassmorphism Sports 風格特色',
                   style: TextStyle(

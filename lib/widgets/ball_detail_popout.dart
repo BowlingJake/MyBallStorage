@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:bowlingarsenal_app/theme/brand_colors.dart'; // 導入品牌色定義
+import 'package:bowlingarsenal_app/widgets/ball_list_view.dart'; // 導入原有的 BowlingBall 模型
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'ball_list_view.dart'; // 導入原有的 BowlingBall 模型
-import '../theme/brand_colors.dart'; // 導入品牌色定義
 
 // 從球心名稱提取核心類型的輔助函數
 String getCoreCategory(String coreName) {
@@ -61,12 +62,11 @@ String _getCombinedCoverstockInfo(BowlingBall ball) {
 }
 
 class BowlingBallDetailWidget extends StatefulWidget {
-  final BowlingBall ball;
 
   const BowlingBallDetailWidget({
-    super.key,
-    required this.ball,
+    required this.ball, super.key,
   });
+  final BowlingBall ball;
 
   @override
   State<BowlingBallDetailWidget> createState() => _BowlingBallDetailWidgetState();
@@ -81,7 +81,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
     final size = MediaQuery.of(context).size;
     // 取得品牌色調色板，使用降飽和度的柔和色彩
     final brandPalette = getBrandTonalPalette(widget.ball.brand, theme);
-    final List<Color> gradientColors = [
+    final gradientColors = <Color>[
       brandPalette.shade400.withOpacity(0.55),
       brandPalette.shade500.withOpacity(0.35),
     ];
@@ -94,7 +94,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
             // 只在彈窗內容區域顯示品牌色漸層背景
             Container(
               width: size.width * 2 / 3,
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 420,
                 minWidth: 280,
               ),
@@ -109,11 +109,10 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.10),
                     blurRadius: 24,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              clipBehavior: Clip.none, // 關鍵：允許內容超出邊界
               child: Stack(
                 clipBehavior: Clip.none, // Stack 也不裁切
                 children: [
@@ -127,7 +126,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                   ),
                   // 內容
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    padding: const EdgeInsets.symmetric(),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -176,20 +175,18 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       gradient: RadialGradient(
-                                        center: Alignment.center,
                                         radius: 0.8,
                                         colors: [
                                           Colors.grey.withOpacity(0.15), // 中心淺灰白
                                           Colors.white.withOpacity(0.08), // 中間層白光
                                           Colors.transparent, // 邊緣透明
                                         ],
-                                        stops: [0.0, 0.5, 1.0],
+                                        stops: const [0.0, 0.5, 1.0],
                                       ),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.white.withOpacity(0.06),
                                           blurRadius: 22, // 20-24px 模糊讓光暈更柔和
-                                          spreadRadius: 0,
                                         ),
                                       ],
                                     ),
@@ -212,7 +209,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                         ),
                                       ],
                                       borderRadius: const BorderRadius.all(
-                                          Radius.elliptical(45, 14)), // 橢圓形
+                                          Radius.elliptical(45, 14),), // 橢圓形
                                     ),
                                   ),
                                 ),
@@ -262,13 +259,13 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             gradient: RadialGradient(
-                                              center: Alignment(0, 0.7), // 靠近底部中心
+                                              center: const Alignment(0, 0.7), // 靠近底部中心
                                               radius: 0.6,
                                               colors: [
                                                 Colors.transparent,
                                                 Colors.black.withOpacity(0.25), // 接觸陰影較深
                                               ],
-                                              stops: [0.7, 1.0], // 只在邊緣很窄的範圍
+                                              stops: const [0.7, 1.0], // 只在邊緣很窄的範圍
                                             ),
                                           ),
                                         ),
@@ -279,14 +276,14 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             gradient: RadialGradient(
-                                              center: Alignment(-0.3, -0.3), // 左上角偏移
+                                              center: const Alignment(-0.3, -0.3), // 左上角偏移
                                               radius: 0.8,
                                               colors: [
                                                 Colors.black.withOpacity(0.15), // 更明顯的陰影
                                                 Colors.black.withOpacity(0.05),
                                                 Colors.transparent,
                                               ],
-                                              stops: [0.0, 0.4, 0.8],
+                                              stops: const [0.0, 0.4, 0.8],
                                             ),
                                           ),
                                         ),
@@ -321,43 +318,43 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                         const SizedBox(height: 24),
                         // 上排兩格（球心、球皮）
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
                             children: [
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/core_logo.svg',
                                 label: '球心',
                                 value: widget.ball.core.isNotEmpty ? widget.ball.core : '未知',
-                              )),
+                              ),),
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/cover_logo.svg',
                                 label: '球皮',
                                 value: _getCombinedCoverstockInfo(widget.ball),
-                              )),
+                              ),),
                             ],
                           ),
                         ),
                         const SizedBox(height: 16),
                         // 下排三格（RG、RG差、MB diff）
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
                             children: [
                               Expanded(child: _StatItem(
                                 svgAsset: 'assets/images/rg_logo.svg',
                                 label: 'RG',
                                 value: widget.ball.rg?.toStringAsFixed(3) ?? 'N/A',
-                              )),
+                              ),),
                               Expanded(child: _StatItem(
                                 icon: Icons.trending_up,
                                 label: 'RG差',
                                 value: widget.ball.differential?.toStringAsFixed(3) ?? 'N/A',
-                              )),
+                              ),),
                               Expanded(child: _StatItem(
                                 icon: Icons.balance,
                                 label: 'MB',
                                 value: widget.ball.massBias?.toStringAsFixed(3) ?? 'N/A',
-                              )),
+                              ),),
                             ],
                           ),
                         ),
@@ -376,17 +373,15 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
 }
 
 class _StatItem extends StatelessWidget {
+
+  const _StatItem({
+    required this.label, required this.value, this.icon,
+    this.svgAsset,
+  });
   final IconData? icon;
   final String? svgAsset;
   final String label;
   final String value;
-
-  const _StatItem({
-    this.icon,
-    this.svgAsset,
-    required this.label,
-    required this.value,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -405,12 +400,12 @@ class _StatItem extends StatelessWidget {
                       width: 48,
                       child: SvgPicture.asset(
                         svgAsset!,
-                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       ),
                     )
                   : (icon != null
                       ? Icon(icon, color: Colors.white, size: 48)
-                      : SizedBox.shrink()),
+                      : const SizedBox.shrink()),
             ),
           ),
           const SizedBox(height: 4),
@@ -441,7 +436,7 @@ void showBallDetails(BuildContext context, BowlingBall ball) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
     constraints: BoxConstraints(
       maxHeight: MediaQuery.of(context).size.height * 0.90,

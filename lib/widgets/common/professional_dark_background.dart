@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 /// Professional Dark 背景組件 - 專業深色風格
 /// 使用指定的圖片作為背景，並提供深色疊加效果
 class ProfessionalDarkBackground extends StatelessWidget {
-  final Widget child;
-  final String backgroundImage;
-  final Color overlayColor;
-  final double overlayOpacity;
-  final List<Rect>? cutoutRects;
 
   const ProfessionalDarkBackground({
-    super.key,
-    required this.child,
+    required this.child, super.key,
     this.backgroundImage = 'images/Sport_Tech_Background.png',
     this.overlayColor = Colors.black,
     this.overlayOpacity = 0.6,
     this.cutoutRects,
   });
+  final Widget child;
+  final String backgroundImage;
+  final Color overlayColor;
+  final double overlayOpacity;
+  final List<Rect>? cutoutRects;
 
   @override
   Widget build(BuildContext context) {
@@ -51,17 +50,17 @@ class ProfessionalDarkBackground extends StatelessWidget {
 
 /// 一個自訂的繪製器，用於繪製一個帶有矩形孔洞的疊加層。
 class _OverlayPainter extends CustomPainter {
-  final Color overlayColor;
-  final List<Rect>? cutoutRects;
 
   _OverlayPainter({required this.overlayColor, this.cutoutRects});
+  final Color overlayColor;
+  final List<Rect>? cutoutRects;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = overlayColor;
 
     // 建立一個覆蓋整個畫布的路徑
-    Path path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    var path = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 
     // 如果有提供開孔區域，就從主路徑中減去它們
     if (cutoutRects != null) {

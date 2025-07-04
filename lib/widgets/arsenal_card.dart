@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
 import 'package:bowlingarsenal_app/widgets/standard_app_card.dart';
+import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 /// 用於在主頁顯示單個裝備庫球的卡片
 /// 使用 StandardAppCard 作為基礎，以保持風格統一
 class ArsenalCard extends StatelessWidget {
-  final ArsenalBall ball;
-  final VoidCallback? onTap;
 
   const ArsenalCard({
-    super.key,
-    required this.ball,
+    required this.ball, super.key,
     this.onTap,
   });
+  final ArsenalBall ball;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +26,11 @@ class ArsenalCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // 球的圖片
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(4),
                 // 使用 imagePath 並假設是本地 asset
                 child: ball.imagePath.isNotEmpty
                     ? Image.asset(
@@ -49,7 +47,7 @@ class ArsenalCard extends StatelessWidget {
                     : Icon( // 如果沒有圖片路徑，使用替代圖示
                         Iconsax.box, // 使用存在的圖示
                         size: 40, 
-                        color: Colors.white.withOpacity(0.7)
+                        color: Colors.white.withOpacity(0.7),
                       ),
               ),
             ),

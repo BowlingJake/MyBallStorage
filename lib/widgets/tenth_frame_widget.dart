@@ -1,23 +1,18 @@
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../models/score_data.dart';
-import 'pin_selector_popup_widget.dart';
 
 class TenthFrameWidget extends StatelessWidget {
+
+  const TenthFrameWidget({
+    required this.frame, required this.isCurrentFrame, required this.availableWidth, required this.onFrameUpdated, required this.onGameComplete, super.key,
+  });
   final Frame frame;
   final bool isCurrentFrame;
   final double availableWidth;
   final Function(Frame) onFrameUpdated;
   final Function() onGameComplete;
-
-  const TenthFrameWidget({
-    super.key,
-    required this.frame,
-    required this.isCurrentFrame,
-    required this.availableWidth,
-    required this.onFrameUpdated,
-    required this.onGameComplete,
-  });
 
   Future<void> _handleFrameTap(BuildContext context) async {
     Set<int> initialPinsDown;
@@ -57,7 +52,7 @@ class TenthFrameWidget extends StatelessWidget {
       return;
     }
 
-    final Set<int>? pinsHit = await showDialog<Set<int>>(
+    final pinsHit = await showDialog<Set<int>>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
@@ -70,8 +65,8 @@ class TenthFrameWidget extends StatelessWidget {
     );
 
     if (pinsHit != null) {
-      final int pinsDown = pinsHit.length;
-      final Roll newRoll = Roll(
+      final pinsDown = pinsHit.length;
+      final newRoll = Roll(
         pinsDown: pinsDown,
         pinsStandingAfterThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}.difference(pinsHit),
         displayScore: _getDisplayScore(pinsDown),
@@ -82,8 +77,8 @@ class TenthFrameWidget extends StatelessWidget {
       
       // 檢查是否需要結束遊戲
       if (frame.rolls.length == 2) {
-        final int first = frame.rolls[0].pinsDown;
-        final int second = frame.rolls[1].pinsDown;
+        final first = frame.rolls[0].pinsDown;
+        final second = frame.rolls[1].pinsDown;
         if (first != 10 && first + second != 10) {
           frame.isComplete = true;
           onGameComplete();
@@ -100,19 +95,19 @@ class TenthFrameWidget extends StatelessWidget {
   String _getDisplayScore(int pinsDown) {
     if (frame.rolls.isEmpty) {
       // 第一球
-      return pinsDown == 10 ? "X" : pinsDown.toString();
+      return pinsDown == 10 ? 'X' : pinsDown.toString();
     } else if (frame.rolls.length == 1) {
       // 第二球
-      if (pinsDown == 10) return "X";
+      if (pinsDown == 10) return 'X';
       if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return pinsDown.toString();
     } else {
       // 第三球
-      if (pinsDown == 10) return "X";
+      if (pinsDown == 10) return 'X';
       if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return pinsDown.toString();
     }
@@ -123,17 +118,17 @@ class TenthFrameWidget extends StatelessWidget {
     final roll = frame.rolls[ballIndex];
     
     if (ballIndex == 0) {
-      return roll.pinsDown == 10 ? "X" : roll.pinsDown.toString();
+      return roll.pinsDown == 10 ? 'X' : roll.pinsDown.toString();
     } else if (ballIndex == 1) {
-      if (roll.pinsDown == 10) return "X";
+      if (roll.pinsDown == 10) return 'X';
       if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return roll.pinsDown.toString();
     } else {
-      if (roll.pinsDown == 10) return "X";
+      if (roll.pinsDown == 10) return 'X';
       if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return roll.pinsDown.toString();
     }
@@ -141,11 +136,11 @@ class TenthFrameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const BorderSide borderSide = BorderSide(color: Colors.black, width: 0.5);
-    final double frameNumberHeight = (availableWidth - 2) * 0.3;
-    final double scoreBoxHeight = (availableWidth - 2) * 0.4;
-    final double totalScoreHeight = (availableWidth - 2) * 0.3;
-    final double smallBoxWidth = (availableWidth - 3) / 3;
+    const borderSide = BorderSide(width: 0.5);
+    final frameNumberHeight = (availableWidth - 2) * 0.3;
+    final scoreBoxHeight = (availableWidth - 2) * 0.4;
+    final totalScoreHeight = (availableWidth - 2) * 0.3;
+    final smallBoxWidth = (availableWidth - 3) / 3;
 
     return GestureDetector(
       onTap: isCurrentFrame ? () => _handleFrameTap(context) : null,
@@ -170,7 +165,7 @@ class TenthFrameWidget extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "10",
+                  '10',
                   style: TextStyle(
                     fontSize: availableWidth * 0.15,
                     fontWeight: FontWeight.bold,
@@ -218,7 +213,7 @@ class TenthFrameWidget extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  frame.totalScore?.toString() ?? "",
+                  frame.totalScore?.toString() ?? '',
                   style: TextStyle(
                     fontSize: availableWidth * 0.25,
                     fontWeight: FontWeight.bold,
@@ -237,29 +232,26 @@ class TenthFrameWidget extends StatelessWidget {
     double width,
     double height,
     BorderSide border, {
-    bool isLeftMost = false,
+    required double fontSize, bool isLeftMost = false,
     bool isRightMost = false,
-    required double fontSize,
   }) {
     Widget displayWidget;
     
-    if (score == "X") {
+    if (score == 'X') {
       displayWidget = SvgPicture.asset(
         'assets/images/strike_symbol.svg',
         width: width * 0.8,
         height: height * 0.8,
-        fit: BoxFit.contain,
       );
-    } else if (score == "/") {
+    } else if (score == '/') {
       displayWidget = SvgPicture.asset(
         'assets/images/spare_symbol.svg',
         width: width * 0.8,
         height: height * 0.8,
-        fit: BoxFit.contain,
       );
     } else {
       displayWidget = Text(
-        score ?? "",
+        score ?? '',
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,

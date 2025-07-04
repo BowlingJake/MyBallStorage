@@ -1,27 +1,24 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../models/training_record.dart';
 
 /// 可編輯的遊戲卡片組件
 /// 支持內聯編輯分數、Strikes、Spares等數據
 class EditableGameCard extends StatefulWidget {
+
+  const EditableGameCard({
+    required this.game, required this.theme, required this.onGameSaved, super.key,
+    this.onGameCanceled,
+    this.onGameDelete,
+    this.isEditing = false,
+  });
   final GameRecord game;
   final ThemeData theme;
   final Function(GameRecord) onGameSaved;
   final VoidCallback? onGameCanceled;
   final VoidCallback? onGameDelete;
   final bool isEditing;
-
-  const EditableGameCard({
-    Key? key,
-    required this.game,
-    required this.theme,
-    required this.onGameSaved,
-    this.onGameCanceled,
-    this.onGameDelete,
-    this.isEditing = false,
-  }) : super(key: key);
 
   @override
   State<EditableGameCard> createState() => _EditableGameCardState();
@@ -126,12 +123,12 @@ class _EditableGameCardState extends State<EditableGameCard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('輸入錯誤'),
+        title: const Text('輸入錯誤'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('確定'),
+            child: const Text('確定'),
           ),
         ],
       ),
@@ -141,8 +138,8 @@ class _EditableGameCardState extends State<EditableGameCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: _isEditing 
           ? widget.theme.colorScheme.primary.withOpacity(0.1)
@@ -167,14 +164,14 @@ class _EditableGameCardState extends State<EditableGameCard> {
           // 頭部 - 局數和控制按鈕
           _buildHeader(),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 主要內容區域
           if (_isEditing) _buildEditingContent() else _buildDisplayContent(),
           
           // 編輯模式下的操作按鈕
           if (_isEditing) ...[
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildEditingActions(),
           ],
         ],
@@ -207,7 +204,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // 標題
         Expanded(
@@ -223,13 +220,13 @@ class _EditableGameCardState extends State<EditableGameCard> {
         // 控制按鈕
         if (!_isEditing) ...[
           IconButton(
-            icon: Icon(Iconsax.edit, size: 20),
+            icon: const Icon(Iconsax.edit, size: 20),
             onPressed: () => setState(() => _isEditing = true),
             color: widget.theme.colorScheme.primary,
           ),
           if (widget.onGameDelete != null)
             IconButton(
-              icon: Icon(Iconsax.trash, size: 20),
+              icon: const Icon(Iconsax.trash, size: 20),
               onPressed: widget.onGameDelete,
               color: Colors.red.withOpacity(0.8),
             ),
@@ -252,7 +249,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // Strikes
         Expanded(
@@ -264,7 +261,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // Spares
         Expanded(
@@ -297,7 +294,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
               ),
             ),
             
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             
             // Strikes
             Expanded(
@@ -310,7 +307,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
               ),
             ),
             
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             
             // Spares
             Expanded(
@@ -325,14 +322,13 @@ class _EditableGameCardState extends State<EditableGameCard> {
           ],
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 備註輸入
         _buildEditField(
           controller: _notesController,
           label: '備註 (選填)',
           icon: Iconsax.note,
-          inputType: TextInputType.text,
           maxLines: 2,
           maxLength: 100,
         ),
@@ -347,7 +343,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
     required Color color,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
@@ -355,7 +351,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
       child: Column(
         children: [
           Icon(icon, size: 20, color: color),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             value,
             style: widget.theme.textTheme.titleMedium?.copyWith(
@@ -363,7 +359,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
           Text(
             label,
             style: widget.theme.textTheme.bodySmall?.copyWith(
@@ -412,7 +408,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
             width: 2,
           ),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       inputFormatters: inputType == TextInputType.number 
         ? [FilteringTextInputFormatter.digitsOnly]
@@ -427,8 +423,8 @@ class _EditableGameCardState extends State<EditableGameCard> {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: _cancelEdit,
-            icon: Icon(Iconsax.close_circle, size: 18),
-            label: Text('取消'),
+            icon: const Icon(Iconsax.close_circle, size: 18),
+            label: const Text('取消'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.grey,
               side: BorderSide(color: Colors.grey.withOpacity(0.3)),
@@ -436,14 +432,14 @@ class _EditableGameCardState extends State<EditableGameCard> {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // 保存按鈕
         Expanded(
           child: ElevatedButton.icon(
             onPressed: _hasChanges ? _saveGame : null,
-            icon: Icon(Iconsax.tick_circle, size: 18),
-            label: Text('保存'),
+            icon: const Icon(Iconsax.tick_circle, size: 18),
+            label: const Text('保存'),
             style: ElevatedButton.styleFrom(
               backgroundColor: widget.theme.colorScheme.primary,
               foregroundColor: Colors.white,

@@ -1,7 +1,7 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/bowling_ball.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
 
 class AddCustomBallPage extends StatefulWidget {
   const AddCustomBallPage({super.key});
@@ -69,7 +69,7 @@ class _AddCustomBallPageState extends State<AddCustomBallPage> {
   // Helper for text input fields
   Widget _buildTextField(TextEditingController controller, String label, {IconData? icon, TextInputType keyboard = TextInputType.text, bool isRequired = true}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
@@ -105,15 +105,15 @@ class _AddCustomBallPageState extends State<AddCustomBallPage> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           children: <Widget>[
             _buildTextField(_brandController, '品牌', icon: Icons.business),
             _buildTextField(_ballNameController, '球名', icon: Icons.sports_baseball),
             _buildTextField(_coreController, '核心 (Core)', icon: Icons.settings),
             _buildTextField(_coverstockController, '球面材質名稱 (Coverstock Name)', icon: Icons.texture),
-             _buildTextField(_rgController, 'RG', icon: Icons.settings_backup_restore, keyboard: TextInputType.numberWithOptions(decimal: true)),
-             _buildTextField(_diffController, 'Diff', icon: Icons.compare_arrows, keyboard: TextInputType.numberWithOptions(decimal: true)),
-             _buildTextField(_mbDiffController, 'MB Diff', icon: Icons.trending_up, keyboard: TextInputType.numberWithOptions(decimal: true), isRequired: false), // MB Diff might not always exist
+             _buildTextField(_rgController, 'RG', icon: Icons.settings_backup_restore, keyboard: const TextInputType.numberWithOptions(decimal: true)),
+             _buildTextField(_diffController, 'Diff', icon: Icons.compare_arrows, keyboard: const TextInputType.numberWithOptions(decimal: true)),
+             _buildTextField(_mbDiffController, 'MB Diff', icon: Icons.trending_up, keyboard: const TextInputType.numberWithOptions(decimal: true), isRequired: false), // MB Diff might not always exist
              _buildTextField(_releaseDateController, '發行日期 (選填)', icon: Icons.calendar_today, isRequired: false), // Release date optional
             
             const SizedBox(height: 24),

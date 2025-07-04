@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 /// 計分方式選擇器組件
 class ScoringMethodSelector extends StatefulWidget {
-  final String selectedMethod;
-  final Function(String) onMethodSelected;
 
   const ScoringMethodSelector({
-    Key? key,
-    required this.selectedMethod,
-    required this.onMethodSelected,
-  }) : super(key: key);
+    required this.selectedMethod, required this.onMethodSelected, super.key,
+  });
+  final String selectedMethod;
+  final Function(String) onMethodSelected;
 
   @override
   State<ScoringMethodSelector> createState() => _ScoringMethodSelectorState();
@@ -20,7 +19,7 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
   OverlayEntry? _tooltipOverlay;
 
   void _showTooltip(BuildContext context) {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final renderBox = context.findRenderObject()! as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
     
     _tooltipOverlay = OverlayEntry(
@@ -53,16 +52,15 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
                     ),
                     Container(
                       width: 260,
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
-                          width: 1,
                         ),
                       ),
                       child: RichText(
-                        text: TextSpan(
+                        text: const TextSpan(
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -110,12 +108,11 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         border: Border.all(
           color: Colors.white.withOpacity(0.3),
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -126,20 +123,20 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Scoring Method',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               GestureDetector(
                 onLongPressStart: (_) => _showTooltip(context),
                 onLongPressEnd: (_) => _hideTooltip(),
                 onTapDown: (_) => _showTooltip(context),
                 onTapUp: (_) => _hideTooltip(),
-                onTapCancel: () => _hideTooltip(),
+                onTapCancel: _hideTooltip,
                 child: Container(
                   width: 14,
                   height: 14,
@@ -148,7 +145,6 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white.withOpacity(0.5),
-                      width: 1,
                     ),
                   ),
                   child: Icon(
@@ -161,7 +157,7 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
             ],
           ),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 兩個並排按鈕
           Row(
@@ -171,7 +167,7 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
                 child: GestureDetector(
                   onTap: () => widget.onMethodSelected('traditional'),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: widget.selectedMethod == 'traditional' 
                           ? Colors.white.withOpacity(0.3)
@@ -197,14 +193,14 @@ class _ScoringMethodSelectorState extends State<ScoringMethodSelector> {
                 ),
               ),
               
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               
               // Current Scoring 按鈕
               Expanded(
                 child: GestureDetector(
                   onTap: () => widget.onMethodSelected('current'),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: widget.selectedMethod == 'current' 
                           ? Colors.white.withOpacity(0.3)

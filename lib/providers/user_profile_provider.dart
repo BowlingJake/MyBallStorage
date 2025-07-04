@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/models/user_profile.dart';
+import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/user_profile.dart';
-import '../services/user_preferences_service.dart';
 
 // 使用者檔案狀態管理
 class UserProfileNotifier extends StateNotifier<UserProfile?> {

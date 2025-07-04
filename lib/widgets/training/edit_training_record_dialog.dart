@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../app_standard_button.dart';
-import '../../models/training_record.dart';
+
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:flutter/material.dart';
 
 // 編輯訓練記錄彈窗 - 樣式與新增彈窗同步
 class EditTrainingRecordDialog extends StatefulWidget {
-  final TrainingDaySummary summary;
-  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated;
 
   const EditTrainingRecordDialog({
-    Key? key,
-    required this.summary,
+    required this.summary, super.key,
     this.onRecordUpdated,
-  }) : super(key: key);
+  });
+  final TrainingDaySummary summary;
+  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated;
 
   @override
   State<EditTrainingRecordDialog> createState() => _EditTrainingRecordDialogState();
@@ -64,7 +64,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
       vsync: this,
     );
     
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
     
@@ -90,7 +90,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
 
   Future<void> _selectDate(BuildContext context) async {
     final theme = Theme.of(context);
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
@@ -689,7 +689,6 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
                 text: 'Previous',
                 icon: Icons.arrow_back,
                 onPressed: _previousStep,
-                isPrimary: false,
                 height: 40,
               ),
             ),
@@ -721,7 +720,6 @@ void showEditTrainingRecordDialog(
 ) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.05), // 極淺的背景遮罩
     builder: (BuildContext context) {
       return EditTrainingRecordDialog(

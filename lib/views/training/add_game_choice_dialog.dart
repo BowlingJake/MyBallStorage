@@ -1,19 +1,17 @@
 import 'dart:ui';
+
+import 'package:bowlingarsenal_app/widgets/training/add_game_advanced_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/training/add_game_simple_dialog.dart';
 import 'package:flutter/material.dart';
-import '../../widgets/training/add_game_advanced_dialog.dart';
-import '../../widgets/training/add_game_simple_dialog.dart';
-import '../../models/training_record.dart';
 
 // 1. 重構為 StatefulWidget 以管理自定義提示視窗的狀態
 class AddGameChoiceDialog extends StatefulWidget {
-  final int gameNumber;
-  final String dayId;
 
   const AddGameChoiceDialog({
-    Key? key,
-    required this.gameNumber,
-    required this.dayId,
-  }) : super(key: key);
+    required this.gameNumber, required this.dayId, super.key,
+  });
+  final int gameNumber;
+  final String dayId;
 
   @override
   State<AddGameChoiceDialog> createState() => _AddGameChoiceDialogState();
@@ -33,7 +31,7 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
   // 3. 顯示自定義的毛玻璃提示視窗
   void _showTooltip() {
     final overlay = Overlay.of(context);
-    final renderBox = _iconKey.currentContext!.findRenderObject() as RenderBox;
+    final renderBox = _iconKey.currentContext!.findRenderObject()! as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
     final theme = Theme.of(context);
@@ -44,7 +42,6 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
         width: MediaQuery.of(context).size.width,
         top: offset.dy + size.height + 8, // 定位在問號圖標下方
         child: Align(
-          alignment: Alignment.center,
           child: Material(
             color: Colors.transparent, // Material 組件用於正確應用文字樣式
             child: Container(
@@ -113,7 +110,7 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
       insetPadding: EdgeInsets.zero,
       child: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
-        child: Container(
+        child: ColoredBox(
           color: Colors.black.withOpacity(0.05),
           child: Center(
             child: GestureDetector(

@@ -1,24 +1,22 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../models/training_record.dart';
 
 /// Enhanced Game Item with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強遊戲項目
 class EnhancedGameItem extends StatelessWidget {
+
+  const EnhancedGameItem({
+    required this.game, required this.theme, super.key,
+    this.onTap,
+    this.onDelete,
+  });
   final GameRecord game;
   final ThemeData theme;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
-
-  const EnhancedGameItem({
-    Key? key,
-    required this.game,
-    required this.theme,
-    this.onTap,
-    this.onDelete,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,7 @@ class EnhancedGameItem extends StatelessWidget {
         }
       },
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.3),
           borderRadius: BorderRadius.circular(12),
@@ -50,7 +48,7 @@ class EnhancedGameItem extends StatelessWidget {
             // 遊戲編號
             _buildGameNumber(),
             
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             
             // 遊戲詳情
             Expanded(
@@ -62,7 +60,7 @@ class EnhancedGameItem extends StatelessWidget {
             
             // 刪除按鈕
             if (onDelete != null) ...[
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               _buildDeleteButton(),
             ],
           ],
@@ -102,12 +100,12 @@ class EnhancedGameItem extends StatelessWidget {
          Row(
            children: [
              _buildStatChip(Iconsax.direct_up, '${game.strikes}', 'STR'),
-             SizedBox(width: 8),
+             const SizedBox(width: 8),
              _buildStatChip(Iconsax.arrow_circle_right, '${game.spares}', 'SPR'),
            ],
          ),
         
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         
         // 使用球具
         if (game.ballUsed != null)
@@ -121,7 +119,7 @@ class EnhancedGameItem extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Text(
                 game.ballUsed!.name,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -137,7 +135,7 @@ class EnhancedGameItem extends StatelessWidget {
 
   Widget _buildStatChip(IconData icon, String value, String label) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
@@ -150,7 +148,7 @@ class EnhancedGameItem extends StatelessWidget {
             size: 12,
             color: theme.colorScheme.primary,
           ),
-          SizedBox(width: 4),
+          const SizedBox(width: 4),
           Text(
             value,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -159,7 +157,7 @@ class EnhancedGameItem extends StatelessWidget {
               fontSize: 11,
             ),
           ),
-          SizedBox(width: 2),
+          const SizedBox(width: 2),
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -174,7 +172,7 @@ class EnhancedGameItem extends StatelessWidget {
 
   Widget _buildScore() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: _getScoreColor().withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),

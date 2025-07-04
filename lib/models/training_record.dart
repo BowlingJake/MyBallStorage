@@ -1,9 +1,5 @@
 // 球具簡化資訊（用於訓練記錄）
-class BallInfo {
-  final String id;
-  final String name;
-  final String brand;
-  final String brandColor; // 品牌主色
+class BallInfo { // 品牌主色
   
   const BallInfo({
     required this.id,
@@ -11,19 +7,14 @@ class BallInfo {
     required this.brand,
     required this.brandColor,
   });
+  final String id;
+  final String name;
+  final String brand;
+  final String brandColor;
 }
 
 // 單局記錄模型
-class GameRecord {
-  final String id;
-  final int gameNumber; // 第幾局
-  final int score;
-  final List<int> frameScores; // 每一格的分數
-  final int strikes;
-  final int spares;
-  final String? notes; // 備註
-  final DateTime timestamp;
-  final BallInfo? ballUsed; // 使用的球具資訊
+class GameRecord { // 使用的球具資訊
 
   GameRecord({
     required this.id,
@@ -32,8 +23,7 @@ class GameRecord {
     required this.frameScores,
     required this.strikes,
     required this.spares,
-    this.notes,
-    required this.timestamp,
+    required this.timestamp, this.notes,
     this.ballUsed, // 新增球具參數
   });
 
@@ -57,6 +47,15 @@ class GameRecord {
         : null,
     );
   }
+  final String id;
+  final int gameNumber; // 第幾局
+  final int score;
+  final List<int> frameScores; // 每一格的分數
+  final int strikes;
+  final int spares;
+  final String? notes; // 備註
+  final DateTime timestamp;
+  final BallInfo? ballUsed;
 
   Map<String, dynamic> toJson() {
     return {
@@ -82,6 +81,33 @@ class GameRecord {
 
 // 訓練日摘要模型
 class TrainingDaySummary {
+
+  TrainingDaySummary({
+    required this.id,
+    required this.title, // 新增標題字段
+    required this.date,
+    required this.center,
+    required this.isHousePattern, required this.scoringMethod, required this.inputMethod, required this.games, required this.createdAt, this.oilPatternName,
+    this.oilPatternLength,
+  });
+
+  factory TrainingDaySummary.fromJson(Map<String, dynamic> json) {
+    return TrainingDaySummary(
+      id: json['id'] ?? '',
+      title: json['title'] ?? 'Training Session', // 默認標題
+      date: DateTime.parse(json['date']),
+      center: json['center'] ?? '',
+      oilPatternName: json['oilPatternName'],
+      oilPatternLength: json['oilPatternLength'],
+      isHousePattern: json['isHousePattern'] ?? true,
+      scoringMethod: json['scoringMethod'] ?? 'Standard',
+      inputMethod: json['inputMethod'] ?? 'simple', // 預設為 simple
+      games: (json['games'] as List?)
+          ?.map((game) => GameRecord.fromJson(game))
+          .toList() ?? [],
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
   final String id;
   final String title; // 新增標題字段
   final DateTime date;
@@ -93,20 +119,6 @@ class TrainingDaySummary {
   final String inputMethod; // 新增：輸入方式 (simple/advanced)
   final List<GameRecord> games;
   final DateTime createdAt;
-
-  TrainingDaySummary({
-    required this.id,
-    required this.title, // 新增標題字段
-    required this.date,
-    required this.center,
-    this.oilPatternName,
-    this.oilPatternLength,
-    required this.isHousePattern,
-    required this.scoringMethod,
-    required this.inputMethod,
-    required this.games,
-    required this.createdAt,
-  });
 
   // 計算摘要統計
   int get totalGames => games.length;
@@ -137,7 +149,7 @@ class TrainingDaySummary {
 
   // 獲取所有使用的球具及其使用的局數
   Map<BallInfo, List<int>> get equipmentUsage {
-    final Map<BallInfo, List<int>> usage = {};
+    final usage = <BallInfo, List<int>>{};
     
     for (final game in games) {
       if (game.ballUsed != null) {
@@ -185,24 +197,6 @@ class TrainingDaySummary {
     return 'Custom Pattern';
   }
 
-  factory TrainingDaySummary.fromJson(Map<String, dynamic> json) {
-    return TrainingDaySummary(
-      id: json['id'] ?? '',
-      title: json['title'] ?? 'Training Session', // 默認標題
-      date: DateTime.parse(json['date']),
-      center: json['center'] ?? '',
-      oilPatternName: json['oilPatternName'],
-      oilPatternLength: json['oilPatternLength'],
-      isHousePattern: json['isHousePattern'] ?? true,
-      scoringMethod: json['scoringMethod'] ?? 'Standard',
-      inputMethod: json['inputMethod'] ?? 'simple', // 預設為 simple
-      games: (json['games'] as List?)
-          ?.map((game) => GameRecord.fromJson(game))
-          .toList() ?? [],
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -222,12 +216,6 @@ class TrainingDaySummary {
 
 // 舊的訓練記錄模型（向後兼容）
 class TrainingRecord {
-  final String id;
-  final String title;
-  final DateTime date;
-  final int score;
-  final String notes;
-  final String? imageUrl;
 
   TrainingRecord({
     required this.id,
@@ -248,6 +236,12 @@ class TrainingRecord {
       imageUrl: json['imageUrl'],
     );
   }
+  final String id;
+  final String title;
+  final DateTime date;
+  final int score;
+  final String notes;
+  final String? imageUrl;
 
   Map<String, dynamic> toJson() {
     return {

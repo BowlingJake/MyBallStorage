@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ScoreFrameWidget extends StatelessWidget {
+
+  const ScoreFrameWidget({required this.frameNumber, required this.availableWidth, // 新增參數, super.key,, super.key,
+    this.ball1Score,
+    this.ball2Score,
+    this.ball3Score, // 只有第10格才可能用到
+    this.frameTotalScore,
+    this.isTenthFrame = false,
+    this.isCurrentFrame = false,
+  });
   final int frameNumber; // 第幾格 (1-10)
   final String? ball1Score; // 第一球得分或標記 (例如 "X", "7")
   final String? ball2Score; // 第二球得分或標記 (例如 "/", "2")
@@ -11,29 +20,17 @@ class ScoreFrameWidget extends StatelessWidget {
   final double availableWidth; // 新增參數
   final bool isCurrentFrame;
 
-  const ScoreFrameWidget({
-    super.key,
-    required this.frameNumber,
-    this.ball1Score,
-    this.ball2Score,
-    this.ball3Score, // 只有第10格才可能用到
-    this.frameTotalScore,
-    this.isTenthFrame = false,
-    required this.availableWidth, // 新增參數
-    this.isCurrentFrame = false,
-  });
-
   @override
   Widget build(BuildContext context) {
-    const BorderSide borderSide = BorderSide(color: Colors.black, width: 0.5);
+    const borderSide = BorderSide(width: 0.5);
 
     // 計算各部分的高度比例，考慮邊框寬度
-    final double frameNumberHeight = (availableWidth - 2) * 0.3; // 減去邊框寬度
-    final double scoreBoxHeight = (availableWidth - 2) * 0.4; // 減去邊框寬度
-    final double totalScoreHeight = (availableWidth - 2) * 0.3; // 減去邊框寬度
+    final frameNumberHeight = (availableWidth - 2) * 0.3; // 減去邊框寬度
+    final scoreBoxHeight = (availableWidth - 2) * 0.4; // 減去邊框寬度
+    final totalScoreHeight = (availableWidth - 2) * 0.3; // 減去邊框寬度
 
     // 計算小格子的寬度，考慮邊框寬度
-    final double smallBoxWidth = (availableWidth - (isTenthFrame ? 3 : 2)) / (isTenthFrame ? 3 : 2); // 減去邊框寬度
+    final smallBoxWidth = (availableWidth - (isTenthFrame ? 3 : 2)) / (isTenthFrame ? 3 : 2); // 減去邊框寬度
 
     return Container(
       width: availableWidth,
@@ -108,7 +105,7 @@ class ScoreFrameWidget extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                frameTotalScore ?? "",
+                frameTotalScore ?? '',
                 style: TextStyle(
                   fontSize: availableWidth * 0.25,
                   fontWeight: FontWeight.bold,
@@ -126,29 +123,26 @@ class ScoreFrameWidget extends StatelessWidget {
     double width,
     double height,
     BorderSide border, {
-    bool isLeftMost = false,
+    required double fontSize, bool isLeftMost = false,
     bool isRightMost = false,
-    required double fontSize,
   }) {
     Widget displayWidget;
     
-    if (score == "X") {
+    if (score == 'X') {
       displayWidget = SvgPicture.asset(
         'assets/images/strike_symbol.svg',
         width: width * 0.8,
         height: height * 0.8,
-        fit: BoxFit.contain,
       );
-    } else if (score == "/") {
+    } else if (score == '/') {
       displayWidget = SvgPicture.asset(
         'assets/images/spare_symbol.svg',
         width: width * 0.8,
         height: height * 0.8,
-        fit: BoxFit.contain,
       );
     } else {
       displayWidget = Text(
-        score ?? "",
+        score ?? '',
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,

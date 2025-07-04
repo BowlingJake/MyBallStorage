@@ -1,9 +1,5 @@
 // lib/models/user_profile.dart
 class UserProfile {
-  final String nickname;
-  final String hand;
-  final String ballPath;
-  final String pap;
 
   const UserProfile({
     required this.nickname,
@@ -11,6 +7,19 @@ class UserProfile {
     required this.ballPath,
     required this.pap,
   });
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      nickname: json['nickname'] ?? '',
+      hand: json['hand'] ?? '',
+      ballPath: json['ballPath'] ?? '',
+      pap: json['pap'] ?? '',
+    );
+  }
+  final String nickname;
+  final String hand;
+  final String ballPath;
+  final String pap;
 
   UserProfile copyWith({
     String? nickname,
@@ -33,15 +42,6 @@ class UserProfile {
       'ballPath': ballPath,
       'pap': pap,
     };
-  }
-
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      nickname: json['nickname'] ?? '',
-      hand: json['hand'] ?? '',
-      ballPath: json['ballPath'] ?? '',
-      pap: json['pap'] ?? '',
-    );
   }
 
   @override

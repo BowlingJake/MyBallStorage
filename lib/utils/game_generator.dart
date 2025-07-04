@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import '../models/training_record.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
 
 /// 遊戲數據生成器
 /// 負責生成隨機的遊戲記錄和球具資訊
@@ -56,21 +56,21 @@ class GameGenerator {
       'Great improvement!',
       'Excellent performance',
       'Amazing consistency',
-      'Perfect timing!'
+      'Perfect timing!',
     ],
     'good': [
       'Great improvement on strikes',
       'Consistent performance',
       'Good ball control',
       'Nice spare conversions',
-      'Solid fundamentals'
+      'Solid fundamentals',
     ],
     'average': [
       'Good start, need to work on 7-10 split',
       'Focus on spare conversion',
       'Working on consistency',
       'Better approach timing',
-      'Need more practice on spares'
+      'Need more practice on spares',
     ],
   };
   
@@ -108,8 +108,8 @@ class GameGenerator {
   
   /// 根據分數生成相應的統計資料
   static Map<String, int> _generateStats(int score) {
-    int strikes = 0;
-    int spares = 0;
+    var strikes = 0;
+    var spares = 0;
     
     if (score >= 240) {
       strikes = _random.nextInt(3) + 8; // 8-10 strikes

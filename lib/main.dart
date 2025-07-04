@@ -1,10 +1,9 @@
 // lib/main.dart
+import 'package:bowlingarsenal_app/app_router.dart';
+import 'package:bowlingarsenal_app/core/error/error_handler.dart';
+import 'package:bowlingarsenal_app/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'app_router.dart';
-import 'core/error/error_handler.dart';
-import 'providers/theme_provider.dart';
-import 'theme/theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/widgets/app_specific/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/widgets/app_specific/theme/brand_colors.dart';
 import 'package:flutter/material.dart';
-import '../models/arsenal_ball.dart';
-import '../theme/brand_colors.dart';
 
 /// Creates a matte overlay effect for the given brand colors
 LinearGradient createMatteOverlay(List<Color> brandColors) {
@@ -16,14 +16,13 @@ LinearGradient createMatteOverlay(List<Color> brandColors) {
 
 /// Home page Arsenal card with the same design as ArsenalBallCard but optimized for horizontal scrolling
 class HomeArsenalCard extends StatelessWidget {
-  final ArsenalBall ball;
-  final VoidCallback? onTap;
 
   const HomeArsenalCard({
-    super.key,
-    required this.ball,
+    required this.ball, super.key,
     this.onTap,
   });
+  final ArsenalBall ball;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,6 @@ class HomeArsenalCard extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
               blurRadius: 6,
-              spreadRadius: 0,
               offset: const Offset(0, 3),
             ),
           ],
@@ -68,14 +66,11 @@ class HomeArsenalCard extends StatelessWidget {
                     Colors.white.withOpacity(0.10),
                     Colors.white.withOpacity(0.08),
                   ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(10),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
               // Ball name at the top (white text with shadow)
               Text(
@@ -109,7 +104,6 @@ class HomeArsenalCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
-                          center: Alignment.center,
                           radius: 0.8,
                           colors: [
                             Colors.white.withOpacity(0.15),
@@ -122,7 +116,6 @@ class HomeArsenalCard extends StatelessWidget {
                           BoxShadow(
                             color: Colors.white.withOpacity(0.06),
                             blurRadius: 22,
-                            spreadRadius: 0,
                           ),
                         ],
                       ),

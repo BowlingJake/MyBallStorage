@@ -1,14 +1,14 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/models/tournament.dart';          // Import Model
+import 'package:bowlingarsenal_app/shared/enums.dart'; // Import the shared enum
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/tournament_viewmodel.dart'; // Import ViewModel
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
+import 'package:bowlingarsenal_app/views/add_match_record_page.dart';
+import 'package:bowlingarsenal_app/views/basic_tournament_info_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import Provider
 import 'package:intl/intl.dart';       // Import intl for date formatting
-import '../viewmodels/tournament_viewmodel.dart'; // Import ViewModel
-import '../models/tournament.dart';          // Import Model
-import 'basic_tournament_info_page.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
-import '../models/bowling_ball.dart';
-import 'add_match_record_page.dart';
-import '../shared/enums.dart'; // Import the shared enum
-import '../theme/text_styles.dart';
+import 'package:provider/provider.dart'; // Import Provider
 
 // Define enum for dialog result (REMOVED)
 // enum AddRecordType { open, championship }
@@ -89,7 +89,7 @@ class TournamentRecordPage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -108,7 +108,7 @@ class TournamentRecordPage extends StatelessWidget {
   // --- Helper Widget to build a tournament card ---
   Widget _buildTournamentCard(BuildContext context, Tournament tournament) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12.0), // Space between cards
+      margin: const EdgeInsets.only(bottom: 12), // Space between cards
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
@@ -118,7 +118,7 @@ class TournamentRecordPage extends StatelessWidget {
           
           // Access the ViewModel to get ball objects
           final weaponViewModel = context.read<WeaponLibraryViewModel>();
-          final List<BowlingBall> selectedBallObjects = tournament.selectedBallNames
+          final selectedBallObjects = tournament.selectedBallNames
               .map((name) {
                 // Find the ball in the ViewModel's arsenal list
                 try {
@@ -168,7 +168,7 @@ class TournamentRecordPage extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               // Left side: Icon or tournament type indicator

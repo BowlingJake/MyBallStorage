@@ -1,18 +1,4 @@
 class BowlingBall {
-  final String ball;
-  final String brand;
-  final String releaseDate;
-  final String coverstockname;
-  final String coverstockcategory;
-  final String factoryFinish;
-  final String core;
-  final String rg;
-  final String diff;
-  final String mbDiff;
-
-  String? handType;
-  String? layoutType;
-  List<String>? layoutValues;
 
   BowlingBall({
     required this.ball,
@@ -41,4 +27,18 @@ class BowlingBall {
       mbDiff: json['MB Diff'] ?? '',
     );
   }
+  final String ball;
+  final String brand;
+  final String releaseDate;
+  final String coverstockname;
+  final String coverstockcategory;
+  final String factoryFinish;
+  final String core;
+  final String rg;
+  final String diff;
+  final String mbDiff;
+
+  String? handType;
+  String? layoutType;
+  List<String>? layoutValues;
 }

@@ -1,22 +1,19 @@
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/score_game_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
-import 'score_game_widget.dart';
-import '../../models/score_data.dart';
-import 'tenth_frame_widget.dart';
-import 'pin_selector_popup_widget.dart';
 
 class EditableBowlingScoreTable extends StatefulWidget {
+
+  const EditableBowlingScoreTable({
+    required this.scoreData, required this.modifiedFrames, required this.onCellEdit, super.key,
+    this.width,
+  });
   final BowlingScoreData scoreData;
   final Set<int> modifiedFrames;
   final void Function(int frameIndex) onCellEdit;
   final double? width;
-
-  const EditableBowlingScoreTable({
-    Key? key,
-    required this.scoreData,
-    required this.modifiedFrames,
-    required this.onCellEdit,
-    this.width,
-  }) : super(key: key);
 
   @override
   _EditableBowlingScoreTableState createState() => _EditableBowlingScoreTableState();
@@ -26,12 +23,12 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
   Future<void> _editFrame(BuildContext context, int frameIdx) async {
     final frame = widget.scoreData.frames[frameIdx];
     if (frame.rolls.isEmpty) return;
-    Set<int> initialPinsDown = {};
-    final List<Roll> originalRolls = List.from(frame.rolls);
-    final bool wasComplete = frame.isComplete;
+    final initialPinsDown = <int>{};
+    final originalRolls = List<Roll>.from(frame.rolls);
+    final wasComplete = frame.isComplete;
     frame.rolls.clear();
     frame.isComplete = false;
-    final Set<int>? pinsHit = await showDialog<Set<int>>(
+    final pinsHit = await showDialog<Set<int>>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
@@ -43,11 +40,11 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
       },
     );
     if (pinsHit != null) {
-      final int pinsDown = pinsHit.length;
-      final Roll newRoll = Roll(
+      final pinsDown = pinsHit.length;
+      final newRoll = Roll(
         pinsDown: pinsDown,
         pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
-        displayScore: pinsDown == 10 ? "X" : pinsDown.toString(),
+        displayScore: pinsDown == 10 ? 'X' : pinsDown.toString(),
         pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
       );
       frame.rolls.add(newRoll);
@@ -63,14 +60,14 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
 
   @override
   Widget build(BuildContext context) {
-    final double availableWidth = widget.width ?? MediaQuery.of(context).size.width;
-    final double frameWidth = availableWidth / 10;
+    final availableWidth = widget.width ?? MediaQuery.of(context).size.width;
+    final frameWidth = availableWidth / 10;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(9, (index) {
           final frame = widget.scoreData.frames[index];
-          final bool isModified = widget.modifiedFrames.contains(index);
+          final isModified = widget.modifiedFrames.contains(index);
           return GestureDetector(
             onTap: () => _editFrame(context, index),
             child: Container(
@@ -82,13 +79,10 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
               ),
               child: ScoreFrameWidget(
                 frameNumber: index + 1,
-                isTenthFrame: false,
                 ball1Score: frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
                 ball2Score: frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
-                ball3Score: null,
                 frameTotalScore: frame.totalScore?.toString(),
                 availableWidth: frameWidth,
-                isCurrentFrame: false,
               ),
             ),
           );

@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 class DashboardStatItem extends StatelessWidget {
+
+  const DashboardStatItem({
+    required this.theme, required this.value, required this.label, required this.unit, required this.progressColor, super.key,
+    this.isPercentage = false,
+    this.glow = false,
+  });
   final ThemeData theme;
   final double value;
   final String label;
@@ -9,17 +15,6 @@ class DashboardStatItem extends StatelessWidget {
   final Color progressColor;
   final bool isPercentage;
   final bool glow;
-
-  const DashboardStatItem({
-    Key? key,
-    required this.theme,
-    required this.value,
-    required this.label,
-    required this.unit,
-    required this.progressColor,
-    this.isPercentage = false,
-    this.glow = false,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +29,6 @@ class DashboardStatItem extends StatelessWidget {
                   percentage: value / 100,
                   radius: 68,
                   type: GFProgressType.circular,
-                  circleWidth: 5,
                   backgroundColor: theme.colorScheme.onSurface.withOpacity(0.08),
                   progressBarColor: progressColor,
                   child: Text(

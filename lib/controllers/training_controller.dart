@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import '../models/training_record.dart';
-import '../services/training_data_service.dart';
-import '../utils/game_generator.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/services/training_data_service.dart';
+import 'package:bowlingarsenal_app/utils/game_generator.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final trainingControllerProvider = ChangeNotifierProvider((ref) => TrainingController());
 
 /// 訓練頁面控制器
 /// 專注於訓練數據相關的業務邏輯和狀態管理
@@ -27,11 +30,8 @@ class TrainingController extends ChangeNotifier {
     required String title,
     required DateTime date,
     required String center,
-    String? oilPatternName,
+    required bool isHousePattern, required String scoringMethod, required String inputMethod, String? oilPatternName,
     String? oilPatternLength,
-    required bool isHousePattern,
-    required String scoringMethod,
-    required String inputMethod,
   }) async {
     // 模擬網路延遲，為未來資料庫操作做準備
     await Future.delayed(Duration.zero);
@@ -56,11 +56,8 @@ class TrainingController extends ChangeNotifier {
     required String title,
     required DateTime date,
     required String center,
-    String? oilPatternName,
+    required bool isHousePattern, required String scoringMethod, required String inputMethod, String? oilPatternName,
     String? oilPatternLength,
-    required bool isHousePattern,
-    required String scoringMethod,
-    required String inputMethod,
   }) async {
     // 模擬網路延遲
     await Future.delayed(Duration.zero);
@@ -198,8 +195,8 @@ class TrainingController extends ChangeNotifier {
   
   /// 獲取選中訓練日的統計資訊
   Map<String, int> getSelectionStats() {
-    int totalDays = _selectedDayIds.length;
-    int totalGames = 0;
+    final totalDays = _selectedDayIds.length;
+    var totalGames = 0;
     
     for (final dayId in _selectedDayIds) {
       final day = _dataService.getTrainingDay(dayId);

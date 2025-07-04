@@ -1,31 +1,31 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 /// 練習標題輸入欄位
 class SessionTitleField extends StatelessWidget {
-  final TextEditingController controller;
 
   const SessionTitleField({
-    Key? key,
-    required this.controller,
-  }) : super(key: key);
+    required this.controller, super.key,
+  });
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       maxLength: 20, // 限制標題長度為20字
       decoration: InputDecoration(
         labelText: 'Session Title',
-        labelStyle: TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.white70),
 
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white, width: 2),
+          borderSide: const BorderSide(color: Colors.white, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         errorBorder: OutlineInputBorder(
@@ -33,12 +33,12 @@ class SessionTitleField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.15),
-        counterStyle: TextStyle(color: Colors.white54, fontSize: 10),
+        counterStyle: const TextStyle(color: Colors.white54, fontSize: 10),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -52,14 +52,12 @@ class SessionTitleField extends StatelessWidget {
 
 /// 日期選擇器
 class DateSelector extends StatelessWidget {
-  final DateTime selectedDate;
-  final Function(BuildContext) onDateSelected;
 
   const DateSelector({
-    Key? key,
-    required this.selectedDate,
-    required this.onDateSelected,
-  }) : super(key: key);
+    required this.selectedDate, required this.onDateSelected, super.key,
+  });
+  final DateTime selectedDate;
+  final Function(BuildContext) onDateSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -67,26 +65,25 @@ class DateSelector extends StatelessWidget {
       onTap: () => onDateSelected(context),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
           border: Border.all(
             color: Colors.white.withOpacity(0.3),
-            width: 1,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.calendar_today,
               color: Colors.white70,
               size: 20,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Text(
               '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
               ),
@@ -100,27 +97,26 @@ class DateSelector extends StatelessWidget {
 
 /// 地點輸入欄位
 class LocationField extends StatelessWidget {
-  final TextEditingController controller;
 
   const LocationField({
-    Key? key,
-    required this.controller,
-  }) : super(key: key);
+    required this.controller, super.key,
+  });
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: 'Location (Bowling Center)',
-        labelStyle: TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.white70),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white, width: 2),
+          borderSide: const BorderSide(color: Colors.white, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         errorBorder: OutlineInputBorder(
@@ -128,7 +124,7 @@ class LocationField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
@@ -146,18 +142,14 @@ class LocationField extends StatelessWidget {
 
 /// 油型選擇器組件
 class OilPatternSelector extends StatefulWidget {
+
+  const OilPatternSelector({
+    required this.isHousePattern, required this.nameController, required this.lengthController, required this.onHousePatternChanged, super.key,
+  });
   final bool isHousePattern;
   final TextEditingController nameController;
   final TextEditingController lengthController;
   final Function(bool) onHousePatternChanged;
-
-  const OilPatternSelector({
-    Key? key,
-    required this.isHousePattern,
-    required this.nameController,
-    required this.lengthController,
-    required this.onHousePatternChanged,
-  }) : super(key: key);
 
   @override
   State<OilPatternSelector> createState() => _OilPatternSelectorState();
@@ -167,7 +159,7 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
   OverlayEntry? _tooltipOverlay;
 
   void _showTooltip(BuildContext context) {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final renderBox = context.findRenderObject()! as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
     
     _tooltipOverlay = OverlayEntry(
@@ -200,16 +192,15 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
                     ),
                     Container(
                       width: 260,
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
-                          width: 1,
                         ),
                       ),
                       child: RichText(
-                        text: TextSpan(
+                        text: const TextSpan(
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -257,12 +248,11 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         border: Border.all(
           color: Colors.white.withOpacity(0.3),
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -273,7 +263,7 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Oil Pattern (Optional)',
                 style: TextStyle(
                   color: Colors.white70,
@@ -284,7 +274,7 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
               GestureDetector(
                 onTap: () => widget.onHousePatternChanged(true),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: widget.isHousePattern 
                         ? Colors.white.withOpacity(0.3)
@@ -310,52 +300,52 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
             ],
           ),
           
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           
           // Custom Pattern 選項
           if (!widget.isHousePattern) ...[
             // Pattern Name 欄位
             TextFormField(
               controller: widget.nameController,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Pattern Name (e.g., Cheetah)',
-                labelStyle: TextStyle(color: Colors.white60, fontSize: 12),
+                labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white, width: 1.5),
+                  borderSide: const BorderSide(color: Colors.white, width: 1.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
             ),
             
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             
             // Pattern Length 欄位
             TextFormField(
               controller: widget.lengthController,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Pattern Length (feet)',
-                labelStyle: TextStyle(color: Colors.white60, fontSize: 12),
+                labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white, width: 1.5),
+                  borderSide: const BorderSide(color: Colors.white, width: 1.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
             ),
           ] else ...[
@@ -364,16 +354,15 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
               onTap: () => widget.onHousePatternChanged(false),
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   border: Border.all(
                     color: Colors.white.withOpacity(0.3),
-                    width: 1,
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
+                child: const Text(
                   'Use Custom Pattern',
                   textAlign: TextAlign.center,
                   style: TextStyle(

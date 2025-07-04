@@ -1,23 +1,22 @@
+import 'dart:collection'; // For HashSet
+
+import 'package:bowlingarsenal_app/widgets/bowling/common/buttons/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:collection'; // For HashSet
-import 'common/buttons/primary_button.dart';
 
 class PinSelectorPopupWidget extends StatefulWidget {
+
+  const PinSelectorPopupWidget({
+    required this.pinStandingAssetPath, required this.pinFallenAssetPath, super.key,
+    this.initialPinsDown = const {},
+    this.pinSize = 40.0,
+    this.pinVisualSpacingFactor = 2.4, // 使用者提供的數值
+  });
   final Set<int> initialPinsDown; // 本球次前已倒的瓶號 (1-10)
   final String pinStandingAssetPath;
   final String pinFallenAssetPath;
   final double pinSize;
   final double pinVisualSpacingFactor;
-
-  const PinSelectorPopupWidget({
-    super.key,
-    this.initialPinsDown = const {},
-    required this.pinStandingAssetPath,
-    required this.pinFallenAssetPath,
-    this.pinSize = 40.0,
-    this.pinVisualSpacingFactor = 2.4, // 使用者提供的數值
-  });
 
   @override
   State<PinSelectorPopupWidget> createState() => _PinSelectorPopupWidgetState();
@@ -33,7 +32,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
     super.initState();
     _newlySelectedPins = HashSet<int>();
     // 為 1 到 10 號瓶初始化 GlobalKey
-    for (int i = 1; i <= 10; i++) {
+    for (var i = 1; i <= 10; i++) {
       _pinKeys[i] = GlobalKey(debugLabel: 'PinKey_$i');
     }
   }
@@ -58,11 +57,11 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
   }
 
   Widget _buildPin(int pinNumber) {
-    final GlobalKey pinKey = _pinKeys[pinNumber]!; // 獲取此瓶的 GlobalKey
-    final bool isInitiallyDown = widget.initialPinsDown.contains(pinNumber);
-    final bool isNewlySelected = _newlySelectedPins.contains(pinNumber);
-    final bool isEffectivelyDown = isInitiallyDown || isNewlySelected;
-    final String assetPath = isEffectivelyDown ? widget.pinFallenAssetPath : widget.pinStandingAssetPath;
+    final pinKey = _pinKeys[pinNumber]!; // 獲取此瓶的 GlobalKey
+    final isInitiallyDown = widget.initialPinsDown.contains(pinNumber);
+    final isNewlySelected = _newlySelectedPins.contains(pinNumber);
+    final isEffectivelyDown = isInitiallyDown || isNewlySelected;
+    final assetPath = isEffectivelyDown ? widget.pinFallenAssetPath : widget.pinStandingAssetPath;
 
     return GestureDetector(
       key: pinKey, // 將 GlobalKey 指派給 GestureDetector
@@ -80,7 +79,7 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
             height: widget.pinSize,
             alignment: Alignment.center,
             decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.red)),
-            child: Text(pinNumber.toString(), style: TextStyle(fontSize: widget.pinSize * 0.4, color: Colors.red))
+            child: Text(pinNumber.toString(), style: TextStyle(fontSize: widget.pinSize * 0.4, color: Colors.red)),
           ),
         ),
       ),
@@ -88,14 +87,14 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
   }
 
   Widget _buildPinRow(List<int> pinNumbers, {double leftPaddingPins = 0.0}) {
-    double actualLeftPadding = leftPaddingPins * widget.pinSize * widget.pinVisualSpacingFactor;
+    final var actualLeftPadding = leftPaddingPins * widget.pinSize * widget.pinVisualSpacingFactor;
     return Padding(
       padding: EdgeInsets.only(left: actualLeftPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: pinNumbers.map((pin) {
-          double horizontalPinPadding = (widget.pinSize * widget.pinVisualSpacingFactor - widget.pinSize) / 2;
+          final horizontalPinPadding = (widget.pinSize * widget.pinVisualSpacingFactor - widget.pinSize) / 2;
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPinPadding.clamp(0, widget.pinSize / 2)),
             child: _buildPin(pin), // 直接傳遞瓶號
@@ -107,9 +106,9 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final List<List<int>> pinLayout = [ [7, 8, 9, 10], [4, 5, 6], [2, 3], [1] ];
+    final pinLayout = <List<int>>[ [7, 8, 9, 10], [4, 5, 6], [2, 3], [1] ];
     // 使用者提供的數值
-    final List<double> rowLeftPaddingsInPinUnits = [0.0, 0.1, 0.1, 0.1];
+    final rowLeftPaddingsInPinUnits = <double>[0, 0.1, 0.1, 0.1];
 
     return AlertDialog(
       title: const Text('選擇擊倒的球瓶', style: AppTextStyles.title),
@@ -120,15 +119,15 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
           },
           onPanUpdate: (details) {
             // 遍歷所有瓶子的 GlobalKey
-            for (var entry in _pinKeys.entries) {
-              final int pinNumber = entry.key;
-              final GlobalKey pinKey = entry.value;
+            for (final entry in _pinKeys.entries) {
+              final pinNumber = entry.key;
+              final pinKey = entry.value;
 
               if (pinKey.currentContext != null) {
-                final RenderBox renderBox = pinKey.currentContext!.findRenderObject() as RenderBox;
+                final renderBox = pinKey.currentContext!.findRenderObject()! as RenderBox;
                 // 獲取瓶子在螢幕上的絕對位置和大小
-                final Offset globalPinPosition = renderBox.localToGlobal(Offset.zero);
-                final Rect pinGlobalRect = globalPinPosition & renderBox.size;
+                final globalPinPosition = renderBox.localToGlobal(Offset.zero);
+                final pinGlobalRect = globalPinPosition & renderBox.size;
 
                 // 檢查當前手指的全域位置是否在該瓶子的矩形區域內
                 if (pinGlobalRect.contains(details.globalPosition)) {
@@ -142,7 +141,6 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
           },
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               for (int i = 0; i < pinLayout.length; i++)
                 Padding(

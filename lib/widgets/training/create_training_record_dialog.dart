@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
-import '../app_standard_button.dart';
+
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:flutter/material.dart';
 
 // 重構的新增訓練記錄彈窗 - 遵循APP標準視覺風格
 class CreateTrainingRecordDialog extends StatefulWidget {
-  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordCreated;
 
   const CreateTrainingRecordDialog({
-    Key? key,
+    super.key,
     this.onRecordCreated,
-  }) : super(key: key);
+  });
+  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordCreated;
 
   @override
   State<CreateTrainingRecordDialog> createState() => _CreateTrainingRecordDialogState();
@@ -50,11 +50,11 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
   void _initAnimations() {
     _fadeController = AnimationController(
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
     
@@ -80,7 +80,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
   Future<void> _selectDate(BuildContext context) async {
     final theme = Theme.of(context);
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
@@ -115,7 +115,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         _currentStep++;
       });
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -127,7 +127,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         _currentStep--;
       });
       _pageController.previousPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -161,7 +161,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
+          content: const Row(
             children: [
               Icon(Icons.check_circle, color: Colors.white),
               SizedBox(width: 12),
@@ -216,12 +216,12 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                       color: theme.colorScheme.primary.withOpacity(0.2),
                       blurRadius: 16,
                       spreadRadius: 2,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -246,7 +246,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     final theme = Theme.of(context);
     
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
         children: [
           // 圖標
@@ -267,7 +267,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
             ),
           ),
           
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           
           // 標題和副標題
           Expanded(
@@ -326,7 +326,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     final theme = Theme.of(context);
     
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         children: [
           for (int i = 0; i < 3; i++) ...[
@@ -341,7 +341,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 ),
               ),
             ),
-            if (i < 2) SizedBox(width: 8),
+            if (i < 2) const SizedBox(width: 8),
           ],
         ],
       ),
@@ -350,12 +350,12 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
   Widget _buildFormContent() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Form(
         key: _formKey,
         child: PageView(
           controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             _buildStep1(),
             _buildStep2(),
@@ -372,7 +372,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         // 步驟標題
         _buildStepHeader(
@@ -381,7 +381,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           subtitle: 'Basic information',
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 練習標題和球館名稱（並排）
             Row(
@@ -395,7 +395,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 onChanged: (_) => _validateStep1(),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: _buildCompactTextField(
                 controller: _centerNameController,
@@ -408,12 +408,12 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ],
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
                 // 日期選擇
         _buildDateSelector(),
         
-        Spacer(),
+        const Spacer(),
       ],
     );
   }
@@ -422,7 +422,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         // 步驟標題
         _buildStepHeader(
@@ -431,12 +431,12 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           subtitle: 'Lane conditions',
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 油圖設定
         _buildOilPatternSelector(),
         
-        Spacer(),
+        const Spacer(),
       ],
     );
   }
@@ -447,7 +447,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         // 步驟標題
         _buildStepHeader(
@@ -456,21 +456,21 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           subtitle: 'Choose your input method and scoring system',
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 輸入方式選擇
         _buildInputMethodSelector(),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 計分系統選擇
         _buildScoringSystemSelector(),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 建議說明（放在底部）
         Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withOpacity(0.08),
             borderRadius: BorderRadius.circular(8),
@@ -485,7 +485,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 color: theme.colorScheme.primary,
                 size: 14,
               ),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'Advanced scoring provides more detailed statistics',
@@ -499,7 +499,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ),
         ),
         
-        Spacer(),
+        const Spacer(),
       ],
     );
   }
@@ -530,7 +530,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                   ),
                 ),
                 
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 
                 Expanded(
           child: Column(
@@ -591,7 +591,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           isDense: true,
         ),
         validator: (value) {
@@ -611,7 +611,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
       onTap: () => _selectDate(context),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -669,7 +669,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
               color: theme.colorScheme.primary,
               size: 16,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'Oil Pattern',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -680,7 +680,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ],
         ),
         
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         // House/Sport切換
         Row(
@@ -692,7 +692,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 () => setState(() => _isHousePattern = true),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: _buildToggleButton(
                 'Custom',
@@ -704,7 +704,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         ),
         
         if (!_isHousePattern) ...[
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -716,7 +716,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                   icon: Icons.label,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildCompactTextField(
                   controller: _oilPatternLengthController,
@@ -745,7 +745,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
               color: theme.colorScheme.primary,
               size: 16,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'Input Method',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -756,7 +756,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ],
         ),
         
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         Row(
           children: [
@@ -770,7 +770,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 () => setState(() => _selectedInputMethod = 'simple'),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: _buildInputMethodCard(
                 'Advanced',
@@ -800,7 +800,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
               color: theme.colorScheme.primary,
               size: 16,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'Scoring System',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -811,7 +811,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           ],
         ),
         
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         
         Row(
           children: [
@@ -822,7 +822,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 () => setState(() => _selectedScoringMethod = 'traditional'),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: _buildToggleButton(
                 'Current',
@@ -849,8 +849,8 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
-        padding: EdgeInsets.all(12),
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: isSelected 
             ? theme.colorScheme.primary.withOpacity(0.1)
@@ -875,7 +875,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                     : theme.colorScheme.onSurface.withOpacity(0.7),
                   size: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     title,
@@ -889,7 +889,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 ),
               ],
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               subtitle,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -901,7 +901,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               description,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -923,8 +923,8 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(vertical: 8),
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected 
             ? theme.colorScheme.primary.withOpacity(0.1)
@@ -953,7 +953,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
   Widget _buildFooter() {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 12, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Row(
         children: [
           // 上一步按鈕
@@ -963,11 +963,10 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                 text: 'Previous',
                 icon: Icons.arrow_back,
                 onPressed: _previousStep,
-                isPrimary: false,
                 height: 40,
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
           ],
           
           // 下一步/完成按鈕
@@ -996,7 +995,6 @@ void showCreateTrainingRecordDialog(
 ) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.05), // 極淺的背景遮罩
     builder: (BuildContext context) {
       return CreateTrainingRecordDialog(

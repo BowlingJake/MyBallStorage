@@ -16,31 +16,30 @@ enum StandardAppCardVariant {
   nested,
 }
 
-class StandardAppCard extends StatelessWidget {
+class StandardAppCard extends StatelessWidget { // 卡片變體
+
+  const StandardAppCard({
+    required this.child, super.key,
+    this.onTap,
+    this.margin = const EdgeInsets.symmetric(vertical: 8),
+    this.padding = const EdgeInsets.all(16),
+    this.constraints,
+    this.enableGlow = true, // 預設啟用光暈，保持向後相容
+    this.variant = StandardAppCardVariant.standard, // 預設為標準變體
+  });
   final Widget child;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
   final BoxConstraints? constraints;
   final bool enableGlow; // 是否啟用光暈效果
-  final StandardAppCardVariant variant; // 卡片變體
-
-  const StandardAppCard({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.margin = const EdgeInsets.symmetric(vertical: 8.0),
-    this.padding = const EdgeInsets.all(16.0),
-    this.constraints,
-    this.enableGlow = true, // 預設啟用光暈，保持向後相容
-    this.variant = StandardAppCardVariant.standard, // 預設為標準變體
-  });
+  final StandardAppCardVariant variant;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
-    final borderRadius = BorderRadius.circular(16.0);
+    final borderRadius = BorderRadius.circular(16);
 
     // 根據變體調整樣式強度
     final isNested = variant == StandardAppCardVariant.nested;

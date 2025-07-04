@@ -1,24 +1,22 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
-import '../../../models/training_record.dart';
 
 /// Enhanced Stats Display with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強統計顯示
 class EnhancedStatsDisplay extends StatelessWidget {
-  final TrainingDaySummary summary;
-  final ThemeData theme;
 
   const EnhancedStatsDisplay({
-    Key? key,
-    required this.summary,
-    required this.theme,
-  }) : super(key: key);
+    required this.summary, required this.theme, super.key,
+  });
+  final TrainingDaySummary summary;
+  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
@@ -38,12 +36,12 @@ class EnhancedStatsDisplay extends StatelessWidget {
           // 標題
           _buildTitle(),
           
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           
           // 主要統計
           _buildMainStats(),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 詳細統計
           _buildDetailedStats(),
@@ -60,7 +58,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
           color: theme.colorScheme.primary,
           size: 20,
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Text(
           'Performance Analytics',
           style: theme.textTheme.titleMedium?.copyWith(
@@ -85,7 +83,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // 最高分
         Expanded(
@@ -97,7 +95,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
           ),
         ),
         
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         
         // 最低分
         Expanded(
@@ -119,7 +117,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -134,7 +132,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
             color: color,
             size: 24,
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             value,
             style: theme.textTheme.titleLarge?.copyWith(
@@ -143,7 +141,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
               fontSize: 22,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -169,7 +167,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
                 Colors.green,
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: _buildPercentageBar(
                 'Spare %',
@@ -180,7 +178,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
           ],
         ),
         
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         
         // 總計統計
         _buildTotalStats(),
@@ -212,7 +210,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Container(
           height: 6,
           decoration: BoxDecoration(
@@ -243,7 +241,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
 
   Widget _buildTotalStats() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
@@ -295,7 +293,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
           color: color,
           size: 16,
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(
@@ -304,7 +302,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
             fontSize: 16,
           ),
         ),
-        SizedBox(height: 2),
+        const SizedBox(height: 2),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(

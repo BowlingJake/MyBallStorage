@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 // import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 // import '../../../models/bowling_ball.dart';
 import 'package:gradient_borders/gradient_borders.dart';
@@ -25,17 +25,17 @@ String cleanBrandName(String brandName) {
 
 // Helper function to adjust hue of a color by specified degrees
 Color adjustHue(Color color, double hueDelta) {
-  HSVColor hsvColor = HSVColor.fromColor(color);
-  double newHue = (hsvColor.hue + hueDelta) % 360;
+  final hsvColor = HSVColor.fromColor(color);
+  var newHue = (hsvColor.hue + hueDelta) % 360;
   if (newHue < 0) newHue += 360;
   return hsvColor.withHue(newHue).toColor();
 }
 
 // Helper function to create radial gradient overlay for matte effect
 RadialGradient createMatteOverlay(List<Color> brandColors) {
-  Color primaryColor = brandColors.first;
-  Color matteColor1 = adjustHue(primaryColor, 15.0);
-  Color matteColor2 = adjustHue(primaryColor, -12.0);
+  final primaryColor = brandColors.first;
+  final matteColor1 = adjustHue(primaryColor, 15);
+  final var matteColor2 = adjustHue(primaryColor, -12);
   
   return RadialGradient(
     center: const Alignment(0.3, -0.2),
@@ -51,25 +51,14 @@ RadialGradient createMatteOverlay(List<Color> brandColors) {
 }
 
 // 保齡球資料模型
-class BowlingBall {
-  final String id;
-  final String name;
-  final String brand;
-  final String coverstock; // 球皮類型（用於卡片顯示）
-  final String coverstockName; // 球皮完整名稱（用於詳細視窗）
-  final String core;
-  final String imageUrl; // Not used in the new card design directly
-  final double? rg; // RG (徑向迴轉半徑)
-  final double? differential; // Diff (差動值)
-  final double? massBias; // MB Diff (質量偏心)
+class BowlingBall { // MB Diff (質量偏心)
 
   BowlingBall({
     required this.id,
     required this.name,
     required this.brand,
     required this.coverstock,
-    this.coverstockName = '',
-    required this.core,
+    required this.core, this.coverstockName = '',
     this.imageUrl = 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball',
     this.rg,
     this.differential,
@@ -102,6 +91,16 @@ class BowlingBall {
       massBias: parseDouble(json['MB Diff']),
     );
   }
+  final String id;
+  final String name;
+  final String brand;
+  final String coverstock; // 球皮類型（用於卡片顯示）
+  final String coverstockName; // 球皮完整名稱（用於詳細視窗）
+  final String core;
+  final String imageUrl; // Not used in the new card design directly
+  final double? rg; // RG (徑向迴轉半徑)
+  final double? differential; // Diff (差動值)
+  final double? massBias;
 }
 
 // Helper class for metal texture background
@@ -126,7 +125,7 @@ class _MetalTexturePainter extends CustomPainter {
       ..color = Colors.grey[300]!.withOpacity(0.05)
       ..strokeWidth = 0.5;
 
-    for (double i = -size.height; i < size.width + size.height; i += 24) {
+    for (var i = -size.height; i < size.width + size.height; i += 24) {
       canvas.drawLine(
         Offset(i, 0),
         Offset(i + size.height, size.height),
@@ -141,15 +140,11 @@ class _MetalTexturePainter extends CustomPainter {
 
 // Helper class for the grid pattern on the card
 class _GridPainter extends CustomPainter {
+
+  _GridPainter();
   final Color gridColor;
   final double strokeWidth;
   final double spacing;
-
-  _GridPainter({
-    this.gridColor = Colors.white24,
-    this.strokeWidth = 0.5,
-    this.spacing = 8.0,
-  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -158,11 +153,11 @@ class _GridPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
-    for (double i = spacing; i < size.width; i += spacing) {
+    for (var i = spacing; i < size.width; i += spacing) {
       canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
     }
 
-    for (double i = spacing; i < size.height; i += spacing) {
+    for (var i = spacing; i < size.height; i += spacing) {
       canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
     }
   }
@@ -177,18 +172,17 @@ class _GridPainter extends CustomPainter {
 
 // Custom Card Item Widget with Color Ring Design
 class _BallCardItem extends StatelessWidget {
-  final BowlingBall ball;
-  final ThemeData theme;
-  final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
 
   const _BallCardItem({
-    Key? key,
     required this.ball,
     required this.theme,
     this.onTap,
     this.onLongPress,
-  }) : super(key: key);
+  });
+  final BowlingBall ball;
+  final ThemeData theme;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -196,11 +190,11 @@ class _BallCardItem extends StatelessWidget {
     final ringColor = brandPalette.shade600;
 
     // 根據品牌主色動態產生金屬光澤的漸層
-    final Color brandColor = brandPalette.primary;
-    final HSVColor hsvColor = HSVColor.fromColor(brandColor);
+    final brandColor = brandPalette.primary;
+    final hsvColor = HSVColor.fromColor(brandColor);
 
-    final Color highlightColor = hsvColor.withValue( (hsvColor.value + 0.3).clamp(0.0, 1.0) ).withSaturation( (hsvColor.saturation - 0.2).clamp(0.0, 1.0) ).toColor();
-    final Color shadowColor = hsvColor.withValue( (hsvColor.value - 0.4).clamp(0.0, 1.0) ).toColor();
+    final highlightColor = hsvColor.withValue( (hsvColor.value + 0.3).clamp(0.0, 1.0) ).withSaturation( (hsvColor.saturation - 0.2).clamp(0.0, 1.0) ).toColor();
+    final shadowColor = hsvColor.withValue( (hsvColor.value - 0.4).clamp(0.0, 1.0) ).toColor();
 
 
     final brandGradient = LinearGradient(
@@ -217,7 +211,7 @@ class _BallCardItem extends StatelessWidget {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         border: GradientBoxBorder(
@@ -237,7 +231,6 @@ class _BallCardItem extends StatelessWidget {
             color: brandColor.withOpacity(0.3),
             blurRadius: 10,
             spreadRadius: 2,
-            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -251,7 +244,7 @@ class _BallCardItem extends StatelessWidget {
           onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(15), // 確保點擊效果也被裁切
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Stack(
               children: [
                 // 主要內容 - 兩行佈局
@@ -267,13 +260,13 @@ class _BallCardItem extends StatelessWidget {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6.0),
+                    const SizedBox(height: 6),
                     // 第二行：Core Type 和 Cover Type
                     Row(
                       children: [
                         Expanded(
                           child: Text(
-                            "Core Type: ${getCoreCategory(ball.core)}",
+                            'Core Type: ${getCoreCategory(ball.core)}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.8),
                             ),
@@ -292,7 +285,7 @@ class _BallCardItem extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            "Cover Type: ${ball.coverstock}",
+                            'Cover Type: ${ball.coverstock}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withOpacity(0.8),
                             ),
@@ -308,10 +301,10 @@ class _BallCardItem extends StatelessWidget {
                   top: 0,
                   right: 0, 
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     decoration: BoxDecoration(
                       color: ringColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(14.0),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
                       cleanBrandName(ball.brand),
@@ -333,7 +326,7 @@ class _BallCardItem extends StatelessWidget {
 }
 
 class BallListView extends ConsumerWidget {
-  const BallListView({Key? key}) : super(key: key);
+  const BallListView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -356,7 +349,7 @@ class BallListView extends ConsumerWidget {
           ),
         ),
         ListView.builder(
-          padding: const EdgeInsets.only(bottom: 32.0),
+          padding: const EdgeInsets.only(bottom: 32),
           itemCount: balls.length,
           itemBuilder: (context, index) {
             final ball = balls[index];

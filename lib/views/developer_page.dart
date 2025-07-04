@@ -1,7 +1,6 @@
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/glow_border_button.dart';
 import 'package:flutter/material.dart';
-import '../theme/theme.dart';
-import '../widgets/app_standard_button.dart';
-import '../widgets/glow_border_button.dart';
 
 class DeveloperPage extends StatelessWidget {
   const DeveloperPage({super.key});
@@ -17,7 +16,7 @@ class DeveloperPage extends StatelessWidget {
         backgroundColor: theme.colorScheme.surface,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         children: [
           _buildSectionTitle(context, 'APP 標準按鈕 (App Standard Button)'),
           const SizedBox(height: 16),
@@ -74,10 +73,10 @@ class DeveloperPage extends StatelessWidget {
           _buildSectionTitle(context, '顏色 (Colors)'),
           const SizedBox(height: 8),
           _buildColorSwatch(context, 'Primary/Accent', theme.colorScheme.primary),
-          _buildColorSwatch(context, 'Background', theme.colorScheme.background),
+          _buildColorSwatch(context, 'Background', theme.colorScheme.surface),
           _buildColorSwatch(context, 'Surface', theme.colorScheme.surface),
           _buildColorSwatch(context, 'On Primary', theme.colorScheme.onPrimary),
-          _buildColorSwatch(context, 'On Background', theme.colorScheme.onBackground),
+          _buildColorSwatch(context, 'On Background', theme.colorScheme.onSurface),
           const SizedBox(height: 24),
 
           _buildSectionTitle(context, '文字樣式 (Typography)'),
@@ -116,7 +115,7 @@ class DeveloperPage extends StatelessWidget {
       color: color,
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Text(
           name,
           style: TextStyle(
@@ -133,7 +132,7 @@ class DeveloperPage extends StatelessWidget {
   Widget _buildTextStyleExample(String name, TextStyle? style) {
     if (style == null) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Text(name, style: style),
     );
   }

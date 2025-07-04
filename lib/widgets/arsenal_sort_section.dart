@@ -1,17 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/material.dart';
 
 class ArsenalSortSection extends StatelessWidget {
+
+  const ArsenalSortSection({
+    required this.sortBy, required this.sortAscending, required this.onSortChanged, super.key,
+  });
   final String sortBy;
   final bool sortAscending;
   final Function(String sortField, bool ascending) onSortChanged;
-
-  const ArsenalSortSection({
-    Key? key,
-    required this.sortBy,
-    required this.sortAscending,
-    required this.onSortChanged,
-  }) : super(key: key);
 
   // Helper function to get current sort option string
   String get _currentSortOption {
@@ -28,11 +25,11 @@ class ArsenalSortSection extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
           Text('Sort', style: theme.textTheme.labelMedium),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Expanded(
             child: _buildSortDropdown(context, theme),
           ),
@@ -42,7 +39,7 @@ class ArsenalSortSection extends StatelessWidget {
   }
 
   Widget _buildSortDropdown(BuildContext context, ThemeData theme) {
-    final List<String> sortOptions = [
+    final sortOptions = <String>[
       'Name A to Z',
       'Name Z to A', 
       'RG High to Low',
@@ -56,25 +53,21 @@ class ArsenalSortSection extends StatelessWidget {
           value: option,
           child: Text(
             option,
-            style: TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 12),
             overflow: TextOverflow.ellipsis,
           ),
-        )).toList(),
+        ),).toList(),
         onChanged: (String? value) {
           if (value != null) {
             switch (value) {
               case 'Name A to Z':
                 onSortChanged('Name', true);
-                break;
               case 'Name Z to A':
                 onSortChanged('Name', false);
-                break;
               case 'RG High to Low':
                 onSortChanged('RG', false);
-                break;
               case 'RG Low to High':
                 onSortChanged('RG', true);
-                break;
             }
           }
         },
@@ -86,7 +79,6 @@ class ArsenalSortSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: theme.colorScheme.outline.withOpacity(0.5),
-              width: 1,
             ),
             color: theme.colorScheme.surface,
           ),
@@ -111,7 +103,6 @@ class ArsenalSortSection extends StatelessWidget {
               ),
             ],
           ),
-          offset: const Offset(0, 0),
           scrollbarTheme: ScrollbarThemeData(
             radius: const Radius.circular(40),
             thickness: WidgetStateProperty.all(6),

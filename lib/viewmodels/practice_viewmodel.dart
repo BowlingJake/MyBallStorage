@@ -1,7 +1,8 @@
 import 'dart:collection';
+
+import 'package:bowlingarsenal_app/models/practice_record.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/practice_record.dart';
 
 class PracticeViewModel extends ChangeNotifier {
   static const String _storageKey = 'practice_records';

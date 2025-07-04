@@ -1,20 +1,18 @@
 // my_arsenal_page.dart
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:developer';
-import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
-import 'package:getwidget/getwidget.dart';
 import 'dart:convert';
-import 'widgets/arsenal_search_bar.dart';
-import 'widgets/arsenal_filter_section.dart';
-import 'widgets/arsenal_sort_section.dart';
-import 'widgets/ball_list_header.dart';
-import 'widgets/ball_list_view.dart';
-import 'widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
-import 'widgets/filter_popout.dart'; // 導入篩選彈窗
-import 'widgets/modern_bottom_navigation.dart'; // 導入現代化底部導覽列
-import 'widgets/professional_dark_background.dart'; // 導入Professional Dark背景
-import 'my_training_page.dart';
+import 'dart:developer';
+
+import 'package:bowlingarsenal_app/my_training_page.dart';
+import 'package:bowlingarsenal_app/widgets/arsenal_search_bar.dart';
+import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart'; // 導入球詳細資訊彈出框
+import 'package:bowlingarsenal_app/widgets/ball_list_header.dart';
+import 'package:bowlingarsenal_app/widgets/ball_list_view.dart';
+import 'package:bowlingarsenal_app/widgets/filter_popout.dart'; // 導入篩選彈窗
+import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart'; // 導入現代化底部導覽列
+import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart'; // 導入Professional Dark背景
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
 
 class BallLibraryPage extends StatefulWidget {
   const BallLibraryPage({super.key});
@@ -27,7 +25,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   List<BowlingBall> _bowlingBalls = <BowlingBall>[];
 
   String _searchText = '';
-  Map<String, String?> _selectedFilters = {
+  final Map<String, String?> _selectedFilters = {
     'brand': null,
     'core': null,
     'coverstock': null,
@@ -42,7 +40,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   }
 
   Future<void> _loadMockData() async {
-    final String jsonString = await rootBundle.loadString('assets/bowling_ball_data.json');
+    final jsonString = await rootBundle.loadString('assets/bowling_ball_data.json');
     final List<dynamic> jsonList = json.decode(jsonString);
     setState(() {
       _bowlingBalls = jsonList.map((e) => BowlingBall.fromJson(e)).toList();
@@ -98,13 +96,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
 
   // 篩選和排序後的列表
   List<BowlingBall> get _filteredAndSortedBalls {
-    List<BowlingBall> items = List.from(_bowlingBalls);
+    var items = List<BowlingBall>.from(_bowlingBalls);
 
     // 搜尋邏輯
     if (_searchText.isNotEmpty) {
       items = items.where((ball) =>
         ball.name.toLowerCase().contains(_searchText.toLowerCase()) ||
-        ball.brand.toLowerCase().contains(_searchText.toLowerCase())
+        ball.brand.toLowerCase().contains(_searchText.toLowerCase()),
       ).toList();
     }
 
@@ -125,7 +123,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
       switch (_sortBy) {
         case 'Name':
           comparison = a.name.compareTo(b.name);
-          break;
         case 'RG':
           // RG 排序，如果其中一個沒有 RG 值，將其排在後面
           if (a.rg == null && b.rg == null) {
@@ -143,7 +140,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
               comparison = a.name.compareTo(b.name);
             }
           }
-          break;
         default:
           comparison = a.name.compareTo(b.name);
       }
@@ -163,7 +159,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
       return 'Filter';
     }
     
-    int activeCount = _selectedFilters.values.where((filter) => filter != null).length;
+    final activeCount = _selectedFilters.values.where((filter) => filter != null).length;
     return 'Filter ($activeCount)';
   }
 
@@ -174,20 +170,17 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
     switch (index) {
       case 0: // 首頁
         Navigator.of(context).pop(); // 返回首頁
-        break;
       case 1: // 社群 (Ball Library)
         // 已經在Ball Library頁面，不需要導航
         setState(() {
           _bottomNavIndex = 1;
         });
-        break;
       case 2: // 中央按鈕 (新增)
         setState(() {
           _bottomNavIndex = index;
         });
         print('Add button tapped in Ball Library');
         // TODO: 實現新增球的功能
-        break;
       case 3: // 訓練
         Navigator.push(
           context,
@@ -198,7 +191,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
             _bottomNavIndex = 1;
           });
         });
-        break;
       case 4: // 個人
         setState(() {
           _bottomNavIndex = index;
@@ -207,7 +199,6 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
           log('Profile button tapped in Ball Library');
         }
         // TODO: 導航到個人頁面
-        break;
     }
     
     print('Bottom Nav Tapped in Ball Library: $index');
@@ -218,12 +209,11 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
     final theme = Theme.of(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
+      value: const SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
       ),
       child: ProfessionalDarkBackground(
-        backgroundImage: 'images/Sport_Tech_Background.png',
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
@@ -242,7 +232,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
             ),
             // 添加細微的底部邊框
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(1),
+              preferredSize: const Size.fromHeight(1),
               child: Container(
                 height: 1,
                 decoration: BoxDecoration(
@@ -274,7 +264,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
               
               // 篩選和排序區域
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     // 篩選按鈕
@@ -295,7 +285,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                             );
                           },
                           style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // 移除vertical padding
+                            padding: const EdgeInsets.symmetric(horizontal: 12), // 移除vertical padding
                             minimumSize: Size.zero, // 移除最小尺寸限制
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊區域
                             side: BorderSide(
@@ -318,7 +308,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                                 size: 18,
                                 color: theme.colorScheme.primary,
                               ),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
                                 _getFilterButtonText(),
                                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -343,14 +333,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                       child: SizedBox(
                         height: 44, // 統一固定高度
                         child: PopupMenuButton<String>(
-                          offset: Offset(0, 50), // 調整選單位置，讓它出現在按鈕下方
+                          offset: const Offset(0, 50), // 調整選單位置，讓它出現在按鈕下方
                           color: theme.colorScheme.surface.withOpacity(0.95), // 半透明背景
                           elevation: 8, // 增加陰影深度
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12), // 圓角
                             side: BorderSide(
                               color: theme.colorScheme.primary.withOpacity(0.3),
-                              width: 1,
                             ),
                           ),
                           onSelected: (value) {
@@ -370,7 +359,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
                                     'Name (A-Z)',
                                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -385,7 +374,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.sort_by_alpha, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
                                     'Name (Z-A)',
                                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -400,7 +389,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
                                     'RG (Low-High)',
                                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -415,7 +404,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.numbers, size: 20, color: theme.colorScheme.primary),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
                                     'RG (High-Low)',
                                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -429,7 +418,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                           child: Container(
                             width: double.infinity,
                             height: double.infinity, // 填滿SizedBox的高度
-                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: theme.colorScheme.primary.withOpacity(0.5),
@@ -446,7 +435,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                                   size: 18,
                                   color: theme.colorScheme.primary,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
                                   'Sort: $_sortBy',
                                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -457,7 +446,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Icon(
                                   Icons.keyboard_arrow_down,
                                   size: 18,
@@ -488,7 +477,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor: theme.colorScheme.error.withOpacity(0.1),
-                          padding: EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(6),
                         ),
                         tooltip: 'Clear all filters',
                       ),
@@ -498,7 +487,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
               ),
               
               // 列表標題
-              BallListHeader(),
+              const BallListHeader(),
               
               // 16dp 間距
               const SizedBox(height: 16),
@@ -545,14 +534,13 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
         border: Border(
           top: BorderSide(
             color: theme.colorScheme.outlineVariant.withOpacity(0.3),
-            width: 1,
           ),
         ),
       ),
@@ -572,11 +560,11 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
   }
 
   Widget _buildGradientNavItem(IconData icon, String label, int index, ThemeData theme, {bool isCenter = false}) {
-    final bool isSelected = _bottomNavIndex == index;
+    final isSelected = _bottomNavIndex == index;
     return GestureDetector(
       onTap: () => _onBottomNavTapped(index),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -595,7 +583,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
                       BoxShadow(
                         color: theme.colorScheme.primary.withOpacity(0.3),
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   )
@@ -609,7 +597,7 @@ class _BallLibraryPageState extends State<BallLibraryPage> {
               ),
             ),
             if (label.isNotEmpty) ...[
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(

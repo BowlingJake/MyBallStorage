@@ -1,31 +1,28 @@
-import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/material.dart';
 
 class ArsenalFilterSection extends StatelessWidget {
-  final Map<String, String?> selectedFilters;
-  final Function(String filterType, String? value) onFilterChanged;
 
   const ArsenalFilterSection({
-    Key? key,
-    required this.selectedFilters,
-    required this.onFilterChanged,
-  }) : super(key: key);
+    required this.selectedFilters, required this.onFilterChanged, super.key,
+  });
+  final Map<String, String?> selectedFilters;
+  final Function(String filterType, String? value) onFilterChanged;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
         children: [
           Text('Filter', style: theme.textTheme.labelMedium),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Expanded(
             child: Row(
               children: [
                 Flexible(
-                  flex: 1,
                   child: _buildDropdown(
                     context: context,
                     label: 'Brand',
@@ -34,9 +31,8 @@ class ArsenalFilterSection extends StatelessWidget {
                     onChanged: (value) => onFilterChanged('brand', value),
                   ),
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Flexible(
-                  flex: 1,
                   child: _buildDropdown(
                     context: context,
                     label: 'Core',
@@ -45,9 +41,8 @@ class ArsenalFilterSection extends StatelessWidget {
                     onChanged: (value) => onFilterChanged('core', value),
                   ),
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Flexible(
-                  flex: 1,
                   child: _buildDropdown(
                     context: context,
                     label: 'Coverstock',
@@ -92,20 +87,19 @@ class ArsenalFilterSection extends StatelessWidget {
         ),
         items: [
           DropdownMenuItem<String>(
-            value: null,
             child: Text(
               getAllText(label),
-              style: TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12),
             ),
           ),
           ...items.map((item) => DropdownMenuItem<String>(
             value: item,
             child: Text(
               item,
-              style: TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12),
               overflow: TextOverflow.ellipsis,
             ),
-          )).toList(),
+          ),),
         ],
         onChanged: onChanged,
         isExpanded: true,
@@ -116,7 +110,6 @@ class ArsenalFilterSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: theme.colorScheme.outline.withOpacity(0.5),
-              width: 1,
             ),
             color: theme.colorScheme.surface,
           ),
@@ -141,7 +134,6 @@ class ArsenalFilterSection extends StatelessWidget {
               ),
             ],
           ),
-          offset: const Offset(0, 0),
           scrollbarTheme: ScrollbarThemeData(
             radius: const Radius.circular(40),
             thickness: WidgetStateProperty.all(6),

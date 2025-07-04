@@ -1,21 +1,21 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/models/tournament.dart'; // Correct model import
+import 'package:bowlingarsenal_app/shared/dialogs/layout_dialog.dart'; // For layout dialog
+import 'package:bowlingarsenal_app/shared/enums.dart'; // for TournamentType
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/tournament_viewmodel.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart'; // For ball selection
+import 'package:bowlingarsenal_app/views/ball_library_page.dart'; // For navigating to ball selection
 import 'package:flutter/material.dart';
-import '../shared/enums.dart'; // for TournamentType
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:provider/provider.dart';
-import '../models/bowling_ball.dart';
-import '../models/tournament.dart'; // Correct model import
-import '../viewmodels/tournament_viewmodel.dart';
-import '../viewmodels/weapon_library_viewmodel.dart'; // For ball selection
-import 'ball_library_page.dart'; // For navigating to ball selection
-import '../shared/dialogs/layout_dialog.dart'; // For layout dialog
-import '../theme/text_styles.dart';
 
 // Removed TournamentType and OpenTournamentFormat enums if they were defined here
 // Assuming they are defined in tournament_model.dart or elsewhere
 class BasicTournamentInfoPage extends StatefulWidget {
-  final Tournament? tournamentToEdit;
 
   const BasicTournamentInfoPage({super.key, this.tournamentToEdit});
+  final Tournament? tournamentToEdit;
 
   @override
   _BasicTournamentInfoPageState createState() => _BasicTournamentInfoPageState();
@@ -51,7 +51,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
   }
 
   Future<void> _selectDateRange(BuildContext context) async {
-    DateTimeRange? picked = await showDateRangePicker(
+    final var picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
@@ -118,7 +118,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
 
         Navigator.pop(context);
       } catch (e) {
-        print("Error saving tournament: $e");
+        print('Error saving tournament: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('儲存賽事時發生錯誤')),
         );
@@ -143,9 +143,9 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
       },
       child: Card(
         elevation: 2,
-        margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+        margin: const EdgeInsets.only(right: 8, bottom: 8),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min, // Keep column tight
             children: [
@@ -173,7 +173,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
     // Access the ViewModel to get ball objects from names
     final viewModel = context.watch<WeaponLibraryViewModel>();
     // Find the actual BowlingBall objects based on selected names
-    final List<BowlingBall> selectedBalls = _selectedTournamentBallNames
+    final selectedBalls = _selectedTournamentBallNames
         .map((name) {
           // Find the ball in the ViewModel's arsenal list
           try {
@@ -193,7 +193,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           children: <Widget>[
             // 賽事名稱
             TextFormField(
@@ -282,24 +282,24 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
             // Display selected ball cards
             if (selectedBalls.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(left: 0.0), // No indent needed for Wrap
+                padding: const EdgeInsets.only(), // No indent needed for Wrap
                 child: Wrap( // Use Wrap to display cards horizontally
-                   spacing: 8.0, // Horizontal space between cards
-                   runSpacing: 4.0, // Vertical space between lines
+                   spacing: 8, // Horizontal space between cards
+                   runSpacing: 4, // Vertical space between lines
                    children: selectedBalls.map((ball) => _buildSmallBallCard(context, ball)).toList(),
-                )
+                ),
               )
             else
-              Padding(
-                 padding: const EdgeInsets.only(left: 16.0), 
-                 child: const Text('尚未選擇賽事用球', style: AppTextStyles.caption),
+              const Padding(
+                 padding: EdgeInsets.only(left: 16), 
+                 child: Text('尚未選擇賽事用球', style: AppTextStyles.caption),
               ),
 
             const SizedBox(height: 24),
 
             // Save Button
             Padding(
-              padding: const EdgeInsets.only(top: 32.0), // Add space before button
+              padding: const EdgeInsets.only(top: 32), // Add space before button
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.arrow_forward),
                 label: const Text('儲存並下一步', style: AppTextStyles.button),
@@ -309,7 +309,7 @@ class _BasicTournamentInfoPageState extends State<BasicTournamentInfoPage> {
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

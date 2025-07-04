@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
-import 'package:iconsax/iconsax.dart';
+
 import 'package:bowlingarsenal_app/widgets/common/dialogs/create_ball_bag_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/common/dialogs/edit_ball_bag_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart';
 // import '../../theme/theme.dart';
 
 /// Ball Bag Options Dialog with modern glassmorphism design, refined based on professional feedback.
@@ -46,12 +47,11 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                 boxShadow: AppGlows.medium,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Iconsax.setting_2,
@@ -81,7 +81,7 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                             scale: closeButtonScale,
                             duration: const Duration(milliseconds: 150),
                             child: Container(
-                              padding: const EdgeInsets.all(4.0),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.5),
                                 shape: BoxShape.circle,
@@ -148,10 +148,6 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
 }
 
 class _ModernOptionButton extends StatefulWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
 
   const _ModernOptionButton({
     required this.title,
@@ -159,6 +155,10 @@ class _ModernOptionButton extends StatefulWidget {
     required this.icon,
     required this.onTap,
   });
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
 
   @override
   State<_ModernOptionButton> createState() => _ModernOptionButtonState();
@@ -174,7 +174,7 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
     final isInteracting = _isHovered || _isPressed;
 
     // 根據互動狀態計算亮度
-    final double brightnessFactor = _isPressed ? 0.15 : (_isHovered ? 0.08 : 0);
+    final brightnessFactor = _isPressed ? 0.15 : (_isHovered ? 0.08 : 0);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -199,7 +199,6 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
             ),
             border: Border.all(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
-              width: 1,
             ),
             // Pressed 狀態下的 Inner Shadow
             boxShadow: _isPressed ? [
@@ -211,7 +210,7 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
             ] : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // 增加 Padding
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // 增加 Padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -227,8 +226,8 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
                       Shadow(
                         color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
                         blurRadius: 4,
-                      )
-                    ]
+                      ),
+                    ],
                   ),
                   textAlign: TextAlign.center,
                 ),

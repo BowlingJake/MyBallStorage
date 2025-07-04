@@ -1,17 +1,20 @@
+import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/views/edit_user_page.dart';
 import 'package:flutter/material.dart';
-import '../services/user_preferences_service.dart';
-import 'edit_user_page.dart';
-import '../theme/text_styles.dart';
 
 class UserInfoPage extends StatefulWidget {
-  const UserInfoPage({Key? key}) : super(key: key);
+  const UserInfoPage({super.key});
   @override
   _UserInfoPageState createState() => _UserInfoPageState();
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
   final _svc = UserPreferencesService();
-  String _nickname = '', _hand = '', _ballPath = '', _pap = '';
+  String _nickname = '';
+  String _hand = '';
+  String _ballPath = '';
+  String _pap = '';
 
   @override
   void initState() {
@@ -43,7 +46,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 MaterialPageRoute(builder: (_) => const EditUserPage()),
               ).then((_) => _loadProfile());
             },
-          )
+          ),
         ],
       ),
       body: ListView(

@@ -1,50 +1,80 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/training/components/game_list_item.dart';
+import 'package:bowlingarsenal_app/widgets/training/components/training_day_equipment.dart';
+import 'package:bowlingarsenal_app/widgets/training/components/training_day_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/training_record.dart';
-import '../app_standard_button.dart';
-import 'components/training_day_equipment.dart';
-import 'components/training_day_stats.dart';
-import 'components/game_list_item.dart';
 
-// 資訊顯示狀態枚舉
+/// Enum for the visibility state of the info section.
 enum InfoVisibility {
-  hidden,   // 隱藏
-  visible,  // 顯示
+  /// The info section is hidden.
+  hidden,
+
+  /// The info section is visible.
+  visible,
 }
 
-// 分頁類型枚舉
+/// Enum for the type of tab selected.
 enum TabType {
-  games,       // 遊戲列表頁籤  
-  equipment,   // 球具頁籤
-  statistics,  // 統計頁籤
+  /// The games tab.
+  games,
+
+  /// The equipment tab.
+  equipment,
+
+  /// The statistics tab.
+  statistics,
 }
 
-// 訓練日摘要卡片 - 支援收合展開的分層設計
+/// A card that displays a summary of a training day.
+///
+/// This widget is collapsible and expandable, showing different levels of detail.
 class TrainingDaySummaryCard extends StatefulWidget {
-  final TrainingDaySummary summary;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-  final VoidCallback? onAddGame;
-  final VoidCallback? onEdit; // 新增編輯回調
-  final bool isSelectionMode;
-  final bool isSelected;
-  final ValueChanged<bool>? onSelectionChanged;
-  final Function(GameRecord)? onGameTap;
-  final Function(GameRecord)? onGameDelete;
-
+  /// Creates a [TrainingDaySummaryCard].
   const TrainingDaySummaryCard({
-    Key? key,
     required this.summary,
     this.onTap,
     this.onDelete,
     this.onAddGame,
-    this.onEdit, // 新增編輯回調
+    this.onEdit,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.onSelectionChanged,
     this.onGameTap,
     this.onGameDelete,
-  }) : super(key: key);
+    super.key,
+  });
+
+  /// The summary data for the training day.
+  final TrainingDaySummary summary;
+
+  /// Callback when the card is tapped.
+  final VoidCallback? onTap;
+
+  /// Callback when the delete action is triggered.
+  final VoidCallback? onDelete;
+
+  /// Callback when the add game action is triggered.
+  final VoidCallback? onAddGame;
+
+  /// Callback when the edit action is triggered.
+  final VoidCallback? onEdit;
+
+  /// Whether the card is in selection mode.
+  final bool isSelectionMode;
+
+  /// Whether the card is currently selected.
+  final bool isSelected;
+
+  /// Callback when the selection state changes.
+  final ValueChanged<bool>? onSelectionChanged;
+
+  /// Callback when a game is tapped.
+  final void Function(GameRecord)? onGameTap;
+
+  /// Callback when a game is deleted.
+  final void Function(GameRecord)? onGameDelete;
 
   @override
   State<TrainingDaySummaryCard> createState() => _TrainingDaySummaryCardState();
@@ -52,18 +82,18 @@ class TrainingDaySummaryCard extends StatefulWidget {
 
 class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
   bool _isExpanded = false;
-  InfoVisibility _infoVisibility = InfoVisibility.visible; // 資訊顯示狀態
-  TabType _selectedTab = TabType.games; // 當前選中的分頁，默認顯示遊戲列表
+  InfoVisibility _infoVisibility = InfoVisibility.visible;
+  TabType _selectedTab = TabType.games;
 
   @override
   void initState() {
     super.initState();
 
     _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
@@ -80,16 +110,17 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
   }
 
   void _toggleExpanded() {
-    if (!widget.isSelectionMode) {
-      setState(() {
-        _isExpanded = !_isExpanded;
-        if (_isExpanded) {
-          _controller.forward();
-        } else {
-          _controller.reverse();
-        }
-      });
+    if (widget.isSelectionMode) {
+      return;
     }
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
   }
 
   /// 構建統一樣式的控制按鈕
@@ -103,14 +134,13 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
     return Tooltip(
       message: tooltip,
       child: Container(
-        width: 32, // 恢復按鈕尺寸，讓它們更容易點擊
-        height: 32, // 恢復按鈕尺寸，讓它們更容易點擊
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1,
+            color: color.withAlpha(77), // 0.3 opacity
           ),
         ),
         child: Material(
@@ -121,17 +151,17 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
             child: rotation != null
                 ? AnimatedRotation(
                     turns: rotation,
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     child: Icon(
                       icon,
-                      size: 18, // 恢復圖標尺寸
-                      color: color.withOpacity(0.8),
+                      size: 18,
+                      color: color.withAlpha(204), // 0.8 opacity
                     ),
                   )
                 : Icon(
                     icon,
-                    size: 18, // 恢復圖標尺寸
-                    color: color.withOpacity(0.8),
+                    size: 18,
+                    color: color.withAlpha(204), // 0.8 opacity
                   ),
           ),
         ),
@@ -145,7 +175,6 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
       children: [
         // 日期區域 (33.33%)
         Expanded(
-          flex: 1,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -154,7 +183,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                 size: 12,
                 color: theme.colorScheme.primary,
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   DateFormat('yyyy.MM.dd', 'en_US').format(widget.summary.date),
@@ -172,21 +201,20 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
         
         // 地點區域 (33.33%)
         Expanded(
-          flex: 1,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.location_on,
                 size: 12,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha(179), // 0.7 opacity
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   widget.summary.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha(179), // 0.7 opacity
                     fontSize: 11,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -198,21 +226,20 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
         
         // 油圖區域 (33.33%)
         Expanded(
-          flex: 1,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.opacity,
                 size: 12,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha(179), // 0.7 opacity
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   widget.summary.oilPatternDisplay,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha(179), // 0.7 opacity
                     fontSize: 11,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -230,7 +257,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
     final theme = Theme.of(context);
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: GestureDetector(
         onTap: () {
           if (widget.isSelectionMode) {
@@ -240,16 +267,12 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
           }
           widget.onTap?.call();
         },
-        onLongPress: () {
-          if (!widget.isSelectionMode && widget.onEdit != null) {
-            widget.onEdit!();
-          }
-        },
+        onLongPress: widget.onEdit,
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOutCubic,
           child: Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: widget.isSelected
                   ? theme.colorScheme.primary.withOpacity(0.1)
@@ -267,12 +290,12 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                       ? theme.colorScheme.primary.withOpacity(0.2)
                       : theme.colorScheme.primary.withOpacity(0.1),
                   blurRadius: widget.isSelected ? 16 : 12,
-                  offset: Offset(0, 4),
+                  offset: const Offset(0, 4),
                 ),
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -288,7 +311,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                       Container(
                         width: 24,
                         height: 24,
-                        margin: EdgeInsets.only(top: 2),
+                        margin: const EdgeInsets.only(top: 2),
                         decoration: BoxDecoration(
                           color: widget.isSelected
                               ? theme.colorScheme.primary
@@ -309,7 +332,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               )
                             : null,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                     ],
                     
                     // 標題區域
@@ -334,8 +357,8 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                     
                     // 遊戲數量徽章
                     Container(
-                      margin: EdgeInsets.only(top: 2, left: 8, right: 4),
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      margin: const EdgeInsets.only(top: 2, left: 8, right: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(10),
@@ -372,7 +395,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               ? '隱藏資訊' 
                               : '顯示資訊',
                           ),
-                          SizedBox(width: 8), // 恢復間距
+                          const SizedBox(width: 8), // 恢復間距
                           // 刪除按鈕
                           if (widget.onDelete != null)
                             _buildControlButton(
@@ -381,7 +404,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               onTap: widget.onDelete!,
                               tooltip: '刪除訓練日',
                             ),
-                          SizedBox(width: 8), // 恢復間距
+                          const SizedBox(width: 8), // 恢復間距
                           // 展開/收起指示器
                           _buildControlButton(
                             icon: Icons.keyboard_arrow_down,
@@ -395,7 +418,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                   ],
                 ),
                 
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
 
                 // 資訊區域（根據模式顯示不同內容）
                 _buildInfoContent(theme),
@@ -410,13 +433,13 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                       sizeFactor: _animation,
                       axisAlignment: -1,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.only(top: 16),
                         child: Column(
                           children: [
                             // 分隔線
                             Container(
                               height: 1,
-                              margin: EdgeInsets.only(bottom: 16),
+                              margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
@@ -433,17 +456,16 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               children: [
                                 Expanded(
                                   child: AppStandardButton(
-                                    text: "Edit Training Day",
+                                    text: 'Edit Training Day',
                                     icon: Icons.edit,
                                     onPressed: widget.onEdit ?? () {},
                                     height: 32,
-                                    isPrimary: false,
                                   ),
                                 ),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: AppStandardButton(
-                                    text: "Add games",
+                                    text: 'Add games',
                                     icon: Icons.add_chart,
                                     onPressed: widget.onAddGame ?? () {},
                                     height: 32,
@@ -470,14 +492,14 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
       firstChild: Column(
         children: [
           _buildVisibleContent(theme),
-          SizedBox(height: 16), // 整個頁籤區域與下方資訊的間距
+          const SizedBox(height: 16), // 整個頁籤區域與下方資訊的間距
         ],
       ),
-      secondChild: SizedBox.shrink(),
+      secondChild: const SizedBox.shrink(),
       crossFadeState: _infoVisibility == InfoVisibility.visible
           ? CrossFadeState.showFirst 
           : CrossFadeState.showSecond,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -495,10 +517,10 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
           // 分頁內容（緊湊的 padding）
           Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: _buildTabContent(theme),
           ),
-          SizedBox(height: 4), // 恢復內部小間距
+          const SizedBox(height: 4), // 恢復內部小間距
         ],
       ),
     );
@@ -506,7 +528,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
 
   // 構建一體化分頁標籤標題
   Widget _buildIntegratedTabHeader(ThemeData theme) {
-    return Container(
+    return SizedBox(
       height: 42, // 增加高度以獲得更好的視覺效果
       child: Row(
         children: [
@@ -554,14 +576,14 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
         });
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         height: 42,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected 
             ? theme.colorScheme.primary.withOpacity(0.1)
             : Colors.transparent,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
         ),
         child: Center(
           child: Text(
@@ -592,7 +614,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
       case TabType.statistics:
         return TrainingDayStats(summary: widget.summary, theme: theme);
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 
@@ -602,7 +624,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
 
     if (games.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
             Icon(
@@ -610,9 +632,9 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
               size: 40,
               color: theme.colorScheme.onSurface.withOpacity(0.4),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              "No games recorded for this day yet.",
+              'No games recorded for this day yet.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -627,7 +649,7 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
       ListView.builder(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: games.length,
         itemBuilder: (context, index) {
           final game = games[index];
@@ -639,19 +661,19 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
           );
         },
       ),
-    ]);
+    ],);
   }
 }
 
 // 自定義繪製器 - 繪製分頁與內容一體化邊框
 class TabContentBorderPainter extends CustomPainter {
-  final TabType selectedTab;
-  final Color primaryColor;
   
   TabContentBorderPainter({
     required this.selectedTab,
     required this.primaryColor,
   });
+  final TabType selectedTab;
+  final Color primaryColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -663,9 +685,9 @@ class TabContentBorderPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
-    final tabHeight = 42.0; // 更新分頁高度
+    const tabHeight = 42.0; // 更新分頁高度
     final thirdWidth = size.width / 3;
-    final radius = 8.0;
+    const radius = 8.0;
 
     // 根據選中的分頁繪製不同的邊框路徑
     switch (selectedTab) {
@@ -685,7 +707,6 @@ class TabContentBorderPainter extends CustomPainter {
         path.lineTo(radius, size.height);
         path.quadraticBezierTo(0, size.height, 0, size.height - radius);
         path.close();
-        break;
         
       case TabType.equipment:
         // Equipment 分頁選中 - 中間分頁與內容連接
@@ -706,7 +727,6 @@ class TabContentBorderPainter extends CustomPainter {
         path.lineTo(radius, size.height);
         path.quadraticBezierTo(0, size.height, 0, size.height - radius);
         path.close();
-        break;
         
       case TabType.statistics:
         // Statistics 分頁選中 - 右側分頁與內容連接
@@ -723,7 +743,6 @@ class TabContentBorderPainter extends CustomPainter {
         path.lineTo(radius, size.height);
         path.quadraticBezierTo(0, size.height, 0, size.height - radius);
         path.close();
-        break;
     }
 
     canvas.drawPath(path, paint);

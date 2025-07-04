@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 class TournamentSection extends StatelessWidget {
+
+  const TournamentSection({
+    super.key,
+    this.tournamentItems,
+    this.onSeeAllPressed,
+    this.onItemPressed,
+  });
   final List<Map<String, String>>? tournamentItems;
   final VoidCallback? onSeeAllPressed;
   final void Function(int index)? onItemPressed;
 
-  const TournamentSection({
-    Key? key,
-    this.tournamentItems,
-    this.onSeeAllPressed,
-    this.onItemPressed,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> items = tournamentItems ?? _getDefaultTournamentItems();
+    final items = tournamentItems ?? _getDefaultTournamentItems();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,32 +28,31 @@ class TournamentSection extends StatelessWidget {
             ) ?? TextStyle(
               fontSize: 20, 
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onBackground,
-            )),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),),
             TextButton(
               onPressed: onSeeAllPressed ?? () => print('See All Tournaments'),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
               ),
-              child: Text('See All'),
+              child: const Text('See All'),
             ),
           ],
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: items.length,
           itemBuilder: (context, index) {
             final item = items[index];
             return GFCard(
-              margin: EdgeInsets.only(bottom: 16),
-              padding: EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(12),
               content: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       item['photoUrl']!,
                       width: 80,
@@ -65,18 +64,18 @@ class TournamentSection extends StatelessWidget {
                           height: 80,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             Icons.event, 
                             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), 
-                            size: 40
+                            size: 40,
                           ),
                         );
                       },
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,16 +86,16 @@ class TournamentSection extends StatelessWidget {
                           fontWeight: FontWeight.bold, 
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onSurface,
-                        )),
-                        SizedBox(height: 4),
+                        ),),
+                        const SizedBox(height: 4),
                         Text('Location: ${item['location']}', style: Theme.of(context).textTheme.bodyMedium ?? TextStyle(
                           fontSize: 13,
                           color: Theme.of(context).colorScheme.onSurface,
-                        )),
+                        ),),
                         Text('AVG: ${item['avg']}', style: Theme.of(context).textTheme.bodyMedium ?? TextStyle(
                           fontSize: 13,
                           color: Theme.of(context).colorScheme.onSurface,
-                        )),
+                        ),),
                       ],
                     ),
                   ),
@@ -112,7 +111,7 @@ class TournamentSection extends StatelessWidget {
                       style: TextButton.styleFrom(
                         foregroundColor: Theme.of(context).colorScheme.primary,
                       ),
-                      child: Text('Detail'),
+                      child: const Text('Detail'),
                     ),
                   ),
                 ],

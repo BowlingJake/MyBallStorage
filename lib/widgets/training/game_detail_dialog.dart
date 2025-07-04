@@ -1,25 +1,23 @@
+import 'dart:ui';
+
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:ui';
-import '../../models/training_record.dart';
-import '../app_standard_button.dart';
-import '../../models/score_data.dart';
-import '../bowling_score_table.dart';
-import '../common/glass_dialog_base.dart';
 
 /// 專業級遊戲詳情對話框
 /// 顯示單局遊戲的詳細分數表、統計資訊和備註
 class GameDetailDialog extends StatefulWidget {
+
+  const GameDetailDialog({
+    required this.game, super.key,
+    this.onGameUpdated,
+    this.onGameDeleted,
+  });
   final GameRecord game;
   final Function(GameRecord)? onGameUpdated;
   final Function(GameRecord)? onGameDeleted;
-
-  const GameDetailDialog({
-    Key? key,
-    required this.game,
-    this.onGameUpdated,
-    this.onGameDeleted,
-  }) : super(key: key);
 
   @override
   State<GameDetailDialog> createState() => _GameDetailDialogState();
@@ -47,7 +45,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
     
     // 如果有 frameScores，嘗試重建分數表
     if (widget.game.frameScores.isNotEmpty) {
-      for (int i = 0; i < widget.game.frameScores.length && i < 10; i++) {
+      for (var i = 0; i < widget.game.frameScores.length && i < 10; i++) {
         final frameScore = widget.game.frameScores[i];
         final frame = scoreData.frames[i];
         
@@ -57,9 +55,9 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
           frame.rolls.add(Roll(
             pinsDown: 10,
             pinsStandingAfterThrow: {},
-            displayScore: "X",
+            displayScore: 'X',
             pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
-          ));
+          ),);
         } else if (frameScore > 0 && frameScore < 10) {
           // 簡化：假設是兩球的組合
           final firstBall = frameScore ~/ 2;
@@ -68,28 +66,28 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
           frame.rolls.add(Roll(
             pinsDown: firstBall,
             pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(
-              List.generate(firstBall, (i) => i + 1).toSet()
+              List.generate(firstBall, (i) => i + 1).toSet(),
             ),
             displayScore: firstBall.toString(),
             pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
-          ));
+          ),);
           
           if (firstBall + secondBall == 10) {
             frame.rolls.add(Roll(
               pinsDown: secondBall,
               pinsStandingAfterThrow: {},
-              displayScore: "/",
+              displayScore: '/',
               pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
-            ));
+            ),);
           } else {
             frame.rolls.add(Roll(
               pinsDown: secondBall,
               pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(
-                List.generate(firstBall + secondBall, (i) => i + 1).toSet()
+                List.generate(firstBall + secondBall, (i) => i + 1).toSet(),
               ),
               displayScore: secondBall.toString(),
               pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
-            ));
+            ),);
           }
         }
         
@@ -123,7 +121,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
     });
     
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('備註已更新'),
         backgroundColor: Colors.green,
       ),
@@ -134,7 +132,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Game'),
+        title: const Text('Delete Game'),
         content: Text('Are you sure you want to delete Game ${widget.game.gameNumber}? This action cannot be undone.'),
         actions: [
           AppStandardButton(
@@ -167,7 +165,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.95,
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.9),
               borderRadius: BorderRadius.circular(20),
@@ -192,16 +190,16 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: Colors.white),
+                  icon: const Icon(Icons.close, color: Colors.white),
                 ),
               ],
             ),
             
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // 分數總覽
             Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -217,7 +215,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // 詳細分數表
             Text(
@@ -227,10 +225,10 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(12),
@@ -246,19 +244,19 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                       Container(
                         width: 60,
                         height: 80,
-                        margin: EdgeInsets.only(right: 4),
+                        margin: const EdgeInsets.only(right: 4),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.white30),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
-                            Container(
+                            SizedBox(
                               height: 20,
                               child: Center(
                                 child: Text(
                                   '${i + 1}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 12,
                                   ),
@@ -269,7 +267,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                               child: Center(
                                 child: Text(
                                   widget.game.frameScores[i].toString(),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -285,7 +283,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // 備註區域
             Row(
@@ -313,7 +311,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
               ],
             ),
             
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
 
             if (_isEditingNotes)
               Column(
@@ -321,17 +319,17 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                   TextField(
                     controller: _notesController,
                     maxLines: 3,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Add notes...',
-                      hintStyle: TextStyle(color: Colors.white54),
+                      hintStyle: const TextStyle(color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.white30),
+                        borderSide: const BorderSide(color: Colors.white30),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.white30),
+                        borderSide: const BorderSide(color: Colors.white30),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -341,7 +339,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                       fillColor: Colors.white.withOpacity(0.1),
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
@@ -358,7 +356,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
             else
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(8),
@@ -375,7 +373,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                 ),
               ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // 底部按鈕
             Row(
@@ -387,7 +385,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                       customColor: Colors.red,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AppStandardButton(
                       text: 'Close',
@@ -415,7 +413,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -436,7 +434,6 @@ void showGameDetailDialog(
 }) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.7),
     builder: (BuildContext context) {
       return Material(

@@ -1,10 +1,11 @@
+import 'dart:math' as math;
+import 'dart:ui';
+
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'dart:ui';
-import 'dart:math' as math;
 
 class CyberpunkTechStyle extends StatefulWidget {
   const CyberpunkTechStyle({super.key});
@@ -106,7 +107,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
     return AnimatedBuilder(
       animation: _matrixController,
       builder: (context, child) {
-        return Container(
+        return SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: CustomPaint(
@@ -132,7 +133,6 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: glowColor.withOpacity(0.6),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -262,10 +262,10 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                 ),
               ).animate(delay: 300.ms).scale(),
               const SizedBox(width: 8),
-              Text(
+              const Text(
                 'USER_TERMINAL_ACTIVE',
                 style: TextStyle(
-                  color: const Color(0xFF00FF00),
+                  color: Color(0xFF00FF00),
                   fontSize: 12,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -333,18 +333,18 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
             Icon(
               Iconsax.monitor,
-              color: const Color(0xFF00FFFF),
+              color: Color(0xFF00FFFF),
               size: 20,
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Text(
               'SYSTEM_MONITOR.EXE',
               style: TextStyle(
-                color: const Color(0xFF00FFFF),
+                color: Color(0xFF00FFFF),
                 fontSize: 16,
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.bold,
@@ -368,15 +368,15 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
           itemBuilder: (context, index) {
             final metric = metrics[index];
             return _buildGlowContainer(
-              glowColor: metric['color'] as Color,
+              glowColor: metric['color']! as Color,
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    metric['label'] as String,
+                    metric['label']! as String,
                     style: TextStyle(
-                      color: (metric['color'] as Color),
+                      color: metric['color']! as Color,
                       fontSize: 10,
                       fontFamily: 'monospace',
                       fontWeight: FontWeight.bold,
@@ -389,13 +389,13 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                       return Text(
                         '${metric['value']}%',
                         style: TextStyle(
-                          color: (metric['color'] as Color),
+                          color: metric['color']! as Color,
                           fontSize: 24,
                           fontFamily: 'monospace',
                           fontWeight: FontWeight.bold,
                           shadows: [
                             Shadow(
-                              color: (metric['color'] as Color).withOpacity(_pulseController.value * 0.5),
+                              color: (metric['color']! as Color).withOpacity(_pulseController.value * 0.5),
                               blurRadius: 10,
                             ),
                           ],
@@ -405,9 +405,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   ),
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
-                    value: (metric['value'] as int) / 100,
+                    value: (metric['value']! as int) / 100,
                     backgroundColor: Colors.black.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(metric['color'] as Color),
+                    valueColor: AlwaysStoppedAnimation<Color>(metric['color']! as Color),
                     minHeight: 4,
                   ),
                 ],
@@ -434,16 +434,16 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Iconsax.scan_barcode,
-                color: const Color(0xFFFF6B6B),
+                color: Color(0xFFFF6B6B),
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
+              const Text(
                 'ARSENAL_SCANNER.DLL',
                 style: TextStyle(
-                  color: const Color(0xFFFF6B6B),
+                  color: Color(0xFFFF6B6B),
                   fontSize: 16,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -511,7 +511,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      weapon['name'] as String,
+                      weapon['name']!,
                       style: const TextStyle(
                         color: Color(0xFF00FFFF),
                         fontSize: 12,
@@ -520,7 +520,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                     ),
                   ),
                   Text(
-                    weapon['threat'] as String,
+                    weapon['threat']!,
                     style: TextStyle(
                       color: threatColor,
                       fontSize: 10,
@@ -530,7 +530,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    weapon['status'] as String,
+                    weapon['status']!,
                     style: TextStyle(
                       color: const Color(0xFF00FF00).withOpacity(0.8),
                       fontSize: 10,
@@ -540,7 +540,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                 ],
               ),
             ).animate(delay: (800 + index * 150).ms).fadeIn().slideX(begin: 0.3);
-          }).toList(),
+          }),
         ],
       ),
     ).animate(delay: 800.ms).fadeIn().slideY(begin: 0.3);
@@ -554,18 +554,18 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(
                 Iconsax.activity,
-                color: const Color(0xFF8B5CF6),
+                color: Color(0xFF8B5CF6),
                 size: 20,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 'NETWORK_ACTIVITY.LOG',
                 style: TextStyle(
-                  color: const Color(0xFF8B5CF6),
+                  color: Color(0xFF8B5CF6),
                   fontSize: 16,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -578,8 +578,6 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
                   horizontalInterval: 1,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
@@ -588,7 +586,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                     );
                   },
                 ),
-                titlesData: FlTitlesData(show: false),
+                titlesData: const FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
                 backgroundColor: Colors.transparent,
                 lineBarsData: [
@@ -611,7 +609,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                     ),
                     barWidth: 3,
                     isStrokeCapRound: true,
-                    dotData: FlDotData(show: false),
+                    dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
@@ -640,18 +638,18 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(
                 Iconsax.shield_search,
-                color: const Color(0xFFFFE66D),
+                color: Color(0xFFFFE66D),
                 size: 20,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 'THREAT_ANALYSIS.BAT',
                 style: TextStyle(
-                  color: const Color(0xFFFFE66D),
+                  color: Color(0xFFFFE66D),
                   fontSize: 16,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -688,18 +686,18 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(
                 Iconsax.code,
-                color: const Color(0xFF00FFFF),
+                color: Color(0xFF00FFFF),
                 size: 20,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 'STYLE_INFO.TXT',
                 style: TextStyle(
-                  color: const Color(0xFF00FFFF),
+                  color: Color(0xFF00FFFF),
                   fontSize: 16,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -724,9 +722,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
 }
 
 class MatrixPainter extends CustomPainter {
-  final double animationValue;
   
   MatrixPainter(this.animationValue);
+  final double animationValue;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -738,7 +736,7 @@ class MatrixPainter extends CustomPainter {
     
     for (double x = 0; x < size.width; x += spacing) {
       final offset = (animationValue * size.height * 2) % (size.height + 100);
-      for (double y = -100 + offset; y < size.height + 100; y += spacing) {
+      for (var y = -100 + offset; y < size.height + 100; y += spacing) {
         if (random.nextDouble() < 0.7) {
           canvas.drawCircle(
             Offset(x + random.nextDouble() * 10, y),

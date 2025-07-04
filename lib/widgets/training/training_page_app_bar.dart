@@ -1,18 +1,15 @@
+import 'package:bowlingarsenal_app/controllers/training_controller.dart';
+import 'package:bowlingarsenal_app/shared/app_strings.dart';
 import 'package:flutter/material.dart';
-import '../../controllers/training_controller.dart';
-import '../../shared/app_strings.dart';
 
 class TrainingPageAppBar extends StatelessWidget {
+
+  const TrainingPageAppBar({
+    required this.controller, required this.onCreateRecord, required this.onShowDeleteDialog, super.key,
+  });
   final TrainingController controller;
   final VoidCallback onCreateRecord;
   final VoidCallback onShowDeleteDialog;
-
-  const TrainingPageAppBar({
-    Key? key,
-    required this.controller,
-    required this.onCreateRecord,
-    required this.onShowDeleteDialog,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +22,8 @@ class TrainingPageAppBar extends StatelessWidget {
       expandedHeight: 120,
       leading: controller.isSelectionMode
           ? IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
-              onPressed: () => controller.toggleSelectionMode(),
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: controller.toggleSelectionMode,
             )
           : null,
       flexibleSpace: FlexibleSpaceBar(
@@ -64,12 +61,12 @@ class TrainingPageAppBar extends StatelessWidget {
             controller.selectedCount == controller.trainingDays.length 
                 ? AppStrings.cancelSelection 
                 : AppStrings.selectAll,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
         ),
         // 刪除按鈕
         IconButton(
-          icon: Icon(Icons.delete, color: Colors.red),
+          icon: const Icon(Icons.delete, color: Colors.red),
           onPressed: controller.selectedCount > 0 ? onShowDeleteDialog : null,
         ),
       ];
@@ -77,14 +74,14 @@ class TrainingPageAppBar extends StatelessWidget {
       return [
         // 選擇模式按鈕
         IconButton(
-          icon: Icon(Icons.select_all, color: Colors.white),
+          icon: const Icon(Icons.select_all, color: Colors.white),
           onPressed: controller.hasTrainingData
-              ? () => controller.toggleSelectionMode()
+              ? controller.toggleSelectionMode
               : null,
         ),
         // 新增按鈕
         IconButton(
-          icon: Icon(Icons.add, color: Colors.white),
+          icon: const Icon(Icons.add, color: Colors.white),
           onPressed: onCreateRecord,
         ),
       ];

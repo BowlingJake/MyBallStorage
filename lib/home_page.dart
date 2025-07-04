@@ -1,21 +1,19 @@
 // lib/home_page.dart
-import 'package:flutter/material.dart';
 import 'dart:ui'; // For BackdropFilter
-import 'package:iconsax/iconsax.dart'; // For Iconsax icons
-import 'widgets/user_info_section.dart';
-import 'widgets/arsenal_section.dart';
-import 'widgets/tournament_section.dart';
-import 'widgets/modern_tournament_section.dart';
-import 'widgets/professional_dark_background.dart';
-import 'widgets/section_container.dart'; // 導入新的容器元件
-import 'ball_library_page.dart';
-import 'views/my_arsenal_page.dart';
-import 'views/settings_page.dart';
-import 'my_training_page.dart';
-import 'views/developer_page.dart';
 
-import 'widgets/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/ball_library_page.dart';
+import 'package:bowlingarsenal_app/my_training_page.dart';
+import 'package:bowlingarsenal_app/views/developer_page.dart';
+import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
+import 'package:bowlingarsenal_app/views/settings_page.dart';
+import 'package:bowlingarsenal_app/widgets/arsenal_section.dart';
+import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/widgets/modern_tournament_section.dart';
+import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/widgets/user_info_section.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _calculateUserCardRect() {
-    final RenderBox? renderBox = _userCardKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = _userCardKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final size = renderBox.size;
       final position = renderBox.localToGlobal(Offset.zero);
@@ -60,7 +58,6 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _selectedIndex = 0;
         });
-        break;
       case 1: // 社群 (Ball Library)
         Navigator.push(
           context,
@@ -71,14 +68,12 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = 0;
           });
         });
-        break;
       case 2: // 中央按鈕 (新增)
         setState(() {
           _selectedIndex = index;
         });
         print('Add button tapped');
         // TODO: 實現新增功能
-        break;
       case 3: // 訓練
         Navigator.push(
           context,
@@ -89,7 +84,6 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = 0;
           });
         });
-        break;
       case 4: // 個人/設定
         Navigator.push(
           context,
@@ -100,7 +94,6 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = 0;
           });
         });
-        break;
     }
     
     print('Bottom Nav Tapped: $index');
@@ -109,7 +102,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return ProfessionalDarkBackground(
-      backgroundImage: 'images/Sport_Tech_Background.png',
       cutoutRects: _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -141,20 +133,17 @@ class _HomePageState extends State<HomePage> {
         drawer: _buildAppDrawer(context), // 加入抽屜選單
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 將 Key 附加到一個非 const 的父元件上
                 Align(
-                  alignment: Alignment.center,
                   child: Container(
                     key: _userCardKey, // 把 Key "貼" 在這裡
                     constraints: const BoxConstraints(maxWidth: 400),
                     child: const UserInfoSection(
-                      // 保持 UserInfoSection 為 const 以獲得性能優化
-                      userName: 'Jake Cheng',
-                      location: 'Taipei, Taiwan',
+                      
                     ),
                   ),
                 ),

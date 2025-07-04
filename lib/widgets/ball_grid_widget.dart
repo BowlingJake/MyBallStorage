@@ -1,16 +1,15 @@
+import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/widgets/arsenal_ball_card.dart';
+import 'package:bowlingarsenal_app/widgets/empty_bag_widget.dart';
 import 'package:flutter/material.dart';
-import '../models/arsenal_ball.dart';
-import 'arsenal_ball_card.dart';
-import 'empty_bag_widget.dart';
 
 /// 球的 GridView Widget
 class BallGridWidget extends StatelessWidget {
-  final List<ArsenalBall> balls;
 
   const BallGridWidget({
-    super.key,
-    required this.balls,
+    required this.balls, super.key,
   });
+  final List<ArsenalBall> balls;
 
   @override
   Widget build(BuildContext context) {

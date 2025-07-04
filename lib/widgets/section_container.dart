@@ -4,20 +4,18 @@ import 'package:flutter/material.dart';
 /// 用於包裹各個功能區域（如 Arsenal、Tournament），
 /// 創造清晰的資訊分組和視覺層次
 class SectionContainer extends StatelessWidget {
+
+  const SectionContainer({
+    required this.title, required this.child, super.key,
+    this.onSeeAllPressed,
+    this.padding = const EdgeInsets.all(16),
+    this.margin = const EdgeInsets.symmetric(vertical: 8),
+  });
   final String title;
   final Widget child;
   final VoidCallback? onSeeAllPressed;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
-
-  const SectionContainer({
-    super.key,
-    required this.title,
-    required this.child,
-    this.onSeeAllPressed,
-    this.padding = const EdgeInsets.all(16.0),
-    this.margin = const EdgeInsets.symmetric(vertical: 8.0),
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +31,6 @@ class SectionContainer extends StatelessWidget {
         // 容器的邊框較細且更透明
         border: Border.all(
           color: accentColor.withOpacity(0.2),
-          width: 1.0,
         ),
         // 容器的光暈較淡
         boxShadow: [

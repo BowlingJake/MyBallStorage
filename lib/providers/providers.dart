@@ -1,14 +1,14 @@
 // lib/providers/providers.dart
 // 統一匯出所有 Provider，方便其他檔案使用
 
-export 'auth_provider.dart';
-export 'user_profile_provider.dart';
-export 'onboarding_provider.dart';
-
+import 'package:bowlingarsenal_app/providers/auth_provider.dart';
+import 'package:bowlingarsenal_app/providers/onboarding_provider.dart';
+import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'auth_provider.dart';
-import 'user_profile_provider.dart';
-import 'onboarding_provider.dart';
+
+export 'auth_provider.dart';
+export 'onboarding_provider.dart';
+export 'user_profile_provider.dart';
 
 // 計算型 Provider - 檢查是否需要顯示 Onboarding
 final shouldShowOnboardingProvider = Provider<bool>((ref) {

@@ -1,9 +1,9 @@
+import 'package:bowlingarsenal_app/home_page.dart';
+import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/views/login_page.dart';
+import 'package:bowlingarsenal_app/views/onboarding/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'providers/providers.dart';
-import 'views/login_page.dart';
-import 'views/onboarding/onboarding_page.dart';
-import 'home_page.dart';
 
 class AppRouter extends ConsumerWidget {
   const AppRouter({super.key});

@@ -1,25 +1,23 @@
-import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'dart:ui'; // For BackdropFilter and ImageFilter
+
+import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
 /// 浮動中心按鈕底部導覽列
 /// 特色：中心按鈕浮動且有凹槽效果
 class FloatingBottomNavigation extends StatelessWidget {
+
+  const FloatingBottomNavigation({
+    required this.currentIndex, required this.onTap, super.key,
+    this.backgroundColor,
+    this.centerButtonColor,
+    this.notchMargin = 8.0,
+  });
   final int currentIndex;
   final Function(int) onTap;
   final Color? backgroundColor;
   final Color? centerButtonColor;
   final double notchMargin;
-
-  const FloatingBottomNavigation({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-    this.backgroundColor,
-    this.centerButtonColor,
-    this.notchMargin = 8.0,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +36,7 @@ class FloatingBottomNavigation extends StatelessWidget {
             color: bgColor,
             notchMargin: notchMargin,
           ),
-          child: Container(
+          child: SizedBox(
             height: 70,
             child: SafeArea(
               child: Row(
@@ -87,7 +85,7 @@ class FloatingBottomNavigation extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.add,
                 color: Colors.white,
                 size: 30,
@@ -100,7 +98,7 @@ class FloatingBottomNavigation extends StatelessWidget {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme) {
-    final bool isSelected = currentIndex == index;
+    final isSelected = currentIndex == index;
     
     return Expanded(
       child: GestureDetector(
@@ -150,13 +148,13 @@ class FloatingBottomNavigation extends StatelessWidget {
 
 /// 自定義繪製器，用於創建帶凹槽的底部導覽列
 class _BottomNavPainter extends CustomPainter {
-  final Color color;
-  final double notchMargin;
 
   _BottomNavPainter({
     required this.color,
     required this.notchMargin,
   });
+  final Color color;
+  final double notchMargin;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -172,7 +170,7 @@ class _BottomNavPainter extends CustomPainter {
     final shadowPath = Path();
 
     // 計算凹槽的尺寸和位置
-    final notchRadius = 35.0; // 凹槽半徑
+    const notchRadius = 35.0; // 凹槽半徑
     final centerX = size.width / 2;
     final notchCenterY = notchMargin; // 凹槽中心Y位置
 
@@ -240,14 +238,12 @@ class _BottomNavPainter extends CustomPainter {
 
 /// 帶動畫效果的浮動底部導覽列
 class AnimatedFloatingBottomNavigation extends StatefulWidget {
-  final int currentIndex;
-  final Function(int) onTap;
 
   const AnimatedFloatingBottomNavigation({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
+    required this.currentIndex, required this.onTap, super.key,
   });
+  final int currentIndex;
+  final Function(int) onTap;
 
   @override
   State<AnimatedFloatingBottomNavigation> createState() =>
@@ -260,7 +256,7 @@ class _AnimatedFloatingBottomNavigationState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const double navBarHeight = 70.0;
+    const navBarHeight = 70;
 
     return ClipRRect(
       child: BackdropFilter(
@@ -292,10 +288,10 @@ class _AnimatedFloatingBottomNavigationState
   }
 
   Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme,
-      {bool isCenter = false}) {
-    final bool isSelected = widget.currentIndex == index;
-    final Color selectedColor = theme.colorScheme.primary;
-    final Color unselectedColor = Colors.white.withOpacity(0.7);
+      {bool isCenter = false,}) {
+    final isSelected = widget.currentIndex == index;
+    final selectedColor = theme.colorScheme.primary;
+    final unselectedColor = Colors.white.withOpacity(0.7);
 
     return Expanded(
       child: GestureDetector(

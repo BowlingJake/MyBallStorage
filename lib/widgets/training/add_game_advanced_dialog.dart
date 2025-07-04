@@ -1,20 +1,19 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../../models/training_record.dart';
-import '../../models/score_data.dart';
-import '../bowling_score_table.dart';
-import '../app_standard_button.dart';
+
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/bowling_score_table.dart';
+import 'package:flutter/material.dart';
 
 /// 高級新增遊戲對話框
 class AddGameAdvancedDialog extends StatefulWidget {
-  final String dayId;
-  final int nextGameNumber;
 
   const AddGameAdvancedDialog({
-    Key? key,
-    required this.dayId,
-    required this.nextGameNumber,
-  }) : super(key: key);
+    required this.dayId, required this.nextGameNumber, super.key,
+  });
+  final String dayId;
+  final int nextGameNumber;
 
   @override
   State<AddGameAdvancedDialog> createState() => _AddGameAdvancedDialogState();
@@ -43,12 +42,12 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
   }
 
   void _saveGame() {
-    int totalScore = 0;
-    int strikes = 0;
-    int spares = 0;
-    List<int> frameScores = [];
+    var totalScore = 0;
+    var strikes = 0;
+    var spares = 0;
+    final var frameScores = <int>[];
 
-    for (int i = 0; i < _scoreData.frames.length; i++) {
+    for (var i = 0; i < _scoreData.frames.length; i++) {
       final frame = _scoreData.frames[i];
       if (frame.totalScore != null) {
         totalScore = frame.totalScore!;
@@ -95,7 +94,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.98,
             height: MediaQuery.of(context).size.height * 0.85,
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.95),
               borderRadius: BorderRadius.circular(20),
@@ -119,7 +118,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       isGameComplete ? 'Game Complete' : 'In Progress...',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -130,11 +129,11 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: Colors.white),
+                  icon: const Icon(Icons.close, color: Colors.white),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Click frames to enter scores:',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -142,9 +141,9 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(12),
@@ -163,10 +162,10 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_scoreData.frames.any((f) => f.rolls.isNotEmpty))
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -180,7 +179,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                   ],
                 ),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Notes:',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -188,21 +187,21 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: _notesController,
               maxLines: 3,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Record performance, thoughts...',
-                hintStyle: TextStyle(color: Colors.white54),
+                hintStyle: const TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white30),
+                  borderSide: const BorderSide(color: Colors.white30),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white30),
+                  borderSide: const BorderSide(color: Colors.white30),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -212,7 +211,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                 fillColor: Colors.white.withOpacity(0.1),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Row(
               children: [
                                   Expanded(
@@ -223,7 +222,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
                       height: 50,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AppStandardButton(
                       text: isGameComplete ? 'Save Game' : 'Please Complete Game',
@@ -256,7 +255,7 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -273,7 +272,7 @@ Future<GameRecord?> showAddGameAdvancedDialog(
   String dayId,
   int nextGameNumber,
 ) async {
-  return await showDialog<GameRecord>(
+  return showDialog<GameRecord>(
     context: context,
     barrierDismissible: false,
     barrierColor: Colors.black.withOpacity(0.8),

@@ -1,12 +1,17 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart'; // Import BowlingBall
+import 'package:bowlingarsenal_app/shared/enums.dart'; // Import the shared enum
+import 'package:bowlingarsenal_app/views/record_scores_page.dart'; // Import the new page
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:provider/provider.dart'; // Import provider
-import '../viewmodels/weapon_library_viewmodel.dart'; // Import ViewModel
-import '../models/bowling_ball.dart'; // Import BowlingBall
-import '../shared/enums.dart'; // Import the shared enum
-import 'record_scores_page.dart'; // Import the new page
 
 class AddMatchRecordPage extends StatefulWidget {
+
+  const AddMatchRecordPage({
+    required this.tournamentId, required this.tournamentName, required this.tournamentLocation, required this.tournamentDate, required this.tournamentType, required this.selectedBalls, super.key,
+    this.openFormat,
+    this.mqGamesPerSession,
+  });
   // --- Add parameters to receive data ---
   final String tournamentId; // Need ID to update the correct tournament
   final String tournamentName;
@@ -16,18 +21,6 @@ class AddMatchRecordPage extends StatefulWidget {
   final OpenTournamentFormat? openFormat;    // Added format details
   final int? mqGamesPerSession;             // Added format details
   final List<BowlingBall> selectedBalls;
-
-  const AddMatchRecordPage({
-    super.key,
-    required this.tournamentId,
-    required this.tournamentName,
-    required this.tournamentLocation,
-    required this.tournamentDate,
-    required this.tournamentType,
-    this.openFormat,
-    this.mqGamesPerSession,
-    required this.selectedBalls,
-  });
 
   @override
   State<AddMatchRecordPage> createState() => _AddMatchRecordPageState();
@@ -73,7 +66,7 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
         children: [
           Expanded( // Make ListView take available space
             child: ListView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               children: <Widget>[
                 // Display Basic Info (Read Only) in Rows
                 Row(
@@ -89,18 +82,17 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
                     const SizedBox(width: 16), // Add spacing
                     Text(
                       '日期: ${DateFormat('yyyy-MM-dd').format(widget.tournamentDate)}',
-                      style: Theme.of(context).textTheme.titleMedium
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ),
                 const SizedBox(height: 8), // Space between rows
                 // Display Tournament Type and Format
                 Text(
-                  '類型: ${widget.tournamentType == TournamentType.open ? '公開賽' : '錦標賽'}'
-                  + (widget.tournamentType == TournamentType.open && widget.openFormat != null
+                  '類型: ${widget.tournamentType == TournamentType.open ? '公開賽' : '錦標賽'}${widget.tournamentType == TournamentType.open && widget.openFormat != null
                       ? ' (${widget.openFormat == OpenTournamentFormat.mq ? 'MQ' : '經典賽'})'
-                      : ''), // Add format if applicable
-                  style: Theme.of(context).textTheme.titleMedium
+                      : ''}', // Add format if applicable
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
 
@@ -115,8 +107,8 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
                   physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, // Two items per row
-                    crossAxisSpacing: 10.0, // Spacing between columns
-                    mainAxisSpacing: 18.0, // Adjusted spacing between rows by adding 8px
+                    crossAxisSpacing: 10, // Spacing between columns
+                    mainAxisSpacing: 18, // Adjusted spacing between rows by adding 8px
                     childAspectRatio: 2.5, // Adjust aspect ratio for card look (width > height)
                   ),
                   itemCount: widget.selectedBalls.length,
@@ -140,7 +132,7 @@ class _AddMatchRecordPageState extends State<AddMatchRecordPage> {
           ),
           // Button to navigate to score recording page
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.edit_note),
               label: const Text('登錄比賽成績'),
@@ -185,7 +177,6 @@ Widget _buildArsenalStyleBallCard(BuildContext context, BowlingBall ball) {
       // 上下間距縮窄、左右保 8px
       padding: const EdgeInsets.symmetric(vertical:4, horizontal:4),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,  // 照片往上對齊
         children: [
           // 左側照片區
           Container(
@@ -205,7 +196,6 @@ Widget _buildArsenalStyleBallCard(BuildContext context, BowlingBall ball) {
           // 右側文字區
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(

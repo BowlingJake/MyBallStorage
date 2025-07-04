@@ -1,8 +1,8 @@
+import 'package:bowlingarsenal_app/demo/cyberpunk_tech_style.dart';
+import 'package:bowlingarsenal_app/demo/dark_tech_style.dart';
+import 'package:bowlingarsenal_app/demo/digital_dashboard_style.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'cyberpunk_tech_style.dart';
-import 'digital_dashboard_style.dart';
-import 'dark_tech_style.dart';
 
 class StyleShowcasePage extends StatelessWidget {
   const StyleShowcasePage({super.key});
@@ -18,7 +18,7 @@ class StyleShowcasePage extends StatelessWidget {
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -262,7 +262,6 @@ class StyleShowcasePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: gradient.colors.first.withOpacity(0.2),
-                      width: 1,
                     ),
                   ),
                   child: Text(
@@ -273,7 +272,7 @@ class StyleShowcasePage extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                )).toList(),
+                ),).toList(),
               ),
             ],
           ),

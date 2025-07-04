@@ -1,21 +1,16 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../../models/training_record.dart';
 
 /// 訓練日摘要卡片的頭部組件
 class TrainingDayHeader extends StatelessWidget {
+
+  const TrainingDayHeader({
+    required this.summary, required this.isSelectionMode, required this.isSelected, required this.theme, super.key,
+  });
   final TrainingDaySummary summary;
   final bool isSelectionMode;
   final bool isSelected;
   final ThemeData theme;
-
-  const TrainingDayHeader({
-    Key? key,
-    required this.summary,
-    required this.isSelectionMode,
-    required this.isSelected,
-    required this.theme,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +41,7 @@ class TrainingDayHeader extends StatelessWidget {
                   )
                 : null,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
         ],
 
         Expanded(
@@ -67,9 +62,9 @@ class TrainingDayHeader extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
@@ -85,7 +80,7 @@ class TrainingDayHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
             ],
           ),
         ),

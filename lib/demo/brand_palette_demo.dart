@@ -1,7 +1,7 @@
+import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
+import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:flutter/material.dart';
-import '../theme/brand_colors.dart';
-import '../models/arsenal_ball.dart';
-import '../models/ball_bag_type.dart';
 
 /// 設計測試頁面
 class BrandPaletteDemoPage extends StatelessWidget {
@@ -89,7 +89,6 @@ class BrandPaletteDemoPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: theme.colorScheme.outlineVariant.withOpacity(0.5),
-                  width: 1,
                 ),
               ),
               child: Column(
@@ -163,9 +162,9 @@ class BrandPaletteDemoPage extends StatelessWidget {
 
 /// 色環設計卡片 - 仿造 Library 頁面卡片佈局
 class _ColorRingCard extends StatelessWidget {
-  final ArsenalBall ball;
   
   const _ColorRingCard({required this.ball});
+  final ArsenalBall ball;
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +184,6 @@ class _ColorRingCard extends StatelessWidget {
           BoxShadow(
             color: brandColor.withOpacity(0.15),
             blurRadius: 12,
-            spreadRadius: 0,
             offset: const Offset(0, 4),
           ),
         ],

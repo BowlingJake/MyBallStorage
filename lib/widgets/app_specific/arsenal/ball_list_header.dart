@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BallListHeader extends StatelessWidget {
-  const BallListHeader({Key? key}) : super(key: key);
+  const BallListHeader({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,9 @@
+import 'dart:ui';
+
+import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
+import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:ui';
-import 'package:iconsax/iconsax.dart';
-import '../../../models/ball_bag_type.dart';
-import '../../../models/arsenal_ball.dart';
-import '../../../views/my_arsenal_page.dart';
-import 'create_ball_bag_dialog.dart';
 
 /// Edit Ball Bag Dialog with popout detail design style
 class EditBallBagDialog extends ConsumerWidget {
@@ -68,7 +66,7 @@ class EditBallBagDialog extends ConsumerWidget {
                         // 標題區域
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.edit,
                               color: Colors.white,
                               size: 28,
@@ -124,7 +122,6 @@ class EditBallBagDialog extends ConsumerWidget {
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: Colors.white.withOpacity(0.2),
-                                          width: 1,
                                         ),
                                       ),
                                       child: ListTile(

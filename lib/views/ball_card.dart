@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 import 'package:flutter/material.dart';
-import '../models/bowling_ball.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
 // 如果您的 layout_dialog.dart 提供了 showBallActionDialog，並且卡片內部需要直接調用（雖然我們這裡主要用回調）
 // import '../shared/dialogs/layout_dialog.dart';
 
@@ -9,6 +9,12 @@ import '../viewmodels/weapon_library_viewmodel.dart';
 ///   palette_generator: ^0.3.2
 
 class BowlingBallCard extends StatelessWidget {
+
+  const BowlingBallCard({
+    required this.ball, required this.viewModel, required this.isSelected, required this.showIndividualDeleteIcon, super.key,
+    this.onTap,
+    this.onLongPress,
+  });
   final BowlingBall ball;
   final WeaponLibraryViewModel viewModel;
   final bool isSelected; // Unified selection display for the card
@@ -16,25 +22,15 @@ class BowlingBallCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
-  const BowlingBallCard({
-    super.key,
-    required this.ball,
-    required this.viewModel,
-    required this.isSelected,
-    required this.showIndividualDeleteIcon,
-    this.onTap,
-    this.onLongPress,
-  });
-
   @override
   Widget build(BuildContext context) {
-    bool isMotiv = ball.brand == 'Motiv Bowling';
-    bool isStorm = ball.brand == 'Storm Bowling';
-    bool hasSpecialBackground = isMotiv || isStorm;
+    final var isMotiv = ball.brand == 'Motiv Bowling';
+    final isStorm = ball.brand == 'Storm Bowling';
+    final var hasSpecialBackground = isMotiv || isStorm;
 
     final baseTextStyle = TextStyle(
       color: hasSpecialBackground ? Colors.white : Theme.of(context).textTheme.bodyMedium?.color,
-      shadows: hasSpecialBackground ? [const Shadow(blurRadius: 1.0, color: Colors.black54, offset: Offset(0.5, 0.5))] : null,
+      shadows: hasSpecialBackground ? [const Shadow(blurRadius: 1, color: Colors.black54, offset: Offset(0.5, 0.5))] : null,
     );
     final boldTextStyle = baseTextStyle.copyWith(
       fontSize: 18,
@@ -51,7 +47,7 @@ class BowlingBallCard extends StatelessWidget {
       fontWeight: FontWeight.w500,
     );
 
-    Widget cardContent = InkWell(
+    final Widget cardContent = InkWell(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Stack(
@@ -198,7 +194,7 @@ class BowlingBallCard extends StatelessWidget {
       child: Container(
         decoration: cardDecoration,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(12),
           child: cardContent,
         ),
       ),

@@ -1,17 +1,11 @@
+import 'package:bowlingarsenal_app/models/practice_record.dart';
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/practice_viewmodel.dart';
+import 'package:bowlingarsenal_app/views/practice_record_card.dart';
+import 'package:bowlingarsenal_app/widgets/dialogs/add_practice_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// 假設您的 PinSelectorPopupWidget 在 lib/widgets/dialogs/
-import '../widgets/pin_selector_popup_widget.dart';
-// 1. 匯入您儲存的 ScoreFrameWidget
-//    假設您的 ScoreFrameWidget.dart 在 lib/widgets/
-import '../widgets/bowling_score_table.dart';
-import '../theme/text_styles.dart';
-import '../widgets/primary_button.dart';
-import '../widgets/dialogs/add_practice_dialog.dart';
-import '../widgets/primary_button.dart';
-import 'practice_record_card.dart';
-import '../viewmodels/practice_viewmodel.dart';
-import '../models/practice_record.dart';
 
 class TrainingPage extends StatelessWidget {
   const TrainingPage({super.key});

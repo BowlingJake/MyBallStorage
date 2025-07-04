@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:iconsax/iconsax.dart';
 
 /// Enhanced Action Button with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強動作按鈕
 class EnhancedActionButton extends StatefulWidget {
+
+  const EnhancedActionButton({
+    required this.text, required this.icon, required this.color, required this.onPressed, super.key,
+    this.isPrimary = false,
+    this.enabled = true,
+    this.width,
+    this.height = 52.0,
+  });
   final String text;
   final IconData icon;
   final Color color;
@@ -14,18 +21,6 @@ class EnhancedActionButton extends StatefulWidget {
   final bool enabled;
   final double? width;
   final double height;
-
-  const EnhancedActionButton({
-    Key? key,
-    required this.text,
-    required this.icon,
-    required this.color,
-    required this.onPressed,
-    this.isPrimary = false,
-    this.enabled = true,
-    this.width,
-    this.height = 52.0,
-  }) : super(key: key);
 
   @override
   State<EnhancedActionButton> createState() => _EnhancedActionButtonState();
@@ -46,7 +41,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
       vsync: this,
     );
     
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+    _scaleAnimation = Tween<double>(begin: 1, end: 0.95).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
     
@@ -117,7 +112,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
                     blurRadius: 4,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -140,7 +135,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                   children: [
                     // Icon with enhanced styling
                     Container(
-                      padding: EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: buttonColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -151,7 +146,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                         color: buttonColor,
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     
                     // Text with enhanced styling
                     Flexible(
@@ -169,7 +164,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                     
                     // Scanning effect when pressed
                     if (_isPressed) ...[
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       SizedBox(
                         width: 12,
                         height: 12,
@@ -193,20 +188,16 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
 /// Professional Data Button for specific use cases
 /// 專業數據按鈕，用於特定用途
 class ProfessionalDataButton extends StatelessWidget {
+
+  const ProfessionalDataButton({
+    required this.label, required this.value, required this.icon, required this.color, super.key,
+    this.onTap,
+  });
   final String label;
   final String value;
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
-
-  const ProfessionalDataButton({
-    Key? key,
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -220,13 +211,12 @@ class ProfessionalDataButton extends StatelessWidget {
         }
       },
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: color.withOpacity(0.3),
-            width: 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -244,7 +234,7 @@ class ProfessionalDataButton extends StatelessWidget {
               color: color,
               size: 24,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               value,
               style: theme.textTheme.titleLarge?.copyWith(
@@ -253,7 +243,7 @@ class ProfessionalDataButton extends StatelessWidget {
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(

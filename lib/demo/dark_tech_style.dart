@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'dart:math' as math;
 
 /// 深色Tech風格展示頁面 - 專業運動數據版本 v2.0
 class DarkTechStyle extends StatefulWidget {
@@ -34,7 +35,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
     ).animate(CurvedAnimation(
       parent: _pulseController,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     // 圖表動畫
     _chartController = AnimationController(
@@ -43,7 +44,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
     )..repeat(reverse: true);
     _chartAnimation = Tween<double>(
       begin: 0.7,
-      end: 1.0,
+      end: 1,
     ).animate(_chartController);
 
     // 發光動畫 - 更溫和
@@ -77,7 +78,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -156,7 +157,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                     const Color(0xFF81C784),
                     _pulseAnimation.value,
                   )!,
-                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -172,22 +172,22 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF4CAF50),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF4CAF50),
+                          color: Color(0xFF4CAF50),
                           blurRadius: 4,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     'LIVE DATA',
                     style: TextStyle(
-                      color: const Color(0xFF4CAF50),
+                      color: Color(0xFF4CAF50),
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1,
@@ -240,7 +240,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             color: shouldGlow 
               ? (iconColor ?? const Color(0xFF1E88E5)).withOpacity(0.4)
               : const Color(0xFF404040),
-            width: 1,
           ),
           boxShadow: shouldGlow ? [
             BoxShadow(
@@ -297,11 +296,11 @@ class _DarkTechStyleState extends State<DarkTechStyle>
         const SizedBox(height: 8),
         
         // 副標題
-        Text(
+        const Text(
           'Bowling Performance Dashboard',
           style: TextStyle(
             fontSize: 16,
-            color: const Color(0xFF90CAF9),
+            color: Color(0xFF90CAF9),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -323,13 +322,12 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: const Color(0xFF1E88E5).withOpacity(0.3),
-              width: 1,
             ),
           ),
-          child: Text(
+          child: const Text(
             '專業運動數據分析界面\n清晰的數據可視化 + 深色護眼設計\n適合專業球員和數據分析需求',
             style: TextStyle(
-              color: const Color(0xFFE3F2FD),
+              color: Color(0xFFE3F2FD),
               fontSize: 14,
               height: 1.5,
             ),
@@ -343,12 +341,12 @@ class _DarkTechStyleState extends State<DarkTechStyle>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Performance Overview',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFFFFFFFF),
+            color: Color(0xFFFFFFFF),
           ),
         ),
         
@@ -422,7 +420,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: color.withOpacity(0.3 + animValue * 0.2),
-              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -453,8 +450,8 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   Expanded(
                     child: Text(
                       title,
-                      style: TextStyle(
-                        color: const Color(0xFF9E9E9E),
+                      style: const TextStyle(
+                        color: Color(0xFF9E9E9E),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -480,8 +477,8 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: TextStyle(
-                  color: const Color(0xFF757575),
+                style: const TextStyle(
+                  color: Color(0xFF757575),
                   fontSize: 11,
                 ),
               ),
@@ -510,7 +507,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: const Color(0xFF1E88E5).withOpacity(0.2 + _glowAnimation.value * 0.2),
-              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -531,26 +527,26 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                       color: const Color(0xFF1E88E5).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Iconsax.chart_square,
-                      color: const Color(0xFF1E88E5),
+                      color: Color(0xFF1E88E5),
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
+                  const Text(
                     'Score Trend',
                     style: TextStyle(
-                      color: const Color(0xFFFFFFFF),
+                      color: Color(0xFFFFFFFF),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const Spacer(),
-                  Text(
+                  const Text(
                     'Last 10 games',
                     style: TextStyle(
-                      color: const Color(0xFF9E9E9E),
+                      color: Color(0xFF9E9E9E),
                       fontSize: 12,
                     ),
                   ),
@@ -572,7 +568,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
     return AnimatedBuilder(
       animation: Listenable.merge([_chartAnimation, _glowAnimation]),
       builder: (context, child) {
-        return Container(
+        return SizedBox(
           height: 120,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -626,7 +622,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: const Color(0xFF43A047).withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Column(
@@ -640,17 +635,17 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   color: const Color(0xFF43A047).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Iconsax.safe_home,
-                  color: const Color(0xFF43A047),
+                  color: Color(0xFF43A047),
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 'Ball Performance',
                 style: TextStyle(
-                  color: const Color(0xFFFFFFFF),
+                  color: Color(0xFFFFFFFF),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -694,7 +689,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: color.withOpacity(0.3 + animValue * 0.2),
-              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -727,8 +721,8 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               const SizedBox(height: 8),
               Text(
                 name,
-                style: TextStyle(
-                  color: const Color(0xFFFFFFFF),
+                style: const TextStyle(
+                  color: Color(0xFFFFFFFF),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -765,7 +759,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: const Color(0xFFFF9800).withOpacity(0.3),
-          width: 1,
         ),
       ),
       child: Column(
@@ -779,17 +772,17 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   color: const Color(0xFFFF9800).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Iconsax.clock,
-                  color: const Color(0xFFFF9800),
+                  color: Color(0xFFFF9800),
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
+              const Text(
                 'Recent Matches',
                 style: TextStyle(
-                  color: const Color(0xFFFFFFFF),
+                  color: Color(0xFFFFFFFF),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -818,8 +811,6 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             const Color(0xFF2A2A2A),
             const Color(0xFF333333).withOpacity(0.8),
           ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -831,8 +822,8 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               children: [
                 Text(
                   match,
-                  style: TextStyle(
-                    color: const Color(0xFFFFFFFF),
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -840,8 +831,8 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                 const SizedBox(height: 4),
                 Text(
                   date,
-                  style: TextStyle(
-                    color: const Color(0xFF9E9E9E),
+                  style: const TextStyle(
+                    color: Color(0xFF9E9E9E),
                     fontSize: 12,
                   ),
                 ),
@@ -871,9 +862,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
 
 // 背景網格繪製器
 class GridPainter extends CustomPainter {
-  final double animationValue;
   
   GridPainter(this.animationValue);
+  final double animationValue;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -882,7 +873,7 @@ class GridPainter extends CustomPainter {
       ..strokeWidth = 1;
 
     // 繪製垂直線
-    for (int i = 0; i < size.width; i += 50) {
+    for (var i = 0; i < size.width; i += 50) {
       canvas.drawLine(
         Offset(i.toDouble(), 0),
         Offset(i.toDouble(), size.height),
@@ -891,7 +882,7 @@ class GridPainter extends CustomPainter {
     }
 
     // 繪製水平線
-    for (int i = 0; i < size.height; i += 50) {
+    for (var i = 0; i < size.height; i += 50) {
       canvas.drawLine(
         Offset(0, i.toDouble()),
         Offset(size.width, i.toDouble()),

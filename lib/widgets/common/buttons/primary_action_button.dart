@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
 class PrimaryActionButton extends StatelessWidget {
+
+  const PrimaryActionButton({
+    required this.text, required this.onPressed, super.key,
+    this.icon,
+  });
   final String text;
   final VoidCallback onPressed;
   final IconData? icon;
-
-  const PrimaryActionButton({
-    super.key,
-    required this.text,
-    required this.onPressed,
-    this.icon,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,7 @@ class PrimaryActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface.withOpacity(0.6),
-            border: Border.all(color: primaryColor.withOpacity(0.8), width: 1),
+            border: Border.all(color: primaryColor.withOpacity(0.8)),
             borderRadius: BorderRadius.circular(100),
             boxShadow: [
               BoxShadow(

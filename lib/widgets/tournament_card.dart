@@ -1,21 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/models/tournament.dart';
+import 'package:bowlingarsenal_app/shared/enums.dart'; // 導入共享的 enum
 import 'package:bowlingarsenal_app/widgets/standard_app_card.dart';
+import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart'; // 用於日期格式化
-import '../shared/enums.dart'; // 導入共享的 enum
 
 /// 用於在主頁顯示單個錦標賽資訊的卡片
 /// 使用 StandardAppCard 作為基礎，以保持風格統一
 class TournamentCard extends StatelessWidget {
-  final Tournament tournament;
-  final VoidCallback? onTap;
 
   const TournamentCard({
-    super.key,
-    required this.tournament,
+    required this.tournament, super.key,
     this.onTap,
   });
+  final Tournament tournament;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,6 @@ class TournamentCard extends StatelessWidget {
     return StandardAppCard(
       variant: StandardAppCardVariant.nested, // 使用嵌套變體以獲得更好的視覺對比
       onTap: onTap,
-      padding: const EdgeInsets.all(16), // 增加 padding
       child: Row(
         children: [
           // 左側：代表錦標賽類型的圖示
@@ -92,10 +90,10 @@ class TournamentCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

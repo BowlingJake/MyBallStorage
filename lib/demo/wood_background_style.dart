@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:iconsax/iconsax.dart';
 
 class WoodBackgroundStyle extends StatefulWidget {
   const WoodBackgroundStyle({super.key});
@@ -82,7 +83,7 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
           // 主要內容
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   const SizedBox(height: 40),
@@ -121,7 +122,7 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: const EdgeInsets.all(24),
                           child: Column(
                             children: [
                               // 圖示容器 - 壓印效果
@@ -205,7 +206,7 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(20.0),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -349,7 +350,7 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: const EdgeInsets.all(24),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -454,7 +455,7 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
                       ],
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16),
                       child: Row(
                         children: [
                           // 圖示不發光，使用壓印效果
@@ -489,10 +490,6 @@ class _WoodBackgroundStyleState extends State<WoodBackgroundStyle> {
 }
 
 class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-  final Color baseColor;
 
   const _StatItem({
     required this.label,
@@ -500,6 +497,10 @@ class _StatItem extends StatelessWidget {
     required this.icon,
     required this.baseColor,
   });
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color baseColor;
 
   @override
   Widget build(BuildContext context) {

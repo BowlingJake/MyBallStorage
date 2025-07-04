@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class TrainingPageAppBarActions extends StatelessWidget {
+
+  const TrainingPageAppBarActions({
+    required this.isSelectionMode, required this.selectedCount, required this.totalCount, required this.onToggleSelectionMode, required this.onSelectAll, required this.onClearAll, required this.onDeleteSelected, super.key,
+  });
   final bool isSelectionMode;
   final int selectedCount;
   final int totalCount;
@@ -8,17 +12,6 @@ class TrainingPageAppBarActions extends StatelessWidget {
   final VoidCallback onSelectAll;
   final VoidCallback onClearAll;
   final VoidCallback onDeleteSelected;
-
-  const TrainingPageAppBarActions({
-    Key? key,
-    required this.isSelectionMode,
-    required this.selectedCount,
-    required this.totalCount,
-    required this.onToggleSelectionMode,
-    required this.onSelectAll,
-    required this.onClearAll,
-    required this.onDeleteSelected,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
-class MyCustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool hasTextStroke; // 新增一個參數來控制是否有文字描邊
+class MyCustomButton extends StatelessWidget { // 新增一個參數來控制是否有文字描邊
 
   const MyCustomButton({
-    Key? key,
-    required this.text,
+    required this.text, super.key,
     this.onPressed,
     this.hasTextStroke = false, // 預設沒有文字描邊
-  }) : super(key: key);
+  });
+  final String text;
+  final VoidCallback? onPressed;
+  final bool hasTextStroke;
 
   @override
   Widget build(BuildContext context) {
     // 文字樣式
-    TextStyle textStyle = TextStyle(
+    var textStyle = const TextStyle(
       fontFamily: 'Inter',
       fontWeight: FontWeight.w600, // SemiBold 大約對應 FontWeight.w600
       fontSize: 16,
@@ -29,20 +28,20 @@ class MyCustomButton extends StatelessWidget {
         foreground: Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1 // 你可以根據 Figma 調整描邊寬度，這裡假設為1
-          ..color = Color(0xFF000000), // 描邊顏色 000000
+          ..color = const Color(0xFF000000), // 描邊顏色 000000
       );
     }
 
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFFA3D5DC), // 按鈕背景色 A3D5DC
+        backgroundColor: const Color(0xFFA3D5DC), // 按鈕背景色 A3D5DC
         foregroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: 25,
           vertical: 12, // 稍微增加垂直padding以改善外觀
         ),
-        minimumSize: Size(0, 44), // 增加最小高度以改善觸摸體驗
+        minimumSize: const Size(0, 44), // 增加最小高度以改善觸摸體驗
                                   // Figma 上的 W:115 Hug 可能是特定文字下的寬度
                                   // 如果需要固定寬度，可以設為 Size(115, 44)
                                   // 但通常按鈕寬度 'Hug' 內容會更好

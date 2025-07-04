@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 
 /// 木雕文字組件 - 強烈的雕刻效果，像真的刻在木頭上
 class WoodCarvedText extends StatelessWidget {
+
+  const WoodCarvedText({
+    required this.text, super.key,
+    this.fontSize = 20.0,
+    this.fontWeight = FontWeight.bold,
+    this.textColor,
+    this.shadowColor,
+    this.highlightColor,
+  });
   final String text;
   final double fontSize;
   final FontWeight fontWeight;
   final Color? textColor;
   final Color? shadowColor;
   final Color? highlightColor;
-
-  const WoodCarvedText({
-    Key? key,
-    required this.text,
-    this.fontSize = 20.0,
-    this.fontWeight = FontWeight.bold,
-    this.textColor,
-    this.shadowColor,
-    this.highlightColor,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ class WoodCarvedText extends StatelessWidget {
       children: [
         // 最深層陰影 - 強烈凹陷效果
         Transform.translate(
-          offset: const Offset(3.0, 3.0),
+          offset: const Offset(3, 3),
           child: Text(
             text,
             style: TextStyle(
@@ -44,7 +43,7 @@ class WoodCarvedText extends StatelessWidget {
         
         // 中層陰影
         Transform.translate(
-          offset: const Offset(2.0, 2.0),
+          offset: const Offset(2, 2),
           child: Text(
             text,
             style: TextStyle(
@@ -58,7 +57,7 @@ class WoodCarvedText extends StatelessWidget {
         
         // 淺層陰影
         Transform.translate(
-          offset: const Offset(1.0, 1.0),
+          offset: const Offset(1, 1),
           child: Text(
             text,
             style: TextStyle(
@@ -109,20 +108,20 @@ class WoodCarvedText extends StatelessWidget {
             shadows: [
               // 強烈內陰影 - 凹陷效果
               Shadow(
-                offset: const Offset(2.0, 2.0),
-                blurRadius: 4.0,
+                offset: const Offset(2, 2),
+                blurRadius: 4,
                 color: Colors.black.withOpacity(0.4),
               ),
               // 深度陰影
               Shadow(
-                offset: const Offset(3.0, 3.0),
-                blurRadius: 6.0,
+                offset: const Offset(3, 3),
+                blurRadius: 6,
                 color: Colors.black.withOpacity(0.2),
               ),
               // 高光效果
               Shadow(
-                offset: const Offset(-1.0, -1.0),
-                blurRadius: 2.0,
+                offset: const Offset(-1, -1),
+                blurRadius: 2,
                 color: Colors.white.withOpacity(0.5),
               ),
             ],
@@ -135,18 +134,17 @@ class WoodCarvedText extends StatelessWidget {
 
 /// 超深度木雕文字組件 - 極致的雕刻效果
 class DeepWoodCarvedText extends StatelessWidget {
+
+  const DeepWoodCarvedText({
+    required this.text, super.key,
+    this.fontSize = 20.0,
+    this.fontWeight = FontWeight.bold,
+    this.textColor,
+  });
   final String text;
   final double fontSize;
   final FontWeight fontWeight;
   final Color? textColor;
-
-  const DeepWoodCarvedText({
-    Key? key,
-    required this.text,
-    this.fontSize = 20.0,
-    this.fontWeight = FontWeight.bold,
-    this.textColor,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +154,7 @@ class DeepWoodCarvedText extends StatelessWidget {
       children: [
         // 最深層陰影 - 極深凹陷
         Transform.translate(
-          offset: const Offset(4.0, 4.0),
+          offset: const Offset(4, 4),
           child: Text(
             text,
             style: TextStyle(
@@ -170,7 +168,7 @@ class DeepWoodCarvedText extends StatelessWidget {
         
         // 深層陰影
         Transform.translate(
-          offset: const Offset(3.0, 3.0),
+          offset: const Offset(3, 3),
           child: Text(
             text,
             style: TextStyle(
@@ -184,7 +182,7 @@ class DeepWoodCarvedText extends StatelessWidget {
         
         // 中層陰影
         Transform.translate(
-          offset: const Offset(2.0, 2.0),
+          offset: const Offset(2, 2),
           child: Text(
             text,
             style: TextStyle(
@@ -198,7 +196,7 @@ class DeepWoodCarvedText extends StatelessWidget {
         
         // 淺層陰影
         Transform.translate(
-          offset: const Offset(1.0, 1.0),
+          offset: const Offset(1, 1),
           child: Text(
             text,
             style: TextStyle(
@@ -212,7 +210,7 @@ class DeepWoodCarvedText extends StatelessWidget {
         
         // 強烈高光 - 左上方
         Transform.translate(
-          offset: const Offset(-2.0, -2.0),
+          offset: const Offset(-2, -2),
           child: Text(
             text,
             style: TextStyle(
@@ -226,7 +224,7 @@ class DeepWoodCarvedText extends StatelessWidget {
         
         // 中等高光
         Transform.translate(
-          offset: const Offset(-1.0, -1.0),
+          offset: const Offset(-1, -1),
           child: Text(
             text,
             style: TextStyle(
@@ -249,26 +247,26 @@ class DeepWoodCarvedText extends StatelessWidget {
             shadows: [
               // 極深內陰影
               Shadow(
-                offset: const Offset(3.0, 3.0),
-                blurRadius: 6.0,
+                offset: const Offset(3, 3),
+                blurRadius: 6,
                 color: Colors.black.withOpacity(0.5),
               ),
               // 深度內陰影
               Shadow(
-                offset: const Offset(2.0, 2.0),
-                blurRadius: 4.0,
+                offset: const Offset(2, 2),
+                blurRadius: 4,
                 color: Colors.black.withOpacity(0.3),
               ),
               // 淺層內陰影
               Shadow(
-                offset: const Offset(1.0, 1.0),
-                blurRadius: 2.0,
+                offset: const Offset(1, 1),
+                blurRadius: 2,
                 color: Colors.black.withOpacity(0.2),
               ),
               // 強烈高光
               Shadow(
                 offset: const Offset(-1.5, -1.5),
-                blurRadius: 3.0,
+                blurRadius: 3,
                 color: Colors.white.withOpacity(0.6),
               ),
             ],
@@ -281,16 +279,15 @@ class DeepWoodCarvedText extends StatelessWidget {
 
 /// 白色木雕文字組件 - 針對深色背景的白色雕刻效果
 class WhiteWoodCarvedText extends StatelessWidget {
+
+  const WhiteWoodCarvedText({
+    required this.text, super.key,
+    this.fontSize = 20.0,
+    this.fontWeight = FontWeight.bold,
+  });
   final String text;
   final double fontSize;
   final FontWeight fontWeight;
-
-  const WhiteWoodCarvedText({
-    Key? key,
-    required this.text,
-    this.fontSize = 20.0,
-    this.fontWeight = FontWeight.bold,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +295,7 @@ class WhiteWoodCarvedText extends StatelessWidget {
       children: [
         // 深色陰影層 - 右下
         Transform.translate(
-          offset: const Offset(2.0, 2.0),
+          offset: const Offset(2, 2),
           child: Text(
             text,
             style: TextStyle(
@@ -312,7 +309,7 @@ class WhiteWoodCarvedText extends StatelessWidget {
         
         // 中等陰影
         Transform.translate(
-          offset: const Offset(1.0, 1.0),
+          offset: const Offset(1, 1),
           child: Text(
             text,
             style: TextStyle(
@@ -335,14 +332,14 @@ class WhiteWoodCarvedText extends StatelessWidget {
             shadows: [
               // 強烈黑色陰影
               Shadow(
-                offset: const Offset(2.0, 2.0),
-                blurRadius: 4.0,
+                offset: const Offset(2, 2),
+                blurRadius: 4,
                 color: Colors.black.withOpacity(0.7),
               ),
               // 深度陰影
               Shadow(
-                offset: const Offset(1.0, 1.0),
-                blurRadius: 2.0,
+                offset: const Offset(1, 1),
+                blurRadius: 2,
                 color: Colors.black.withOpacity(0.5),
               ),
             ],

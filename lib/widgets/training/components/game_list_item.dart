@@ -1,33 +1,29 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../../models/training_record.dart';
 
 /// 單局遊戲列表項目組件
 class GameListItem extends StatelessWidget {
+
+  const GameListItem({
+    required this.game, required this.theme, super.key,
+    this.onGameTap,
+    this.onGameDelete,
+  });
   final GameRecord game;
   final ThemeData theme;
   final Function(GameRecord)? onGameTap;
   final Function(GameRecord)? onGameDelete;
 
-  const GameListItem({
-    Key? key,
-    required this.game,
-    required this.theme,
-    this.onGameTap,
-    this.onGameDelete,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: theme.colorScheme.primary.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.2),
-          width: 1,
         ),
       ),
       child: Row(
@@ -50,7 +46,7 @@ class GameListItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
 
           // 分數和球具記錄
           Expanded(
@@ -65,7 +61,7 @@ class GameListItem extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 // 顯示使用的球具
                 if (game.ballUsed != null)
                   Text(

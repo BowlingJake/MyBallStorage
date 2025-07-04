@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Defines the state for the theme, which is now always dark.
 class ThemeState {
-  final ThemeMode themeMode;
   const ThemeState(this.themeMode);
+  final ThemeMode themeMode;
 }
 
 /// Manages the theme state of the application, forcing dark mode.

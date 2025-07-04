@@ -1,16 +1,14 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
-import '../../../models/training_record.dart';
 
 /// 訓練日統計資訊組件
 class TrainingDayStats extends StatelessWidget {
-  final TrainingDaySummary summary;
-  final ThemeData theme;
 
   const TrainingDayStats({
-    Key? key,
-    required this.summary,
-    required this.theme,
-  }) : super(key: key);
+    required this.summary, required this.theme, super.key,
+  });
+  final TrainingDaySummary summary;
+  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +20,7 @@ class TrainingDayStats extends StatelessWidget {
             theme,
             Icons.analytics,
             'AVG',
-            '${summary.averageScore.toStringAsFixed(0)}',
+            summary.averageScore.toStringAsFixed(0),
           ),
         ),
         // 最高分
@@ -55,7 +53,7 @@ class TrainingDayStats extends StatelessWidget {
           size: 18,
           color: theme.colorScheme.primary,
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(

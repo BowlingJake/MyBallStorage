@@ -1,17 +1,14 @@
+import 'dart:ui';
+
+import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
+import 'package:bowlingarsenal_app/widgets/ball_bag_options_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:iconsax/iconsax.dart';
-import 'dart:ui';
-import '../models/arsenal_ball.dart';
-import '../models/ball_bag_type.dart';
-import '../widgets/action_button_pair.dart';
-import '../widgets/bag_selector_widget.dart';
-import '../widgets/ball_grid_widget.dart';
-import '../widgets/ball_bag_options_dialog.dart';
-import '../widgets/professional_dark_background.dart';
-import '../widgets/section_container.dart';
-import '../widgets/modern_bottom_navigation.dart';
 
 final bottomIndexProvider = StateProvider<int>((ref) => 0);
 final selectedBagTypeProvider = StateProvider<BallBagType>((ref) => BallBagType.all);
@@ -68,7 +65,7 @@ final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
         dateAdded: DateTime(2024, 4, 2),
         bagType: BallBagType.competition,
       ),
-    ]);
+    ],);
 
 /// Filter balls based on selected bag type
 final filteredBallsProvider = Provider<List<ArsenalBall>>((ref) {
@@ -94,7 +91,6 @@ class MyArsenalPage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return ProfessionalDarkBackground(
-      backgroundImage: 'images/Sport_Tech_Background.png',
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -112,18 +108,17 @@ class MyArsenalPage extends ConsumerWidget {
           iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               // 控制區域 - 使用簡化的容器
               Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: theme.colorScheme.primary.withOpacity(0.2),
-                    width: 1.0,
                   ),
                 ),
                 child: Column(
@@ -161,13 +156,12 @@ class MyArsenalPage extends ConsumerWidget {
               // 球的網格 - 使用簡化的容器
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: theme.colorScheme.primary.withOpacity(0.2),
-                      width: 1.0,
                     ),
                   ),
                   child: Column(
@@ -272,7 +266,6 @@ class MyArsenalPage extends ConsumerWidget {
             color: theme.colorScheme.surface.withOpacity(0.95),
             border: Border.all(
               color: theme.colorScheme.primary.withOpacity(0.3),
-              width: 1,
             ),
             boxShadow: [
               BoxShadow(
@@ -298,7 +291,7 @@ class MyArsenalPage extends ConsumerWidget {
   }
 
   Widget _buildCreateBagButton(ThemeData theme, BuildContext context, WidgetRef ref) {
-    return Container(
+    return SizedBox(
       height: 40,
       child: OutlinedButton.icon(
         onPressed: () {
@@ -361,9 +354,8 @@ class MyArsenalPage extends ConsumerWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // 球的圖片
             Expanded(
@@ -472,7 +464,6 @@ class MyArsenalPage extends ConsumerWidget {
   void _showBallBagOptionsDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.7),
       builder: (BuildContext context) {
         return const BallBagOptionsDialog();
@@ -484,22 +475,18 @@ class MyArsenalPage extends ConsumerWidget {
     switch (index) {
       case 0: // 首頁
         Navigator.of(context).pop(); // 返回首頁
-        break;
       case 1: // Arsenal
         // 已經在 Arsenal 頁面，不需要導航
         break;
       case 2: // 中央按鈕 (新增)
         print('Add button tapped in Arsenal');
         // TODO: 實現新增球的功能
-        break;
       case 3: // 訓練
         print('Training button tapped in Arsenal');
         // TODO: 導航到訓練頁面
-        break;
       case 4: // 設定
         print('Settings button tapped in Arsenal');
         // TODO: 導航到設定頁面
-        break;
     }
     // 更新當前索引
     ref.read(bottomIndexProvider.notifier).state = index;

@@ -1,17 +1,14 @@
+import 'package:bowlingarsenal_app/logic/scoring_logic.dart';
 import 'package:flutter/material.dart';
-import '../../logic/scoring_logic.dart';
 
 class FrameWidget extends StatelessWidget {
+
+  const FrameWidget({
+    required this.frameNumber, required this.frame, required this.onTap, super.key,
+  });
   final int frameNumber;
   final Frame frame;
   final VoidCallback onTap;
-
-  const FrameWidget({
-    Key? key,
-    required this.frameNumber,
-    required this.frame,
-    required this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +29,7 @@ class FrameWidget extends StatelessWidget {
           children: [
             // Frame Number
             Container(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(4),
               width: double.infinity,
               color: theme.colorScheme.primary.withOpacity(0.1),
               child: Text(
@@ -104,7 +101,7 @@ class FrameWidget extends StatelessWidget {
     if (rollPosition == 3) {
       if (roll == 10) return 'X';
       // If second roll was a strike, or first+second was a spare, this is a bonus
-      bool previousSpare = (frame.firstRoll ?? 0) != 10 && (frame.firstRoll ?? 0) + (frame.secondRoll ?? 0) == 10;
+      final previousSpare = (frame.firstRoll ?? 0) != 10 && (frame.firstRoll ?? 0) + (frame.secondRoll ?? 0) == 10;
       if( (frame.secondRoll ?? 0) + roll == 10 && !previousSpare) return '/';
     }
     

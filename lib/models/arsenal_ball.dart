@@ -1,14 +1,6 @@
-import 'ball_bag_type.dart';
+import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
 
 class ArsenalBall {
-  final String name;
-  final String core;
-  final String cover;
-  final String layout;
-  final String imagePath;
-  final String brand;
-  final DateTime dateAdded;
-  final BallBagType bagType;
 
   const ArsenalBall({
     required this.name,
@@ -20,4 +12,12 @@ class ArsenalBall {
     required this.dateAdded,
     required this.bagType,
   });
+  final String name;
+  final String core;
+  final String cover;
+  final String layout;
+  final String imagePath;
+  final String brand;
+  final DateTime dateAdded;
+  final BallBagType bagType;
 }

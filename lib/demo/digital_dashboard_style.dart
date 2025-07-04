@@ -1,8 +1,8 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class DigitalDashboardStyle extends StatefulWidget {
   const DigitalDashboardStyle({super.key});
@@ -91,7 +91,6 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: borderColor ?? const Color(0xFF334155),
-          width: 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -151,10 +150,10 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
               ),
             ).animate().fadeIn(duration: 800.ms).slideY(begin: -0.3),
             const SizedBox(height: 4),
-            Text(
+            const Text(
               '數字儀表板風格',
               style: TextStyle(
-                color: const Color(0xFF64748B),
+                color: Color(0xFF64748B),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -220,30 +219,30 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       itemBuilder: (context, index) {
         final kpi = kpis[index];
         return _buildDashboardCard(
-          borderColor: kpi['color'] as Color,
+          borderColor: kpi['color']! as Color,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Icon(
-                    kpi['icon'] as IconData,
-                    color: kpi['color'] as Color,
+                    kpi['icon']! as IconData,
+                    color: kpi['color']! as Color,
                     size: 18,
                   ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: (kpi['positive'] as bool)
+                      color: (kpi['positive']! as bool)
                           ? const Color(0xFF10B981).withOpacity(0.2)
                           : const Color(0xFFEF4444).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      kpi['change'] as String,
+                      kpi['change']! as String,
                       style: TextStyle(
-                        color: (kpi['positive'] as bool)
+                        color: (kpi['positive']! as bool)
                             ? const Color(0xFF10B981)
                             : const Color(0xFFEF4444),
                         fontSize: 10,
@@ -255,7 +254,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
               ),
               const SizedBox(height: 8),
               Text(
-                kpi['title'] as String,
+                kpi['title']! as String,
                 style: const TextStyle(
                   color: Color(0xFF94A3B8),
                   fontSize: 12,
@@ -270,11 +269,11 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                   AnimatedBuilder(
                     animation: _counterController,
                     builder: (context, child) {
-                      final animatedValue = ((kpi['value'] as int) * _counterController.value).round();
+                      final animatedValue = ((kpi['value']! as int) * _counterController.value).round();
                       return Text(
                         animatedValue.toString(),
                         style: TextStyle(
-                          color: kpi['color'] as Color,
+                          color: kpi['color']! as Color,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           fontFeatures: const [FontFeature.tabularFigures()],
@@ -284,9 +283,9 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    kpi['unit'] as String,
+                    kpi['unit']! as String,
                     style: TextStyle(
-                      color: (kpi['color'] as Color).withOpacity(0.7),
+                      color: (kpi['color']! as Color).withOpacity(0.7),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -349,18 +348,16 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
-                  show: true,
-                  drawHorizontalLine: true,
                   horizontalInterval: 50,
                   getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: const Color(0xFF334155),
+                    return const FlLine(
+                      color: Color(0xFF334155),
                       strokeWidth: 1,
                     );
                   },
                   getDrawingVerticalLine: (value) {
-                    return FlLine(
-                      color: const Color(0xFF334155),
+                    return const FlLine(
+                      color: Color(0xFF334155),
                       strokeWidth: 1,
                     );
                   },
@@ -400,8 +397,8 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                       },
                     ),
                   ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(),
+                  rightTitles: const AxisTitles(),
                 ),
                 borderData: FlBorderData(show: false),
                 backgroundColor: Colors.transparent,
@@ -423,7 +420,6 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
-                      show: true,
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 4,
@@ -480,15 +476,15 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(
+            Icon(
               Iconsax.percentage_circle,
               color: Color(0xFF64748B),
               size: 20,
             ),
-            const SizedBox(width: 10),
-            const Text(
+            SizedBox(width: 10),
+            Text(
               '進度指標',
               style: TextStyle(
                 color: Color(0xFF64748B),
@@ -504,12 +500,12 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
         ...metrics.asMap().entries.map((entry) {
           final index = entry.key;
           final metric = entry.value;
-          final progress = (metric['current'] as int) / (metric['target'] as int);
+          final progress = (metric['current']! as int) / (metric['target']! as int);
           
           return Container(
             margin: const EdgeInsets.only(bottom: 15),
             child: _buildDashboardCard(
-              borderColor: metric['color'] as Color,
+              borderColor: metric['color']! as Color,
               child: Row(
                 children: [
                   Expanded(
@@ -517,7 +513,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          metric['title'] as String,
+                          metric['title']! as String,
                           style: const TextStyle(
                             color: Color(0xFF94A3B8),
                             fontSize: 14,
@@ -530,7 +526,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                             Text(
                               '${metric['current']}',
                               style: TextStyle(
-                                color: metric['color'] as Color,
+                                color: metric['color']! as Color,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 fontFeatures: const [FontFeature.tabularFigures()],
@@ -551,7 +547,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                           lineHeight: 6,
                           percent: progress.clamp(0.0, 1.0),
                           backgroundColor: const Color(0xFF334155),
-                          progressColor: metric['color'] as Color,
+                          progressColor: metric['color']! as Color,
                           barRadius: const Radius.circular(3),
                           padding: EdgeInsets.zero,
                         ),
@@ -566,13 +562,13 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                     center: Text(
                       '${(progress * 100).round()}%',
                       style: TextStyle(
-                        color: metric['color'] as Color,
+                        color: metric['color']! as Color,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
-                    progressColor: metric['color'] as Color,
+                    progressColor: metric['color']! as Color,
                     backgroundColor: const Color(0xFF334155),
                     circularStrokeCap: CircularStrokeCap.round,
                   ),
@@ -580,7 +576,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
               ),
             ),
           ).animate(delay: (850 + index * 100).ms).fadeIn().slideX(begin: 0.3);
-        }).toList(),
+        }),
       ],
     );
   }
@@ -599,15 +595,15 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
+              Icon(
                 Iconsax.data_2,
                 color: Color(0xFF64748B),
                 size: 20,
               ),
-              const SizedBox(width: 10),
-              const Text(
+              SizedBox(width: 10),
+              Text(
                 '最近比賽記錄',
                 style: TextStyle(
                   color: Color(0xFF64748B),
@@ -700,7 +696,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                   Expanded(
                     flex: 2,
                     child: Text(
-                      row['date'] as String,
+                      row['date']! as String,
                       style: TextStyle(
                         color: index == 0 ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
                         fontSize: 12,
@@ -747,7 +743,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                 ],
               ),
             ).animate(delay: (1100 + index * 100).ms).fadeIn().slideX(begin: 0.2);
-          }).toList(),
+          }),
         ],
       ),
     ).animate(delay: 1000.ms).fadeIn().slideY(begin: 0.3);
@@ -860,18 +856,18 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
   Widget _buildStyleDescription(BuildContext context) {
     return _buildDashboardCard(
       borderColor: const Color(0xFF3B82F6),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Iconsax.chart,
                 color: Color(0xFF3B82F6),
                 size: 20,
               ),
-              const SizedBox(width: 10),
-              const Text(
+              SizedBox(width: 10),
+              Text(
                 'Digital Dashboard 風格特色',
                 style: TextStyle(
                   color: Color(0xFF3B82F6),
@@ -881,8 +877,8 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          const Text(
+          SizedBox(height: 20),
+          Text(
             '• 專業數據可視化，適合大量數字展示\n• 清晰的圖表和進度指標\n• 等寬字體確保數字對齊\n• KPI 卡片和數據表格設計\n• 適合數據分析和專業使用\n• 深色背景減少眼部疲勞',
             style: TextStyle(
               color: Color(0xFF94A3B8),

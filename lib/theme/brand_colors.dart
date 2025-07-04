@@ -2,18 +2,7 @@
 import 'package:flutter/material.dart';
 
 /// 品牌色調色板類，包含完整的明度變化
-class BrandTonalPalette {
-  final Color primary;
-  final Color shade50;   // 最淺
-  final Color shade100;
-  final Color shade200;
-  final Color shade300;
-  final Color shade400;
-  final Color shade500;  // 基準色
-  final Color shade600;
-  final Color shade700;
-  final Color shade800;
-  final Color shade900;  // 最深
+class BrandTonalPalette {  // 最深
 
   const BrandTonalPalette({
     required this.primary,
@@ -31,7 +20,7 @@ class BrandTonalPalette {
 
   /// 從基準色生成完整的色調調色板
   factory BrandTonalPalette.fromBaseColor(Color baseColor) {
-    final HSLColor hsl = HSLColor.fromColor(baseColor);
+    final hsl = HSLColor.fromColor(baseColor);
     
     return BrandTonalPalette(
       primary: baseColor,
@@ -47,6 +36,17 @@ class BrandTonalPalette {
       shade900: hsl.withLightness(0.2).toColor(),
     );
   }
+  final Color primary;
+  final Color shade50;   // 最淺
+  final Color shade100;
+  final Color shade200;
+  final Color shade300;
+  final Color shade400;
+  final Color shade500;  // 基準色
+  final Color shade600;
+  final Color shade700;
+  final Color shade800;
+  final Color shade900;
 
   /// 獲取適合背景的漸層色
   List<Color> getBackgroundGradient() {
@@ -65,8 +65,8 @@ class BrandTonalPalette {
 
   /// 檢查是否為暖色系（橙、紅、黃），需要額外遮罩
   bool isWarmColor() {
-    final HSLColor hsl = HSLColor.fromColor(primary);
-    final double hue = hsl.hue;
+    final hsl = HSLColor.fromColor(primary);
+    final hue = hsl.hue;
     // 橙色(30-60°)、紅色(0-30°, 330-360°)、黃色(60-90°)
     return (hue >= 0 && hue <= 90) || (hue >= 330 && hue <= 360);
   }
@@ -196,7 +196,7 @@ List<Color> getGradientColorsForBrand(String brandName, ThemeData theme) {
   }
   
   // 如果直接匹配失敗，嘗試不區分大小寫的匹配
-  final String lowerBrandName = brandName.toLowerCase();
+  final lowerBrandName = brandName.toLowerCase();
   for (final entry in brandGradientColors.entries) {
     if (entry.key.toLowerCase() == lowerBrandName) {
       print('找到品牌顏色(不區分大小寫): $brandName -> ${entry.key}');
@@ -205,7 +205,7 @@ List<Color> getGradientColorsForBrand(String brandName, ThemeData theme) {
   }
   
   // 如果還是找不到，嘗試部分匹配（去掉 "Bowling" 後綴）
-  final String simplifiedBrandName = brandName.replaceAll(' Bowling', '').trim();
+  final simplifiedBrandName = brandName.replaceAll(' Bowling', '').trim();
   if (brandGradientColors.containsKey(simplifiedBrandName)) {
     print('找到品牌顏色(簡化名稱): $brandName -> $simplifiedBrandName');
     return brandGradientColors[simplifiedBrandName]!;
@@ -223,7 +223,7 @@ BrandTonalPalette getBrandTonalPalette(String brandName, ThemeData theme) {
   }
   
   // 如果直接匹配失敗，嘗試不區分大小寫的匹配
-  final String lowerBrandName = brandName.toLowerCase();
+  final lowerBrandName = brandName.toLowerCase();
   for (final entry in brandTonalPalettes.entries) {
     if (entry.key.toLowerCase() == lowerBrandName) {
       return entry.value;
@@ -231,7 +231,7 @@ BrandTonalPalette getBrandTonalPalette(String brandName, ThemeData theme) {
   }
   
   // 如果還是找不到，嘗試部分匹配（去掉 "Bowling" 後綴）
-  final String simplifiedBrandName = brandName.replaceAll(' Bowling', '').trim();
+  final simplifiedBrandName = brandName.replaceAll(' Bowling', '').trim();
   if (brandTonalPalettes.containsKey(simplifiedBrandName)) {
     return brandTonalPalettes[simplifiedBrandName]!;
   }

@@ -1,32 +1,29 @@
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/score_game_widget.dart';
+import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
-import 'score_game_widget.dart';
-import '../models/score_data.dart';
-import 'tenth_frame_widget.dart';
-import 'pin_selector_popup_widget.dart';
 
 class EditableBowlingScoreTable extends StatelessWidget {
+
+  const EditableBowlingScoreTable({
+    required this.scoreData, required this.modifiedFrames, required this.onCellEdit, super.key,
+    this.width,
+  });
   final BowlingScoreData scoreData;
   final Set<int> modifiedFrames;
   final void Function(int frameIndex) onCellEdit;
   final double? width;
 
-  const EditableBowlingScoreTable({
-    Key? key,
-    required this.scoreData,
-    required this.modifiedFrames,
-    required this.onCellEdit,
-    this.width,
-  }) : super(key: key);
-
   Future<void> _editFrame(BuildContext context, int frameIdx) async {
     final frame = scoreData.frames[frameIdx];
     if (frame.rolls.isEmpty) return;
-    Set<int> initialPinsDown = {};
-    final List<Roll> originalRolls = List.from(frame.rolls);
-    final bool wasComplete = frame.isComplete;
+    final var initialPinsDown = <int>{};
+    final originalRolls = List<Roll>.from(frame.rolls);
+    final wasComplete = frame.isComplete;
     frame.rolls.clear();
     frame.isComplete = false;
-    final Set<int>? pinsHit = await showDialog<Set<int>>(
+    final pinsHit = await showDialog<Set<int>>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
@@ -38,11 +35,11 @@ class EditableBowlingScoreTable extends StatelessWidget {
       },
     );
     if (pinsHit != null) {
-      final int pinsDown = pinsHit.length;
-      final Roll newRoll = Roll(
+      final pinsDown = pinsHit.length;
+      final newRoll = Roll(
         pinsDown: pinsDown,
         pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
-        displayScore: pinsDown == 10 ? "X" : pinsDown.toString(),
+        displayScore: pinsDown == 10 ? 'X' : pinsDown.toString(),
         pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
       );
       frame.rolls.add(newRoll);
@@ -58,14 +55,14 @@ class EditableBowlingScoreTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double availableWidth = width ?? MediaQuery.of(context).size.width;
-    final double frameWidth = availableWidth / 10;
+    final availableWidth = width ?? MediaQuery.of(context).size.width;
+    final frameWidth = availableWidth / 10;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(9, (index) {
           final frame = scoreData.frames[index];
-          final bool isModified = modifiedFrames.contains(index);
+          final isModified = modifiedFrames.contains(index);
           return GestureDetector(
             onTap: () => _editFrame(context, index),
             child: Container(
@@ -77,13 +74,10 @@ class EditableBowlingScoreTable extends StatelessWidget {
               ),
               child: ScoreFrameWidget(
                 frameNumber: index + 1,
-                isTenthFrame: false,
                 ball1Score: frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
                 ball2Score: frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
-                ball3Score: null,
                 frameTotalScore: frame.totalScore?.toString(),
                 availableWidth: frameWidth,
-                isCurrentFrame: false,
               ),
             ),
           );

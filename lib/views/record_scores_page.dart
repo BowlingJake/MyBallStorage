@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For input formatters
 import 'package:provider/provider.dart';
-import '../viewmodels/tournament_viewmodel.dart'; // Assuming we update scores via this ViewModel
-import '../models/tournament.dart'; // Might need Tournament model later
 
 class RecordScoresPage extends StatefulWidget {
+
+  const RecordScoresPage({
+    required this.tournamentId, required this.tournamentName, required this.gamesPerSession, super.key,
+  });
   final String tournamentId;
   final String tournamentName;
   final int gamesPerSession;
-
-  const RecordScoresPage({
-    super.key,
-    required this.tournamentId,
-    required this.tournamentName,
-    required this.gamesPerSession,
-  });
 
   @override
   State<RecordScoresPage> createState() => _RecordScoresPageState();
@@ -38,7 +33,7 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
   @override
   void dispose() {
     // Dispose all controllers
-    for (var controller in _scoreControllers) {
+    for (final controller in _scoreControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -48,9 +43,9 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
     FocusScope.of(context).unfocus(); // Hide keyboard
     if (_formKey.currentState!.validate()) {
       // Collect scores from controllers
-      List<int> scores = [];
-      bool parseError = false;
-      for (int i = 0; i < _scoreControllers.length; i++) {
+      final scores = <int>[];
+      var parseError = false;
+      for (var i = 0; i < _scoreControllers.length; i++) {
         final text = _scoreControllers[i].text;
         final score = int.tryParse(text);
         if (score == null || score < 0 || score > 300) { // Basic validation
@@ -101,16 +96,16 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
             icon: const Icon(Icons.save),
             tooltip: '儲存分數',
             onPressed: _saveScores,
-          )
+          ),
         ],
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView( // Allow scrolling if many games
-           padding: const EdgeInsets.all(16.0),
+           padding: const EdgeInsets.all(16),
            child: Wrap( // Use Wrap for horizontal arrangement that wraps
-             spacing: 12.0, // Horizontal space between inputs
-             runSpacing: 12.0, // Vertical space if wraps
+             spacing: 12, // Horizontal space between inputs
+             runSpacing: 12, // Vertical space if wraps
              alignment: WrapAlignment.center, // Center items horizontally
              children: List.generate(widget.gamesPerSession, (index) {
                 return SizedBox(

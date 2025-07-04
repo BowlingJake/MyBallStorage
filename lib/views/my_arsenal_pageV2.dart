@@ -1,20 +1,20 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
+import 'package:bowlingarsenal_app/views/add_custom_ball_page.dart'; // <-- Add import for the new custom page
+import 'package:bowlingarsenal_app/views/ball_card.dart';
+import 'package:bowlingarsenal_app/views/weapon_library_page.dart'; // <-- Add this import
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
-import '../models/bowling_ball.dart';
-import '../shared/dialogs/layout_dialog.dart'; // Import layout dialog if needed
-import 'weapon_library_page.dart'; // <-- Add this import
-import 'add_custom_ball_page.dart'; // <-- Add import for the new custom page
-import 'package:bowlingarsenal_app/views/ball_card.dart';
-import '../theme/text_styles.dart';
 
 
 /// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
-class MyArsenalPage extends StatefulWidget { // Changed to StatefulWidget
-  final bool isSelectionMode;
+class MyArsenalPage extends StatefulWidget {
 
-  const MyArsenalPage({super.key, this.isSelectionMode = false});
+  const MyArsenalPage({super.key, this.isSelectionMode = false}); // Changed to StatefulWidget
+  final bool isSelectionMode;
 
   @override
   State<MyArsenalPage> createState() => _MyArsenalPageState(); // Create State
@@ -86,7 +86,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
     final theme = Theme.of(context);
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
           // Brand Filter
@@ -108,7 +108,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       value: brand,
                       child: Text(
                         brand,
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     );
@@ -124,7 +124,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: theme.colorScheme.outline.withOpacity(0.5),
-                        width: 1,
                       ),
                       color: theme.colorScheme.surface,
                     ),
@@ -149,7 +148,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                         ),
                       ],
                     ),
-                    offset: const Offset(0, 0),
                     scrollbarTheme: ScrollbarThemeData(
                       radius: const Radius.circular(40),
                       thickness: WidgetStateProperty.all(6),
@@ -184,7 +182,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       value: category,
                       child: Text(
                         category,
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     );
@@ -200,7 +198,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: theme.colorScheme.outline.withOpacity(0.5),
-                        width: 1,
                       ),
                       color: theme.colorScheme.surface,
                     ),
@@ -225,7 +222,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                         ),
                       ],
                     ),
-                    offset: const Offset(0, 0),
                     scrollbarTheme: ScrollbarThemeData(
                       radius: const Radius.circular(40),
                       thickness: WidgetStateProperty.all(6),
@@ -260,7 +256,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       value: category,
                       child: Text(
                         category,
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     );
@@ -276,7 +272,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: theme.colorScheme.outline.withOpacity(0.5),
-                        width: 1,
                       ),
                       color: theme.colorScheme.surface,
                     ),
@@ -301,7 +296,6 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                         ),
                       ],
                     ),
-                    offset: const Offset(0, 0),
                     scrollbarTheme: ScrollbarThemeData(
                       radius: const Radius.circular(40),
                       thickness: WidgetStateProperty.all(6),
@@ -355,9 +349,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
           // Batch delete button (only in multi-select mode and if items are selected)
           if (_isMultiSelectMode && _selectedBallNames.isNotEmpty)
             TextButton(
-              onPressed: () {
-                _showDeleteConfirmationDialog();
-              },
+              onPressed: _showDeleteConfirmationDialog,
               child: Text(
                 '刪除 (${_selectedBallNames.length})',
                 style: AppTextStyles.button.copyWith(color: Colors.red),
@@ -370,7 +362,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
           _buildFilterDropdown(context, viewModel),
           if (!widget.isSelectionMode && !_isMultiSelectMode) // Show search only in normal mode
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: TextField(
                 decoration: const InputDecoration(
                   hintText: '搜尋我的球櫃...',
@@ -378,14 +370,12 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                   border: OutlineInputBorder(),
                   isDense: true,
                 ),
-                onChanged: (value) {
-                  viewModel.filterArsenal(value);
-                },
+                onChanged: viewModel.filterArsenal,
               ),
             ),
           if (widget.isSelectionMode && !_isMultiSelectMode) // Show "Add to Arsenal" only in page's selection mode
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('新增保齡球至我的球櫃', style: AppTextStyles.button),
@@ -399,7 +389,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
             child: filteredArsenal.isEmpty
                 ? Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(20),
                       child: Text(
                         widget.isSelectionMode && !_isMultiSelectMode
                             ? '球櫃中無球可選\n點擊上方按鈕新增'
@@ -413,11 +403,11 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 80.0),
+                    padding: const EdgeInsets.only(top: 8, bottom: 80),
                     itemCount: filteredArsenal.length,
                     itemBuilder: (context, index) {
                       final ball = filteredArsenal[index];
-                      final bool isSelectedForCurrentMode = _selectedBallNames.contains(ball.ball);
+                      final isSelectedForCurrentMode = _selectedBallNames.contains(ball.ball);
 
                       return BowlingBallCard(
                         key: ValueKey(ball.ball + ball.brand), // More unique key
@@ -484,7 +474,7 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
       builder: (dialogContext) => AlertDialog(
         title: const Text('確認刪除'),
         content: Text(
-            '確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？'),
+            '確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？',),
         actions: [
           TextButton(
             child: const Text('取消'),
@@ -492,10 +482,10 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
           ),
           TextButton(
             child: const Text('刪除',
-                style: TextStyle(color: Colors.red)),
+                style: TextStyle(color: Colors.red),),
             onPressed: () {
-              int deletedCount = 0;
-              List<String> namesToDelete = List.from(_selectedBallNames); // Create a copy for iteration
+              var deletedCount = 0;
+              final namesToDelete = List<String>.from(_selectedBallNames); // Create a copy for iteration
               final viewModel = context.read<WeaponLibraryViewModel>();
               for (final ballName in namesToDelete) {
                 try {

@@ -1,10 +1,10 @@
+import 'dart:ui';
+
+import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/theme/theme.dart';
+import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:ui';
-import 'package:iconsax/iconsax.dart';
-import '../../../models/arsenal_ball.dart';
-import '../../../views/my_arsenal_page.dart';
-import '../../../theme/theme.dart';
 
 /// Create Ball Bag Dialog with popout detail design style, refined based on professional feedback.
 class CreateBallBagDialog extends ConsumerStatefulWidget {
@@ -31,10 +31,10 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
     _animationController.forward();
@@ -53,7 +53,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     final allBalls = ref.read(userBallsProvider);
-    final bool isCreateEnabled = nameController.text.isNotEmpty;
+    final isCreateEnabled = nameController.text.isNotEmpty;
 
     return Material(
       type: MaterialType.transparency,
@@ -117,7 +117,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                   decoration: BoxDecoration(
                                     color: Colors.black.withOpacity(0.58),
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white.withOpacity(0.8), width: 1),
+                                    border: Border.all(color: Colors.white.withOpacity(0.8)),
                                   ),
                                   child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
                                 ),
@@ -163,7 +163,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        '(${selectedBalls.length}/${bagCapacity})',
+                                        '(${selectedBalls.length}/$bagCapacity)',
                                         style: theme.textTheme.bodyMedium?.copyWith(
                                           color: selectedBalls.length >= bagCapacity 
                                               ? Colors.redAccent 
@@ -184,7 +184,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                     child: allBalls.isEmpty
                                         ? const Center(
                                             child: Padding(
-                                              padding: EdgeInsets.all(32.0),
+                                              padding: EdgeInsets.all(32),
                                               child: Text(
                                                 'No balls available in your arsenal.',
                                                 style: TextStyle(color: Colors.white70),
@@ -242,7 +242,6 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                   onPressed: () {
                                     // TODO: Implement create logic
                                   },
-                                  isPrimary: true,
                                   isEnabled: isCreateEnabled,
                                 ),
                               ),
@@ -275,7 +274,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
       onChanged: onChanged,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         prefixIcon: Icon(icon, color: Colors.white, size: 22),
         labelText: label,
         labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
@@ -300,10 +299,6 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
 }
 
 class _DialogActionButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final bool isPrimary;
-  final bool isEnabled;
 
   const _DialogActionButton({
     required this.text,
@@ -311,6 +306,10 @@ class _DialogActionButton extends StatelessWidget {
     this.isPrimary = true,
     this.isEnabled = true,
   });
+  final String text;
+  final VoidCallback onPressed;
+  final bool isPrimary;
+  final bool isEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -353,10 +352,6 @@ class _DialogActionButton extends StatelessWidget {
 }
 
 class _SelectableBallCard extends StatefulWidget {
-  final ArsenalBall ball;
-  final bool isSelected;
-  final bool isEnabled;
-  final VoidCallback onTap;
 
   const _SelectableBallCard({
     required this.ball,
@@ -364,6 +359,10 @@ class _SelectableBallCard extends StatefulWidget {
     required this.isEnabled,
     required this.onTap,
   });
+  final ArsenalBall ball;
+  final bool isSelected;
+  final bool isEnabled;
+  final VoidCallback onTap;
 
   @override
   State<_SelectableBallCard> createState() => _SelectableBallCardState();
@@ -375,7 +374,7 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final double elevation = (widget.isSelected || _isHovered) ? 8.0 : 1.0;
+    final elevation = (widget.isSelected || _isHovered) ? 8.0 : 1.0;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -388,8 +387,8 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             gradient: widget.isSelected
-                ? LinearGradient(
-                    colors: [const Color(0xFF003B5C), const Color(0xFF052C43)],
+                ? const LinearGradient(
+                    colors: [Color(0xFF003B5C), Color(0xFF052C43)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   )
@@ -417,7 +416,7 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
           child: Opacity(
             opacity: widget.isEnabled ? 1.0 : 0.5,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: Row(
                 children: [
                   Container(

@@ -1,11 +1,11 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:flutter/material.dart';
-import '../../models/bowling_ball.dart';
 
 enum _DialogView { selection, details, layoutInput }
 
 /// 共用的顯示 Layout 設定與詳細資料的 Dialog
 void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback onUpdated) {
-  _DialogView currentView = _DialogView.selection;
+  var currentView = _DialogView.selection;
 
   // Keep track of layout input values within the dialog's state
   String? handType = ball.handType ?? 'One Handed';
@@ -47,7 +47,6 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                   child: const Text('返回'),
                 ),
               ];
-              break;
 
             case _DialogView.layoutInput:
               title = ball.ball; // Show ball name as title for layout input
@@ -140,7 +139,6 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                   child: const Text('確認'),
                 ),
               ];
-              break;
 
             case _DialogView.selection:
             default:
@@ -170,7 +168,6 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                   child: const Text('輸入 Layout'),
                 ),
               ];
-              break;
           }
 
           return AlertDialog(

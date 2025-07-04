@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../app_standard_button.dart';
+
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:flutter/material.dart';
 
 // 訓練詳細資訊彈窗
 class TrainingDetailDialog extends StatefulWidget {
-  final String sessionId;
 
   const TrainingDetailDialog({
-    Key? key,
-    required this.sessionId,
-  }) : super(key: key);
+    required this.sessionId, super.key,
+  });
+  final String sessionId;
 
   @override
   State<TrainingDetailDialog> createState() => _TrainingDetailDialogState();
@@ -29,7 +29,7 @@ class _TrainingDetailDialogState extends State<TrainingDetailDialog> {
       
       // 顯示成功提示
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Training details saved successfully'),
           backgroundColor: Colors.green,
         ),
@@ -61,7 +61,7 @@ class _TrainingDetailDialogState extends State<TrainingDetailDialog> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.10),
                     blurRadius: 24,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -78,7 +78,7 @@ class _TrainingDetailDialogState extends State<TrainingDetailDialog> {
                   // 內容
                   SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.all(24),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -135,13 +135,13 @@ class _TrainingDetailDialogState extends State<TrainingDetailDialog> {
 
 // 計分方式選擇器
 class _ScoringMethodSelector extends StatefulWidget {
-  final String selectedMethod;
-  final Function(String) onMethodSelected;
 
   const _ScoringMethodSelector({
     required this.selectedMethod,
     required this.onMethodSelected,
   });
+  final String selectedMethod;
+  final Function(String) onMethodSelected;
 
   @override
   State<_ScoringMethodSelector> createState() => _ScoringMethodSelectorState();
@@ -151,7 +151,7 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
   OverlayEntry? _tooltipOverlay;
 
   void _showTooltip(BuildContext context) {
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final renderBox = context.findRenderObject()! as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
     
     _tooltipOverlay = OverlayEntry(
@@ -172,7 +172,7 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
               color: Colors.transparent,
               child: Container(
                 width: 280,
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
@@ -180,11 +180,11 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Text(
+                child: const Text(
                   'Traditional Scoring: Classic 10-pin bowling scoring system with strikes, spares, and cumulative frame scoring.\n\nCurrent Scoring: Modern scoring method with simplified pin counting and instant score calculation.',
                   style: TextStyle(
                     color: Colors.white,
@@ -217,12 +217,11 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         border: Border.all(
           color: Colors.white.withOpacity(0.3),
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -232,14 +231,14 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
           // 標題與問號按鈕
           Row(
             children: [
-              Text(
+              const Text(
                 'Scoring Method',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: () => _showTooltip(context),
                 child: Container(
@@ -250,10 +249,9 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Colors.white.withOpacity(0.5),
-                      width: 1,
                     ),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.help_outline,
                     size: 12,
                     color: Colors.white,
@@ -263,7 +261,7 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
             ],
           ),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 兩個並排按鈕
           Row(
@@ -273,7 +271,7 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
                 child: GestureDetector(
                   onTap: () => widget.onMethodSelected('traditional'),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                       color: widget.selectedMethod == 'traditional' 
                         ? Colors.white.withOpacity(0.3)
@@ -299,14 +297,14 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
                 ),
               ),
               
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               
               // Current Scoring 按鈕
               Expanded(
                 child: GestureDetector(
                   onTap: () => widget.onMethodSelected('current'),
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                       color: widget.selectedMethod == 'current' 
                         ? Colors.white.withOpacity(0.3)
@@ -341,9 +339,9 @@ class _ScoringMethodSelectorState extends State<_ScoringMethodSelector> {
 
 // 操作按鈕
 class _ActionButtons extends StatelessWidget {
-  final VoidCallback onSave;
 
   const _ActionButtons({required this.onSave});
+  final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -351,15 +349,15 @@ class _ActionButtons extends StatelessWidget {
       children: [
         Expanded(
           child: AppStandardButton(
-            text: "Cancel",
+            text: 'Cancel',
             onPressed: () => Navigator.of(context).pop(),
             customColor: Colors.white,
           ),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: AppStandardButton(
-            text: "Save",
+            text: 'Save',
             onPressed: onSave,
             customColor: Colors.white,
             isPrimary: true,
@@ -374,7 +372,6 @@ class _ActionButtons extends StatelessWidget {
 void showTrainingDetailDialog(BuildContext context, String sessionId) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.7),
     builder: (BuildContext context) {
       return Material(

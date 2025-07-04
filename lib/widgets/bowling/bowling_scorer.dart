@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
-import '../../logic/scoring_logic.dart';
-import 'frame_widget.dart';
-import 'frame_editor_dialog.dart'; 
+import 'package:bowlingarsenal_app/logic/scoring_logic.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/frame_editor_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/frame_widget.dart';
+import 'package:flutter/material.dart'; 
 
 class BowlingScorerWidget extends StatefulWidget {
-  final Function(int)? onFrameTap;
-  final bool readOnly;
 
   const BowlingScorerWidget({
-    Key? key,
+    super.key,
     this.onFrameTap,
     this.readOnly = false,
-  }) : super(key: key);
+  });
+  final Function(int)? onFrameTap;
+  final bool readOnly;
 
   @override
   BowlingScorerWidgetState createState() => BowlingScorerWidgetState();
@@ -30,7 +30,7 @@ class BowlingScorerWidgetState extends State<BowlingScorerWidget> {
     return _logic;
   }
 
-  void _editFrame(int frameIndex) async {
+  Future<void> _editFrame(int frameIndex) async {
     if (widget.onFrameTap != null) {
       widget.onFrameTap!(frameIndex);
       return;
@@ -38,7 +38,7 @@ class BowlingScorerWidgetState extends State<BowlingScorerWidget> {
 
     if (widget.readOnly) return;
 
-    final Frame? updatedFrame = await showDialog<Frame>(
+    final updatedFrame = await showDialog<Frame>(
       context: context,
       builder: (context) => FrameEditorDialog(
         frame: _logic.frames[frameIndex],
@@ -77,25 +77,25 @@ class BowlingScorerWidgetState extends State<BowlingScorerWidget> {
             },
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: theme.colorScheme.primary.withOpacity(0.5))
+            border: Border.all(color: theme.colorScheme.primary.withOpacity(0.5)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Total Score", style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.onSurface)),
+              Text('Total Score', style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.onSurface)),
               Text(
                 _logic.totalScore.toString(),
                 style: theme.textTheme.headlineSmall?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }

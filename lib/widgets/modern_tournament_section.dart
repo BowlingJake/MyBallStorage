@@ -1,12 +1,18 @@
+import 'package:bowlingarsenal_app/models/tournament.dart';
+import 'package:bowlingarsenal_app/shared/enums.dart'; // 導入共享的 enum
+import 'package:bowlingarsenal_app/widgets/section_container.dart'; // 導入新的容器元件
+import 'package:bowlingarsenal_app/widgets/tournament_card.dart'; // 導入新的 TournamentCard
 import 'package:flutter/material.dart';
-import '../models/tournament.dart';
-import 'tournament_card.dart'; // 導入新的 TournamentCard
-import '../shared/enums.dart'; // 導入共享的 enum
-import 'section_container.dart'; // 導入新的容器元件
 
 /// 現代化Tournament區塊
 /// 垂直列表顯示錦標賽卡片
 class ModernTournamentSection extends StatelessWidget {
+
+  const ModernTournamentSection({
+    super.key,
+    this.onSeeAllPressed,
+    this.onTournamentPressed,
+  });
   final VoidCallback? onSeeAllPressed;
   final Function(Tournament tournament)? onTournamentPressed;
 
@@ -41,12 +47,6 @@ class ModernTournamentSection extends StatelessWidget {
     ),
   ];
 
-  const ModernTournamentSection({
-    Key? key,
-    this.onSeeAllPressed,
-    this.onTournamentPressed,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SectionContainer(
@@ -75,15 +75,6 @@ class ModernTournamentSection extends StatelessWidget {
 
 /// Tournament數據模型
 class TournamentData {
-  final String id;
-  final String name;
-  final String location;
-  final String date;
-  final double averageScore;
-  final int participants;
-  final TournamentStatus status;
-  final IconData icon;
-  final String imageUrl;
 
   const TournamentData({
     required this.id,
@@ -96,6 +87,15 @@ class TournamentData {
     required this.icon,
     required this.imageUrl,
   });
+  final String id;
+  final String name;
+  final String location;
+  final String date;
+  final double averageScore;
+  final int participants;
+  final TournamentStatus status;
+  final IconData icon;
+  final String imageUrl;
 }
 
 /// Tournament狀態枚舉

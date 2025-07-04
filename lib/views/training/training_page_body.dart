@@ -1,9 +1,13 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/training/training_day_summary_card.dart';
 import 'package:flutter/material.dart';
-import '../../models/training_record.dart';
-import '../../widgets/app_standard_button.dart';
-import '../../widgets/training/training_day_summary_card.dart';
 
 class TrainingPageBody extends StatelessWidget {
+
+  const TrainingPageBody({
+    required this.trainingDays, required this.selectedDayIds, required this.isSelectionMode, required this.onAddRecord, required this.onToggleSelectionMode, required this.onToggleDaySelection, required this.onDeleteDay, required this.onAddGame, required this.onEditRecord, required this.onGameTap, required this.onGameDelete, required this.onSelectionChanged, super.key,
+  });
   final List<TrainingDaySummary> trainingDays;
   final Set<String> selectedDayIds;
   final bool isSelectionMode;
@@ -17,34 +21,18 @@ class TrainingPageBody extends StatelessWidget {
   final Function(GameRecord) onGameDelete;
   final Function(String, bool) onSelectionChanged;
 
-  const TrainingPageBody({
-    Key? key,
-    required this.trainingDays,
-    required this.selectedDayIds,
-    required this.isSelectionMode,
-    required this.onAddRecord,
-    required this.onToggleSelectionMode,
-    required this.onToggleDaySelection,
-    required this.onDeleteDay,
-    required this.onAddGame,
-    required this.onEditRecord,
-    required this.onGameTap,
-    required this.onGameDelete,
-    required this.onSelectionChanged,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         if (!isSelectionMode)
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Expanded(
                   child: AppStandardButton(
-                    text: "Add Training Day",
+                    text: 'Add Training Day',
                     icon: Icons.add_circle_outline,
                     onPressed: onAddRecord,
                   ),
@@ -52,7 +40,7 @@ class TrainingPageBody extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppStandardButton(
-                    text: "Delete Days",
+                    text: 'Delete Days',
                     icon: Icons.delete_outline,
                     onPressed: onToggleSelectionMode,
                   ),
@@ -62,7 +50,7 @@ class TrainingPageBody extends StatelessWidget {
           ),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            padding: const EdgeInsets.symmetric(),
             itemCount: trainingDays.length,
             itemBuilder: (context, index) {
               final day = trainingDays[index];

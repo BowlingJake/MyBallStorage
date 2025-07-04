@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 
 class BallCardWidget extends StatelessWidget {
-  final String title;
-  final String stat1, stat2, stat3;
-  final VoidCallback? onTap;
 
   const BallCardWidget({
-    Key? key,
-    required this.title,
-    required this.stat1,
-    required this.stat2,
-    required this.stat3,
+    required this.title, required this.stat1, required this.stat2, required this.stat3, super.key,
     this.onTap,
-  }) : super(key: key);
+  });
+  final String title;
+  final String stat1;
+  final String stat2;
+  final String stat3;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 12,
@@ -65,14 +63,14 @@ class BallCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildStat(context, stat1, 'RG'),
-                  VerticalDivider(color: Colors.white54, thickness: 1),
+                  const VerticalDivider(color: Colors.white54, thickness: 1),
                   _buildStat(context, stat2, 'Diff'),
-                  VerticalDivider(color: Colors.white54, thickness: 1),
+                  const VerticalDivider(color: Colors.white54, thickness: 1),
                   _buildStat(context, stat3, 'MB Diff'),
                 ],
               ),
@@ -113,9 +111,9 @@ class _TopCurveClipper extends CustomClipper<Path> {
     final path = Path()
       ..moveTo(0, size.height * 0.8)
       ..quadraticBezierTo(
-          size.width * 0.2, size.height, size.width * 0.5, size.height)
+          size.width * 0.2, size.height, size.width * 0.5, size.height,)
       ..quadraticBezierTo(
-          size.width * 0.8, size.height, size.width, size.height * 0.8)
+          size.width * 0.8, size.height, size.width, size.height * 0.8,)
       ..lineTo(size.width, 0)
       ..lineTo(0, 0)
       ..close();

@@ -1,10 +1,14 @@
+import 'package:bowlingarsenal_app/controllers/training_controller.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/training/training_day_summary_card.dart';
+import 'package:bowlingarsenal_app/widgets/training/training_empty_state.dart';
 import 'package:flutter/material.dart';
-import '../../controllers/training_controller.dart';
-import '../../models/training_record.dart';
-import 'training_day_summary_card.dart';
-import 'training_empty_state.dart';
 
 class TrainingListView extends StatelessWidget {
+
+  const TrainingListView({
+    required this.controller, required this.onCreateRecord, required this.onAddGame, required this.onEditRecord, required this.onDeleteDay, required this.onGameTap, required this.onGameDelete, super.key,
+  });
   final TrainingController controller;
   final VoidCallback onCreateRecord;
   final Function(String dayId) onAddGame;
@@ -12,17 +16,6 @@ class TrainingListView extends StatelessWidget {
   final Function(String dayId) onDeleteDay;
   final Function(GameRecord game) onGameTap;
   final Function(GameRecord game) onGameDelete;
-
-  const TrainingListView({
-    Key? key,
-    required this.controller,
-    required this.onCreateRecord,
-    required this.onAddGame,
-    required this.onEditRecord,
-    required this.onDeleteDay,
-    required this.onGameTap,
-    required this.onGameDelete,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +34,7 @@ class TrainingListView extends StatelessWidget {
         (context, index) {
           final day = controller.trainingDays[index];
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TrainingDaySummaryCard(
               key: ValueKey(day.id), // 添加唯一 key 避免重建動畫問題
               summary: day,

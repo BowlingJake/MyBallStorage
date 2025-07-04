@@ -1,22 +1,17 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
-import '../../models/training_record.dart';
 
 class TrainingRecordListItem extends StatelessWidget {
+
+  const TrainingRecordListItem({
+    required this.record, required this.theme, required this.onTap, required this.isLastItem, required this.index, super.key,
+  });
   final TrainingRecord record;
   final ThemeData theme;
   final VoidCallback onTap;
   final bool isLastItem;
   final int index;
-
-  const TrainingRecordListItem({
-    Key? key,
-    required this.record,
-    required this.theme,
-    required this.onTap,
-    required this.isLastItem,
-    required this.index,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +25,11 @@ class TrainingRecordListItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+          padding: const EdgeInsets.symmetric(),
           content: GFListTile(
             avatar: GFAvatar(
               backgroundColor: theme.colorScheme.primary,
+              size: GFSize.LARGE,
               child: Text(
                 (index + 1).toString(),
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -41,8 +37,6 @@ class TrainingRecordListItem extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              size: GFSize.LARGE,
-              shape: GFAvatarShape.circle,
             ),
             title: Text(
               "${record.date.year}.${record.date.month.toString().padLeft(2, '0')}.${record.date.day.toString().padLeft(2, '0')} - ${record.title}",
@@ -52,7 +46,7 @@ class TrainingRecordListItem extends StatelessWidget {
               ),
             ),
             subTitle: Text(
-              "Score: ${record.score} | ${record.notes}",
+              'Score: ${record.score} | ${record.notes}',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -62,7 +56,6 @@ class TrainingRecordListItem extends StatelessWidget {
             icon: Icon(Icons.chevron_right, color: theme.colorScheme.outline),
             color: Colors.transparent,
             onTap: onTap,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             margin: EdgeInsets.zero,
           ),
         ),

@@ -1,11 +1,11 @@
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 // import '../models/arsenal_ball.dart';
 
 /// Two action buttons shown on the MyArsenalPage.
 class ArsenalActionButtons extends ConsumerWidget {
-  const ArsenalActionButtons({Key? key}) : super(key: key);
+  const ArsenalActionButtons({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

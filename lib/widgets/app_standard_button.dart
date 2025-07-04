@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
-class AppStandardButton extends StatelessWidget {
+class AppStandardButton extends StatelessWidget { // 新增是否為主要按鈕樣式
+
+  const AppStandardButton({
+    required this.onPressed, super.key,
+    this.text,
+    this.icon,
+    this.width,
+    this.height = 44.0,
+    this.enabled = true,
+    this.customColor, // 新增自訂顏色參數
+    this.isPrimary = false, // 新增是否為主要按鈕樣式
+  });
   final String? text;
   final IconData? icon;
   final VoidCallback onPressed;
@@ -8,19 +19,7 @@ class AppStandardButton extends StatelessWidget {
   final double height;
   final bool enabled;
   final Color? customColor; // 新增自訂顏色參數
-  final bool isPrimary; // 新增是否為主要按鈕樣式
-
-  const AppStandardButton({
-    super.key,
-    this.text,
-    this.icon,
-    required this.onPressed,
-    this.width,
-    this.height = 44.0,
-    this.enabled = true,
-    this.customColor, // 新增自訂顏色參數
-    this.isPrimary = false, // 新增是否為主要按鈕樣式
-  });
+  final bool isPrimary;
 
   @override
   Widget build(BuildContext context) {

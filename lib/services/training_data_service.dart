@@ -1,5 +1,4 @@
-import 'dart:math' as math;
-import '../models/training_record.dart';
+import 'package:bowlingarsenal_app/models/training_record.dart';
 
 /// 訓練數據服務
 /// 負責處理所有與訓練記錄相關的數據操作
@@ -17,11 +16,8 @@ class TrainingDataService {
     required String title,
     required DateTime date,
     required String center,
-    String? oilPatternName,
+    required bool isHousePattern, required String scoringMethod, required String inputMethod, String? oilPatternName,
     String? oilPatternLength,
-    required bool isHousePattern,
-    required String scoringMethod,
-    required String inputMethod,
   }) {
     final id = 'day_${DateTime.now().millisecondsSinceEpoch}';
     final newDay = TrainingDaySummary(
@@ -48,11 +44,8 @@ class TrainingDataService {
     required String title,
     required DateTime date,
     required String center,
-    String? oilPatternName,
+    required bool isHousePattern, required String scoringMethod, required String inputMethod, String? oilPatternName,
     String? oilPatternLength,
-    required bool isHousePattern,
-    required String scoringMethod,
-    required String inputMethod,
   }) {
     final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
     if (dayIndex == -1) return false;
@@ -120,7 +113,7 @@ class TrainingDataService {
   
   // 更新遊戲記錄
   bool updateGameInDay(GameRecord updatedGame) {
-    for (int dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
+    for (var dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
       final dayGames = _trainingDays[dayIndex].games;
       final gameIndex = dayGames.indexWhere((g) => g.id == updatedGame.id);
       
@@ -152,7 +145,7 @@ class TrainingDataService {
   
   // 從訓練日中移除遊戲
   bool removeGameFromDay(GameRecord gameToRemove) {
-    for (int dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
+    for (var dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
       final dayGames = _trainingDays[dayIndex].games;
       final gameIndex = dayGames.indexWhere((g) => g.id == gameToRemove.id);
       
@@ -161,7 +154,7 @@ class TrainingDataService {
         updatedGames.removeAt(gameIndex);
         
         // 重新編號剩餘的遊戲
-        for (int i = 0; i < updatedGames.length; i++) {
+        for (var i = 0; i < updatedGames.length; i++) {
           updatedGames[i] = GameRecord(
             id: updatedGames[i].id,
             gameNumber: i + 1,

@@ -1,16 +1,16 @@
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
 import 'package:flutter/material.dart';
-import 'app_standard_button.dart';
 
 /// Two action buttons shown on the MyArsenalPage.
 class ArsenalActionButtons extends StatelessWidget {
-  final VoidCallback? onAddPressed;
-  final VoidCallback? onAnalyzePressed;
 
   const ArsenalActionButtons({
     super.key,
     this.onAddPressed,
     this.onAnalyzePressed,
   });
+  final VoidCallback? onAddPressed;
+  final VoidCallback? onAnalyzePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,6 @@ class ArsenalActionButtons extends StatelessWidget {
             text: 'Analyze Chart',
             onPressed: onAnalyzePressed ?? () {},
             customColor: colorScheme.primary,
-            isPrimary: false,
           ),
         ),
       ],

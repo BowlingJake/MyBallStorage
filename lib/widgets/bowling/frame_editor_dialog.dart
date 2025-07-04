@@ -1,17 +1,16 @@
+import 'package:bowlingarsenal_app/logic/scoring_logic.dart';
 import 'package:flutter/material.dart';
-import '../../logic/scoring_logic.dart';
 
 class FrameEditorDialog extends StatefulWidget {
+
+  const FrameEditorDialog({
+    required this.frameNumber, super.key,
+    this.frame,
+    this.onScoreSubmitted,
+  });
   final Frame? frame;
   final int frameNumber;
   final Function(int?, int?, int?)? onScoreSubmitted;
-
-  const FrameEditorDialog({
-    Key? key,
-    this.frame,
-    required this.frameNumber,
-    this.onScoreSubmitted,
-  }) : super(key: key);
 
   @override
   _FrameEditorDialogState createState() => _FrameEditorDialogState();
@@ -78,30 +77,30 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
                 child: TextField(
                   controller: _firstRollController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'First Roll',
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: TextField(
                   controller: _secondRollController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Second Roll',
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
               if (_showThirdRoll) ...[
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     controller: _thirdRollController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Third Roll',
                       border: OutlineInputBorder(),
                     ),
@@ -115,11 +114,11 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: _submitScores,
-          child: Text('Save'),
+          child: const Text('Save'),
         ),
       ],
     );

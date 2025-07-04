@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
+import 'package:bowlingarsenal_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
-import '../../theme/text_styles.dart';
-import '../primary_button.dart';
 
 enum _PracticeStep { details, oilPattern, scoring }
 enum InputMethod { simple, advanced }
@@ -134,7 +134,7 @@ class _AddPracticeDialogState extends State<AddPracticeDialog> {
         children: [
           InkWell(
             onTap: () async {
-              final DateTime? picked = await showDatePicker(
+              final picked = await showDatePicker(
                 context: context,
                 initialDate: _selectedDate,
                 firstDate: DateTime(2020),

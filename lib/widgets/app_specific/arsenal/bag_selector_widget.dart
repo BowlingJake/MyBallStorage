@@ -1,27 +1,23 @@
-import 'package:flutter/material.dart';
-import '../../../models/ball_bag_type.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:bowlingarsenal_app/viewmodels/my_arsenal_viewmodel.dart';
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 球袋選擇器 Widget，參考 Ball Library filter 樣式
 class BagSelectorWidget extends ConsumerWidget {
-  final BallBagType selectedBagType;
-  final ValueChanged<BallBagType?> onChanged;
 
   const BagSelectorWidget({
-    super.key,
-    required this.selectedBagType,
-    required this.onChanged,
+    required this.selectedBagType, required this.onChanged, super.key,
   });
+  final BallBagType selectedBagType;
+  final ValueChanged<BallBagType?> onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           Text(
@@ -60,7 +56,6 @@ class BagSelectorWidget extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.5),
-                      width: 1,
                     ),
                     color: theme.colorScheme.surface,
                   ),
@@ -85,7 +80,6 @@ class BagSelectorWidget extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  offset: const Offset(0, 0),
                   scrollbarTheme: ScrollbarThemeData(
                     radius: const Radius.circular(40),
                     thickness: WidgetStateProperty.all(6),

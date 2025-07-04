@@ -1,16 +1,14 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:flutter/material.dart';
-import '../../../models/training_record.dart';
 
 /// 訓練日球具使用情況組件
 class TrainingDayEquipment extends StatelessWidget {
-  final TrainingDaySummary summary;
-  final ThemeData theme;
 
   const TrainingDayEquipment({
-    Key? key,
-    required this.summary,
-    required this.theme,
-  }) : super(key: key);
+    required this.summary, required this.theme, super.key,
+  });
+  final TrainingDaySummary summary;
+  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +22,7 @@ class TrainingDayEquipment extends StatelessWidget {
             size: 16,
             color: theme.colorScheme.onSurface.withOpacity(0.5),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             'No equipment recorded',
             style: theme.textTheme.bodySmall?.copyWith(

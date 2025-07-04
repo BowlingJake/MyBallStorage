@@ -1,7 +1,7 @@
+import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/views/onboarding/onboarding_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/providers.dart';
-import 'onboarding_pages.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});

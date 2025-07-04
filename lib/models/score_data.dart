@@ -1,24 +1,10 @@
-import 'dart:convert';
 
 class Roll {
-  final int pinsDown;
-  final Set<int>? pinsStandingAfterThrow;
-  final String displayScore;
-  final Set<int> pinsStandingBeforeThrow;
 
   Roll({
     required this.pinsDown,
-    this.pinsStandingAfterThrow,
-    required this.displayScore,
-    required this.pinsStandingBeforeThrow,
+    required this.displayScore, required this.pinsStandingBeforeThrow, this.pinsStandingAfterThrow,
   });
-
-  Map<String, dynamic> toJson() => {
-    'pinsDown': pinsDown,
-    'pinsStandingAfterThrow': pinsStandingAfterThrow != null ? pinsStandingAfterThrow!.toList() : null,
-    'displayScore': displayScore,
-    'pinsStandingBeforeThrow': pinsStandingBeforeThrow.toList(),
-  };
 
   factory Roll.fromJson(Map<String, dynamic> json) => Roll(
     pinsDown: json['pinsDown'] as int,
@@ -28,18 +14,21 @@ class Roll {
     displayScore: json['displayScore'] as String,
     pinsStandingBeforeThrow: Set<int>.from(json['pinsStandingBeforeThrow'] as List),
   );
+  final int pinsDown;
+  final Set<int>? pinsStandingAfterThrow;
+  final String displayScore;
+  final Set<int> pinsStandingBeforeThrow;
+
+  Map<String, dynamic> toJson() => {
+    'pinsDown': pinsDown,
+    'pinsStandingAfterThrow': pinsStandingAfterThrow?.toList(),
+    'displayScore': displayScore,
+    'pinsStandingBeforeThrow': pinsStandingBeforeThrow.toList(),
+  };
 }
 
 /// 表示單一局 (Frame) 的記錄
 class Frame {
-  final int frameNumber;
-
-  final List<Roll> rolls;
-
-
-  int? totalScore;
-
-  bool isComplete;
 
   Frame({
     required this.frameNumber,
@@ -53,27 +42,29 @@ class Frame {
     return Frame(frameNumber: frameNumber, rolls: []);
   }
 
-  Map<String, dynamic> toJson() => {
-    'frameNumber': frameNumber,
-    'rolls': rolls.map((r) => r.toJson()).toList(),
-    'totalScore': totalScore,
-    'isComplete': isComplete,
-  };
-
   factory Frame.fromJson(Map<String, dynamic> json) => Frame(
     frameNumber: json['frameNumber'] as int,
     rolls: (json['rolls'] as List).map((r) => Roll.fromJson(r)).toList(),
     totalScore: json['totalScore'] as int?,
     isComplete: json['isComplete'] as bool? ?? false,
   );
+  final int frameNumber;
+
+  final List<Roll> rolls;
+
+
+  int? totalScore;
+
+  bool isComplete;
+
+  Map<String, dynamic> toJson() => {
+    'frameNumber': frameNumber,
+    'rolls': rolls.map((r) => r.toJson()).toList(),
+    'totalScore': totalScore,
+    'isComplete': isComplete,
+  };
 }
 class BowlingScoreData {
-  /// 包含 10 局的列表
-  final List<Frame> frames;
-  int currentFrameIndex;
-  int currentRollIndex;
-  Set<int> pinsStanding;
-  bool isGameOver;
 
   BowlingScoreData({
     required this.frames,
@@ -90,6 +81,20 @@ class BowlingScoreData {
     );
   }
 
+  factory BowlingScoreData.fromJson(Map<String, dynamic> json) => BowlingScoreData(
+    frames: (json['frames'] as List).map((f) => Frame.fromJson(f)).toList(),
+    currentFrameIndex: json['currentFrameIndex'] as int? ?? 0,
+    currentRollIndex: json['currentRollIndex'] as int? ?? 0,
+    pinsStanding: Set<int>.from(json['pinsStanding'] as List),
+    isGameOver: json['isGameOver'] as bool? ?? false,
+  );
+  /// 包含 10 局的列表
+  final List<Frame> frames;
+  int currentFrameIndex;
+  int currentRollIndex;
+  Set<int> pinsStanding;
+  bool isGameOver;
+
   Map<String, dynamic> toJson() => {
     'frames': frames.map((f) => f.toJson()).toList(),
     'currentFrameIndex': currentFrameIndex,
@@ -98,29 +103,21 @@ class BowlingScoreData {
     'isGameOver': isGameOver,
   };
 
-  factory BowlingScoreData.fromJson(Map<String, dynamic> json) => BowlingScoreData(
-    frames: (json['frames'] as List).map((f) => Frame.fromJson(f)).toList(),
-    currentFrameIndex: json['currentFrameIndex'] as int? ?? 0,
-    currentRollIndex: json['currentRollIndex'] as int? ?? 0,
-    pinsStanding: Set<int>.from(json['pinsStanding'] as List),
-    isGameOver: json['isGameOver'] as bool? ?? false,
-  );
-
   /// 計算並更新所有局的累計總分
   /// 這是核心的計分邏輯，需要根據保齡球規則實現
   void calculateScores() {
     // 重置所有局的總分以便重新計算
-    for (var frame in frames) {
+    for (final frame in frames) {
       frame.totalScore = null;
     }
 
-    int cumulativeScore = 0;
+    var cumulativeScore = 0;
 
     // 遍歷前 9 局
-    for (int i = 0; i < 9; i++) {
+    for (var i = 0; i < 9; i++) {
       final currentFrame = frames[i];
-      int frameScore = 0;
-      bool frameScorable = false; // 判斷本局是否已經可以計算分數
+      var frameScore = 0;
+      var frameScorable = false; // 判斷本局是否已經可以計算分數
 
       if (currentFrame.rolls.isNotEmpty) {
         final firstRoll = currentFrame.rolls[0];
@@ -158,13 +155,13 @@ class BowlingScoreData {
     }
 
     final tenthFrame = frames[9];
-    int tenthFrameScore = 0;
-    bool tenthFrameScorable = false;
+    var tenthFrameScore = 0;
+    var tenthFrameScorable = false;
 
     if (tenthFrame.rolls.isNotEmpty) {
-      final int first = tenthFrame.rolls[0].pinsDown;
-      final int second = tenthFrame.rolls.length > 1 ? tenthFrame.rolls[1].pinsDown : 0;
-      final int third = tenthFrame.rolls.length > 2 ? tenthFrame.rolls[2].pinsDown : 0;
+      final first = tenthFrame.rolls[0].pinsDown;
+      final second = tenthFrame.rolls.length > 1 ? tenthFrame.rolls[1].pinsDown : 0;
+      final third = tenthFrame.rolls.length > 2 ? tenthFrame.rolls[2].pinsDown : 0;
 
       if (tenthFrame.rolls.length == 1) {
         // 只打一球，分數暫不確定
@@ -198,10 +195,10 @@ class BowlingScoreData {
   }
 
   List<Roll> _getNextRolls(int currentFrameIndex, int count) {
-    final List<Roll> nextRolls = [];
-    int rollsFound = 0;
+    final nextRolls = <Roll>[];
+    var rollsFound = 0;
 
-    for (int i = currentFrameIndex + 1; i < 10 && rollsFound < count; i++) {
+    for (var i = currentFrameIndex + 1; i < 10 && rollsFound < count; i++) {
       final frame = frames[i];
       for (final roll in frame.rolls) {
         nextRolls.add(roll);

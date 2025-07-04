@@ -1,21 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:bowlingarsenal_app/widgets/standard_app_card.dart'; // 導入新的標準卡片
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 class UserInfoSection extends StatelessWidget {
-  final String userName;
-  final String location;
-  final String? userPhotoUrl;
-  final BoxConstraints? constraints;
 
   const UserInfoSection({
-    Key? key,
+    super.key,
     this.userName = 'Jake Cheng',
     this.location = 'Taipei, Taiwan',
     this.userPhotoUrl,
     this.constraints,
-  }) : super(key: key);
+  });
+  final String userName;
+  final String location;
+  final String? userPhotoUrl;
+  final BoxConstraints? constraints;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class UserInfoSection extends StatelessWidget {
       // 移除卡片預設的垂直邊距，因為外部容器會處理
       margin: EdgeInsets.zero, 
       // 增加內部 padding 以提供足夠的呼吸空間
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0), 
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18), 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -1,13 +1,12 @@
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
 import 'package:flutter/material.dart';
-import '../app_standard_button.dart';
 
 class TrainingEmptyState extends StatelessWidget {
-  final VoidCallback onAddRecord;
 
   const TrainingEmptyState({
-    Key? key,
-    required this.onAddRecord,
-  }) : super(key: key);
+    required this.onAddRecord, super.key,
+  });
+  final VoidCallback onAddRecord;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class TrainingEmptyState extends StatelessWidget {
     
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -62,7 +61,7 @@ class TrainingEmptyState extends StatelessWidget {
             
             // Add Record 按鈕 - 使用 AppStandardButton
             AppStandardButton(
-              text: "Add Training Record",
+              text: 'Add Training Record',
               icon: Icons.add_circle_outline,
               onPressed: onAddRecord,
             ),

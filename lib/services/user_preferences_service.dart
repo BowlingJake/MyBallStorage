@@ -14,7 +14,7 @@ class UserPreferencesService {
     required String pap,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs
+    prefs
       ..setString(_keyNickname, nickname)
       ..setString(_keyHand, hand)
       ..setString(_keyBallPath, ballPath)

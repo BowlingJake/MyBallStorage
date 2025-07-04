@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../../models/training_record.dart';
-import 'add_game_simple_dialog.dart';
-import 'add_game_advanced_dialog.dart';
+
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/training/add_game_advanced_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/training/add_game_simple_dialog.dart';
+import 'package:flutter/material.dart';
 
 /// 新增遊戲方式選擇器對話框
 class AddGameSelectorDialog extends StatelessWidget {
-  final String dayId;
-  final int nextGameNumber;
 
   const AddGameSelectorDialog({
-    Key? key,
-    required this.dayId,
-    required this.nextGameNumber,
-  }) : super(key: key);
+    required this.dayId, required this.nextGameNumber, super.key,
+  });
+  final String dayId;
+  final int nextGameNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class AddGameSelectorDialog extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.85,
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.9),
               borderRadius: BorderRadius.circular(20),
@@ -51,21 +50,21 @@ class AddGameSelectorDialog extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: Colors.white),
+                  icon: const Icon(Icons.close, color: Colors.white),
                 ),
               ],
             ),
 
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
 
             Text(
-              'Choose input method for Game ${nextGameNumber}',
+              'Choose input method for Game $nextGameNumber',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white70,
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // 選項列表
             _buildOptionCard(
@@ -78,7 +77,7 @@ class AddGameSelectorDialog extends StatelessWidget {
               onTap: () => _showSimpleDialog(context),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             _buildOptionCard(
               context,
@@ -90,11 +89,11 @@ class AddGameSelectorDialog extends StatelessWidget {
               onTap: () => _showAdvancedDialog(context),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // 說明文字
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -104,12 +103,12 @@ class AddGameSelectorDialog extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline,
                     color: Colors.blue,
                     size: 16,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child:                     Text(
                       'Recommend using detailed scoring for more accurate statistics',
@@ -142,7 +141,7 @@ class AddGameSelectorDialog extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
@@ -153,7 +152,7 @@ class AddGameSelectorDialog extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
@@ -164,7 +163,7 @@ class AddGameSelectorDialog extends StatelessWidget {
                 size: 24,
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,14 +175,14 @@ class AddGameSelectorDialog extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: color,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -193,7 +192,7 @@ class AddGameSelectorDialog extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios,
               color: Colors.white54,
               size: 16,
@@ -204,7 +203,7 @@ class AddGameSelectorDialog extends StatelessWidget {
     );
   }
 
-  void _showSimpleDialog(BuildContext context) async {
+  Future<void> _showSimpleDialog(BuildContext context) async {
     Navigator.pop(context); // 關閉選擇器
     final result = await showAddGameSimpleDialog(context, dayId, nextGameNumber);
     if (result != null) {
@@ -212,7 +211,7 @@ class AddGameSelectorDialog extends StatelessWidget {
     }
   }
 
-  void _showAdvancedDialog(BuildContext context) async {
+  Future<void> _showAdvancedDialog(BuildContext context) async {
     Navigator.pop(context); // 關閉選擇器
     final result = await showAddGameAdvancedDialog(context, dayId, nextGameNumber);
     if (result != null) {
@@ -227,9 +226,8 @@ Future<GameRecord?> showAddGameSelectorDialog(
   String dayId,
   int nextGameNumber,
 ) async {
-  return await showDialog<GameRecord>(
+  return showDialog<GameRecord>(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.7),
     builder: (BuildContext context) {
       return Material(

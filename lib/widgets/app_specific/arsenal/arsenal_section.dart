@@ -1,19 +1,18 @@
+import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
+import 'package:bowlingarsenal_app/widgets/app_specific/arsenal/arsenal_card.dart';
+import 'package:bowlingarsenal_app/widgets/common/cards/section_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
-import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
-import 'arsenal_card.dart';
-import 'package:bowlingarsenal_app/widgets/common/cards/section_container.dart';
 
 class ArsenalSection extends ConsumerStatefulWidget {
-  final VoidCallback? onSeeAllPressed;
-  final void Function(int index)? onItemPressed;
 
   const ArsenalSection({
-    Key? key,
+    super.key,
     this.onSeeAllPressed,
     this.onItemPressed,
-  }) : super(key: key);
+  });
+  final VoidCallback? onSeeAllPressed;
+  final void Function(int index)? onItemPressed;
 
   @override
   ConsumerState<ArsenalSection> createState() => _ArsenalSectionState();
@@ -38,7 +37,7 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
   }
 
   void _onScroll() {
-    final cardWidth = 130.0 + 16.0; // 卡片寬度 + 間距
+    const cardWidth = 130.0 + 16.0; // 卡片寬度 + 間距
     final currentIndex = (_scrollController.offset / cardWidth).round();
     if (currentIndex != _currentIndex) {
       setState(() {
@@ -49,7 +48,7 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
 
   @override
   Widget build(BuildContext context) {
-    final List<ArsenalBall> arsenalBalls = ref.watch(userBallsProvider);
+    final arsenalBalls = ref.watch(userBallsProvider);
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
 
@@ -61,7 +60,7 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
           if (arsenalBalls.isEmpty)
             const Center(
               child: Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(20),
                 child: Text(
                   'Your arsenal is empty.',
                   style: TextStyle(color: Colors.white70),

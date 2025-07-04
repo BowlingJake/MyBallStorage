@@ -1,6 +1,6 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/services/ball_data_service.dart';
 import 'package:flutter/material.dart';
-import '../models/bowling_ball.dart';
-import '../services/ball_data_service.dart';
 
 /// ViewModel 負責管理武器庫頁面的邏輯、狀態
 class WeaponLibraryViewModel extends ChangeNotifier {
@@ -49,7 +49,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   String _getSimplifiedBrandName(String fullBrandName) {
     // Extract the main brand name from full brand name
     // e.g., "Storm Bowling" -> "Storm", "Hammer Bowling" -> "Hammer"
-    final Map<String, String> brandMapping = {
+    final brandMapping = <String, String>{
       'Storm Bowling': 'Storm',
       'Hammer Bowling': 'Hammer', 
       'Brunswick Bowling': 'Brunswick',
@@ -215,7 +215,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     final currentCoreCategories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet();
     final currentCoverstockCategories = myArsenal.map((ball) => ball.coverstockcategory).toSet();
 
-    bool filterChanged = false;
+    var filterChanged = false;
 
     // Check Brand Filter
     if (selectedBrandFilter != null &&

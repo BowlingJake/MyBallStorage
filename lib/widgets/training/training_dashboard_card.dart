@@ -1,19 +1,15 @@
+import 'package:bowlingarsenal_app/widgets/training/dashboard_stat_item.dart';
 import 'package:flutter/material.dart';
-import 'dashboard_stat_item.dart';
 
 class TrainingDashboardCard extends StatelessWidget {
+
+  const TrainingDashboardCard({
+    required this.theme, required this.strikePercentage, required this.sparePercentage, required this.averageScore, super.key,
+  });
   final ThemeData theme;
   final double strikePercentage;
   final double sparePercentage;
   final int averageScore;
-
-  const TrainingDashboardCard({
-    Key? key,
-    required this.theme,
-    required this.strikePercentage,
-    required this.sparePercentage,
-    required this.averageScore,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +19,9 @@ class TrainingDashboardCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      color: theme.colorScheme.surfaceVariant,
+      color: theme.colorScheme.surfaceContainerHighest,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 18.0),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -48,7 +44,6 @@ class TrainingDashboardCard extends StatelessWidget {
                   unit: '%',
                   progressColor: theme.colorScheme.primary,
                   isPercentage: true,
-                  glow: false,
                 ),
                 DashboardStatItem(
                   theme: theme,
@@ -57,7 +52,6 @@ class TrainingDashboardCard extends StatelessWidget {
                   unit: '%',
                   progressColor: theme.colorScheme.secondary,
                   isPercentage: true,
-                  glow: false,
                 ),
                 DashboardStatItem(
                   theme: theme,
@@ -65,8 +59,6 @@ class TrainingDashboardCard extends StatelessWidget {
                   label: '平均分',
                   unit: '',
                   progressColor: theme.colorScheme.tertiary,
-                  isPercentage: false,
-                  glow: false,
                 ),
               ],
             ),

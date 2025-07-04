@@ -1,19 +1,17 @@
+import 'package:bowlingarsenal_app/models/score_data.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/score_game_widget.dart';
+import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
-import '../score_game_widget.dart';
-import '../tenth_frame_widget.dart';
-import '../pin_selector_popup_widget.dart';
-import '../../models/score_data.dart';
-import '../app_standard_button.dart';
 
 class AddGamesDialog extends StatefulWidget {
-  final String trainingId;
-  final String scoringMethod;
 
   const AddGamesDialog({
-    Key? key,
-    required this.trainingId,
-    required this.scoringMethod,
-  }) : super(key: key);
+    required this.trainingId, required this.scoringMethod, super.key,
+  });
+  final String trainingId;
+  final String scoringMethod;
 
   @override
   State<AddGamesDialog> createState() => _AddGamesDialogState();
@@ -67,11 +65,11 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
   String _getDisplayScore(Frame frame, int pinsDown) {
     if (frame.rolls.isEmpty) {
       // 第一球
-      return pinsDown == 10 ? "X" : pinsDown.toString();
+      return pinsDown == 10 ? 'X' : pinsDown.toString();
     } else {
       // 第二球
       if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + pinsDown == 10) {
-        return "/";
+        return '/';
       }
       return pinsDown.toString();
     }
@@ -84,7 +82,7 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
 
     return Dialog(
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -92,7 +90,7 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
               '新增遊戲',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 4,
               runSpacing: 4,
@@ -152,7 +150,7 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -160,7 +158,7 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
                   text: '取消',
                   onPressed: () => Navigator.of(context).pop(),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 AppStandardButton(
                   text: '完成',
                   onPressed: _onGameComplete,

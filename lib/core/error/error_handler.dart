@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 /// A global error handler that catches and logs Flutter and Dart errors.
 class AppErrorHandler {

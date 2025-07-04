@@ -1,11 +1,20 @@
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/training/add_games_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:iconsax/iconsax.dart';
-import '../app_standard_button.dart';
-import 'add_games_dialog.dart';
+import 'package:intl/intl.dart';
 
 // 訓練記錄數據模型
 class TrainingSession {
+
+  TrainingSession({
+    required this.id,
+    required this.title,
+    required this.date,
+    required this.center,
+    required this.isHousePattern, required this.scoringMethod, // 新增計分方式, required this.createdAt, this.oilPatternName,
+    this.oilPatternLength,
+  });
   final String id;
   final String title;
   final DateTime date;
@@ -15,22 +24,21 @@ class TrainingSession {
   final bool isHousePattern;
   final String scoringMethod; // 新增計分方式
   final DateTime createdAt;
-
-  TrainingSession({
-    required this.id,
-    required this.title,
-    required this.date,
-    required this.center,
-    this.oilPatternName,
-    this.oilPatternLength,
-    required this.isHousePattern,
-    required this.scoringMethod, // 新增計分方式
-    required this.createdAt,
-  });
 }
 
 // 訓練記錄卡片組件 - Professional Dark Glass 風格
 class TrainingSessionCard extends StatefulWidget {
+
+  const TrainingSessionCard({
+    required this.session, super.key,
+    this.onTap,
+    this.onDelete,
+    this.onEdit,
+    this.onAddGames,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onSelectionChanged,
+  });
   final TrainingSession session;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
@@ -39,18 +47,6 @@ class TrainingSessionCard extends StatefulWidget {
   final bool isSelectionMode;
   final bool isSelected;
   final ValueChanged<bool>? onSelectionChanged;
-
-  const TrainingSessionCard({
-    Key? key,
-    required this.session,
-    this.onTap,
-    this.onDelete,
-    this.onEdit,
-    this.onAddGames,
-    this.isSelectionMode = false,
-    this.isSelected = false,
-    this.onSelectionChanged,
-  }) : super(key: key);
 
   @override
   State<TrainingSessionCard> createState() => _TrainingSessionCardState();
@@ -67,7 +63,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
     super.initState();
     
     _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     
@@ -118,12 +114,12 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
     final theme = Theme.of(context);
     
     // 限制標題在20字以內
-    String displayTitle = widget.session.title.length > 20 
+    final displayTitle = widget.session.title.length > 20 
         ? '${widget.session.title.substring(0, 20)}...' 
         : widget.session.title;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: GestureDetector(
         onTap: () {
           if (widget.isSelectionMode) {
@@ -134,10 +130,10 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
           widget.onTap?.call();
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOutCubic,
           child: Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               // Professional Dark Glass 風格 - 透明背景
               color: widget.isSelected 
@@ -157,12 +153,12 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                     ? theme.colorScheme.primary.withOpacity(0.2)
                     : theme.colorScheme.primary.withOpacity(0.1),
                   blurRadius: widget.isSelected ? 16 : 12,
-                  offset: Offset(0, 4),
+                  offset: const Offset(0, 4),
                 ),
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -197,7 +193,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                             )
                           : null,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                     ],
                     
                     Expanded(
@@ -213,7 +209,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                               fontSize: 18,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           // 日期和地點
                           Row(
                             children: [
@@ -222,7 +218,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                 size: 14,
                                 color: theme.colorScheme.primary,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
                                 DateFormat('yyyy.MM.dd').format(widget.session.date),
                                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -231,13 +227,13 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                   fontSize: 13,
                                 ),
                               ),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Icon(
                                 Icons.location_on,
                                 size: 14,
                                 color: theme.colorScheme.onSurface.withOpacity(0.7),
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   widget.session.center,
@@ -250,7 +246,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                               ),
                             ],
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           // 油型信息
                           Row(
                             children: [
@@ -259,7 +255,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                 size: 14,
                                 color: theme.colorScheme.onSurface.withOpacity(0.7),
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   _getOilPatternDisplay(),
@@ -290,7 +286,6 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                 borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
                                   color: Colors.red.withOpacity(0.5),
-                                  width: 1,
                                 ),
                               ),
                               child: Material(
@@ -306,11 +301,11 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                 ),
                               ),
                             ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           // 展開/收起指示器
                           AnimatedRotation(
                             turns: _isExpanded ? 0.5 : 0,
-                            duration: Duration(milliseconds: 300),
+                            duration: const Duration(milliseconds: 300),
                             child: Icon(
                               Icons.keyboard_arrow_down,
                               size: 24,
@@ -329,13 +324,13 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                       sizeFactor: _animation,
                       axisAlignment: -1,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.only(top: 16),
                         child: Column(
                           children: [
                             // 分隔線
                             Container(
                               height: 1,
-                              margin: EdgeInsets.only(bottom: 16),
+                              margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
@@ -352,7 +347,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                 // Add Games 按鈕
                                 Expanded(
                                   child: AppStandardButton(
-                                    text: "Add Games",
+                                    text: 'Add Games',
                                     icon: Icons.add_circle_outline,
                                     onPressed: () async {
                                       final result = await showDialog(
@@ -368,11 +363,11 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                     },
                                   ),
                                 ),
-                                SizedBox(width: 12),
+                                const SizedBox(width: 12),
                                 // Delete Games 按鈕 (disabled)
                                 Expanded(
                                   child: AppStandardButton(
-                                    text: "Delete Games",
+                                    text: 'Delete Games',
                                     icon: Icons.remove_circle_outline,
                                     onPressed: () {
                                       // TODO: 實現刪除遊戲功能

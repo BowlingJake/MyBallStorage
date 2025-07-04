@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 class FilterPopout extends StatefulWidget {
-  final Map<String, String?> selectedFilters;
-  final Function(String filterType, String? value) onFilterChanged;
 
   const FilterPopout({
-    Key? key,
-    required this.selectedFilters,
-    required this.onFilterChanged,
-  }) : super(key: key);
+    required this.selectedFilters, required this.onFilterChanged, super.key,
+  });
+  final Map<String, String?> selectedFilters;
+  final Function(String filterType, String? value) onFilterChanged;
 
   @override
   State<FilterPopout> createState() => _FilterPopoutState();
@@ -72,7 +71,7 @@ class _FilterPopoutState extends State<FilterPopout> {
             Container(
               width: size.width * 0.9,
               height: size.height * 0.8,
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 450,
                 maxHeight: 600,
                 minWidth: 320,
@@ -91,7 +90,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.15),
                     blurRadius: 24,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -114,7 +113,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               'Filter Options',
                               style: TextStyle(
                                 color: Colors.white,
@@ -179,9 +178,9 @@ class _FilterPopoutState extends State<FilterPopout> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'Apply Filters',
                                   style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
@@ -203,7 +202,7 @@ class _FilterPopoutState extends State<FilterPopout> {
 
   Widget _buildBrandFilterSection() {
     // 定義品牌分組
-    final Map<String, List<String>> brandGroups = {
+    final brandGroups = <String, List<String>>{
       'Team SPI': ['Storm', 'Roto Grip', '900 Global'],
       'Brunswick Group': ['Brunswick', 'Ebonite', 'Track', 'Columbia 300', 'DV8', 'Radical', 'Hammer'],
       'Others': ['Motiv', 'SWAG'],
@@ -216,7 +215,7 @@ class _FilterPopoutState extends State<FilterPopout> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Brand',
               style: TextStyle(
                 color: Colors.white,
@@ -237,7 +236,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _localFilters['brand']!.isNotEmpty
                       ? Colors.white.withOpacity(0.25)
@@ -246,7 +245,6 @@ class _FilterPopoutState extends State<FilterPopout> {
                     color: _localFilters['brand']!.isNotEmpty
                         ? Colors.white.withOpacity(0.9)
                         : Colors.white.withOpacity(0.3),
-                    width: 1,
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -258,7 +256,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                       color: Colors.white.withOpacity(_localFilters['brand']!.isNotEmpty ? 1.0 : 0.7),
                       size: 14,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       _localFilters['brand']!.isNotEmpty ? 'Clear All' : 'Select All',
                       style: TextStyle(
@@ -276,7 +274,7 @@ class _FilterPopoutState extends State<FilterPopout> {
         const SizedBox(height: 12),
         
         // 各品牌集團
-        ...brandGroups.entries.map((entry) => _buildBrandGroup(entry.key, entry.value)).toList(),
+        ...brandGroups.entries.map((entry) => _buildBrandGroup(entry.key, entry.value)),
       ],
     );
   }
@@ -294,12 +292,12 @@ class _FilterPopoutState extends State<FilterPopout> {
             setState(() {
               if (isGroupSelected) {
                 // 如果集團全選，則取消選擇該集團所有品牌
-                for (String brand in brands) {
+                for (final brand in brands) {
                   _localFilters['brand']!.remove(brand);
                 }
               } else {
                 // 如果集團未全選，則選擇該集團所有品牌
-                for (String brand in brands) {
+                for (final brand in brands) {
                   if (!_localFilters['brand']!.contains(brand)) {
                     _localFilters['brand']!.add(brand);
                   }
@@ -308,15 +306,14 @@ class _FilterPopoutState extends State<FilterPopout> {
             });
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
               color: isGroupSelected || hasPartialSelection
                   ? Colors.white.withOpacity(0.15)
                   : Colors.white.withOpacity(0.08),
               border: Border.all(
                 color: Colors.white.withOpacity(0.3),
-                width: 1,
               ),
               borderRadius: BorderRadius.circular(20),
             ),
@@ -332,7 +329,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                   color: Colors.white.withOpacity(0.8),
                   size: 16,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   groupName,
                   style: TextStyle(
@@ -363,10 +360,10 @@ class _FilterPopoutState extends State<FilterPopout> {
                 });
               },
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 width: (MediaQuery.of(context).size.width * 0.9 - 40 - 12) / 3,
                 height: 36,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.white.withOpacity(0.25)
@@ -383,7 +380,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                           BoxShadow(
                             color: Colors.white.withOpacity(0.15),
                             blurRadius: 6,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ]
                       : [],
@@ -404,7 +401,7 @@ class _FilterPopoutState extends State<FilterPopout> {
           }).toList(),
         ),
         
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -417,7 +414,7 @@ class _FilterPopoutState extends State<FilterPopout> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Core',
               style: TextStyle(
                 color: Colors.white,
@@ -436,7 +433,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _localFilters['core']!.isNotEmpty
                       ? Colors.white.withOpacity(0.25)
@@ -445,7 +442,6 @@ class _FilterPopoutState extends State<FilterPopout> {
                     color: _localFilters['core']!.isNotEmpty
                         ? Colors.white.withOpacity(0.9)
                         : Colors.white.withOpacity(0.3),
-                    width: 1,
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -457,7 +453,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                       color: Colors.white.withOpacity(_localFilters['core']!.isNotEmpty ? 1.0 : 0.7),
                       size: 14,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       _localFilters['core']!.isNotEmpty ? 'Clear All' : 'Select All',
                       style: TextStyle(
@@ -492,9 +488,9 @@ class _FilterPopoutState extends State<FilterPopout> {
                      });
                    },
                    child: AnimatedContainer(
-                     duration: Duration(milliseconds: 200),
+                     duration: const Duration(milliseconds: 200),
                      height: 36,
-                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                      decoration: BoxDecoration(
                        color: isSelected
                            ? Colors.white.withOpacity(0.25)
@@ -511,7 +507,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                                BoxShadow(
                                  color: Colors.white.withOpacity(0.15),
                                  blurRadius: 6,
-                                 offset: Offset(0, 2),
+                                 offset: const Offset(0, 2),
                                ),
                              ]
                            : [],
@@ -545,7 +541,7 @@ class _FilterPopoutState extends State<FilterPopout> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Cover',
               style: TextStyle(
                 color: Colors.white,
@@ -564,7 +560,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _localFilters['coverstock']!.isNotEmpty
                       ? Colors.white.withOpacity(0.25)
@@ -573,7 +569,6 @@ class _FilterPopoutState extends State<FilterPopout> {
                     color: _localFilters['coverstock']!.isNotEmpty
                         ? Colors.white.withOpacity(0.9)
                         : Colors.white.withOpacity(0.3),
-                    width: 1,
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -585,7 +580,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                       color: Colors.white.withOpacity(_localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.7),
                       size: 14,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
                       _localFilters['coverstock']!.isNotEmpty ? 'Clear All' : 'Select All',
                       style: TextStyle(
@@ -625,9 +620,9 @@ class _FilterPopoutState extends State<FilterPopout> {
                          });
                        },
                        child: AnimatedContainer(
-                         duration: Duration(milliseconds: 200),
+                         duration: const Duration(milliseconds: 200),
                          height: 36,
-                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                          decoration: BoxDecoration(
                            color: isSelected
                                ? Colors.white.withOpacity(0.25)
@@ -644,7 +639,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                                    BoxShadow(
                                      color: Colors.white.withOpacity(0.15),
                                      blurRadius: 6,
-                                     offset: Offset(0, 2),
+                                     offset: const Offset(0, 2),
                                    ),
                                  ]
                                : [],
@@ -667,7 +662,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                }).toList(),
              ),
              
-             SizedBox(height: 6),
+             const SizedBox(height: 6),
              
              // 第二行：後兩個選項
              Row(
@@ -689,9 +684,9 @@ class _FilterPopoutState extends State<FilterPopout> {
                          });
                        },
                        child: AnimatedContainer(
-                         duration: Duration(milliseconds: 200),
+                         duration: const Duration(milliseconds: 200),
                          height: 36,
-                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                          decoration: BoxDecoration(
                            color: isSelected
                                ? Colors.white.withOpacity(0.25)
@@ -708,7 +703,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                                    BoxShadow(
                                      color: Colors.white.withOpacity(0.15),
                                      blurRadius: 6,
-                                     offset: Offset(0, 2),
+                                     offset: const Offset(0, 2),
                                    ),
                                  ]
                                : [],
@@ -748,7 +743,7 @@ class _FilterPopoutState extends State<FilterPopout> {
         // 區段標題
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -773,12 +768,12 @@ class _FilterPopoutState extends State<FilterPopout> {
                 });
               },
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                constraints: BoxConstraints(
+                duration: const Duration(milliseconds: 200),
+                constraints: const BoxConstraints(
                   minWidth: 60,
                   minHeight: 32,
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.white.withOpacity(0.25)
@@ -795,7 +790,7 @@ class _FilterPopoutState extends State<FilterPopout> {
                           BoxShadow(
                             color: Colors.white.withOpacity(0.15),
                             blurRadius: 8,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ]
                       : [],
@@ -830,7 +825,6 @@ void showFilterPopout(
 ) {
   showDialog(
     context: context,
-    barrierDismissible: true,
     barrierColor: Colors.black.withOpacity(0.3),
     builder: (BuildContext context) {
       return Material(

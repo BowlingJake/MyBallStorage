@@ -1,21 +1,21 @@
+import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/user_preferences_service.dart';
-import 'user_profile_provider.dart';
 
 // 使用者認證狀態
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
 class AuthState {
-  final AuthStatus status;
-  final String? userId;
-  final String? error;
 
   const AuthState({
     required this.status,
     this.userId,
     this.error,
   });
+  final AuthStatus status;
+  final String? userId;
+  final String? error;
 
   AuthState copyWith({
     AuthStatus? status,
@@ -32,11 +32,11 @@ class AuthState {
 
 // 認證狀態管理
 class AuthNotifier extends StateNotifier<AuthState> {
-  final Ref _ref;
 
   AuthNotifier(this._ref) : super(const AuthState(status: AuthStatus.unknown)) {
     _checkAuthStatus();
   }
+  final Ref _ref;
 
   Future<void> _checkAuthStatus() async {
     try {

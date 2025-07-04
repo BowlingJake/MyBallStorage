@@ -1,20 +1,19 @@
+import 'dart:ui';
+
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
-import '../../models/training_record.dart';
-import '../app_standard_button.dart';
 
 /// 簡化版新增遊戲對話框
 /// 快速輸入分數而不需要詳細的格數據
 class AddGameSimpleDialog extends StatefulWidget {
-  final String dayId;
-  final int nextGameNumber;
 
   const AddGameSimpleDialog({
-    Key? key,
-    required this.dayId,
-    required this.nextGameNumber,
-  }) : super(key: key);
+    required this.dayId, required this.nextGameNumber, super.key,
+  });
+  final String dayId;
+  final int nextGameNumber;
 
   @override
   State<AddGameSimpleDialog> createState() => _AddGameSimpleDialogState();
@@ -73,7 +72,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.9),
               borderRadius: BorderRadius.circular(20),
@@ -100,12 +99,12 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Colors.white),
                   ),
                 ],
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // 分數輸入
               _buildNumberField(
@@ -116,7 +115,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 isRequired: true,
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Strikes 和 Spares 輸入
               Row(
@@ -130,7 +129,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                       isRequired: true,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildNumberField(
                       controller: _sparesController,
@@ -143,25 +142,25 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 ],
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // 備註輸入
               TextFormField(
                 controller: _notesController,
                 maxLines: 3,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Notes (Optional)',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: const TextStyle(color: Colors.white70),
                   hintText: 'Performance, thoughts...',
-                  hintStyle: TextStyle(color: Colors.white54),
+                  hintStyle: const TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: const BorderSide(color: Colors.white30),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: const BorderSide(color: Colors.white30),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -172,7 +171,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 ),
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // 底部按鈕
               Row(
@@ -184,7 +183,7 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                       customColor: Colors.white,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AppStandardButton(
                       text: 'Save',
@@ -218,19 +217,19 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
         FilteringTextInputFormatter.digitsOnly,
         LengthLimitingTextInputFormatter(3),
       ],
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.white70),
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.white54),
+        hintStyle: const TextStyle(color: Colors.white54),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white30),
+          borderSide: const BorderSide(color: Colors.white30),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white30),
+          borderSide: const BorderSide(color: Colors.white30),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -264,7 +263,7 @@ Future<GameRecord?> showAddGameSimpleDialog(
   String dayId,
   int nextGameNumber,
 ) async {
-  return await showDialog<GameRecord>(
+  return showDialog<GameRecord>(
     context: context,
     barrierDismissible: false,
     barrierColor: Colors.black.withOpacity(0.7),

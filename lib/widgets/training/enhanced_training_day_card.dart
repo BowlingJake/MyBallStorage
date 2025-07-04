@@ -1,17 +1,27 @@
+import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/widgets/enhanced_action_button.dart';
+import 'package:bowlingarsenal_app/widgets/training/components/enhanced_game_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import '../../models/training_record.dart';
-import '../../theme/brand_colors.dart';
-import '../enhanced_action_button.dart';
-import 'components/enhanced_game_item.dart';
-import 'components/enhanced_stats_display.dart';
 
 /// Enhanced Training Day Card with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強訓練日卡片
 class EnhancedTrainingDayCard extends StatefulWidget {
+
+  const EnhancedTrainingDayCard({
+    required this.summary, super.key,
+    this.onTap,
+    this.onDelete,
+    this.onAddGame,
+    this.onEdit,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onSelectionChanged,
+    this.onGameTap,
+    this.onGameDelete,
+  });
   final TrainingDaySummary summary;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
@@ -22,20 +32,6 @@ class EnhancedTrainingDayCard extends StatefulWidget {
   final ValueChanged<bool>? onSelectionChanged;
   final Function(GameRecord)? onGameTap;
   final Function(GameRecord)? onGameDelete;
-
-  const EnhancedTrainingDayCard({
-    Key? key,
-    required this.summary,
-    this.onTap,
-    this.onDelete,
-    this.onAddGame,
-    this.onEdit,
-    this.isSelectionMode = false,
-    this.isSelected = false,
-    this.onSelectionChanged,
-    this.onGameTap,
-    this.onGameDelete,
-  }) : super(key: key);
 
   @override
   State<EnhancedTrainingDayCard> createState() => _EnhancedTrainingDayCardState();
@@ -81,11 +77,11 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       curve: Curves.easeInOutCubic,
     );
     
-    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     
-    _scanAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _scanAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _scanController, curve: Curves.linear),
     );
   }
@@ -127,7 +123,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
     final theme = Theme.of(context);
     
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: AnimatedBuilder(
         animation: Listenable.merge([_pulseAnimation, _scanAnimation]),
         builder: (context, child) {
@@ -147,7 +143,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         }
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic,
         decoration: BoxDecoration(
           color: widget.isSelected
@@ -180,7 +176,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -223,18 +219,18 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
 
   Widget _buildMainContent(ThemeData theme) {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           // 頭部區域
           _buildHeader(theme),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 統計資訊區域
           _buildQuickStats(theme),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 底部資訊區域
           _buildInfoRow(theme),
@@ -249,7 +245,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         // 選擇框（選擇模式時顯示）
         if (widget.isSelectionMode) ...[
           _buildSelectionCheckbox(theme),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
         ],
         
         // 標題和日期
@@ -266,7 +262,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Row(
                 children: [
                   Icon(
@@ -274,7 +270,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
                     size: 14,
                     color: theme.colorScheme.primary,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     DateFormat('MMM dd, yyyy').format(widget.summary.date),
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -293,7 +289,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         
         // 控制按鈕組
         if (!widget.isSelectionMode) ...[
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           _buildControlButtons(theme),
         ],
       ],
@@ -302,7 +298,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
 
   Widget _buildSelectionCheckbox(ThemeData theme) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       width: 28,
       height: 28,
       decoration: BoxDecoration(
@@ -318,7 +314,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         ),
       ),
       child: widget.isSelected
-          ? Icon(
+          ? const Icon(
               Icons.check,
               size: 18,
               color: Colors.white,
@@ -334,7 +330,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         return Transform.scale(
           scale: _pulseAnimation.value,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: theme.colorScheme.primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
@@ -376,7 +372,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             tooltip: 'Edit Training Day',
           ),
         
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         
         // 刪除按鈕
         if (widget.onDelete != null)
@@ -387,7 +383,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             tooltip: 'Delete Training Day',
           ),
         
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         
         // 展開指示器
         _buildControlButton(
@@ -418,7 +414,6 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: color.withOpacity(0.3),
-            width: 1,
           ),
         ),
         child: Material(
@@ -432,7 +427,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             child: rotation != null
                 ? AnimatedRotation(
                     turns: rotation,
-                    duration: Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 300),
                     child: Icon(
                       icon,
                       size: 18,
@@ -452,7 +447,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
 
   Widget _buildQuickStats(ThemeData theme) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
@@ -467,7 +462,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             child: _buildStatItem(
               theme,
               Iconsax.chart_21,
-              '${widget.summary.averageScore.toStringAsFixed(0)}',
+              widget.summary.averageScore.toStringAsFixed(0),
               'AVG',
               theme.colorScheme.primary,
             ),
@@ -508,7 +503,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           size: 20,
           color: color,
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
           value,
           style: theme.textTheme.titleMedium?.copyWith(
@@ -517,7 +512,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             fontSize: 18,
           ),
         ),
-        SizedBox(height: 2),
+        const SizedBox(height: 2),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -571,7 +566,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           size: 12,
           color: theme.colorScheme.primary.withOpacity(0.7),
         ),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Flexible(
           child: Text(
             text,
@@ -587,16 +582,16 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
   }
 
   Widget _buildExpandedContent(ThemeData theme) {
-    if (!_isExpanded) return SizedBox.shrink();
+    if (!_isExpanded) return const SizedBox.shrink();
     
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Column(
         children: [
           // 分隔線
           Container(
             height: 1,
-            margin: EdgeInsets.only(bottom: 20),
+            margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -611,12 +606,12 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           // 標籤頁
           _buildTabBar(theme),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 標籤內容
           _buildTabContent(theme),
           
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           
           // 新增遊戲按鈕
           if (widget.onAddGame != null)
@@ -664,8 +659,8 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           HapticFeedback.selectionClick();
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          margin: EdgeInsets.all(4),
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: isSelected 
               ? theme.colorScheme.primary.withOpacity(0.2)
@@ -685,7 +680,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
                   ? theme.colorScheme.primary 
                   : Colors.white70,
               ),
-              SizedBox(width: 6),
+              const SizedBox(width: 6),
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -710,14 +705,14 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       case 1:
         return _buildEquipmentContent(theme);
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 
   Widget _buildGamesContent(ThemeData theme) {
     if (widget.summary.games.isEmpty) {
       return Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
@@ -727,12 +722,12 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         ),
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Iconsax.game,
               size: 48,
               color: Colors.white30,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'No games recorded yet',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -767,7 +762,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
     
     if (equipmentUsage.isEmpty) {
       return Container(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
@@ -777,12 +772,12 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         ),
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Iconsax.box,
               size: 48,
               color: Colors.white30,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'No equipment data recorded',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -810,7 +805,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         }
         
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: brandColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
@@ -829,7 +824,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
                   shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 ball.name,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -837,7 +832,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
                 '(${games.length})',
                 style: theme.textTheme.bodySmall?.copyWith(

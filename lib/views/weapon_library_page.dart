@@ -1,17 +1,17 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
+import 'package:bowlingarsenal_app/widgets/ball_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodels/weapon_library_viewmodel.dart';
-import '../models/bowling_ball.dart';
-import '../widgets/ball_card_widget.dart';
 
 /// 列出所有保齡球（可搜尋），點擊選擇，長按查看詳情
 class WeaponLibraryPage extends StatefulWidget {
-  final bool readOnly;
   
   const WeaponLibraryPage({
     super.key,
     this.readOnly = false,
   });
+  final bool readOnly;
 
   @override
   State<WeaponLibraryPage> createState() => _WeaponLibraryPageState();
@@ -32,9 +32,9 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
           insetPadding: const EdgeInsets.all(16),
           child: BallCardWidget(
             title: ball.ball,
-            stat1: ball.rg.toString(),
-            stat2: ball.diff.toString(),
-            stat3: ball.mbDiff.toString(),
+            stat1: ball.rg,
+            stat2: ball.diff,
+            stat3: ball.mbDiff,
             onTap: () => Navigator.pop(dialogContext),
           ),
         );
@@ -43,10 +43,10 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
   }
 
   Widget _buildSearchFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        children: [ /* 篩選 UI 不變 */ ],
+        
       ),
     );
   }
@@ -73,10 +73,10 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
             : [
                 TextButton(
                   child: const Text('取消選取'),
-                  onPressed: () => setState(() => _selectedBalls.clear()),
+                  onPressed: () => setState(_selectedBalls.clear),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 8),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
@@ -91,16 +91,16 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
               ],
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(
           children: [
             TextField(
-              onChanged: (keyword) => viewModel.filterBalls(keyword),
+              onChanged: viewModel.filterBalls,
               decoration: const InputDecoration(
                 labelText: '搜尋球名',
                 prefixIcon: Icon(Icons.search),
                 // 使用 theme 處理 border 等樣式
-                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               ),
             ),
             const SizedBox(height: 8),
@@ -116,7 +116,7 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 16.0),
+                      padding: const EdgeInsets.only(bottom: 16),
                       itemCount: searchResults.length,
                       itemBuilder: (context, index) {
                         final ball = searchResults[index];
@@ -131,7 +131,7 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
   }
 
   Widget _buildBallCard(BuildContext context, BowlingBall ball) {
-    final bool isSelected = _selectedBalls.contains(ball);
+    final isSelected = _selectedBalls.contains(ball);
 
     return GestureDetector(
       // 長按才彈窗
@@ -162,7 +162,7 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                 },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -229,9 +229,9 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                 ),
                 if (isSelected && !widget.readOnly)
                   Padding(
-                    padding: const EdgeInsets.only(left: 4.0),
+                    padding: const EdgeInsets.only(left: 4),
                     child: Icon(Icons.check_circle,
-                        color: Theme.of(context).primaryColor, size: 20),
+                        color: Theme.of(context).primaryColor, size: 20,),
                   ),
               ],
             ),

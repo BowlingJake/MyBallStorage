@@ -1,9 +1,9 @@
+import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
+import 'package:bowlingarsenal_app/theme/text_styles.dart';
 import 'package:flutter/material.dart';
-import '../services/user_preferences_service.dart';
-import '../theme/text_styles.dart';
 
 class EditUserPage extends StatefulWidget {
-  const EditUserPage({Key? key}) : super(key: key);
+  const EditUserPage({super.key});
 
   @override
   _EditUserPageState createState() => _EditUserPageState();
@@ -65,7 +65,7 @@ class _EditUserPageState extends State<EditUserPage> {
 
   Future<void> _saveProfile() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    String combinedPap = _papBaseController.text;
+    var combinedPap = _papBaseController.text;
     if (_papOffsetType != '無') {
       combinedPap += '$_papOffsetType${_papOffsetController.text}';
     }
@@ -76,7 +76,7 @@ class _EditUserPageState extends State<EditUserPage> {
       pap: combinedPap,
     );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('使用者資訊已儲存', style: AppTextStyles.body)),
+      const SnackBar(content: Text('使用者資訊已儲存', style: AppTextStyles.body)),
     );
     // 儲存完成後返回顯示頁面
     Navigator.pop(context);
@@ -95,7 +95,7 @@ class _EditUserPageState extends State<EditUserPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('編輯使用者資訊', style: AppTextStyles.title)),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -124,7 +124,7 @@ class _EditUserPageState extends State<EditUserPage> {
                     .map((hand) => DropdownMenuItem(
                           value: hand,
                           child: Text(hand, style: AppTextStyles.body),
-                        ))
+                        ),)
                     .toList(),
                 onChanged: (value) => setState(() => _preferredHand = value),
                 validator: (value) {
@@ -145,7 +145,7 @@ class _EditUserPageState extends State<EditUserPage> {
                     .map((path) => DropdownMenuItem(
                           value: path,
                           child: Text(path, style: AppTextStyles.body),
-                        ))
+                        ),)
                     .toList(),
                 onChanged: (value) => setState(() => _preferredBallPath = value),
                 validator: (value) {
@@ -176,7 +176,6 @@ class _EditUserPageState extends State<EditUserPage> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    flex: 1,
                     child: DropdownButtonFormField<String>(
                       value: _papOffsetType,
                       decoration: const InputDecoration(

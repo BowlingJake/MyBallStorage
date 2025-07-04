@@ -1,25 +1,24 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../app_standard_button.dart';
+
+import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:flutter/material.dart';
 
 /// 毛玻璃效果對話框基底組件
 class GlassDialogBase extends StatelessWidget {
+
+  const GlassDialogBase({
+    required this.title, required this.child, super.key,
+    this.actions,
+    this.maxWidth = 400,
+    this.minWidth = 320,
+    this.onClose,
+  });
   final String title;
   final Widget child;
   final List<Widget>? actions;
   final double? maxWidth;
   final double? minWidth;
   final VoidCallback? onClose;
-
-  const GlassDialogBase({
-    Key? key,
-    required this.title,
-    required this.child,
-    this.actions,
-    this.maxWidth = 400,
-    this.minWidth = 320,
-    this.onClose,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +43,7 @@ class GlassDialogBase extends StatelessWidget {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.10),
                     blurRadius: 24,
-                    offset: Offset(0, 8),
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -61,7 +60,7 @@ class GlassDialogBase extends StatelessWidget {
                   ),
                   // 內容
                   Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -110,22 +109,20 @@ class GlassDialogBase extends StatelessWidget {
 
 /// 標準的對話框按鈕
 class DialogButton extends StatelessWidget {
+
+  const DialogButton({
+    required this.text, required this.onPressed, super.key,
+    this.isPrimary = false,
+    this.isExpanded = true,
+  });
   final String text;
   final VoidCallback onPressed;
   final bool isPrimary;
   final bool isExpanded;
 
-  const DialogButton({
-    Key? key,
-    required this.text,
-    required this.onPressed,
-    this.isPrimary = false,
-    this.isExpanded = true,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    Widget button = AppStandardButton(
+    final Widget button = AppStandardButton(
       text: text,
       onPressed: onPressed,
       customColor: isPrimary ? Colors.white : Colors.white.withOpacity(0.8),

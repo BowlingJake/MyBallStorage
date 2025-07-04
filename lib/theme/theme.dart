@@ -64,13 +64,9 @@ final ThemeData darkTheme = ThemeData(
     primary: accentColor,
     onPrimary: Color(0xFFFFFFFF), // 在強調色上的文字改為純白
     secondary: accentColor, 
-    onSecondary: Color(0xFFFFFFFF), // 在強調色上的文字改為純白
-    background: darkBackgroundColor,
-    onBackground: Color(0xFFF5F5F5), // 主要文字改為更亮的灰白
+    onSecondary: Color(0xFFFFFFFF), // 主要文字改為更亮的灰白
     surface: darkSurfaceColor,
-    onSurface: Color(0xFFFFFFFF), // 卡片上的文字改為純白
     error: Color(0xFFE57373), // 稍亮的紅色以提高可見度
-    onError: Color(0xFF000000), // 錯誤訊息上的文字用黑色
   ),
 
   // --- 文字排版主題 ---
@@ -91,7 +87,7 @@ final ThemeData darkTheme = ThemeData(
       labelLarge: const TextStyle(fontSize: 14),
       labelMedium: const TextStyle(fontSize: 12),
       labelSmall: const TextStyle(fontSize: 11),
-    )
+    ),
   ),
 
   // --- 元件主題 ---
@@ -155,13 +151,12 @@ final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   colorScheme: ColorScheme.fromSeed(
     seedColor: primaryColorLight,
-    brightness: Brightness.light,
   ),
-  appBarTheme: AppBarTheme(
+  appBarTheme: const AppBarTheme(
     backgroundColor: primaryColorLight,
     foregroundColor: Colors.white,
     elevation: 0.5,
-    titleTextStyle: const TextStyle(
+    titleTextStyle: TextStyle(
       color: Colors.white,
       fontSize: 20,
       fontWeight: FontWeight.w500,
