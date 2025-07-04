@@ -1,35 +1,15 @@
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart';
+import 'package:bowlingarsenal_app/utils/color_utils.dart';
+import 'package:bowlingarsenal_app/utils/string_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 // import '../../../models/bowling_ball.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 // import 'package:getwidget/getwidget.dart'; // GFListTile is no longer used
-
-// Helper function to extract core category (Symmetric/Asymmetric)
-String getCoreCategory(String coreName) {
-  if (coreName.trim().isEmpty) {
-    return '未知'; // Handle empty core names
-  }
-  final parts = coreName.trim().split(' ');
-  return parts.last; // Return last part (works even if no space)
-}
-
-// Helper function to clean brand name (remove "bowling" word)
-String cleanBrandName(String brandName) {
-  return brandName
-      .replaceAll(RegExp(r'\bbowling\b', caseSensitive: false), '')
-      .trim()
-      .replaceAll(RegExp(r'\s+'), ' '); // Remove extra spaces
-}
-
-// Helper function to adjust hue of a color by specified degrees
-Color adjustHue(Color color, double hueDelta) {
-  final hsvColor = HSVColor.fromColor(color);
-  var newHue = (hsvColor.hue + hueDelta) % 360;
-  if (newHue < 0) newHue += 360;
-  return hsvColor.withHue(newHue).toColor();
-}
+import 'package:bowlingarsenal_app/widgets/painters/grid_painter.dart';
+import 'package:bowlingarsenal_app/widgets/painters/metal_texture_painter.dart';
 
 // Helper function to create radial gradient overlay for matte effect
 RadialGradient createMatteOverlay(List<Color> brandColors) {
@@ -48,126 +28,6 @@ RadialGradient createMatteOverlay(List<Color> brandColors) {
     ],
     stops: const [0.0, 0.4, 0.7, 1.0],
   );
-}
-
-// 保齡球資料模型
-class BowlingBall { // MB Diff (質量偏心)
-
-  BowlingBall({
-    required this.id,
-    required this.name,
-    required this.brand,
-    required this.coverstock,
-    required this.core, this.coverstockName = '',
-    this.imageUrl = 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball',
-    this.rg,
-    this.differential,
-    this.massBias,
-  });
-
-  factory BowlingBall.fromJson(Map<String, dynamic> json) {
-    double? parseDouble(String? value) {
-      if (value == null || value.isEmpty) return null;
-      return double.tryParse(value);
-    }
-
-    String getImageUrl(String ballName) {
-      if (ballName == 'Jackal EXJ') {
-        return 'assets/images/Jackal EXJ.jpg';
-      }
-      return 'https://via.placeholder.com/80x80/A3D5DC/FFFFFF?Text=Ball';
-    }
-
-    return BowlingBall(
-      id: json['Ball'] ?? '',
-      name: json['Ball'] ?? '',
-      brand: json['Brand'] ?? '',
-      coverstock: json['Coverstock Category'] ?? '',
-      coverstockName: json['Coverstock Name'] ?? '',
-      core: json['Core'] ?? '',
-      imageUrl: getImageUrl(json['Ball'] ?? ''),
-      rg: parseDouble(json['RG']),
-      differential: parseDouble(json['Diff']),
-      massBias: parseDouble(json['MB Diff']),
-    );
-  }
-  final String id;
-  final String name;
-  final String brand;
-  final String coverstock; // 球皮類型（用於卡片顯示）
-  final String coverstockName; // 球皮完整名稱（用於詳細視窗）
-  final String core;
-  final String imageUrl; // Not used in the new card design directly
-  final double? rg; // RG (徑向迴轉半徑)
-  final double? differential; // Diff (差動值)
-  final double? massBias;
-}
-
-// Helper class for metal texture background
-class _MetalTexturePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey[400]!.withOpacity(0.08)
-      ..style = PaintingStyle.fill;
-
-    // 創建細微的點狀紋理
-    for (double x = 0; x < size.width; x += 16) {
-      for (double y = 0; y < size.height; y += 16) {
-        if ((x / 16 + y / 16) % 3 == 0) {
-          canvas.drawCircle(Offset(x, y), 0.8, paint);
-        }
-      }
-    }
-
-    // 添加細微的對角線紋理
-    final linePaint = Paint()
-      ..color = Colors.grey[300]!.withOpacity(0.05)
-      ..strokeWidth = 0.5;
-
-    for (var i = -size.height; i < size.width + size.height; i += 24) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        linePaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// Helper class for the grid pattern on the card
-class _GridPainter extends CustomPainter {
-
-  _GridPainter();
-  final Color gridColor;
-  final double strokeWidth;
-  final double spacing;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = gridColor
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    for (var i = spacing; i < size.width; i += spacing) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
-    }
-
-    for (var i = spacing; i < size.height; i += spacing) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _GridPainter oldDelegate) {
-    return oldDelegate.gridColor != gridColor ||
-           oldDelegate.strokeWidth != strokeWidth ||
-           oldDelegate.spacing != spacing;
-  }
 }
 
 // Custom Card Item Widget with Color Ring Design
@@ -344,8 +204,19 @@ class BallListView extends ConsumerWidget {
         // 添加細微的點狀紋理效果
         Container(
           child: CustomPaint(
-            painter: _MetalTexturePainter(),
             size: Size.infinite,
+            painter: MetalTexturePainter(),
+          ),
+        ),
+        // 網格圖案
+        Positioned.fill(
+          child: CustomPaint(
+            size: Size.infinite,
+            painter: GridPainter(
+              gridColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+              strokeWidth: 1.2,
+              spacing: 28,
+            ),
           ),
         ),
         ListView.builder(

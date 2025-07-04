@@ -1,24 +1,11 @@
 import 'dart:ui';
+import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/utils/string_formatters.dart';
 
 // import '../models/bowling_ball.dart'; // 導入原有的 BowlingBall 模型
 import 'package:bowlingarsenal_app/widgets/common/theme/brand_colors.dart'; // 導入品牌色定義
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-// 從球心名稱提取核心類型的輔助函數
-String getCoreCategory(String coreName) {
-  if (coreName.trim().isEmpty) {
-    return '未知';
-  }
-  final lowerCoreName = coreName.toLowerCase();
-  if (lowerCoreName.contains('asymmetric')) {
-    return 'Asymmetric';
-  } else if (lowerCoreName.contains('symmetric')) {
-    return 'Symmetric';
-  }
-  final parts = coreName.trim().split(' ');
-  return parts.isNotEmpty ? parts.last : '未知';
-}
 
 // 組合球皮名稱和類別的輔助函數
 String _getCombinedCoverstockInfo(BowlingBall ball) {
@@ -373,29 +360,23 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        // 上排兩格（球心、球皮）
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
+                        // 球皮和核心資訊
+                        _InfoSection(
+                          title: 'Coverstock & Core',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: _StatItem(
-                                  svgAsset: 'assets/images/core_logo.svg',
-                                  label: '球心',
-                                  value:
-                                      widget.ball.core.isNotEmpty
-                                          ? widget.ball.core
-                                          : '未知',
-                                ),
+                              _InfoRow(
+                                icon: Icons.texture,
+                                label: 'Coverstock',
+                                value: widget.ball.combinedCoverstockInfo,
                               ),
-                              Expanded(
-                                child: _StatItem(
-                                  svgAsset: 'assets/images/cover_logo.svg',
-                                  label: '球皮',
-                                  value: _getCombinedCoverstockInfo(
-                                    widget.ball,
-                                  ),
-                                ),
+                              const SizedBox(height: 10),
+                              _InfoRow(
+                                icon: Icons.settings_input_component,
+                                label: 'Core',
+                                value:
+                                    '${widget.ball.core} (${getCoreCategory(widget.ball.core)})',
                               ),
                             ],
                           ),
