@@ -13,11 +13,17 @@ export 'auth_provider.dart';
 export 'onboarding_provider.dart';
 export 'user_profile_provider.dart';
 
+/// 提供 BallDataService 實例的 Provider
+final ballDataServiceProvider = Provider<BallDataService>((ref) {
+  return BallDataService();
+});
+
 /// 提供保齡球列表的 FutureProvider
 ///
 /// 會自動處理讀取、快取（由 BallDataService 處理）、錯誤和成功狀態
 final ballListProvider = FutureProvider<List<BowlingBall>>((ref) {
-  return BallDataService.loadBallData();
+  final ballService = ref.watch(ballDataServiceProvider);
+  return ballService.loadBallData();
 });
 
 // 計算型 Provider - 檢查是否需要顯示 Onboarding
