@@ -5,8 +5,8 @@ import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/my_training_page.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_search_bar.dart';
-import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';
-import 'package:bowlingarsenal_app/widgets/ball_list_view.dart';
+// import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';
+import 'package:bowlingarsenal_app/widgets/app_specific/arsenal/ball_list_view.dart';
 import 'package:bowlingarsenal_app/widgets/filter_popout.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
@@ -129,11 +129,12 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                       bowlingBalls: filteredBalls, // 直接使用 Provider 計算後的列表
                       onBallTapped: (ball) {
                         // 彈出球的詳細資訊
-                        showDialog(
-                          context: context,
-                          builder:
-                              (context) => BowlingBallDetailWidget(ball: ball),
-                        );
+                        // showDialog(
+                        //   context: context,
+                        //   builder:
+                        //       (context) => BowlingBallDetailWidget(ball: ball),
+                        // );
+                        print('Ball tapped: ${ball.name}');
                       },
                     ),
                   ),

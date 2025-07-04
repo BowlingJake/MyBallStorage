@@ -1,5 +1,5 @@
 class BowlingBall {
-  BowlingBall({
+  const BowlingBall({
     required this.id,
     required this.name,
     required this.brand,
@@ -63,6 +63,11 @@ class BowlingBall {
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
       intDiff: tryParseDouble(json['intDiff'] ?? json['MB Diff']),
+      handType: json['handType'] as String?,
+      layoutType: json['layoutType'] as String?,
+      layoutValues: json['layoutValues'] != null
+          ? List<String>.from(json['layoutValues'] as List)
+          : null,
     );
   }
   final String id;
@@ -79,9 +84,9 @@ class BowlingBall {
   final double? intDiff;
 
   // 用戶自定義數據
-  String? handType;
-  String? layoutType;
-  List<String>? layoutValues;
+  final String? handType;
+  final String? layoutType;
+  final List<String>? layoutValues;
 
   String get combinedCoverstockInfo {
     if (coverstockName.isEmpty && coverstock.isEmpty) {
@@ -125,6 +130,42 @@ class BowlingBall {
     }
   }
 
+  BowlingBall copyWith({
+    String? id,
+    String? name,
+    String? brand,
+    String? core,
+    String? coverstock,
+    String? coverstockName,
+    String? factoryFinish,
+    String? releaseDate,
+    String? imageUrl,
+    double? rg,
+    double? diff,
+    double? intDiff,
+    String? handType,
+    String? layoutType,
+    List<String>? layoutValues,
+  }) {
+    return BowlingBall(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      brand: brand ?? this.brand,
+      core: core ?? this.core,
+      coverstock: coverstock ?? this.coverstock,
+      coverstockName: coverstockName ?? this.coverstockName,
+      factoryFinish: factoryFinish ?? this.factoryFinish,
+      releaseDate: releaseDate ?? this.releaseDate,
+      imageUrl: imageUrl ?? this.imageUrl,
+      rg: rg ?? this.rg,
+      diff: diff ?? this.diff,
+      intDiff: intDiff ?? this.intDiff,
+      handType: handType ?? this.handType,
+      layoutType: layoutType ?? this.layoutType,
+      layoutValues: layoutValues ?? this.layoutValues,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -139,6 +180,9 @@ class BowlingBall {
       'rg': rg,
       'diff': diff,
       'intDiff': intDiff,
+      'handType': handType,
+      'layoutType': layoutType,
+      'layoutValues': layoutValues,
     };
   }
 }

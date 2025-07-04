@@ -1,7 +1,7 @@
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
-import 'package:bowlingarsenal_app/utils/string_formatters.dart';
+import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
@@ -15,7 +15,7 @@ import 'package:bowlingarsenal_app/widgets/painters/metal_texture_painter.dart';
 RadialGradient createMatteOverlay(List<Color> brandColors) {
   final primaryColor = brandColors.first;
   final matteColor1 = adjustHue(primaryColor, 15);
-  final var matteColor2 = adjustHue(primaryColor, -12);
+  final matteColor2 = adjustHue(primaryColor, -12);
   
   return RadialGradient(
     center: const Alignment(0.3, -0.2),
@@ -186,12 +186,21 @@ class _BallCardItem extends StatelessWidget {
 }
 
 class BallListView extends ConsumerWidget {
-  const BallListView({super.key});
+  const BallListView({
+    required this.bowlingBalls,
+    this.onBallTapped,
+    this.onBallLongPress,
+    super.key,
+  });
+
+  final List<BowlingBall> bowlingBalls;
+  final Function(BowlingBall)? onBallTapped;
+  final Function(BowlingBall)? onBallLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final balls = ref.watch(filteredBowlingBallProvider);
-    final balls = []; // Placeholder
+    final balls = bowlingBalls; // Use passed list
 
     if (balls.isEmpty) {
       return const Center(
@@ -228,12 +237,12 @@ class BallListView extends ConsumerWidget {
               ball: ball,
               theme: Theme.of(context),
               onTap: () {
-                // onBallTap?.call(ball);
-                print('Tapped on ${ball.name}');
+                onBallTapped?.call(ball);
+                // print('Tapped on ${ball.name}');
               },
               onLongPress: () {
                 onBallLongPress?.call(ball);
-                print('Long pressed on ${ball.name}');
+                // print('Long pressed on ${ball.name}');
               },
             );
           },
