@@ -2,67 +2,11 @@ import 'dart:ui';
 
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart'; // 導入品牌色定義
+import 'package:bowlingarsenal_app/utils/app_formatters.dart';
+import 'package:bowlingarsenal_app/widgets/common/ball_image_widget.dart';
 // 導入原有的 BowlingBall 模型
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-// 從球心名稱提取核心類型的輔助函數
-String getCoreCategory(String coreName) {
-  if (coreName.trim().isEmpty) {
-    return '未知';
-  }
-  final lowerCoreName = coreName.toLowerCase();
-  if (lowerCoreName.contains('asymmetric')) {
-    return 'Asymmetric';
-  } else if (lowerCoreName.contains('symmetric')) {
-    return 'Symmetric';
-  }
-  final parts = coreName.trim().split(' ');
-  return parts.isNotEmpty ? parts.last : '未知';
-}
-
-// 組合球皮名稱和類別的輔助函數
-String _getCombinedCoverstockInfo(BowlingBall ball) {
-  if (ball.coverstockName.isEmpty && ball.coverstock.isEmpty) {
-    return '未知';
-  }
-
-  final name = ball.coverstockName;
-  final category = ball.coverstock;
-
-  if (name.isEmpty) {
-    return category.isNotEmpty ? category : '未知';
-  }
-
-  if (category.isEmpty) {
-    return name;
-  }
-
-  // 檢查名稱是否已經包含類別信息
-  final lowerName = name.toLowerCase();
-  final lowerCategory = category.toLowerCase();
-
-  if (lowerName.contains('reactive') ||
-      lowerName.contains('urethane') ||
-      lowerName.contains('polyester')) {
-    return name; // 名稱已經包含類別信息
-  }
-
-  // 智能組合名稱和類別，避免重複
-  if (lowerCategory.contains('pearl') && lowerName.contains('pearl')) {
-    // 例如 "Reactor Pearl" + "Pearl Reactive" → "Reactor Pearl Reactive"
-    return '$name Reactive';
-  } else if (lowerCategory.contains('solid') && lowerName.contains('solid')) {
-    // 例如 "HK22 Solid" + "Solid Reactive" → "HK22 Solid Reactive"
-    return '$name Reactive';
-  } else if (lowerCategory.contains('hybrid') && lowerName.contains('hybrid')) {
-    // 例如 "R2S Hybrid" + "Hybrid Reactive" → "R2S Hybrid Reactive"
-    return '$name Reactive';
-  } else {
-    // 一般情況，直接組合
-    return '$name $category';
-  }
-}
 
 class BowlingBallDetailWidget extends StatefulWidget {
   const BowlingBallDetailWidget({required this.ball, super.key});
@@ -236,52 +180,11 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                     children: [
                                       // 球圖片
                                       ClipOval(
-                                        child:
-                                            widget.ball.imageUrl.isNotEmpty
-                                                ? widget.ball.imageUrl
-                                                        .startsWith('assets/')
-                                                    ? Image.asset(
-                                                      widget.ball.imageUrl,
-                                                      fit: BoxFit.cover,
-                                                      filterQuality:
-                                                          FilterQuality.high,
-                                                      errorBuilder:
-                                                          (
-                                                            context,
-                                                            error,
-                                                            stackTrace,
-                                                          ) => Image.asset(
-                                                            'assets/images/sample_strikeTrack.png',
-                                                            fit: BoxFit.cover,
-                                                            filterQuality:
-                                                                FilterQuality
-                                                                    .high,
-                                                          ),
-                                                    )
-                                                    : Image.network(
-                                                      widget.ball.imageUrl,
-                                                      fit: BoxFit.cover,
-                                                      filterQuality:
-                                                          FilterQuality.high,
-                                                      errorBuilder:
-                                                          (
-                                                            context,
-                                                            error,
-                                                            stackTrace,
-                                                          ) => Image.asset(
-                                                            'assets/images/sample_strikeTrack.png',
-                                                            fit: BoxFit.cover,
-                                                            filterQuality:
-                                                                FilterQuality
-                                                                    .high,
-                                                          ),
-                                                    )
-                                                : Image.asset(
-                                                  'assets/images/sample_strikeTrack.png',
-                                                  fit: BoxFit.cover,
-                                                  filterQuality:
-                                                      FilterQuality.high,
-                                                ),
+                                        child: BallImageWidget(
+                                          imageUrl: widget.ball.imageUrl,
+                                          width: 100,
+                                          height: 100,
+                                        ),
                                       ),
                                       // 接觸陰影 - 球底部內側的窄暗帶（環境遮蔽）
                                       ClipOval(
@@ -378,9 +281,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                 child: _StatItem(
                                   svgAsset: 'assets/images/cover_logo.svg',
                                   label: '球皮',
-                                  value: _getCombinedCoverstockInfo(
-                                    widget.ball,
-                                  ),
+                                  value: widget.ball.combinedCoverstockInfo,
                                 ),
                               ),
                             ],

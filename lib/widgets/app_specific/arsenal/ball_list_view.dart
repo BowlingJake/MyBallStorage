@@ -3,7 +3,7 @@ import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 // import '../../../models/bowling_ball.dart';
 import 'package:gradient_borders/gradient_borders.dart';
@@ -185,7 +185,7 @@ class _BallCardItem extends StatelessWidget {
   }
 }
 
-class BallListView extends ConsumerWidget {
+class BallListView extends StatelessWidget {
   const BallListView({
     required this.bowlingBalls,
     this.onBallTapped,
@@ -198,7 +198,7 @@ class BallListView extends ConsumerWidget {
   final Function(BowlingBall)? onBallLongPress;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // final balls = ref.watch(filteredBowlingBallProvider);
     final balls = bowlingBalls; // Use passed list
 
