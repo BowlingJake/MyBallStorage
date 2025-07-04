@@ -1,22 +1,23 @@
 import 'dart:ui';
-
+import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:flutter/material.dart';
 
 class FilterPopout extends StatefulWidget {
   const FilterPopout({
-    required this.selectedFilters,
+    required this.filters,
     required this.onFilterChanged,
     super.key,
   });
-  final Map<String, String?> selectedFilters;
-  final Function(String filterType, String? value) onFilterChanged;
+  final BallFilters filters;
+  final void Function(FilterField field, String? value) onFilterChanged;
 
   @override
   State<FilterPopout> createState() => _FilterPopoutState();
 }
 
 class _FilterPopoutState extends State<FilterPopout> {
-  late Map<String, List<String>> _localFilters;
+  // 本地狀態，用於 UI 互動
+  late BallFilters _localFilters;
 
   // 品牌圖標映射
   final Map<String, IconData> _brandIcons = {
@@ -51,21 +52,7 @@ class _FilterPopoutState extends State<FilterPopout> {
   @override
   void initState() {
     super.initState();
-    // 轉換為多選格式
-    _localFilters = {
-      'brand':
-          widget.selectedFilters['brand'] != null
-              ? [widget.selectedFilters['brand']!]
-              : [],
-      'core':
-          widget.selectedFilters['core'] != null
-              ? [widget.selectedFilters['core']!]
-              : [],
-      'coverstock':
-          widget.selectedFilters['coverstock'] != null
-              ? [widget.selectedFilters['coverstock']!]
-              : [],
-    };
+    _localFilters = widget.filters;
   }
 
   @override
@@ -178,29 +165,19 @@ class _FilterPopoutState extends State<FilterPopout> {
                         ),
                         child: Row(
                           children: [
-                            // 應用按鈕 - 修改為透明背景且全寬
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // 應用篩選 - 多選品牌支持，其他保持單選相容性
-                                  widget.onFilterChanged(
-                                    'brand',
-                                    _localFilters['brand']!.isNotEmpty
-                                        ? _localFilters['brand']!.first
-                                        : null,
-                                  );
-                                  widget.onFilterChanged(
-                                    'core',
-                                    _localFilters['core']!.isNotEmpty
-                                        ? _localFilters['core']!.first
-                                        : null,
-                                  );
-                                  widget.onFilterChanged(
-                                    'coverstock',
-                                    _localFilters['coverstock']!.isNotEmpty
-                                        ? _localFilters['coverstock']!.first
-                                        : null,
-                                  );
+                                  // Apply all local changes to the provider
+                                  if (_localFilters.brand != widget.filters.brand) {
+                                    widget.onFilterChanged(FilterField.brand, _localFilters.brand);
+                                  }
+                                  if (_localFilters.core != widget.filters.core) {
+                                    widget.onFilterChanged(FilterField.core, _localFilters.core);
+                                  }
+                                  if (_localFilters.coverstock != widget.filters.coverstock) {
+                                    widget.onFilterChanged(FilterField.coverstock, _localFilters.coverstock);
+                                  }
                                   Navigator.of(context).pop();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -238,743 +215,111 @@ class _FilterPopoutState extends State<FilterPopout> {
   }
 
   Widget _buildBrandFilterSection() {
-    // 定義品牌分組
     final brandGroups = <String, List<String>>{
       'Team SPI': ['Storm', 'Roto Grip', '900 Global'],
-      'Brunswick Group': [
-        'Brunswick',
-        'Ebonite',
-        'Track',
-        'Columbia 300',
-        'DV8',
-        'Radical',
-        'Hammer',
-      ],
-      'Others': ['Motiv', 'SWAG'],
+      'Brunswick Group': ['Brunswick', 'Ebonite', 'Track', 'Columbia 300', 'DV8', 'Radical'],
+      'Others': ['Motiv', 'Hammer', 'SWAG'],
     };
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 區段標題和小型 Select All 按鈕
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Brand',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (_localFilters['brand']!.isEmpty) {
-                    // 如果目前沒有選擇，就全選
-                    _localFilters['brand']!.addAll(
-                      brandGroups.values.expand((list) => list),
-                    );
-                  } else {
-                    // 如果有選擇，就清除所有
-                    _localFilters['brand']!.clear();
-                  }
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      _localFilters['brand']!.isNotEmpty
-                          ? Colors.white.withOpacity(0.25)
-                          : Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color:
-                        _localFilters['brand']!.isNotEmpty
-                            ? Colors.white.withOpacity(0.9)
-                            : Colors.white.withOpacity(0.3),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _localFilters['brand']!.isNotEmpty
-                          ? Icons.check_circle
-                          : Icons.radio_button_unchecked,
-                      color: Colors.white.withOpacity(
-                        _localFilters['brand']!.isNotEmpty ? 1.0 : 0.7,
-                      ),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _localFilters['brand']!.isNotEmpty
-                          ? 'Clear All'
-                          : 'Select All',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(
-                          _localFilters['brand']!.isNotEmpty ? 1.0 : 0.8,
-                        ),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // 各品牌集團
-        ...brandGroups.entries.map(
-          (entry) => _buildBrandGroup(entry.key, entry.value),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBrandGroup(String groupName, List<String> brands) {
-    final isGroupSelected = brands.every(
-      (brand) => _localFilters['brand']!.contains(brand),
-    );
-    final hasPartialSelection =
-        brands.any((brand) => _localFilters['brand']!.contains(brand)) &&
-        !isGroupSelected;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 集團標題按鈕 - 簡潔的小標題樣式
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              if (isGroupSelected) {
-                // 如果集團全選，則取消選擇該集團所有品牌
-                for (final brand in brands) {
-                  _localFilters['brand']!.remove(brand);
-                }
-              } else {
-                // 如果集團未全選，則選擇該集團所有品牌
-                for (final brand in brands) {
-                  if (!_localFilters['brand']!.contains(brand)) {
-                    _localFilters['brand']!.add(brand);
-                  }
-                }
-              }
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color:
-                  isGroupSelected || hasPartialSelection
-                      ? Colors.white.withOpacity(0.15)
-                      : Colors.white.withOpacity(0.08),
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isGroupSelected
-                      ? Icons.check_circle
-                      : hasPartialSelection
-                      ? Icons.remove_circle
-                      : Icons.radio_button_unchecked,
-                  color: Colors.white.withOpacity(0.8),
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  groupName,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // 該集團的品牌選項 - 緊湊排列
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children:
-              brands.map((brand) {
-                final isSelected = _localFilters['brand']!.contains(brand);
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _localFilters['brand']!.remove(brand);
-                      } else {
-                        _localFilters['brand']!.add(brand);
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width:
-                        (MediaQuery.of(context).size.width * 0.9 - 40 - 12) / 3,
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? Colors.white.withOpacity(0.25)
-                              : Colors.white.withOpacity(0.08),
-                      border: Border.all(
-                        color:
-                            isSelected
-                                ? Colors.white.withOpacity(0.9)
-                                : Colors.white.withOpacity(0.3),
-                        width: isSelected ? 2 : 1,
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow:
-                          isSelected
-                              ? [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.15),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                              : [],
-                    ),
-                    child: Center(
-                      child: Text(
-                        brand,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(
-                            isSelected ? 1.0 : 0.8,
-                          ),
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-        ),
-
-        const SizedBox(height: 20),
-      ],
+    return _buildFilterSection(
+      title: 'Brand',
+      groups: brandGroups,
+      selectedItem: _localFilters.brand,
+      onSelected: (brand) {
+        setState(() {
+          _localFilters = _localFilters.copyWith(brand: _localFilters.brand == brand ? null : brand);
+        });
+      },
+      icons: _brandIcons,
     );
   }
 
   Widget _buildCoreFilterSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 區段標題和小型 Select All 按鈕
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Core',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (_localFilters['core']!.isEmpty) {
-                    _localFilters['core']!.addAll(['Symmetric', 'Asymmetric']);
-                  } else {
-                    _localFilters['core']!.clear();
-                  }
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      _localFilters['core']!.isNotEmpty
-                          ? Colors.white.withOpacity(0.25)
-                          : Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color:
-                        _localFilters['core']!.isNotEmpty
-                            ? Colors.white.withOpacity(0.9)
-                            : Colors.white.withOpacity(0.3),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _localFilters['core']!.isNotEmpty
-                          ? Icons.check_circle
-                          : Icons.radio_button_unchecked,
-                      color: Colors.white.withOpacity(
-                        _localFilters['core']!.isNotEmpty ? 1.0 : 0.7,
-                      ),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _localFilters['core']!.isNotEmpty
-                          ? 'Clear All'
-                          : 'Select All',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(
-                          _localFilters['core']!.isNotEmpty ? 1.0 : 0.8,
-                        ),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Core 選項 - 兩個選項等寬並排
-        Row(
-          children:
-              ['Symmetric', 'Asymmetric'].map((core) {
-                final isSelected = _localFilters['core']!.contains(core);
-                return Expanded(
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      right: core != 'Asymmetric' ? 6 : 0,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          if (isSelected) {
-                            _localFilters['core']!.remove(core);
-                          } else {
-                            _localFilters['core']!.add(core);
-                          }
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        height: 36,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? Colors.white.withOpacity(0.25)
-                                  : Colors.white.withOpacity(0.08),
-                          border: Border.all(
-                            color:
-                                isSelected
-                                    ? Colors.white.withOpacity(0.9)
-                                    : Colors.white.withOpacity(0.3),
-                            width: isSelected ? 2 : 1,
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow:
-                              isSelected
-                                  ? [
-                                    BoxShadow(
-                                      color: Colors.white.withOpacity(0.15),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                  : [],
-                        ),
-                        child: Center(
-                          child: Text(
-                            core,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(
-                                isSelected ? 1.0 : 0.8,
-                              ),
-                              fontSize: 12,
-                              fontWeight:
-                                  isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-        ),
-      ],
+    return _buildFilterSection(
+      title: 'Core',
+      items: ['Symmetric', 'Asymmetric'],
+      selectedItem: _localFilters.core,
+      onSelected: (core) {
+        setState(() {
+          _localFilters = _localFilters.copyWith(core: _localFilters.core == core ? null : core);
+        });
+      },
+      icons: _coreIcons,
     );
   }
 
   Widget _buildCoverFilterSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 區段標題和小型 Select All 按鈕
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Cover',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (_localFilters['coverstock']!.isEmpty) {
-                    _localFilters['coverstock']!.addAll([
-                      'Solid Reactive',
-                      'Pearl Reactive',
-                      'Hybrid Reactive',
-                      'Urethane',
-                      'Polyester',
-                    ]);
-                  } else {
-                    _localFilters['coverstock']!.clear();
-                  }
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      _localFilters['coverstock']!.isNotEmpty
-                          ? Colors.white.withOpacity(0.25)
-                          : Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color:
-                        _localFilters['coverstock']!.isNotEmpty
-                            ? Colors.white.withOpacity(0.9)
-                            : Colors.white.withOpacity(0.3),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _localFilters['coverstock']!.isNotEmpty
-                          ? Icons.check_circle
-                          : Icons.radio_button_unchecked,
-                      color: Colors.white.withOpacity(
-                        _localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.7,
-                      ),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _localFilters['coverstock']!.isNotEmpty
-                          ? 'Clear All'
-                          : 'Select All',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(
-                          _localFilters['coverstock']!.isNotEmpty ? 1.0 : 0.8,
-                        ),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Cover 選項 - 等寬Grid布局
-        Column(
-          children: [
-            // 第一行：前三個選項
-            Row(
-              children:
-                  [
-                    'Solid Reactive',
-                    'Pearl Reactive',
-                    'Hybrid Reactive',
-                  ].asMap().entries.map((entry) {
-                    final cover = entry.value;
-                    final index = entry.key;
-                    final isSelected = _localFilters['coverstock']!.contains(
-                      cover,
-                    );
-                    return Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(right: index != 2 ? 6 : 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isSelected) {
-                                _localFilters['coverstock']!.remove(cover);
-                              } else {
-                                _localFilters['coverstock']!.add(cover);
-                              }
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            height: 36,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  isSelected
-                                      ? Colors.white.withOpacity(0.25)
-                                      : Colors.white.withOpacity(0.08),
-                              border: Border.all(
-                                color:
-                                    isSelected
-                                        ? Colors.white.withOpacity(0.9)
-                                        : Colors.white.withOpacity(0.3),
-                                width: isSelected ? 2 : 1,
-                              ),
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow:
-                                  isSelected
-                                      ? [
-                                        BoxShadow(
-                                          color: Colors.white.withOpacity(0.15),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                      : [],
-                            ),
-                            child: Center(
-                              child: Text(
-                                cover,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(
-                                    isSelected ? 1.0 : 0.8,
-                                  ),
-                                  fontSize: 11,
-                                  fontWeight:
-                                      isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-            ),
-
-            const SizedBox(height: 6),
-
-            // 第二行：後兩個選項
-            Row(
-              children:
-                  ['Urethane', 'Polyester'].asMap().entries.map((entry) {
-                    final cover = entry.value;
-                    final index = entry.key;
-                    final isSelected = _localFilters['coverstock']!.contains(
-                      cover,
-                    );
-                    return Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(right: index != 1 ? 6 : 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isSelected) {
-                                _localFilters['coverstock']!.remove(cover);
-                              } else {
-                                _localFilters['coverstock']!.add(cover);
-                              }
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            height: 36,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  isSelected
-                                      ? Colors.white.withOpacity(0.25)
-                                      : Colors.white.withOpacity(0.08),
-                              border: Border.all(
-                                color:
-                                    isSelected
-                                        ? Colors.white.withOpacity(0.9)
-                                        : Colors.white.withOpacity(0.3),
-                                width: isSelected ? 2 : 1,
-                              ),
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow:
-                                  isSelected
-                                      ? [
-                                        BoxShadow(
-                                          color: Colors.white.withOpacity(0.15),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                      : [],
-                            ),
-                            child: Center(
-                              child: Text(
-                                cover,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(
-                                    isSelected ? 1.0 : 0.8,
-                                  ),
-                                  fontSize: 12,
-                                  fontWeight:
-                                      isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-            ),
-          ],
-        ),
-      ],
+    return _buildFilterSection(
+      title: 'Coverstock',
+      items: ['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'],
+      selectedItem: _localFilters.coverstock,
+      onSelected: (cover) {
+        setState(() {
+          _localFilters = _localFilters.copyWith(coverstock: _localFilters.coverstock == cover ? null : cover);
+        });
+      },
+      icons: _coverstockIcons,
     );
   }
 
-  Widget _buildFilterSection(
-    String title,
-    List<String> options,
-    Map<String, IconData> iconMap,
-    String filterKey,
-  ) {
+  Widget _buildFilterSection({
+    required String title,
+    Map<String, List<String>>? groups,
+    List<String>? items,
+    required String? selectedItem,
+    required ValueChanged<String?> onSelected,
+    required Map<String, IconData> icons,
+  }) {
+    final allItems = groups?.values.expand((list) => list).toList() ?? items!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 區段標題
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
         const SizedBox(height: 12),
-
-        // 文字按鈕網格
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children:
-              options.map((option) {
-                final isSelected = _localFilters[filterKey]!.contains(option);
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        _localFilters[filterKey]!.remove(option);
-                      } else {
-                        _localFilters[filterKey]!.add(option);
-                      }
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    constraints: const BoxConstraints(
-                      minWidth: 60,
-                      minHeight: 32,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? Colors.white.withOpacity(0.25)
-                              : Colors.white.withOpacity(0.08),
-                      border: Border.all(
-                        color:
-                            isSelected
-                                ? Colors.white.withOpacity(0.9)
-                                : Colors.white.withOpacity(0.3),
-                        width: isSelected ? 2 : 1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow:
-                          isSelected
-                              ? [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                              : [],
-                    ),
-                    child: Center(
-                      child: Text(
-                        option,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(
-                            isSelected ? 1.0 : 0.8,
-                          ),
-                          fontSize: 11,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+          children: allItems.map((item) {
+            final isSelected = selectedItem == item;
+            return GestureDetector(
+              onTap: () => onSelected(isSelected ? null : item),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: (MediaQuery.of(context).size.width * 0.9 - 40 - 12) / 3,
+                height: 36,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white.withOpacity(0.25) : Colors.white.withOpacity(0.08),
+                  border: Border.all(
+                    color: isSelected ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.3),
+                    width: isSelected ? 2 : 1,
                   ),
-                );
-              }).toList(),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: isSelected ? [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.15),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : [],
+                ),
+                child: Center(
+                  child: Text(
+                    item!,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(isSelected ? 1.0 : 0.8),
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -984,8 +329,8 @@ class _FilterPopoutState extends State<FilterPopout> {
 // 顯示篩選彈窗的函數
 void showFilterPopout(
   BuildContext context,
-  Map<String, String?> selectedFilters,
-  Function(String filterType, String? value) onFilterChanged,
+  BallFilters filters,
+  void Function(FilterField field, String? value) onFilterChanged,
 ) {
   showDialog(
     context: context,
@@ -994,7 +339,7 @@ void showFilterPopout(
       return Material(
         type: MaterialType.transparency,
         child: FilterPopout(
-          selectedFilters: selectedFilters,
+          filters: filters,
           onFilterChanged: onFilterChanged,
         ),
       );

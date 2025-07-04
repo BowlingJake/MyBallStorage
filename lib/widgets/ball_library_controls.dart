@@ -12,15 +12,13 @@ class BallLibraryControls extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 監聽 Provider 以獲取當前狀態
     final searchText = ref.watch(ballSearchTextProvider);
-    final selectedFilters = ref.watch(ballFiltersProvider);
+    final filters = ref.watch(ballFiltersProvider);
     final sortCriteria = ref.watch(ballSortProvider);
 
     // 計算篩選按鈕的顯示文字
-    final hasActiveFilters = selectedFilters.values.any((f) => f != null);
-    final activeFilterCount =
-        selectedFilters.values.where((f) => f != null).length;
+    final activeFilterCount = filters.activeFilterCount;
     final filterButtonText =
-        hasActiveFilters ? 'Filter ($activeFilterCount)' : 'Filter';
+        activeFilterCount > 0 ? 'Filter ($activeFilterCount)' : 'Filter';
 
     return Column(
       children: [
@@ -47,14 +45,19 @@ class BallLibraryControls extends ConsumerWidget {
                     await showDialog<void>(
                       context: context,
                       builder: (context) => FilterPopout(
-                        selectedFilters: selectedFilters,
-                        onFilterChanged: (type, value) {
+                        filters: filters,
+                        onFilterChanged: (field, value) {
                           ref
                               .read(ballFiltersProvider.notifier)
                               .update((state) {
-                            final newState = Map<String, String?>.from(state);
-                            newState[type] = value;
-                            return newState;
+                            switch (field) {
+                              case FilterField.brand:
+                                return state.copyWith(brand: value);
+                              case FilterField.core:
+                                return state.copyWith(core: value);
+                              case FilterField.coverstock:
+                                return state.copyWith(coverstock: value);
+                            }
                           });
                         },
                       ),
