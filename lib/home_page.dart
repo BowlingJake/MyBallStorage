@@ -28,16 +28,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   final _userCardKey = GlobalKey(); // 1. 建立一個 GlobalKey 來追蹤使用者卡片
   Rect? _userCardRect; // 2. 用於儲存卡片的矩形區域
 
-  @override
-  void initState() {
-    super.initState();
-    // 3. 在第一幀渲染結束後，計算卡片的 Rect
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _calculateUserCardRect(),
-    );
-  }
-
   void _calculateUserCardRect() {
+    if (!mounted) return;
+
     final renderBox =
         _userCardKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
@@ -60,49 +53,49 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _onItemTapped(int index) {
-    // 導覽邏輯
+    // If the selected tab is tapped again, do nothing.
+    if (index == _selectedIndex) {
+      return;
+    }
+
+    // Handle navigation logic
     switch (index) {
-      case 0: // 首頁
-        // 已經在首頁，不需要導航
+      case 0:
+        // Tapped on the home tab, set state to reflect this.
         setState(() {
           _selectedIndex = 0;
         });
-      case 1: // 社群 (Ball Library)
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const BallLibraryPage()),
-        ).then((_) {
-          // 返回時重置選中狀態為首頁
-          setState(() {
-            _selectedIndex = 0;
-          });
-        });
-      case 2: // 中央按鈕 (新增)
+        break;
+      case 2:
+        // Tapped on the center 'Add' button.
         setState(() {
           _selectedIndex = index;
         });
         print('Add button tapped');
-      // TODO: 實現新增功能
-      case 3: // 訓練
+        // TODO: Implement 'Add' functionality
+        break;
+      case 1: // Ball Library
+      case 3: // Training
+      case 4: // Settings
+        // For navigation tabs, push the new page.
+        // The _selectedIndex is not updated to keep the home tab visually active
+        // and avoid UI flicker on return.
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MyTrainingPage()),
-        ).then((_) {
-          // 返回時重置選中狀態為首頁
-          setState(() {
-            _selectedIndex = 0;
-          });
-        });
-      case 4: // 個人/設定
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SettingsPage()),
-        ).then((_) {
-          // 返回時重置選中狀態為首頁
-          setState(() {
-            _selectedIndex = 0;
-          });
-        });
+          MaterialPageRoute(builder: (context) {
+            switch (index) {
+              case 1:
+                return const BallLibraryPage();
+              case 3:
+                return const MyTrainingPage();
+              case 4:
+                return const SettingsPage();
+              default:
+                return const SizedBox.shrink(); // Should not happen
+            }
+          }),
+        );
+        break;
     }
 
     print('Bottom Nav Tapped: $index');
@@ -110,6 +103,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 每次 build 後都延遲計算卡片位置，以應對佈局變化
+    WidgetsBinding.instance.addPostFrameCallback((_) => _calculateUserCardRect());
+
     final themeMode = ref.watch(themeProvider);
 
     return ProfessionalDarkBackground(
