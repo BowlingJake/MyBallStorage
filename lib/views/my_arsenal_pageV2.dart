@@ -9,18 +9,20 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 /// 顯示使用者目前擁有的武器清單頁面 (支援選擇模式)
 class MyArsenalPage extends StatefulWidget {
-
-  const MyArsenalPage({super.key, this.isSelectionMode = false}); // Changed to StatefulWidget
+  const MyArsenalPage({
+    super.key,
+    this.isSelectionMode = false,
+  }); // Changed to StatefulWidget
   final bool isSelectionMode;
 
   @override
   State<MyArsenalPage> createState() => _MyArsenalPageState(); // Create State
 }
 
-class _MyArsenalPageState extends State<MyArsenalPage> { // State class
+class _MyArsenalPageState extends State<MyArsenalPage> {
+  // State class
   // 新增多選模式狀態
   bool _isMultiSelectMode = false;
   // State to keep track of selected ball names in selection mode
@@ -51,7 +53,9 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                 Navigator.pop(dialogContext); // Close the dialog
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AddCustomBallPage()), // Navigate to custom page
+                  MaterialPageRoute(
+                    builder: (_) => const AddCustomBallPage(),
+                  ), // Navigate to custom page
                 );
               },
             ),
@@ -62,14 +66,18 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                 final viewModel = context.read<WeaponLibraryViewModel>();
                 Navigator.push<List<BowlingBall>>(
                   context,
-                  MaterialPageRoute(builder: (_) => const WeaponLibraryPage()), // Ensure WeaponLibraryPage is imported
+                  MaterialPageRoute(
+                    builder: (_) => const WeaponLibraryPage(),
+                  ), // Ensure WeaponLibraryPage is imported
                 ).then((selectedBalls) {
                   if (selectedBalls != null && selectedBalls.isNotEmpty) {
                     for (final ball in selectedBalls) {
                       viewModel.addBallToArsenal(ball);
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('已成功新增 ${selectedBalls.length} 個球具到我的球櫃')),
+                      SnackBar(
+                        content: Text('已成功新增 ${selectedBalls.length} 個球具到我的球櫃'),
+                      ),
                     );
                   }
                 });
@@ -82,9 +90,12 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
   }
 
   // --- Filter Dropdown Widget ---
-  Widget _buildFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
+  Widget _buildFilterDropdown(
+    BuildContext context,
+    WeaponLibraryViewModel viewModel,
+  ) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
@@ -103,23 +114,27 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
-                  items: viewModel.arsenalBrands.map((String brand) {
-                    return DropdownMenuItem<String>(
-                      value: brand,
-                      child: Text(
-                        brand,
-                        style: const TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      viewModel.arsenalBrands.map((String brand) {
+                        return DropdownMenuItem<String>(
+                          value: brand,
+                          child: Text(
+                            brand,
+                            style: const TextStyle(fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     viewModel.updateSelectedBrandFilter(newValue);
                   },
                   isExpanded: true,
                   buttonStyleData: ButtonStyleData(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -177,23 +192,27 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
-                  items: viewModel.arsenalCoreCategories.map((String category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(
-                        category,
-                        style: const TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      viewModel.arsenalCoreCategories.map((String category) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(
+                            category,
+                            style: const TextStyle(fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     viewModel.updateSelectedCoreCategoryFilter(newValue);
                   },
                   isExpanded: true,
                   buttonStyleData: ButtonStyleData(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -251,23 +270,29 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
-                  items: viewModel.arsenalCoverstockCategories.map((String category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(
-                        category,
-                        style: const TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    );
-                  }).toList(),
+                  items:
+                      viewModel.arsenalCoverstockCategories.map((
+                        String category,
+                      ) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(
+                            category,
+                            style: const TextStyle(fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     viewModel.updateSelectedCoverstockCategoryFilter(newValue);
                   },
                   isExpanded: true,
                   buttonStyleData: ButtonStyleData(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -342,7 +367,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
               onPressed: () {
                 setState(() {
                   _isMultiSelectMode = !_isMultiSelectMode;
-                  _selectedBallNames.clear(); // Clear selections when toggling mode
+                  _selectedBallNames
+                      .clear(); // Clear selections when toggling mode
                 });
               },
             ),
@@ -360,7 +386,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
       body: Column(
         children: [
           _buildFilterDropdown(context, viewModel),
-          if (!widget.isSelectionMode && !_isMultiSelectMode) // Show search only in normal mode
+          if (!widget.isSelectionMode &&
+              !_isMultiSelectMode) // Show search only in normal mode
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: TextField(
@@ -373,7 +400,8 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
                 onChanged: viewModel.filterArsenal,
               ),
             ),
-          if (widget.isSelectionMode && !_isMultiSelectMode) // Show "Add to Arsenal" only in page's selection mode
+          if (widget.isSelectionMode &&
+              !_isMultiSelectMode) // Show "Add to Arsenal" only in page's selection mode
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: ElevatedButton.icon(
@@ -386,133 +414,155 @@ class _MyArsenalPageState extends State<MyArsenalPage> { // State class
               ),
             ),
           Expanded(
-            child: filteredArsenal.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Text(
-                        widget.isSelectionMode && !_isMultiSelectMode
-                            ? '球櫃中無球可選\n點擊上方按鈕新增'
-                            : (viewModel.hasActiveFilters ||
-                                    viewModel.currentArsenalSearchKeyword.isNotEmpty)
-                                ? '沒有符合條件的球具'
-                                : '您的球櫃是空的\n點擊右下角按鈕新增',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            child:
+                filteredArsenal.isEmpty
+                    ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          widget.isSelectionMode && !_isMultiSelectMode
+                              ? '球櫃中無球可選\n點擊上方按鈕新增'
+                              : (viewModel.hasActiveFilters ||
+                                  viewModel
+                                      .currentArsenalSearchKeyword
+                                      .isNotEmpty)
+                              ? '沒有符合條件的球具'
+                              : '您的球櫃是空的\n點擊右下角按鈕新增',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.only(top: 8, bottom: 80),
-                    itemCount: filteredArsenal.length,
-                    itemBuilder: (context, index) {
-                      final ball = filteredArsenal[index];
-                      final isSelectedForCurrentMode = _selectedBallNames.contains(ball.ball);
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.only(top: 8, bottom: 80),
+                      itemCount: filteredArsenal.length,
+                      itemBuilder: (context, index) {
+                        final ball = filteredArsenal[index];
+                        final isSelectedForCurrentMode = _selectedBallNames
+                            .contains(ball.ball);
 
-                      return BowlingBallCard(
-                        key: ValueKey(ball.ball + ball.brand), // More unique key
-                        ball: ball,
-                        viewModel: viewModel,
-                        isSelected: (_isMultiSelectMode && isSelectedForCurrentMode) || 
-                                    (widget.isSelectionMode && !_isMultiSelectMode && isSelectedForCurrentMode),
-                        showIndividualDeleteIcon: !_isMultiSelectMode && !widget.isSelectionMode,
-                        onTap: () {
-                          if (_isMultiSelectMode) { // Multi-delete selection
-                            setState(() {
-                              if (isSelectedForCurrentMode) {
-                                _selectedBallNames.remove(ball.ball);
-                              } else {
-                                _selectedBallNames.add(ball.ball);
-                              }
-                            });
-                          } else if (widget.isSelectionMode) { // Page's primary selection mode
-                            setState(() {
-                              if (isSelectedForCurrentMode) {
-                                _selectedBallNames.remove(ball.ball);
-                              } else {
-                                _selectedBallNames.add(ball.ball);
-                              }
-                            });
-                          } else { // Normal mode: Show details dialog
-                            showBallActionDialog(context, ball, () {
-                              // Optional: Callback if dialog modifies ball state directly
-                              // This setState might be useful if layout is updated and needs redraw
-                              setState(() {});
-                            });
-                          }
-                        },
-                        onLongPress: () {
-                          // Long press for layout only in normal view mode
-                          if (!_isMultiSelectMode && !widget.isSelectionMode) {
-                            showBallActionDialog(
-                              context,
-                              ball,
-                              () { setState(() {}); }, // For potential redraws after layout update
-                              directToLayout: true,
-                            );
-                          }
-                        },
-                      );
-                    },
-                  ),
+                        return BowlingBallCard(
+                          key: ValueKey(
+                            ball.ball + ball.brand,
+                          ), // More unique key
+                          ball: ball,
+                          viewModel: viewModel,
+                          isSelected:
+                              (_isMultiSelectMode &&
+                                  isSelectedForCurrentMode) ||
+                              (widget.isSelectionMode &&
+                                  !_isMultiSelectMode &&
+                                  isSelectedForCurrentMode),
+                          showIndividualDeleteIcon:
+                              !_isMultiSelectMode && !widget.isSelectionMode,
+                          onTap: () {
+                            if (_isMultiSelectMode) {
+                              // Multi-delete selection
+                              setState(() {
+                                if (isSelectedForCurrentMode) {
+                                  _selectedBallNames.remove(ball.ball);
+                                } else {
+                                  _selectedBallNames.add(ball.ball);
+                                }
+                              });
+                            } else if (widget.isSelectionMode) {
+                              // Page's primary selection mode
+                              setState(() {
+                                if (isSelectedForCurrentMode) {
+                                  _selectedBallNames.remove(ball.ball);
+                                } else {
+                                  _selectedBallNames.add(ball.ball);
+                                }
+                              });
+                            } else {
+                              // Normal mode: Show details dialog
+                              showBallActionDialog(context, ball, () {
+                                // Optional: Callback if dialog modifies ball state directly
+                                // This setState might be useful if layout is updated and needs redraw
+                                setState(() {});
+                              });
+                            }
+                          },
+                          onLongPress: () {
+                            // Long press for layout only in normal view mode
+                            if (!_isMultiSelectMode &&
+                                !widget.isSelectionMode) {
+                              showBallActionDialog(
+                                context,
+                                ball,
+                                () {
+                                  setState(() {});
+                                }, // For potential redraws after layout update
+                                directToLayout: true,
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
           ),
         ],
       ),
-      floatingActionButton: (widget.isSelectionMode || _isMultiSelectMode)
-          ? null // No FAB in any selection mode
-          : FloatingActionButton(
-              onPressed: () => _showAddMethodSelectionDialog(context),
-              tooltip: '新增武器',
-              child: const Icon(Icons.add),
-            ),
+      floatingActionButton:
+          (widget.isSelectionMode || _isMultiSelectMode)
+              ? null // No FAB in any selection mode
+              : FloatingActionButton(
+                onPressed: () => _showAddMethodSelectionDialog(context),
+                tooltip: '新增武器',
+                child: const Icon(Icons.add),
+              ),
     );
   }
 
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('確認刪除'),
-        content: Text(
-            '確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？',),
-        actions: [
-          TextButton(
-            child: const Text('取消'),
-            onPressed: () => Navigator.pop(dialogContext),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('確認刪除'),
+            content: Text('確定要刪除選取的 ${_selectedBallNames.length} 個球具嗎？'),
+            actions: [
+              TextButton(
+                child: const Text('取消'),
+                onPressed: () => Navigator.pop(dialogContext),
+              ),
+              TextButton(
+                child: const Text('刪除', style: TextStyle(color: Colors.red)),
+                onPressed: () {
+                  var deletedCount = 0;
+                  final namesToDelete = List<String>.from(
+                    _selectedBallNames,
+                  ); // Create a copy for iteration
+                  final viewModel = context.read<WeaponLibraryViewModel>();
+                  for (final ballName in namesToDelete) {
+                    try {
+                      final ball = viewModel.myArsenal.firstWhere(
+                        (b) => b.ball == ballName,
+                      );
+                      viewModel.removeBallFromArsenal(ball);
+                      deletedCount++;
+                    } catch (e) {
+                      // Ball might have been removed by another process or not found
+                      print('Error removing ball $ballName: $e');
+                    }
+                  }
+                  Navigator.pop(dialogContext); // Close the dialog
+                  setState(() {
+                    _isMultiSelectMode = false;
+                    _selectedBallNames.clear();
+                  });
+                  if (deletedCount > 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('已刪除 $deletedCount 個球具')),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
-          TextButton(
-            child: const Text('刪除',
-                style: TextStyle(color: Colors.red),),
-            onPressed: () {
-              var deletedCount = 0;
-              final namesToDelete = List<String>.from(_selectedBallNames); // Create a copy for iteration
-              final viewModel = context.read<WeaponLibraryViewModel>();
-              for (final ballName in namesToDelete) {
-                try {
-                  final ball = viewModel.myArsenal.firstWhere(
-                    (b) => b.ball == ballName,
-                  );
-                  viewModel.removeBallFromArsenal(ball);
-                  deletedCount++;
-                } catch (e) {
-                  // Ball might have been removed by another process or not found
-                  print('Error removing ball $ballName: $e');
-                }
-              }
-              Navigator.pop(dialogContext); // Close the dialog
-              setState(() {
-                _isMultiSelectMode = false;
-                _selectedBallNames.clear();
-              });
-              if (deletedCount > 0) {
-                 ScaffoldMessenger.of(context).showSnackBar(
-                   SnackBar(content: Text('已刪除 $deletedCount 個球具')),
-                 );
-              }
-            },
-          ),
-        ],
-      ),
     );
   }
-} 
+}

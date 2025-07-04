@@ -1,5 +1,4 @@
 // my_arsenal_page.dart
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
@@ -7,7 +6,6 @@ import 'package:bowlingarsenal_app/my_training_page.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_search_bar.dart';
 import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';
-import 'package:bowlingarsenal_app/widgets/ball_list_header.dart';
 import 'package:bowlingarsenal_app/widgets/ball_list_view.dart';
 import 'package:bowlingarsenal_app/widgets/filter_popout.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
@@ -54,21 +52,24 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
   }
 
   // --- Helper function for coverstock matching ---
-  bool _matchesCoverstockFilter(String ballCoverstock, String? selectedCoverstock) {
+  bool _matchesCoverstockFilter(
+    String ballCoverstock,
+    String? selectedCoverstock,
+  ) {
     if (selectedCoverstock == null) {
       return true;
     }
-    
+
     final coverLower = ballCoverstock.toLowerCase();
     final selectedLower = selectedCoverstock.toLowerCase();
-    
+
     // Priority matching: Urethane and Polyester take precedence
     if (selectedLower == 'urethane') {
       return coverLower.contains('urethane');
     } else if (selectedLower == 'polyester') {
       return coverLower.contains('polyester') || coverLower.contains('poly');
     }
-    
+
     // For reactive types, match the category
     if (selectedLower == 'solid reactive') {
       return coverLower.contains('solid') && coverLower.contains('reactive');
@@ -77,7 +78,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     } else if (selectedLower == 'hybrid reactive') {
       return coverLower.contains('hybrid') && coverLower.contains('reactive');
     }
-    
+
     return false;
   }
 
@@ -87,21 +88,49 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
 
     // 搜尋邏輯
     if (_searchText.isNotEmpty) {
-      items = items.where((ball) =>
-        ball.name.toLowerCase().contains(_searchText.toLowerCase()) ||
-        ball.brand.toLowerCase().contains(_searchText.toLowerCase()),
-      ).toList();
+      items =
+          items
+              .where(
+                (ball) =>
+                    ball.name.toLowerCase().contains(
+                      _searchText.toLowerCase(),
+                    ) ||
+                    ball.brand.toLowerCase().contains(
+                      _searchText.toLowerCase(),
+                    ),
+              )
+              .toList();
     }
 
     // 篩選邏輯 - 使用helper方法進行部分匹配
     if (_selectedFilters['brand'] != null) {
-      items = items.where((ball) => _matchesBrandFilter(ball.brand, _selectedFilters['brand'])).toList();
+      items =
+          items
+              .where(
+                (ball) =>
+                    _matchesBrandFilter(ball.brand, _selectedFilters['brand']),
+              )
+              .toList();
     }
     if (_selectedFilters['core'] != null) {
-      items = items.where((ball) => _matchesCoreFilter(ball.core, _selectedFilters['core'])).toList();
+      items =
+          items
+              .where(
+                (ball) =>
+                    _matchesCoreFilter(ball.core, _selectedFilters['core']),
+              )
+              .toList();
     }
     if (_selectedFilters['coverstock'] != null) {
-      items = items.where((ball) => _matchesCoverstockFilter(ball.coverstock, _selectedFilters['coverstock'])).toList();
+      items =
+          items
+              .where(
+                (ball) => _matchesCoverstockFilter(
+                  ball.coverstock,
+                  _selectedFilters['coverstock'],
+                ),
+              )
+              .toList();
     }
 
     // 排序邏輯
@@ -140,19 +169,20 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
   bool _hasActiveFilters() {
     return _selectedFilters.values.any((filter) => filter != null);
   }
-  
+
   String _getFilterButtonText() {
     if (!_hasActiveFilters()) {
       return 'Filter';
     }
-    
-    final activeCount = _selectedFilters.values.where((filter) => filter != null).length;
+
+    final activeCount =
+        _selectedFilters.values.where((filter) => filter != null).length;
     return 'Filter ($activeCount)';
   }
 
   // 底部導覽列相關狀態和方法
   int _bottomNavIndex = 1; // Ball Library在第1個位置（社群）
-  
+
   void _onBottomNavTapped(int index) {
     switch (index) {
       case 0: // 首頁
@@ -167,7 +197,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           _bottomNavIndex = index;
         });
         print('Add button tapped in Ball Library');
-        // TODO: 實現新增球的功能
+      // TODO: 實現新增球的功能
       case 3: // 訓練
         Navigator.push(
           context,
@@ -185,9 +215,9 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         if (kDebugMode) {
           log('Profile button tapped in Ball Library');
         }
-        // TODO: 導航到個人頁面
+      // TODO: 導航到個人頁面
     }
-    
+
     print('Bottom Nav Tapped in Ball Library: $index');
   }
 
@@ -244,7 +274,10 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 children: [
                   // 搜尋和篩選控制項
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: ArsenalSearchBar(
                       searchText: _searchText,
                       onSearchChanged: (text) {
@@ -264,17 +297,19 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                             icon: const Icon(Icons.filter_list),
                             label: Text(_getFilterButtonText()),
                             onPressed: () async {
-                              final result = await showDialog<Map<String, String?>>(
-                                context: context,
-                                builder: (context) => FilterPopout(
-                                  selectedFilters: _selectedFilters,
-                                  onFilterChanged: (type, value) {
-                                    setState(() {
-                                      _selectedFilters[type] = value;
-                                    });
-                                  },
-                                ),
-                              );
+                              final result =
+                                  await showDialog<Map<String, String?>>(
+                                    context: context,
+                                    builder:
+                                        (context) => FilterPopout(
+                                          selectedFilters: _selectedFilters,
+                                          onFilterChanged: (type, value) {
+                                            setState(() {
+                                              _selectedFilters[type] = value;
+                                            });
+                                          },
+                                        ),
+                                  );
                             },
                           ),
                         ),
@@ -282,18 +317,34 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                         Expanded(
                           child: PopupMenuButton<String>(
                             onSelected: (value) {
-                                setState(() {
-                                  final parts = value.split(' ');
-                                  _sortBy = parts[0];
-                                  _sortAscending = !value.contains('High-Low') && !value.contains('Z-A');
-                                });
+                              setState(() {
+                                final parts = value.split(' ');
+                                _sortBy = parts[0];
+                                _sortAscending =
+                                    !value.contains('High-Low') &&
+                                    !value.contains('Z-A');
+                              });
                             },
-                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                              const PopupMenuItem<String>(value: 'Name A-Z', child: Text('Name (A-Z)')),
-                              const PopupMenuItem<String>(value: 'Name Z-A', child: Text('Name (Z-A)')),
-                              const PopupMenuItem<String>(value: 'RG Low-High', child: Text('RG (Low-High)')),
-                              const PopupMenuItem<String>(value: 'RG High-Low', child: Text('RG (High-Low)')),
-                            ],
+                            itemBuilder:
+                                (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
+                                      const PopupMenuItem<String>(
+                                        value: 'Name A-Z',
+                                        child: Text('Name (A-Z)'),
+                                      ),
+                                      const PopupMenuItem<String>(
+                                        value: 'Name Z-A',
+                                        child: Text('Name (Z-A)'),
+                                      ),
+                                      const PopupMenuItem<String>(
+                                        value: 'RG Low-High',
+                                        child: Text('RG (Low-High)'),
+                                      ),
+                                      const PopupMenuItem<String>(
+                                        value: 'RG High-Low',
+                                        child: Text('RG (High-Low)'),
+                                      ),
+                                    ],
                             child: OutlinedButton.icon(
                               icon: const Icon(Icons.sort),
                               label: Text('Sort: $_sortBy'),
@@ -312,7 +363,8 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                         // 彈出球的詳細資訊
                         showDialog(
                           context: context,
-                          builder: (context) => BowlingBallDetailWidget(ball: ball),
+                          builder:
+                              (context) => BowlingBallDetailWidget(ball: ball),
                         );
                       },
                     ),
@@ -359,7 +411,13 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           children: [
             _buildGradientNavItem(Icons.home, '首頁', 0, theme),
             _buildGradientNavItem(Icons.people, '社群', 1, theme),
-            _buildGradientNavItem(Icons.add_circle_outline, '', 2, theme, isCenter: true),
+            _buildGradientNavItem(
+              Icons.add_circle_outline,
+              '',
+              2,
+              theme,
+              isCenter: true,
+            ),
             _buildGradientNavItem(Icons.sports_baseball, 'Training', 3, theme),
             _buildGradientNavItem(Icons.account_circle, '個人', 4, theme),
           ],
@@ -368,7 +426,13 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     );
   }
 
-  Widget _buildGradientNavItem(IconData icon, String label, int index, ThemeData theme, {bool isCenter = false}) {
+  Widget _buildGradientNavItem(
+    IconData icon,
+    String label,
+    int index,
+    ThemeData theme, {
+    bool isCenter = false,
+  }) {
     final isSelected = _bottomNavIndex == index;
     return GestureDetector(
       onTap: () => _onBottomNavTapped(index),
@@ -379,29 +443,31 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           children: [
             Container(
               padding: EdgeInsets.all(isCenter ? 12 : 8),
-              decoration: isSelected
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.colorScheme.primary,
-                        theme.colorScheme.primary.withOpacity(0.7),
-                      ],
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  )
-                : null,
+              decoration:
+                  isSelected
+                      ? BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withOpacity(0.7),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      )
+                      : null,
               child: Icon(
                 icon,
-                color: isSelected 
-                  ? Colors.white
-                  : theme.colorScheme.onSurface.withOpacity(0.6),
+                color:
+                    isSelected
+                        ? Colors.white
+                        : theme.colorScheme.onSurface.withOpacity(0.6),
                 size: isCenter ? 28 : 24,
               ),
             ),
@@ -410,9 +476,10 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected 
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.6),
+                  color:
+                      isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),

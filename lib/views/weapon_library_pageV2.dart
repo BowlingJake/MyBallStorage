@@ -37,13 +37,13 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
   }
 
   Widget _buildSearchFilterDropdown(
-      BuildContext context, WeaponLibraryViewModel viewModel,) {
+    BuildContext context,
+    WeaponLibraryViewModel viewModel,
+  ) {
     // ...原本的篩選 dropdown 不變...
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        
-      ),
+      child: Row(),
     );
   }
 
@@ -63,12 +63,10 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.readOnly
-            ? '球類清單'
-            : '選擇武器 (${_selectedBalls.length})',),
-        actions: widget.readOnly
-            ? null
-            : [ /* 保留原本取消與新增按鈕 */ ],
+        title: Text(
+          widget.readOnly ? '球類清單' : '選擇武器 (${_selectedBalls.length})',
+        ),
+        actions: widget.readOnly ? null : [/* 保留原本取消與新增按鈕 */],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -82,7 +80,9 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                 prefixIcon: Icon(Icons.search),
                 // 讓 theme 處理 border
                 contentPadding: EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 12,),
+                  vertical: 10,
+                  horizontal: 12,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -91,22 +91,23 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
             const SizedBox(height: 8),
             // 結果列表
             Expanded(
-              child: searchResults.isEmpty
-                  ? const Center(
-                      child: Text(
-                        '找不到符合條件的球。',
-                        style: TextStyle(color: Colors.grey),
-                        textAlign: TextAlign.center,
+              child:
+                  searchResults.isEmpty
+                      ? const Center(
+                        child: Text(
+                          '找不到符合條件的球。',
+                          style: TextStyle(color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                      : ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          final ball = searchResults[index];
+                          return _buildBallCard(context, ball);
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      itemCount: searchResults.length,
-                      itemBuilder: (context, index) {
-                        final ball = searchResults[index];
-                        return _buildBallCard(context, ball);
-                      },
-                    ),
             ),
           ],
         ),
@@ -117,17 +118,18 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
   Widget _buildBallCard(BuildContext context, BowlingBall ball) {
     final isSelected = _selectedBalls.contains(ball);
     return GestureDetector(
-      onTap: widget.readOnly
-          ? null
-          : () {
-              setState(() {
-                if (isSelected) {
-                  _selectedBalls.remove(ball);
-                } else {
-                  _selectedBalls.add(ball);
-                }
-              });
-            },
+      onTap:
+          widget.readOnly
+              ? null
+              : () {
+                setState(() {
+                  if (isSelected) {
+                    _selectedBalls.remove(ball);
+                  } else {
+                    _selectedBalls.add(ball);
+                  }
+                });
+              },
       child: BallCardWidget(
         title: ball.ball,
         stat1: ball.rg,

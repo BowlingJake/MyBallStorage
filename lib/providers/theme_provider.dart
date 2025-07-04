@@ -48,4 +48,4 @@ final isDarkModeProvider = Provider.family<bool, BuildContext>((ref, context) {
     case ThemeMode.system:
       return MediaQuery.of(context).platformBrightness == Brightness.dark;
   }
-}); 
+});

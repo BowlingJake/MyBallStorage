@@ -4,9 +4,20 @@ import 'package:bowlingarsenal_app/widgets/training/training_day_summary_card.da
 import 'package:flutter/material.dart';
 
 class TrainingPageBody extends StatelessWidget {
-
   const TrainingPageBody({
-    required this.trainingDays, required this.selectedDayIds, required this.isSelectionMode, required this.onAddRecord, required this.onToggleSelectionMode, required this.onToggleDaySelection, required this.onDeleteDay, required this.onAddGame, required this.onEditRecord, required this.onGameTap, required this.onGameDelete, required this.onSelectionChanged, super.key,
+    required this.trainingDays,
+    required this.selectedDayIds,
+    required this.isSelectionMode,
+    required this.onAddRecord,
+    required this.onToggleSelectionMode,
+    required this.onToggleDaySelection,
+    required this.onDeleteDay,
+    required this.onAddGame,
+    required this.onEditRecord,
+    required this.onGameTap,
+    required this.onGameDelete,
+    required this.onSelectionChanged,
+    super.key,
   });
   final List<TrainingDaySummary> trainingDays;
   final Set<String> selectedDayIds;
@@ -60,16 +71,17 @@ class TrainingPageBody extends StatelessWidget {
                 summary: day,
                 isSelectionMode: isSelectionMode,
                 isSelected: isSelected,
-                onTap: isSelectionMode
-                    ? () => onToggleDaySelection(day.id)
-                    : () => print('Tap day: ${day.id}'),
+                onTap:
+                    isSelectionMode
+                        ? () => onToggleDaySelection(day.id)
+                        : () => print('Tap day: ${day.id}'),
                 onDelete: () => onDeleteDay(day.id),
                 onAddGame: () => onAddGame(day.id),
                 onEdit: () => onEditRecord(day.id),
                 onGameTap: onGameTap,
                 onGameDelete: onGameDelete,
-                onSelectionChanged: (selected) =>
-                    onSelectionChanged(day.id, selected),
+                onSelectionChanged:
+                    (selected) => onSelectionChanged(day.id, selected),
               );
             },
           ),
@@ -77,4 +89,4 @@ class TrainingPageBody extends StatelessWidget {
       ],
     );
   }
-} 
+}

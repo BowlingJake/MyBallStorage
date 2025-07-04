@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 /// 單局遊戲列表項目組件
 class GameListItem extends StatelessWidget {
-
   const GameListItem({
-    required this.game, required this.theme, super.key,
+    required this.game,
+    required this.theme,
+    super.key,
     this.onGameTap,
     this.onGameDelete,
   });
@@ -22,9 +23,7 @@ class GameListItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.primary.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -80,4 +79,4 @@ class GameListItem extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 
 /// 毛玻璃效果對話框基底組件
 class GlassDialogBase extends StatelessWidget {
-
   const GlassDialogBase({
-    required this.title, required this.child, super.key,
+    required this.title,
+    required this.child,
+    super.key,
     this.actions,
     this.maxWidth = 400,
     this.minWidth = 320,
@@ -53,9 +54,7 @@ class GlassDialogBase extends StatelessWidget {
                   Positioned.fill(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                      child: Container(
-                        color: Colors.white.withOpacity(0.10),
-                      ),
+                      child: Container(color: Colors.white.withOpacity(0.10)),
                     ),
                   ),
                   // 內容
@@ -76,23 +75,26 @@ class GlassDialogBase extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                              onPressed: onClose ?? () => Navigator.of(context).pop(),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                              onPressed:
+                                  onClose ?? () => Navigator.of(context).pop(),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // 主要內容
                         child,
-                        
+
                         // 操作按鈕
                         if (actions != null) ...[
                           const SizedBox(height: 32),
-                          Row(
-                            children: actions!,
-                          ),
+                          Row(children: actions!),
                         ],
                       ],
                     ),
@@ -109,9 +111,10 @@ class GlassDialogBase extends StatelessWidget {
 
 /// 標準的對話框按鈕
 class DialogButton extends StatelessWidget {
-
   const DialogButton({
-    required this.text, required this.onPressed, super.key,
+    required this.text,
+    required this.onPressed,
+    super.key,
     this.isPrimary = false,
     this.isExpanded = true,
   });
@@ -132,4 +135,4 @@ class DialogButton extends StatelessWidget {
 
     return isExpanded ? Expanded(child: button) : button;
   }
-} 
+}

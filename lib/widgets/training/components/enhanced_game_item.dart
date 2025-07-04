@@ -7,9 +7,10 @@ import 'package:iconsax/iconsax.dart';
 /// Enhanced Game Item with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強遊戲項目
 class EnhancedGameItem extends StatelessWidget {
-
   const EnhancedGameItem({
-    required this.game, required this.theme, super.key,
+    required this.game,
+    required this.theme,
+    super.key,
     this.onTap,
     this.onDelete,
   });
@@ -32,9 +33,7 @@ class EnhancedGameItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.3),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _getScoreColor().withOpacity(0.3),
-          ),
+          border: Border.all(color: _getScoreColor().withOpacity(0.3)),
           boxShadow: [
             BoxShadow(
               color: _getScoreColor().withOpacity(0.1),
@@ -47,17 +46,15 @@ class EnhancedGameItem extends StatelessWidget {
           children: [
             // 遊戲編號
             _buildGameNumber(),
-            
+
             const SizedBox(width: 16),
-            
+
             // 遊戲詳情
-            Expanded(
-              child: _buildGameDetails(),
-            ),
-            
+            Expanded(child: _buildGameDetails()),
+
             // 分數
             _buildScore(),
-            
+
             // 刪除按鈕
             if (onDelete != null) ...[
               const SizedBox(width: 12),
@@ -76,9 +73,7 @@ class EnhancedGameItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: _getScoreColor().withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _getScoreColor().withOpacity(0.5),
-        ),
+        border: Border.all(color: _getScoreColor().withOpacity(0.5)),
       ),
       child: Center(
         child: Text(
@@ -96,17 +91,17 @@ class EnhancedGameItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-                 // 統計資訊
-         Row(
-           children: [
-             _buildStatChip(Iconsax.direct_up, '${game.strikes}', 'STR'),
-             const SizedBox(width: 8),
-             _buildStatChip(Iconsax.arrow_circle_right, '${game.spares}', 'SPR'),
-           ],
-         ),
-        
+        // 統計資訊
+        Row(
+          children: [
+            _buildStatChip(Iconsax.direct_up, '${game.strikes}', 'STR'),
+            const SizedBox(width: 8),
+            _buildStatChip(Iconsax.arrow_circle_right, '${game.spares}', 'SPR'),
+          ],
+        ),
+
         const SizedBox(height: 4),
-        
+
         // 使用球具
         if (game.ballUsed != null)
           Row(
@@ -143,11 +138,7 @@ class EnhancedGameItem extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(icon, size: 12, color: theme.colorScheme.primary),
           const SizedBox(width: 4),
           Text(
             value,
@@ -176,9 +167,7 @@ class EnhancedGameItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: _getScoreColor().withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getScoreColor().withOpacity(0.5),
-        ),
+        border: Border.all(color: _getScoreColor().withOpacity(0.5)),
       ),
       child: Text(
         '${game.score}',
@@ -205,9 +194,7 @@ class EnhancedGameItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: Colors.red.withOpacity(0.3),
-          ),
+          border: Border.all(color: Colors.red.withOpacity(0.3)),
         ),
         child: Icon(
           Iconsax.trash,
@@ -232,11 +219,13 @@ class EnhancedGameItem extends StatelessWidget {
 
   Color _getBallColor() {
     if (game.ballUsed == null) return theme.colorScheme.primary;
-    
+
     try {
-      return Color(int.parse(game.ballUsed!.brandColor.replaceFirst('#', '0xFF')));
+      return Color(
+        int.parse(game.ballUsed!.brandColor.replaceFirst('#', '0xFF')),
+      );
     } catch (e) {
       return theme.colorScheme.primary;
     }
   }
-} 
+}

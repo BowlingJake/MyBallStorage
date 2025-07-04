@@ -3,9 +3,13 @@ import 'package:bowlingarsenal_app/widgets/bowling/pin_selector_popup_widget.dar
 import 'package:flutter/material.dart';
 
 class TenthFrameWidget extends StatelessWidget {
-
   const TenthFrameWidget({
-    required this.frame, required this.isCurrentFrame, required this.availableWidth, required this.onFrameUpdated, required this.onGameComplete, super.key,
+    required this.frame,
+    required this.isCurrentFrame,
+    required this.availableWidth,
+    required this.onFrameUpdated,
+    required this.onGameComplete,
+    super.key,
   });
   final Frame frame;
   final bool isCurrentFrame;
@@ -26,7 +30,18 @@ class TenthFrameWidget extends StatelessWidget {
         initialPinsDown = {};
       } else {
         // 第一球沒全倒，第二球剩下的瓶
-        initialPinsDown = {1,2,3,4,5,6,7,8,9,10}.difference(frame.rolls[0].pinsStandingAfterThrow!);
+        initialPinsDown = {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(frame.rolls[0].pinsStandingAfterThrow!);
       }
     } else if (frame.rolls.length == 2) {
       // 第三球
@@ -34,10 +49,21 @@ class TenthFrameWidget extends StatelessWidget {
         // 第一球全倒
         if (frame.rolls[1].pinsDown == 10) {
           // 第二球也全倒，第三球重置
-          initialPinsDown = {}; 
+          initialPinsDown = {};
         } else {
           // 第二球沒全倒，第三球為第二球剩下的瓶
-          initialPinsDown = {1,2,3,4,5,6,7,8,9,10}.difference(frame.rolls[1].pinsStandingAfterThrow!);
+          initialPinsDown = {
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+          }.difference(frame.rolls[1].pinsStandingAfterThrow!);
         }
       } else if (frame.rolls[0].pinsDown + frame.rolls[1].pinsDown == 10) {
         // 前兩球補中，第三球重置
@@ -67,13 +93,27 @@ class TenthFrameWidget extends StatelessWidget {
       final pinsDown = pinsHit.length;
       final newRoll = Roll(
         pinsDown: pinsDown,
-        pinsStandingAfterThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}.difference(pinsHit),
+        pinsStandingAfterThrow: {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(pinsHit),
         displayScore: _getDisplayScore(pinsDown),
-        pinsStandingBeforeThrow: frame.rolls.isEmpty ? {1,2,3,4,5,6,7,8,9,10} : frame.rolls.last.pinsStandingAfterThrow!,
+        pinsStandingBeforeThrow:
+            frame.rolls.isEmpty
+                ? {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+                : frame.rolls.last.pinsStandingAfterThrow!,
       );
 
       frame.rolls.add(newRoll);
-      
+
       // 檢查是否需要結束遊戲
       if (frame.rolls.length == 2) {
         final first = frame.rolls[0].pinsDown;
@@ -98,14 +138,16 @@ class TenthFrameWidget extends StatelessWidget {
     } else if (frame.rolls.length == 1) {
       // 第二球
       if (pinsDown == 10) return 'X';
-      if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + pinsDown == 10) {
+      if (frame.rolls[0].pinsDown < 10 &&
+          frame.rolls[0].pinsDown + pinsDown == 10) {
         return '/';
       }
       return pinsDown.toString();
     } else {
       // 第三球
       if (pinsDown == 10) return 'X';
-      if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + pinsDown == 10) {
+      if (frame.rolls[1].pinsDown < 10 &&
+          frame.rolls[1].pinsDown + pinsDown == 10) {
         return '/';
       }
       return pinsDown.toString();
@@ -115,18 +157,20 @@ class TenthFrameWidget extends StatelessWidget {
   String? _getBallScore(int ballIndex) {
     if (frame.rolls.length <= ballIndex) return null;
     final roll = frame.rolls[ballIndex];
-    
+
     if (ballIndex == 0) {
       return roll.pinsDown == 10 ? 'X' : roll.pinsDown.toString();
     } else if (ballIndex == 1) {
       if (roll.pinsDown == 10) return 'X';
-      if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
+      if (frame.rolls[0].pinsDown < 10 &&
+          frame.rolls[0].pinsDown + roll.pinsDown == 10) {
         return '/';
       }
       return roll.pinsDown.toString();
     } else {
       if (roll.pinsDown == 10) return 'X';
-      if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
+      if (frame.rolls[1].pinsDown < 10 &&
+          frame.rolls[1].pinsDown + roll.pinsDown == 10) {
         return '/';
       }
       return roll.pinsDown.toString();
@@ -207,9 +251,7 @@ class TenthFrameWidget extends StatelessWidget {
             Container(
               height: totalScoreHeight,
               width: double.infinity,
-              decoration: const BoxDecoration(
-                border: Border(top: borderSide),
-              ),
+              decoration: const BoxDecoration(border: Border(top: borderSide)),
               child: Center(
                 child: Text(
                   frame.totalScore?.toString() ?? '',
@@ -231,11 +273,12 @@ class TenthFrameWidget extends StatelessWidget {
     double width,
     double height,
     BorderSide border, {
-    required double fontSize, bool isLeftMost = false,
+    required double fontSize,
+    bool isLeftMost = false,
     bool isRightMost = false,
   }) {
     Widget displayWidget;
-    
+
     if (score == 'X') {
       displayWidget = SvgPicture.asset(
         'assets/images/strike_symbol.svg',
@@ -253,10 +296,7 @@ class TenthFrameWidget extends StatelessWidget {
     } else {
       displayWidget = Text(
         score ?? '',
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
       );
     }
 
@@ -272,4 +312,4 @@ class TenthFrameWidget extends StatelessWidget {
       child: Center(child: displayWidget),
     );
   }
-} 
+}

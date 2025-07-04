@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 /// 現代化Tournament區塊
 /// 垂直列表顯示錦標賽卡片
 class ModernTournamentSection extends StatelessWidget {
-
   const ModernTournamentSection({
     super.key,
     this.onSeeAllPressed,
@@ -59,12 +58,15 @@ class ModernTournamentSection extends StatelessWidget {
         itemBuilder: (context, index) {
           final tournament = _tournaments[index];
           return Padding(
-            padding: EdgeInsets.only(bottom: index < _tournaments.length - 1 ? 12.0 : 0),
+            padding: EdgeInsets.only(
+              bottom: index < _tournaments.length - 1 ? 12.0 : 0,
+            ),
             child: TournamentCard(
               tournament: tournament,
-              onTap: onTournamentPressed != null
-                  ? () => onTournamentPressed!(tournament)
-                  : null,
+              onTap:
+                  onTournamentPressed != null
+                      ? () => onTournamentPressed!(tournament)
+                      : null,
             ),
           );
         },
@@ -75,7 +77,6 @@ class ModernTournamentSection extends StatelessWidget {
 
 /// Tournament數據模型
 class TournamentData {
-
   const TournamentData({
     required this.id,
     required this.name,
@@ -99,9 +100,4 @@ class TournamentData {
 }
 
 /// Tournament狀態枚舉
-enum TournamentStatus {
-  upcoming,
-  active,
-  registration,
-  completed,
-}
+enum TournamentStatus { upcoming, active, registration, completed }

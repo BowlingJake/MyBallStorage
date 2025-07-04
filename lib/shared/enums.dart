@@ -1,15 +1,15 @@
-enum TournamentType { open, championship } 
+enum TournamentType { open, championship }
 
 // Enum for Open tournament format
-enum OpenTournamentFormat { mq, classic } 
+enum OpenTournamentFormat { mq, classic }
 
 // 底部導航標籤枚舉
 enum BottomNavTab {
-  home,      // 0 - 首頁
-  library,   // 1 - 球具庫
-  add,       // 2 - 新增按鈕
-  training,  // 3 - 訓練頁面
-  profile,   // 4 - 個人頁面
+  home, // 0 - 首頁
+  library, // 1 - 球具庫
+  add, // 2 - 新增按鈕
+  training, // 3 - 訓練頁面
+  profile, // 4 - 個人頁面
 }
 
 // BottomNavTab 的擴展方法
@@ -28,7 +28,7 @@ extension BottomNavTabExtension on BottomNavTab {
         return 4;
     }
   }
-  
+
   String get label {
     switch (this) {
       case BottomNavTab.home:
@@ -43,4 +43,4 @@ extension BottomNavTabExtension on BottomNavTab {
         return '個人';
     }
   }
-} 
+}

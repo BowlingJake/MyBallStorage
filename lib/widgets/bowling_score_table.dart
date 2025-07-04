@@ -5,7 +5,6 @@ import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
 
 class BowlingScoreTable extends StatefulWidget {
-
   const BowlingScoreTable({super.key, this.scoreData, this.onScoreChanged});
   final BowlingScoreData? scoreData;
   final void Function(BowlingScoreData data)? onScoreChanged;
@@ -46,14 +45,27 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           initialPinsDown = {};
         } else {
           // 第一球沒全倒，第二球剩下的瓶
-          initialPinsDown = {1,2,3,4,5,6,7,8,9,10}.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
+          initialPinsDown = {
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+          }.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
         }
       } else if (currentFrame.rolls.length == 2) {
         // 第三球
         if (currentFrame.rolls[0].pinsDown == 10) {
           // 第一球全倒，第三球重置
           initialPinsDown = {};
-        } else if (currentFrame.rolls[0].pinsDown + currentFrame.rolls[1].pinsDown == 10) {
+        } else if (currentFrame.rolls[0].pinsDown +
+                currentFrame.rolls[1].pinsDown ==
+            10) {
           // 前兩球補中，第三球重置
           initialPinsDown = {};
         } else {
@@ -66,9 +78,21 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       }
     } else {
       // 前九格
-      initialPinsDown = currentFrame.rolls.isEmpty
-          ? {}
-          : {1,2,3,4,5,6,7,8,9,10}.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
+      initialPinsDown =
+          currentFrame.rolls.isEmpty
+              ? {}
+              : {
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+              }.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
     }
 
     // 其餘邏輯不變
@@ -88,20 +112,42 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       setState(() {
         // 計算擊倒的瓶數
         final pinsDown = pinsHit.length;
-        
+
         // 創建新的 Roll 記錄
         final newRoll = Roll(
           pinsDown: pinsDown,
-          pinsStandingAfterThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}.difference(pinsHit),
+          pinsStandingAfterThrow: {
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+          }.difference(pinsHit),
           displayScore: _getDisplayScore(pinsDown, frameIndex),
           pinsStandingBeforeThrow: _scoreData.pinsStanding,
         );
 
         // 更新當前局的記錄
         currentFrame.rolls.add(newRoll);
-        
+
         // 更新站立的瓶數
-        _scoreData.pinsStanding = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}.difference(pinsHit);
+        _scoreData.pinsStanding = {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(pinsHit);
 
         // 檢查是否需要進入下一局
         _checkAndAdvanceFrame(frameIndex, isEdit: isEdit);
@@ -123,7 +169,18 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
         // 第一球全倒，第二球應該全部站立
         initialPinsDown = {};
       } else {
-        initialPinsDown = {1,2,3,4,5,6,7,8,9,10}.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
+        initialPinsDown = {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
       }
       final pinsHit = await showDialog<Set<int>>(
         context: context,
@@ -141,9 +198,21 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           final pinsDown = pinsHit.length;
           final newRoll = Roll(
             pinsDown: pinsDown,
-            pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
+            pinsStandingAfterThrow: {
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+            }.difference(pinsHit),
             displayScore: _getDisplayScore(pinsDown, frameIndex),
-            pinsStandingBeforeThrow: currentFrame.rolls[0].pinsStandingAfterThrow!,
+            pinsStandingBeforeThrow:
+                currentFrame.rolls[0].pinsStandingAfterThrow!,
           );
           // 修正：如果原本第一球是全倒，這次其實是要覆蓋第一球
           if (currentFrame.rolls[0].pinsDown == 10) {
@@ -151,7 +220,18 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           } else {
             currentFrame.rolls.add(newRoll);
           }
-          _scoreData.pinsStanding = {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit);
+          _scoreData.pinsStanding = {
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+          }.difference(pinsHit);
           _checkAndAdvanceFrame(frameIndex, isEdit: true);
           _scoreData.calculateScores();
         });
@@ -166,7 +246,7 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
         currentFrame.isComplete = false;
         _scoreData.isGameOver = false;
         if (frameIndex < 9) {
-          _scoreData.pinsStanding = {1,2,3,4,5,6,7,8,9,10};
+          _scoreData.pinsStanding = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         }
       });
       await _handleFrameTap(frameIndex, isEdit: true);
@@ -195,28 +275,30 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
   String? getTenthFrameDisplayScore(int ballIndex, Frame frame) {
     if (frame.rolls.length <= ballIndex) return null;
     final roll = frame.rolls[ballIndex];
-    
+
     // 第一球
     if (ballIndex == 0) {
       if (roll.pinsDown == 10) return 'X';
       return roll.pinsDown.toString();
     }
-    
+
     // 第二球
     if (ballIndex == 1) {
       if (roll.pinsDown == 10) return 'X';
-      if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + roll.pinsDown == 10) {
+      if (frame.rolls[0].pinsDown < 10 &&
+          frame.rolls[0].pinsDown + roll.pinsDown == 10) {
         return '/';
       }
       return roll.pinsDown.toString();
     }
-    
+
     // 第三球
     if (ballIndex == 2) {
       // 如果第一球是全倒，第三球可以顯示
       if (frame.rolls[0].pinsDown == 10) {
         if (roll.pinsDown == 10) return 'X';
-        if (frame.rolls[1].pinsDown < 10 && frame.rolls[1].pinsDown + roll.pinsDown == 10) {
+        if (frame.rolls[1].pinsDown < 10 &&
+            frame.rolls[1].pinsDown + roll.pinsDown == 10) {
           return '/';
         }
         return roll.pinsDown.toString();
@@ -229,7 +311,7 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       // 其他情況不應該有第三球
       return null;
     }
-    
+
     return roll.pinsDown.toString();
   }
 
@@ -260,7 +342,8 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       }
     } else {
       // 前九格
-      if (currentFrame.rolls.length == 2 || currentFrame.rolls[0].pinsDown == 10) {
+      if (currentFrame.rolls.length == 2 ||
+          currentFrame.rolls[0].pinsDown == 10) {
         currentFrame.isComplete = true;
         if (!isEdit) {
           _scoreData.currentFrameIndex++;
@@ -288,8 +371,14 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
                 onTap: isCurrentFrame ? () => _handleFrameTap(index) : null,
                 child: ScoreFrameWidget(
                   frameNumber: index + 1,
-                  ball1Score: frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
-                  ball2Score: frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
+                  ball1Score:
+                      frame.rolls.isNotEmpty
+                          ? frame.rolls[0].displayScore
+                          : null,
+                  ball2Score:
+                      frame.rolls.length > 1
+                          ? frame.rolls[1].displayScore
+                          : null,
                   frameTotalScore: frame.totalScore?.toString(),
                   availableWidth: frameWidth,
                   isCurrentFrame: isCurrentFrame,
@@ -325,4 +414,4 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
       },
     );
   }
-} 
+}

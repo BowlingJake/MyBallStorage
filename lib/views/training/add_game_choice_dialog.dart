@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 
 // 1. 重構為 StatefulWidget 以管理自定義提示視窗的狀態
 class AddGameChoiceDialog extends StatefulWidget {
-
   const AddGameChoiceDialog({
-    required this.gameNumber, required this.dayId, super.key,
+    required this.gameNumber,
+    required this.dayId,
+    super.key,
   });
   final int gameNumber;
   final String dayId;
@@ -37,35 +38,38 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
     final theme = Theme.of(context);
 
     _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        // 全局定位，以使其在對話框之上
-        width: MediaQuery.of(context).size.width,
-        top: offset.dy + size.height + 8, // 定位在問號圖標下方
-        child: Align(
-          child: Material(
-            color: Colors.transparent, // Material 組件用於正確應用文字樣式
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              constraints: const BoxConstraints(maxWidth: 350), // 4. 限制寬度
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // 毛玻璃效果
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5), // 半透明背景
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
-                      ),
-                    ),
-                    child: Text(
-                      'Recommend using detailed scoring for more accurate statistics',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 12,
+      builder:
+          (context) => Positioned(
+            // 全局定位，以使其在對話框之上
+            width: MediaQuery.of(context).size.width,
+            top: offset.dy + size.height + 8, // 定位在問號圖標下方
+            child: Align(
+              child: Material(
+                color: Colors.transparent, // Material 組件用於正確應用文字樣式
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  constraints: const BoxConstraints(maxWidth: 350), // 4. 限制寬度
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // 毛玻璃效果
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5), // 半透明背景
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Text(
+                          'Recommend using detailed scoring for more accurate statistics',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -73,8 +77,6 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
               ),
             ),
           ),
-        ),
-      ),
     );
 
     overlay.insert(_overlayEntry!);
@@ -88,7 +90,11 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
 
   Future<void> _showSimpleDialog(BuildContext context) async {
     Navigator.pop(context); // Close the selector
-    final result = await showAddGameSimpleDialog(context, widget.dayId, widget.gameNumber);
+    final result = await showAddGameSimpleDialog(
+      context,
+      widget.dayId,
+      widget.gameNumber,
+    );
     if (result != null && context.mounted) {
       Navigator.pop(context, result); // Return result to the original caller
     }
@@ -96,7 +102,11 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
 
   Future<void> _showAdvancedDialog(BuildContext context) async {
     Navigator.pop(context); // Close the selector
-    final result = await showAddGameAdvancedDialog(context, widget.dayId, widget.gameNumber);
+    final result = await showAddGameAdvancedDialog(
+      context,
+      widget.dayId,
+      widget.gameNumber,
+    );
     if (result != null && context.mounted) {
       Navigator.pop(context, result); // Return result to the original caller
     }
@@ -157,7 +167,8 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
                           _buildChoiceOption(
                             context,
                             title: 'Detailed Scoring',
-                            subtitle: 'Use complete score table frame-by-frame input',
+                            subtitle:
+                                'Use complete score table frame-by-frame input',
                             color: Colors.purple,
                             onTap: () => _showAdvancedDialog(context),
                           ),
@@ -222,9 +233,7 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Row(
           children: [
@@ -260,4 +269,4 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
       ),
     );
   }
-} 
+}

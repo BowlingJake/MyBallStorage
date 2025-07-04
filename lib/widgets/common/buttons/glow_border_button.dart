@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class GlowBorderButton extends StatelessWidget {
-
   const GlowBorderButton({
-    required this.onTap, super.key,
+    required this.onTap,
+    super.key,
     this.width = 220.0,
     this.height = 44.0,
   });
@@ -35,4 +35,4 @@ class GlowBorderButton extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -32,15 +32,23 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     // 3. 在第一幀渲染結束後，計算卡片的 Rect
-    WidgetsBinding.instance.addPostFrameCallback((_) => _calculateUserCardRect());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _calculateUserCardRect(),
+    );
   }
 
   void _calculateUserCardRect() {
-    final renderBox = _userCardKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox =
+        _userCardKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final size = renderBox.size;
       final position = renderBox.localToGlobal(Offset.zero);
-      final newRect = Rect.fromLTWH(position.dx, position.dy, size.width, size.height);
+      final newRect = Rect.fromLTWH(
+        position.dx,
+        position.dy,
+        size.width,
+        size.height,
+      );
 
       // 檢查是否需要更新，避免不必要的重繪
       if (_userCardRect != newRect) {
@@ -74,7 +82,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           _selectedIndex = index;
         });
         print('Add button tapped');
-        // TODO: 實現新增功能
+      // TODO: 實現新增功能
       case 3: // 訓練
         Navigator.push(
           context,
@@ -96,7 +104,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           });
         });
     }
-    
+
     print('Bottom Nav Tapped: $index');
   }
 
@@ -105,7 +113,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     final themeMode = ref.watch(themeProvider);
 
     return ProfessionalDarkBackground(
-      cutoutRects: _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
+      cutoutRects:
+          _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -120,7 +129,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           actions: [
             IconButton(
               icon: Icon(
-                themeMode == ThemeMode.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                themeMode == ThemeMode.dark
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
               ),
               color: Theme.of(context).colorScheme.onSurface,
               onPressed: () {
@@ -134,7 +145,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DeveloperPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const DeveloperPage(),
+                  ),
                 );
               },
             ),
@@ -155,22 +168,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Container(
                     key: _userCardKey, // 把 Key "貼" 在這裡
                     constraints: const BoxConstraints(maxWidth: 400),
-                    child: const UserInfoSection(
-                      
-                    ),
+                    child: const UserInfoSection(),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 ArsenalSection(
                   onSeeAllPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const ProviderScope(
-                          child: MyArsenalPage(),
-                        ),
+                        builder:
+                            (_) => const ProviderScope(child: MyArsenalPage()),
                       ),
                     );
                   },
@@ -253,7 +263,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   Navigator.pop(context); // Close the drawer
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
                   );
                 },
               ),
@@ -296,13 +308,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   // 建立抽屜選單的項目
-  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap}) {
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     final theme = Theme.of(context);
     return ListTile(
-      leading: Icon(
-        icon,
-        color: theme.colorScheme.onSurface.withOpacity(0.8),
-      ),
+      leading: Icon(icon, color: theme.colorScheme.onSurface.withOpacity(0.8)),
       title: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(

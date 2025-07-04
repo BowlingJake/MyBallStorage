@@ -26,6 +26,8 @@ class OnboardingNotifier extends StateNotifier<bool> {
 }
 
 // Provider 定義
-final onboardingProvider = StateNotifierProvider<OnboardingNotifier, bool>((ref) {
+final onboardingProvider = StateNotifierProvider<OnboardingNotifier, bool>((
+  ref,
+) {
   return OnboardingNotifier();
-}); 
+});

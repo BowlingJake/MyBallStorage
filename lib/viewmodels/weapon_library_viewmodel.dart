@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 class WeaponLibraryViewModel extends ChangeNotifier {
   /// 所有球的資料（從 service 載入）
   List<BowlingBall> allBalls = [];
+
   /// 過濾後（搜尋用）- 這個主要用於新增頁面
   List<BowlingBall> filteredBallsForSearch = [];
 
   /// 我的武器清單
   final List<BowlingBall> myArsenal = [];
 
-  // --- Filtering State for My Arsenal --- 
+  // --- Filtering State for My Arsenal ---
   String? selectedBrandFilter;
   String? selectedCoreCategoryFilter;
   String? selectedCoverstockCategoryFilter;
@@ -51,7 +52,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     // e.g., "Storm Bowling" -> "Storm", "Hammer Bowling" -> "Hammer"
     final brandMapping = <String, String>{
       'Storm Bowling': 'Storm',
-      'Hammer Bowling': 'Hammer', 
+      'Hammer Bowling': 'Hammer',
       'Brunswick Bowling': 'Brunswick',
       'Roto Grip': 'Roto Grip',
       'Motiv Bowling': 'Motiv',
@@ -62,70 +63,88 @@ class WeaponLibraryViewModel extends ChangeNotifier {
       'Radical Bowling': 'Radical',
       'SWAG Bowling': 'SWAG',
     };
-    
+
     return brandMapping[fullBrandName] ?? fullBrandName;
   }
 
-  // --- Dynamic Filter Options --- 
+  // --- Dynamic Filter Options ---
   List<String> get arsenalBrands {
-    final brands = myArsenal.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet().toList();
+    final brands =
+        myArsenal
+            .map((ball) => _getSimplifiedBrandName(ball.brand))
+            .toSet()
+            .toList();
     brands.sort();
     return [allFilterOption, ...brands];
   }
 
   List<String> get arsenalCoreCategories {
     // Use the public helper function
-    final categories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet().toList();
+    final categories =
+        myArsenal.map((ball) => getCoreCategory(ball.core)).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
 
   List<String> get arsenalCoverstockCategories {
-    final categories = myArsenal.map((ball) => ball.coverstockcategory).toSet().toList();
+    final categories =
+        myArsenal.map((ball) => ball.coverstockcategory).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
 
-  // --- Filtered Arsenal List --- 
+  // --- Filtered Arsenal List ---
   List<BowlingBall> get filteredArsenal {
     return myArsenal.where((ball) {
       // Keyword filter for arsenal page (apply to ball name)
-      final keywordMatch = currentArsenalSearchKeyword.isEmpty ||
-                           ball.ball.toLowerCase().contains(currentArsenalSearchKeyword);
+      final keywordMatch =
+          currentArsenalSearchKeyword.isEmpty ||
+          ball.ball.toLowerCase().contains(currentArsenalSearchKeyword);
 
       // Dropdown filters - use helper method for brand matching
       final brandMatch = _matchesBrandFilter(ball.brand, selectedBrandFilter);
-      final coreCategoryMatch = selectedCoreCategoryFilter == null || 
-                                selectedCoreCategoryFilter == allFilterOption ||
-                                getCoreCategory(ball.core) == selectedCoreCategoryFilter;
-      final coverstockCategoryMatch = selectedCoverstockCategoryFilter == null || 
-                                      selectedCoverstockCategoryFilter == allFilterOption ||
-                                      ball.coverstockcategory == selectedCoverstockCategoryFilter;
-      
-      return keywordMatch && brandMatch && coreCategoryMatch && coverstockCategoryMatch;
+      final coreCategoryMatch =
+          selectedCoreCategoryFilter == null ||
+          selectedCoreCategoryFilter == allFilterOption ||
+          getCoreCategory(ball.core) == selectedCoreCategoryFilter;
+      final coverstockCategoryMatch =
+          selectedCoverstockCategoryFilter == null ||
+          selectedCoverstockCategoryFilter == allFilterOption ||
+          ball.coverstockcategory == selectedCoverstockCategoryFilter;
+
+      return keywordMatch &&
+          brandMatch &&
+          coreCategoryMatch &&
+          coverstockCategoryMatch;
     }).toList();
   }
 
   // --- Dynamic Filter Options for All Balls ---
   List<String> get allAvailableBrands {
-    final brands = allBalls.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet().toList();
+    final brands =
+        allBalls
+            .map((ball) => _getSimplifiedBrandName(ball.brand))
+            .toSet()
+            .toList();
     brands.sort();
     return [allFilterOption, ...brands];
   }
 
   List<String> get allAvailableCoreCategories {
-    final categories = allBalls.map((ball) => getCoreCategory(ball.core)).toSet().toList();
+    final categories =
+        allBalls.map((ball) => getCoreCategory(ball.core)).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
 
   List<String> get allAvailableCoverstockCategories {
-    final categories = allBalls.map((ball) => ball.coverstockcategory).toSet().toList();
+    final categories =
+        allBalls.map((ball) => ball.coverstockcategory).toSet().toList();
     categories.sort();
     return [allFilterOption, ...categories];
   }
 
-  // --- Update Filter Methods --- 
+  // --- Update Filter Methods ---
   void updateSelectedBrandFilter(String? brand) {
     selectedBrandFilter = brand;
     notifyListeners();
@@ -169,8 +188,8 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     if (!myArsenal.contains(ball)) {
       myArsenal.add(ball);
       // Validate filters *before* notifying listeners
-      _validateAndResetFilters(); 
-      notifyListeners(); 
+      _validateAndResetFilters();
+      notifyListeners();
     }
   }
 
@@ -178,7 +197,7 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   void removeBallFromArsenal(BowlingBall ball) {
     myArsenal.remove(ball);
     // Validate filters *before* notifying listeners
-    _validateAndResetFilters(); 
+    _validateAndResetFilters();
     notifyListeners();
   }
 
@@ -189,31 +208,45 @@ class WeaponLibraryViewModel extends ChangeNotifier {
   }
 
   void _applySearchFilters() {
-    filteredBallsForSearch = allBalls.where((ball) {
-      // Keyword filter (applies to ball name currently)
-      final keywordMatch = currentSearchKeyword.isEmpty ||
-                           ball.ball.toLowerCase().contains(currentSearchKeyword);
+    filteredBallsForSearch =
+        allBalls.where((ball) {
+          // Keyword filter (applies to ball name currently)
+          final keywordMatch =
+              currentSearchKeyword.isEmpty ||
+              ball.ball.toLowerCase().contains(currentSearchKeyword);
 
-      // Dropdown filters - use helper method for brand matching
-      final brandMatch = _matchesBrandFilter(ball.brand, selectedBrandFilterForSearch);
-      final coreCategoryMatch = selectedCoreCategoryFilterForSearch == null ||
-                                selectedCoreCategoryFilterForSearch == allFilterOption ||
-                                getCoreCategory(ball.core) == selectedCoreCategoryFilterForSearch;
-      final coverstockCategoryMatch = selectedCoverstockCategoryFilterForSearch == null ||
-                                      selectedCoverstockCategoryFilterForSearch == allFilterOption ||
-                                      ball.coverstockcategory == selectedCoverstockCategoryFilterForSearch;
+          // Dropdown filters - use helper method for brand matching
+          final brandMatch = _matchesBrandFilter(
+            ball.brand,
+            selectedBrandFilterForSearch,
+          );
+          final coreCategoryMatch =
+              selectedCoreCategoryFilterForSearch == null ||
+              selectedCoreCategoryFilterForSearch == allFilterOption ||
+              getCoreCategory(ball.core) == selectedCoreCategoryFilterForSearch;
+          final coverstockCategoryMatch =
+              selectedCoverstockCategoryFilterForSearch == null ||
+              selectedCoverstockCategoryFilterForSearch == allFilterOption ||
+              ball.coverstockcategory ==
+                  selectedCoverstockCategoryFilterForSearch;
 
-      return keywordMatch && brandMatch && coreCategoryMatch && coverstockCategoryMatch;
-    }).toList();
+          return keywordMatch &&
+              brandMatch &&
+              coreCategoryMatch &&
+              coverstockCategoryMatch;
+        }).toList();
     notifyListeners();
   }
 
   // --- Helper function to check and reset filters if selected value is no longer valid ---
   void _validateAndResetFilters() {
     // Regenerate options based on current arsenal to check against
-    final currentBrands = myArsenal.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet();
-    final currentCoreCategories = myArsenal.map((ball) => getCoreCategory(ball.core)).toSet();
-    final currentCoverstockCategories = myArsenal.map((ball) => ball.coverstockcategory).toSet();
+    final currentBrands =
+        myArsenal.map((ball) => _getSimplifiedBrandName(ball.brand)).toSet();
+    final currentCoreCategories =
+        myArsenal.map((ball) => getCoreCategory(ball.core)).toSet();
+    final currentCoverstockCategories =
+        myArsenal.map((ball) => ball.coverstockcategory).toSet();
 
     var filterChanged = false;
 
@@ -236,23 +269,28 @@ class WeaponLibraryViewModel extends ChangeNotifier {
     // Check Coverstock Category Filter
     if (selectedCoverstockCategoryFilter != null &&
         selectedCoverstockCategoryFilter != allFilterOption &&
-        !currentCoverstockCategories.contains(selectedCoverstockCategoryFilter)) {
+        !currentCoverstockCategories.contains(
+          selectedCoverstockCategoryFilter,
+        )) {
       selectedCoverstockCategoryFilter = null; // Reset to null
       filterChanged = true;
     }
 
-    // If any filter was reset, we need to notify listeners, 
+    // If any filter was reset, we need to notify listeners,
     // but notifyListeners is already called in add/remove methods, so this check is mainly for logic clarity.
-    // if (filterChanged) { 
+    // if (filterChanged) {
     //   // Not strictly needed here as parent methods call notifyListeners
     // }
   }
 
   // --- Getter to check if any arsenal filters are active ---
   bool get hasActiveFilters {
-    return (selectedBrandFilter != null && selectedBrandFilter != allFilterOption) ||
-           (selectedCoreCategoryFilter != null && selectedCoreCategoryFilter != allFilterOption) ||
-           (selectedCoverstockCategoryFilter != null && selectedCoverstockCategoryFilter != allFilterOption);
+    return (selectedBrandFilter != null &&
+            selectedBrandFilter != allFilterOption) ||
+        (selectedCoreCategoryFilter != null &&
+            selectedCoreCategoryFilter != allFilterOption) ||
+        (selectedCoverstockCategoryFilter != null &&
+            selectedCoverstockCategoryFilter != allFilterOption);
   }
 
   // --- Method to update arsenal search keyword ---

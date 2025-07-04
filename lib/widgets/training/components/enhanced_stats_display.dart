@@ -6,9 +6,10 @@ import 'package:iconsax/iconsax.dart';
 /// Enhanced Stats Display with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強統計顯示
 class EnhancedStatsDisplay extends StatelessWidget {
-
   const EnhancedStatsDisplay({
-    required this.summary, required this.theme, super.key,
+    required this.summary,
+    required this.theme,
+    super.key,
   });
   final TrainingDaySummary summary;
   final ThemeData theme;
@@ -20,9 +21,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: theme.colorScheme.primary.withOpacity(0.1),
@@ -35,14 +34,14 @@ class EnhancedStatsDisplay extends StatelessWidget {
         children: [
           // 標題
           _buildTitle(),
-          
+
           const SizedBox(height: 20),
-          
+
           // 主要統計
           _buildMainStats(),
-          
+
           const SizedBox(height: 16),
-          
+
           // 詳細統計
           _buildDetailedStats(),
         ],
@@ -53,11 +52,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
   Widget _buildTitle() {
     return Row(
       children: [
-        Icon(
-          Iconsax.chart_21,
-          color: theme.colorScheme.primary,
-          size: 20,
-        ),
+        Icon(Iconsax.chart_21, color: theme.colorScheme.primary, size: 20),
         const SizedBox(width: 8),
         Text(
           'Performance Analytics',
@@ -82,9 +77,9 @@ class EnhancedStatsDisplay extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // 最高分
         Expanded(
           child: _buildStatCard(
@@ -94,9 +89,9 @@ class EnhancedStatsDisplay extends StatelessWidget {
             color: Colors.green,
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // 最低分
         Expanded(
           child: _buildStatCard(
@@ -121,17 +116,11 @@ class EnhancedStatsDisplay extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-        ),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
+          Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
@@ -177,9 +166,9 @@ class EnhancedStatsDisplay extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // 總計統計
         _buildTotalStats(),
       ],
@@ -245,22 +234,20 @@ class EnhancedStatsDisplay extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
-                     // 總Strikes
-           Expanded(
-             child: _buildTotalStatItem(
-               Iconsax.direct_up,
-               '${summary.totalStrikes}',
-               'Total Strikes',
-               Colors.green,
-             ),
-           ),
-          
+          // 總Strikes
+          Expanded(
+            child: _buildTotalStatItem(
+              Iconsax.direct_up,
+              '${summary.totalStrikes}',
+              'Total Strikes',
+              Colors.green,
+            ),
+          ),
+
           // 總Spares
           Expanded(
             child: _buildTotalStatItem(
@@ -270,7 +257,7 @@ class EnhancedStatsDisplay extends StatelessWidget {
               Colors.blue,
             ),
           ),
-          
+
           // 總局數
           Expanded(
             child: _buildTotalStatItem(
@@ -285,14 +272,15 @@ class EnhancedStatsDisplay extends StatelessWidget {
     );
   }
 
-  Widget _buildTotalStatItem(IconData icon, String value, String label, Color color) {
+  Widget _buildTotalStatItem(
+    IconData icon,
+    String value,
+    String label,
+    Color color,
+  ) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: color,
-          size: 16,
-        ),
+        Icon(icon, color: color, size: 16),
         const SizedBox(height: 4),
         Text(
           value,
@@ -314,4 +302,4 @@ class EnhancedStatsDisplay extends StatelessWidget {
       ],
     );
   }
-} 
+}

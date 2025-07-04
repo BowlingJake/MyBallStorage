@@ -2,9 +2,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
 class ArsenalFilterSection extends StatelessWidget {
-
   const ArsenalFilterSection({
-    required this.selectedFilters, required this.onFilterChanged, super.key,
+    required this.selectedFilters,
+    required this.onFilterChanged,
+    super.key,
   });
   final Map<String, String?> selectedFilters;
   final Function(String filterType, String? value) onFilterChanged;
@@ -12,7 +13,7 @@ class ArsenalFilterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
@@ -27,7 +28,19 @@ class ArsenalFilterSection extends StatelessWidget {
                     context: context,
                     label: 'Brand',
                     value: selectedFilters['brand'],
-                    items: ['Storm', 'Hammer', 'Brunswick', 'Roto Grip', 'Motiv', 'Columbia 300', 'Ebonite', '900 Global', 'Track', 'Radical', 'SWAG'],
+                    items: [
+                      'Storm',
+                      'Hammer',
+                      'Brunswick',
+                      'Roto Grip',
+                      'Motiv',
+                      'Columbia 300',
+                      'Ebonite',
+                      '900 Global',
+                      'Track',
+                      'Radical',
+                      'SWAG',
+                    ],
                     onChanged: (value) => onFilterChanged('brand', value),
                   ),
                 ),
@@ -47,7 +60,13 @@ class ArsenalFilterSection extends StatelessWidget {
                     context: context,
                     label: 'Coverstock',
                     value: selectedFilters['coverstock'],
-                    items: ['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'],
+                    items: [
+                      'Solid Reactive',
+                      'Pearl Reactive',
+                      'Hybrid Reactive',
+                      'Urethane',
+                      'Polyester',
+                    ],
                     onChanged: (value) => onFilterChanged('coverstock', value),
                   ),
                 ),
@@ -67,14 +86,14 @@ class ArsenalFilterSection extends StatelessWidget {
     required ValueChanged<String?> onChanged,
   }) {
     final theme = Theme.of(context);
-    
+
     String getAllText(String label) {
       if (label == 'Coverstock') {
         return 'All Cover';
       }
       return 'All $label';
     }
-    
+
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         value: value,
@@ -92,14 +111,16 @@ class ArsenalFilterSection extends StatelessWidget {
               style: const TextStyle(fontSize: 12),
             ),
           ),
-          ...items.map((item) => DropdownMenuItem<String>(
-            value: item,
-            child: Text(
-              item,
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
+          ...items.map(
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                style: const TextStyle(fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),),
+          ),
         ],
         onChanged: onChanged,
         isExpanded: true,
@@ -147,4 +168,4 @@ class ArsenalFilterSection extends StatelessWidget {
       ),
     );
   }
-} 
+}

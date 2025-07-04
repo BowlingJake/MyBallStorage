@@ -7,9 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// 現代化Tournament區塊
 /// 垂直列表顯示錦標賽卡片
 class ModernTournamentSection extends ConsumerWidget {
-
   const ModernTournamentSection({
-    required this.title, super.key,
+    required this.title,
+    super.key,
     // this.onTournamentPressed,
     this.onViewAllPressed,
   });
@@ -65,7 +65,6 @@ class ModernTournamentSection extends ConsumerWidget {
 
 /// Tournament數據模型
 class TournamentData {
-
   const TournamentData({
     required this.id,
     required this.name,
@@ -89,9 +88,4 @@ class TournamentData {
 }
 
 /// Tournament狀態枚舉
-enum TournamentStatus {
-  upcoming,
-  active,
-  registration,
-  completed,
-}
+enum TournamentStatus { upcoming, active, registration, completed }

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 /// 訓練日統計資訊組件
 class TrainingDayStats extends StatelessWidget {
-
   const TrainingDayStats({
-    required this.summary, required this.theme, super.key,
+    required this.summary,
+    required this.theme,
+    super.key,
   });
   final TrainingDaySummary summary;
   final ThemeData theme;
@@ -45,14 +46,15 @@ class TrainingDayStats extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, IconData icon, String label, String value) {
+  Widget _buildStatItem(
+    ThemeData theme,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
         const SizedBox(height: 4),
         Text(
           value,
@@ -72,4 +74,4 @@ class TrainingDayStats extends StatelessWidget {
       ],
     );
   }
-} 
+}

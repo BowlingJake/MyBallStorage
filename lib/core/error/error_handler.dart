@@ -43,9 +43,6 @@ class AppErrorHandler {
 
   /// Wraps the app's root widget execution in a guarded zone.
   static void runGuarded(void Function() body) {
-    runZonedGuarded(
-      body,
-      handleZonedError,
-    );
+    runZonedGuarded(body, handleZonedError);
   }
-} 
+}

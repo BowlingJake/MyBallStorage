@@ -9,17 +9,10 @@ class BallPlaceholderCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       color: theme.colorScheme.surfaceContainerHighest,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: const AspectRatio(
         aspectRatio: 1,
-        child: Center(
-          child: Icon(
-            Icons.sports_handball,
-            size: 48,
-          ),
-        ),
+        child: Center(child: Icon(Icons.sports_handball, size: 48)),
       ),
     );
   }

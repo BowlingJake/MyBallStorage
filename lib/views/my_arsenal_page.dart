@@ -11,71 +11,75 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 
 final bottomIndexProvider = StateProvider<int>((ref) => 0);
-final selectedBagTypeProvider = StateProvider<BallBagType>((ref) => BallBagType.all);
+final selectedBagTypeProvider = StateProvider<BallBagType>(
+  (ref) => BallBagType.all,
+);
 
 /// Mock data for the arsenal grid.
-final userBallsProvider = Provider<List<ArsenalBall>>((ref) => [
-      ArsenalBall(
-        name: 'Jackal EXJ',
-        core: 'Predator V2',
-        cover: 'Propulsion HVH Hybrid Reactive',
-        layout: '4x4x2',
-        imagePath: 'assets/images/Jackal EXJ.jpg',
-        brand: 'Motiv',
-        dateAdded: DateTime(2024, 1, 15),
-        bagType: BallBagType.competition,
-      ),
-      ArsenalBall(
-        name: 'Phaze II',
-        core: 'R2S Pearl',
-        cover: 'R2S Pearl Reactive',
-        layout: '5x3x3',
-        imagePath: 'assets/images/Jackal EXJ.jpg',
-        brand: 'Storm',
-        dateAdded: DateTime(2024, 2, 20),
-        bagType: BallBagType.competition,
-      ),
-      ArsenalBall(
-        name: 'IQ Tour',
-        core: 'C3 Centripetal Control Core',
-        cover: 'R2S Solid Reactive',
-        layout: '4.5x4x2',
-        imagePath: 'assets/images/Jackal EXJ.jpg',
-        brand: 'Storm',
-        dateAdded: DateTime(2024, 3, 10),
-        bagType: BallBagType.practice,
-      ),
-      ArsenalBall(
-        name: 'Hustle Ink',
-        core: 'VTC-P18',
-        cover: 'VTC-S19 Solid Reactive',
-        layout: '5x4x3',
-        imagePath: 'assets/images/Jackal EXJ.jpg',
-        brand: 'Roto Grip',
-        dateAdded: DateTime(2024, 1, 5),
-        bagType: BallBagType.practice,
-      ),
-      ArsenalBall(
-        name: 'Code Black',
-        core: 'RAD4 Core',
-        cover: 'HK22 Solid Reactive',
-        layout: '4.5x3.5x3',
-        imagePath: 'assets/images/Jackal EXJ.jpg',
-        brand: 'Motiv',
-        dateAdded: DateTime(2024, 4, 2),
-        bagType: BallBagType.competition,
-      ),
-    ],);
+final userBallsProvider = Provider<List<ArsenalBall>>(
+  (ref) => [
+    ArsenalBall(
+      name: 'Jackal EXJ',
+      core: 'Predator V2',
+      cover: 'Propulsion HVH Hybrid Reactive',
+      layout: '4x4x2',
+      imagePath: 'assets/images/Jackal EXJ.jpg',
+      brand: 'Motiv',
+      dateAdded: DateTime(2024, 1, 15),
+      bagType: BallBagType.competition,
+    ),
+    ArsenalBall(
+      name: 'Phaze II',
+      core: 'R2S Pearl',
+      cover: 'R2S Pearl Reactive',
+      layout: '5x3x3',
+      imagePath: 'assets/images/Jackal EXJ.jpg',
+      brand: 'Storm',
+      dateAdded: DateTime(2024, 2, 20),
+      bagType: BallBagType.competition,
+    ),
+    ArsenalBall(
+      name: 'IQ Tour',
+      core: 'C3 Centripetal Control Core',
+      cover: 'R2S Solid Reactive',
+      layout: '4.5x4x2',
+      imagePath: 'assets/images/Jackal EXJ.jpg',
+      brand: 'Storm',
+      dateAdded: DateTime(2024, 3, 10),
+      bagType: BallBagType.practice,
+    ),
+    ArsenalBall(
+      name: 'Hustle Ink',
+      core: 'VTC-P18',
+      cover: 'VTC-S19 Solid Reactive',
+      layout: '5x4x3',
+      imagePath: 'assets/images/Jackal EXJ.jpg',
+      brand: 'Roto Grip',
+      dateAdded: DateTime(2024, 1, 5),
+      bagType: BallBagType.practice,
+    ),
+    ArsenalBall(
+      name: 'Code Black',
+      core: 'RAD4 Core',
+      cover: 'HK22 Solid Reactive',
+      layout: '4.5x3.5x3',
+      imagePath: 'assets/images/Jackal EXJ.jpg',
+      brand: 'Motiv',
+      dateAdded: DateTime(2024, 4, 2),
+      bagType: BallBagType.competition,
+    ),
+  ],
+);
 
 /// Filter balls based on selected bag type
 final filteredBallsProvider = Provider<List<ArsenalBall>>((ref) {
   final allBalls = ref.watch(userBallsProvider);
   final selectedBagType = ref.watch(selectedBagTypeProvider);
-  
+
   if (selectedBagType == BallBagType.all) {
     return allBalls;
   }
-  
+
   return allBalls.where((ball) => ball.bagType == selectedBagType).toList();
 });
 
@@ -134,10 +138,14 @@ class MyArsenalPage extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        // Bag selector dropdown 
+                        // Bag selector dropdown
                         Expanded(
                           flex: 3,
-                          child: _buildModernDropdown(theme, selectedBagType, ref),
+                          child: _buildModernDropdown(
+                            theme,
+                            selectedBagType,
+                            ref,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         // Create ball bag button
@@ -150,9 +158,9 @@ class MyArsenalPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // 球的網格 - 使用簡化的容器
               Expanded(
                 child: Container(
@@ -168,8 +176,8 @@ class MyArsenalPage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        selectedBagType == BallBagType.all 
-                            ? 'All Balls (${balls.length})' 
+                        selectedBagType == BallBagType.all
+                            ? 'All Balls (${balls.length})'
                             : '${selectedBagType.displayName} (${balls.length})',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           color: Colors.white,
@@ -178,21 +186,23 @@ class MyArsenalPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       Expanded(
-                        child: balls.isEmpty
-                            ? _buildEmptyState(theme)
-                            : GridView.builder(
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  mainAxisSpacing: 12,
-                                  crossAxisSpacing: 12,
-                                  childAspectRatio: 0.65,
+                        child:
+                            balls.isEmpty
+                                ? _buildEmptyState(theme)
+                                : GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        mainAxisSpacing: 12,
+                                        crossAxisSpacing: 12,
+                                        childAspectRatio: 0.65,
+                                      ),
+                                  itemCount: balls.length,
+                                  itemBuilder: (context, index) {
+                                    final ball = balls[index];
+                                    return _buildBallCard(theme, ball);
+                                  },
                                 ),
-                                itemCount: balls.length,
-                                itemBuilder: (context, index) {
-                                  final ball = balls[index];
-                                  return _buildBallCard(theme, ball);
-                                },
-                              ),
                       ),
                     ],
                   ),
@@ -211,7 +221,11 @@ class MyArsenalPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildModernDropdown(ThemeData theme, BallBagType selectedBagType, WidgetRef ref) {
+  Widget _buildModernDropdown(
+    ThemeData theme,
+    BallBagType selectedBagType,
+    WidgetRef ref,
+  ) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<BallBagType>(
         value: selectedBagType,
@@ -222,18 +236,19 @@ class MyArsenalPage extends ConsumerWidget {
             color: theme.colorScheme.onSurface.withOpacity(0.6),
           ),
         ),
-        items: BallBagType.values.map((bagType) {
-          return DropdownMenuItem<BallBagType>(
-            value: bagType,
-            child: Text(
-              bagType.displayName,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
-          );
-        }).toList(),
+        items:
+            BallBagType.values.map((bagType) {
+              return DropdownMenuItem<BallBagType>(
+                value: bagType,
+                child: Text(
+                  bagType.displayName,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+              );
+            }).toList(),
         onChanged: (BallBagType? value) {
           if (value != null) {
             ref.read(selectedBagTypeProvider.notifier).state = value;
@@ -290,7 +305,11 @@ class MyArsenalPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCreateBagButton(ThemeData theme, BuildContext context, WidgetRef ref) {
+  Widget _buildCreateBagButton(
+    ThemeData theme,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return SizedBox(
       height: 40,
       child: OutlinedButton.icon(
@@ -310,7 +329,11 @@ class MyArsenalPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           elevation: 0,
         ),
-        icon: Icon(Iconsax.add_circle, size: 16, color: theme.colorScheme.primary),
+        icon: Icon(
+          Iconsax.add_circle,
+          size: 16,
+          color: theme.colorScheme.primary,
+        ),
         label: Text(
           'Create Bag',
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -440,9 +463,13 @@ class MyArsenalPage extends ConsumerWidget {
                     SnackBar(
                       content: Text(
                         'Analyze Chart功能待實現',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
-                      backgroundColor: theme.colorScheme.surface.withOpacity(0.9),
+                      backgroundColor: theme.colorScheme.surface.withOpacity(
+                        0.9,
+                      ),
                     ),
                   );
                 },
@@ -480,13 +507,13 @@ class MyArsenalPage extends ConsumerWidget {
         break;
       case 2: // 中央按鈕 (新增)
         print('Add button tapped in Arsenal');
-        // TODO: 實現新增球的功能
+      // TODO: 實現新增球的功能
       case 3: // 訓練
         print('Training button tapped in Arsenal');
-        // TODO: 導航到訓練頁面
+      // TODO: 導航到訓練頁面
       case 4: // 設定
         print('Settings button tapped in Arsenal');
-        // TODO: 導航到設定頁面
+      // TODO: 導航到設定頁面
     }
     // 更新當前索引
     ref.read(bottomIndexProvider.notifier).state = index;

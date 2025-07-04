@@ -3,9 +3,11 @@ import 'package:flutter/services.dart'; // For input formatters
 import 'package:provider/provider.dart';
 
 class RecordScoresPage extends StatefulWidget {
-
   const RecordScoresPage({
-    required this.tournamentId, required this.tournamentName, required this.gamesPerSession, super.key,
+    required this.tournamentId,
+    required this.tournamentName,
+    required this.gamesPerSession,
+    super.key,
   });
   final String tournamentId;
   final String tournamentName;
@@ -48,7 +50,8 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
       for (var i = 0; i < _scoreControllers.length; i++) {
         final text = _scoreControllers[i].text;
         final score = int.tryParse(text);
-        if (score == null || score < 0 || score > 300) { // Basic validation
+        if (score == null || score < 0 || score > 300) {
+          // Basic validation
           parseError = true;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('G${i + 1} 的分數無效 (請輸入 0-300 之間的數字)')),
@@ -76,12 +79,12 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
         //     SnackBar(content: Text('儲存分數時發生錯誤: $e')),
         //   );
         // }
-        
+
         // Placeholder action: just pop for now
-        ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('分數已記錄 (待儲存)')),
-           );
-        Navigator.pop(context); 
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('分數已記錄 (待儲存)')));
+        Navigator.pop(context);
       }
     }
   }
@@ -101,44 +104,46 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
       ),
       body: Form(
         key: _formKey,
-        child: SingleChildScrollView( // Allow scrolling if many games
-           padding: const EdgeInsets.all(16),
-           child: Wrap( // Use Wrap for horizontal arrangement that wraps
-             spacing: 12, // Horizontal space between inputs
-             runSpacing: 12, // Vertical space if wraps
-             alignment: WrapAlignment.center, // Center items horizontally
-             children: List.generate(widget.gamesPerSession, (index) {
-                return SizedBox(
-                  width: 100, // Fixed width for each input box
-                  child: TextFormField(
-                    controller: _scoreControllers[index],
-                    decoration: InputDecoration(
-                      labelText: 'G${index + 1}', // Label like G1, G2, ...
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly, // Only allow digits
-                       LengthLimitingTextInputFormatter(3), // Limit to 3 digits
-                    ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return '必填';
-                      }
-                       final score = int.tryParse(value);
-                       if (score == null || score < 0 || score > 300) {
-                         return '0-300'; // Short error message inside the box
-                       }
-                      return null;
-                    },
+        child: SingleChildScrollView(
+          // Allow scrolling if many games
+          padding: const EdgeInsets.all(16),
+          child: Wrap(
+            // Use Wrap for horizontal arrangement that wraps
+            spacing: 12, // Horizontal space between inputs
+            runSpacing: 12, // Vertical space if wraps
+            alignment: WrapAlignment.center, // Center items horizontally
+            children: List.generate(widget.gamesPerSession, (index) {
+              return SizedBox(
+                width: 100, // Fixed width for each input box
+                child: TextFormField(
+                  controller: _scoreControllers[index],
+                  decoration: InputDecoration(
+                    labelText: 'G${index + 1}', // Label like G1, G2, ...
+                    border: const OutlineInputBorder(),
                   ),
-                );
-             }),
-           ),
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // Only allow digits
+                    LengthLimitingTextInputFormatter(3), // Limit to 3 digits
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '必填';
+                    }
+                    final score = int.tryParse(value);
+                    if (score == null || score < 0 || score > 300) {
+                      return '0-300'; // Short error message inside the box
+                    }
+                    return null;
+                  },
+                ),
+              );
+            }),
+          ),
         ),
       ),
-       // Optional: Add a persistent save button at the bottom
+      // Optional: Add a persistent save button at the bottom
       // bottomNavigationBar: Padding(
       //   padding: const EdgeInsets.all(16.0),
       //   child: ElevatedButton.icon(
@@ -152,4 +157,4 @@ class _RecordScoresPageState extends State<RecordScoresPage> {
       // ),
     );
   }
-} 
+}

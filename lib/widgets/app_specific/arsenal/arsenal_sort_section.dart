@@ -2,9 +2,11 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
 class ArsenalSortSection extends StatelessWidget {
-
   const ArsenalSortSection({
-    required this.sortBy, required this.sortAscending, required this.onSortChanged, super.key,
+    required this.sortBy,
+    required this.sortAscending,
+    required this.onSortChanged,
+    super.key,
   });
   final String sortBy;
   final bool sortAscending;
@@ -23,16 +25,14 @@ class ArsenalSortSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
           Text('Sort', style: theme.textTheme.labelMedium),
           const SizedBox(width: 6),
-          Expanded(
-            child: _buildSortDropdown(context, theme),
-          ),
+          Expanded(child: _buildSortDropdown(context, theme)),
         ],
       ),
     );
@@ -41,7 +41,7 @@ class ArsenalSortSection extends StatelessWidget {
   Widget _buildSortDropdown(BuildContext context, ThemeData theme) {
     final sortOptions = <String>[
       'Name A to Z',
-      'Name Z to A', 
+      'Name Z to A',
       'RG High to Low',
       'RG Low to High',
     ];
@@ -49,14 +49,19 @@ class ArsenalSortSection extends StatelessWidget {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         value: _currentSortOption,
-        items: sortOptions.map((option) => DropdownMenuItem<String>(
-          value: option,
-          child: Text(
-            option,
-            style: const TextStyle(fontSize: 12),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),).toList(),
+        items:
+            sortOptions
+                .map(
+                  (option) => DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(
+                      option,
+                      style: const TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(),
         onChanged: (String? value) {
           if (value != null) {
             switch (value) {
@@ -116,4 +121,4 @@ class ArsenalSortSection extends StatelessWidget {
       ),
     );
   }
-} 
+}

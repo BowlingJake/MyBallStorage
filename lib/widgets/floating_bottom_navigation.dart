@@ -6,9 +6,10 @@ import 'package:iconsax/iconsax.dart';
 /// 浮動中心按鈕底部導覽列
 /// 特色：中心按鈕浮動且有凹槽效果
 class FloatingBottomNavigation extends StatelessWidget {
-
   const FloatingBottomNavigation({
-    required this.currentIndex, required this.onTap, super.key,
+    required this.currentIndex,
+    required this.onTap,
+    super.key,
     this.backgroundColor,
     this.centerButtonColor,
     this.notchMargin = 8.0,
@@ -32,10 +33,7 @@ class FloatingBottomNavigation extends StatelessWidget {
         // 底部導覽列主體 - 帶凹槽
         CustomPaint(
           size: Size(MediaQuery.of(context).size.width, 70),
-          painter: _BottomNavPainter(
-            color: bgColor,
-            notchMargin: notchMargin,
-          ),
+          painter: _BottomNavPainter(color: bgColor, notchMargin: notchMargin),
           child: SizedBox(
             height: 70,
             child: SafeArea(
@@ -44,10 +42,10 @@ class FloatingBottomNavigation extends StatelessWidget {
                   // 左側按鈕
                   _buildNavItem(Icons.home_rounded, '首頁', 0, theme),
                   _buildNavItem(Icons.people_rounded, '社群', 1, theme),
-                  
+
                   // 中間空白區域（為浮動按鈕留空間）
                   const Expanded(child: SizedBox()),
-                  
+
                   // 右側按鈕
                   _buildNavItem(Icons.sports_baseball_rounded, '訓練', 3, theme),
                   _buildNavItem(Icons.account_circle_rounded, '個人', 4, theme),
@@ -56,7 +54,7 @@ class FloatingBottomNavigation extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 浮動中心按鈕
         Positioned(
           bottom: 25, // 浮動在導覽列上方
@@ -85,11 +83,7 @@ class FloatingBottomNavigation extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 30,
-              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 30),
             ),
           ),
         ),
@@ -97,9 +91,14 @@ class FloatingBottomNavigation extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme) {
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    int index,
+    ThemeData theme,
+  ) {
     final isSelected = currentIndex == index;
-    
+
     return Expanded(
       child: GestureDetector(
         onTap: () => onTap(index),
@@ -112,17 +111,19 @@ class FloatingBottomNavigation extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(6),
-                decoration: isSelected
-                  ? BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    )
-                  : null,
+                decoration:
+                    isSelected
+                        ? BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        )
+                        : null,
                 child: Icon(
                   icon,
-                  color: isSelected 
-                    ? theme.colorScheme.primary
-                    : Colors.grey.shade500,
+                  color:
+                      isSelected
+                          ? theme.colorScheme.primary
+                          : Colors.grey.shade500,
                   size: 24,
                 ),
               ),
@@ -130,9 +131,10 @@ class FloatingBottomNavigation extends StatelessWidget {
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: TextStyle(
-                  color: isSelected 
-                    ? theme.colorScheme.primary
-                    : Colors.grey.shade500,
+                  color:
+                      isSelected
+                          ? theme.colorScheme.primary
+                          : Colors.grey.shade500,
                   fontSize: 10,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -143,28 +145,26 @@ class FloatingBottomNavigation extends StatelessWidget {
         ),
       ),
     );
-    }
+  }
 }
 
 /// 自定義繪製器，用於創建帶凹槽的底部導覽列
 class _BottomNavPainter extends CustomPainter {
-
-  _BottomNavPainter({
-    required this.color,
-    required this.notchMargin,
-  });
+  _BottomNavPainter({required this.color, required this.notchMargin});
   final Color color;
   final double notchMargin;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
 
-    final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.1)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    final shadowPaint =
+        Paint()
+          ..color = Colors.black.withOpacity(0.1)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
 
     final path = Path();
     final shadowPath = Path();
@@ -180,55 +180,65 @@ class _BottomNavPainter extends CustomPainter {
 
     // 繪製陰影
     canvas.drawPath(shadowPath, shadowPaint);
-    
+
     // 繪製主體
     canvas.drawPath(path, paint);
   }
 
-  void _drawMainPath(Path path, Size size, double centerX, double notchCenterY, double notchRadius) {
+  void _drawMainPath(
+    Path path,
+    Size size,
+    double centerX,
+    double notchCenterY,
+    double notchRadius,
+  ) {
     // 起始點：左下角
     path.moveTo(0, size.height);
-    
+
     // 左側直線到頂部
     path.lineTo(0, 20);
-    
+
     // 頂部圓角
     path.quadraticBezierTo(0, 0, 20, 0);
-    
+
     // 到凹槽開始位置
     path.lineTo(centerX - notchRadius - 20, 0);
-    
+
     // 凹槽左側曲線
     path.quadraticBezierTo(
-      centerX - notchRadius - 10, 0,
-      centerX - notchRadius, notchCenterY,
+      centerX - notchRadius - 10,
+      0,
+      centerX - notchRadius,
+      notchCenterY,
     );
-    
+
     // 凹槽弧形
     path.arcToPoint(
       Offset(centerX + notchRadius, notchCenterY),
       radius: Radius.circular(notchRadius),
       clockwise: false,
     );
-    
+
     // 凹槽右側曲線
     path.quadraticBezierTo(
-      centerX + notchRadius + 10, 0,
-      centerX + notchRadius + 20, 0,
+      centerX + notchRadius + 10,
+      0,
+      centerX + notchRadius + 20,
+      0,
     );
-    
+
     // 右側直線
     path.lineTo(size.width - 20, 0);
-    
+
     // 右上角圓角
     path.quadraticBezierTo(size.width, 0, size.width, 20);
-    
+
     // 右側直線到底部
     path.lineTo(size.width, size.height);
-    
+
     // 底部直線
     path.lineTo(0, size.height);
-    
+
     path.close();
   }
 
@@ -238,9 +248,10 @@ class _BottomNavPainter extends CustomPainter {
 
 /// 帶動畫效果的浮動底部導覽列
 class AnimatedFloatingBottomNavigation extends StatefulWidget {
-
   const AnimatedFloatingBottomNavigation({
-    required this.currentIndex, required this.onTap, super.key,
+    required this.currentIndex,
+    required this.onTap,
+    super.key,
   });
   final int currentIndex;
   final Function(int) onTap;
@@ -252,7 +263,6 @@ class AnimatedFloatingBottomNavigation extends StatefulWidget {
 
 class _AnimatedFloatingBottomNavigationState
     extends State<AnimatedFloatingBottomNavigation> {
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -263,14 +273,13 @@ class _AnimatedFloatingBottomNavigationState
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: navBarHeight + MediaQuery.of(context).padding.bottom,
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).padding.bottom,
+          ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface.withOpacity(0.1),
             border: Border(
-              top: BorderSide(
-                color: Colors.white.withOpacity(0.2),
-                width: 0.5,
-              ),
+              top: BorderSide(color: Colors.white.withOpacity(0.2), width: 0.5),
             ),
           ),
           child: Row(
@@ -287,8 +296,13 @@ class _AnimatedFloatingBottomNavigationState
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index, ThemeData theme,
-      {bool isCenter = false,}) {
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    int index,
+    ThemeData theme, {
+    bool isCenter = false,
+  }) {
     final isSelected = widget.currentIndex == index;
     final selectedColor = theme.colorScheme.primary;
     final unselectedColor = Colors.white.withOpacity(0.7);
@@ -302,16 +316,21 @@ class _AnimatedFloatingBottomNavigationState
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.all(4), // Give some space for the shadow
+              padding: const EdgeInsets.all(
+                4,
+              ), // Give some space for the shadow
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: isSelected ? [
-                  BoxShadow(
-                    color: selectedColor.withOpacity(0.7),
-                    blurRadius: 15,
-                    spreadRadius: 3,
-                  ),
-                ] : [],
+                boxShadow:
+                    isSelected
+                        ? [
+                          BoxShadow(
+                            color: selectedColor.withOpacity(0.7),
+                            blurRadius: 15,
+                            spreadRadius: 3,
+                          ),
+                        ]
+                        : [],
               ),
               child: AnimatedScale(
                 duration: const Duration(milliseconds: 250),
@@ -337,4 +356,4 @@ class _AnimatedFloatingBottomNavigationState
       ),
     );
   }
-} 
+}

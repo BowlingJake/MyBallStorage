@@ -1,6 +1,5 @@
 // lib/models/user_profile.dart
 class UserProfile {
-
   const UserProfile({
     required this.nickname,
     required this.hand,
@@ -61,9 +60,6 @@ class UserProfile {
 
   @override
   int get hashCode {
-    return nickname.hashCode ^
-        hand.hashCode ^
-        ballPath.hashCode ^
-        pap.hashCode;
+    return nickname.hashCode ^ hand.hashCode ^ ballPath.hashCode ^ pap.hashCode;
   }
-} 
+}

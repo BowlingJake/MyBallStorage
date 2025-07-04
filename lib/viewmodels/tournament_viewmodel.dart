@@ -8,13 +8,14 @@ class TournamentViewModel extends ChangeNotifier {
   final List<Tournament> _tournaments = [];
 
   // Public getter for accessing the list (unmodifiable)
-  UnmodifiableListView<Tournament> get tournaments => UnmodifiableListView(_tournaments);
+  UnmodifiableListView<Tournament> get tournaments =>
+      UnmodifiableListView(_tournaments);
 
   // Method to add a new tournament
   void addTournament(Tournament tournament) {
     _tournaments.add(tournament);
     // Optional: Sort tournaments after adding, e.g., by start date descending
-    _tournaments.sort((a, b) => b.startDate.compareTo(a.startDate)); 
+    _tournaments.sort((a, b) => b.startDate.compareTo(a.startDate));
     notifyListeners(); // Notify listeners about the change
   }
 
@@ -55,5 +56,4 @@ class TournamentViewModel extends ChangeNotifier {
   //   notifyListeners();
   //   // saveTournaments(); // Save after removing
   // }
-
 }

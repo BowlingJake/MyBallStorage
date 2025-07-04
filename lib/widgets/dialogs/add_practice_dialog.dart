@@ -3,7 +3,9 @@ import 'package:bowlingarsenal_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 
 enum _PracticeStep { details, oilPattern, scoring }
+
 enum InputMethod { simple, advanced }
+
 enum ScoringSystem { traditional, current }
 
 class AddPracticeDialog extends StatefulWidget {
@@ -107,12 +109,15 @@ class _AddPracticeDialogState extends State<AddPracticeDialog> {
             // Final step: validate and pop with results
             if (_locationController.text.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('請返回第一步填寫練習地點', style: AppTextStyles.body)),
+                const SnackBar(
+                  content: Text('請返回第一步填寫練習地點', style: AppTextStyles.body),
+                ),
               );
               return;
             }
             Navigator.pop(context, {
-              'date': '${_selectedDate.year}/${_selectedDate.month}/${_selectedDate.day}',
+              'date':
+                  '${_selectedDate.year}/${_selectedDate.month}/${_selectedDate.day}',
               'location': _locationController.text,
               'oilPattern': _oilPatternController.text,
               'inputMethod': _inputMethod,
@@ -192,8 +197,16 @@ class _AddPracticeDialogState extends State<AddPracticeDialog> {
           const SizedBox(height: 8),
           SegmentedButton<InputMethod>(
             segments: const [
-              ButtonSegment(value: InputMethod.simple, label: Text('簡易'), icon: Icon(Icons.speed)),
-              ButtonSegment(value: InputMethod.advanced, label: Text('詳細'), icon: Icon(Icons.grid_on)),
+              ButtonSegment(
+                value: InputMethod.simple,
+                label: Text('簡易'),
+                icon: Icon(Icons.speed),
+              ),
+              ButtonSegment(
+                value: InputMethod.advanced,
+                label: Text('詳細'),
+                icon: Icon(Icons.grid_on),
+              ),
             ],
             selected: {_inputMethod},
             onSelectionChanged: (newSelection) {
@@ -205,7 +218,10 @@ class _AddPracticeDialogState extends State<AddPracticeDialog> {
           const SizedBox(height: 8),
           SegmentedButton<ScoringSystem>(
             segments: const [
-              ButtonSegment(value: ScoringSystem.traditional, label: Text('傳統')),
+              ButtonSegment(
+                value: ScoringSystem.traditional,
+                label: Text('傳統'),
+              ),
               ButtonSegment(value: ScoringSystem.current, label: Text('現代')),
             ],
             selected: {_scoringSystem},
@@ -217,4 +233,4 @@ class _AddPracticeDialogState extends State<AddPracticeDialog> {
       ),
     );
   }
-} 
+}

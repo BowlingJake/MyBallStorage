@@ -6,11 +6,7 @@ import 'package:iconsax/iconsax.dart';
 /// 用於在主頁顯示單個裝備庫球的卡片
 /// 使用 StandardAppCard 作為基礎，以保持風格統一
 class ArsenalCard extends StatelessWidget {
-
-  const ArsenalCard({
-    required this.ball, super.key,
-    this.onTap,
-  });
+  const ArsenalCard({required this.ball, super.key, this.onTap});
   final ArsenalBall ball;
   final VoidCallback? onTap;
 
@@ -32,23 +28,25 @@ class ArsenalCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(4),
                 // 使用 imagePath 並假設是本地 asset
-                child: ball.imagePath.isNotEmpty
-                    ? Image.asset(
-                        'assets/images/${ball.imagePath}', // 假設路徑相對於 assets/images
-                        fit: BoxFit.contain,
-                        // 圖片載入失敗時的錯誤圖示
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.error_outline,
-                            color: Colors.white.withOpacity(0.5),
-                          );
-                        },
-                      )
-                    : Icon( // 如果沒有圖片路徑，使用替代圖示
-                        Iconsax.box, // 使用存在的圖示
-                        size: 40, 
-                        color: Colors.white.withOpacity(0.7),
-                      ),
+                child:
+                    ball.imagePath.isNotEmpty
+                        ? Image.asset(
+                          'assets/images/${ball.imagePath}', // 假設路徑相對於 assets/images
+                          fit: BoxFit.contain,
+                          // 圖片載入失敗時的錯誤圖示
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.error_outline,
+                              color: Colors.white.withOpacity(0.5),
+                            );
+                          },
+                        )
+                        : Icon(
+                          // 如果沒有圖片路徑，使用替代圖示
+                          Iconsax.box, // 使用存在的圖示
+                          size: 40,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
               ),
             ),
             const SizedBox(height: 8),
@@ -69,4 +67,4 @@ class ArsenalCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

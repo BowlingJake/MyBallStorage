@@ -9,9 +9,9 @@ import 'package:intl/intl.dart';
 /// 專業級遊戲詳情對話框
 /// 顯示單局遊戲的詳細分數表、統計資訊和備註
 class GameDetailDialog extends StatefulWidget {
-
   const GameDetailDialog({
-    required this.game, super.key,
+    required this.game,
+    super.key,
     this.onGameUpdated,
     this.onGameDeleted,
   });
@@ -42,64 +42,94 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
   /// 將 GameRecord 轉換為 BowlingScoreData 用於顯示
   BowlingScoreData _convertToScoreData() {
     final scoreData = BowlingScoreData.newGame();
-    
+
     // 如果有 frameScores，嘗試重建分數表
     if (widget.game.frameScores.isNotEmpty) {
       for (var i = 0; i < widget.game.frameScores.length && i < 10; i++) {
         final frameScore = widget.game.frameScores[i];
         final frame = scoreData.frames[i];
-        
+
         // 簡化的分數重建邏輯
         if (frameScore == 10 && i < 9) {
           // Strike
-          frame.rolls.add(Roll(
-            pinsDown: 10,
-            pinsStandingAfterThrow: {},
-            displayScore: 'X',
-            pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
-          ),);
+          frame.rolls.add(
+            Roll(
+              pinsDown: 10,
+              pinsStandingAfterThrow: {},
+              displayScore: 'X',
+              pinsStandingBeforeThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+            ),
+          );
         } else if (frameScore > 0 && frameScore < 10) {
           // 簡化：假設是兩球的組合
           final firstBall = frameScore ~/ 2;
           final secondBall = frameScore - firstBall;
-          
-          frame.rolls.add(Roll(
-            pinsDown: firstBall,
-            pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(
-              List.generate(firstBall, (i) => i + 1).toSet(),
+
+          frame.rolls.add(
+            Roll(
+              pinsDown: firstBall,
+              pinsStandingAfterThrow: {
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+              }.difference(List.generate(firstBall, (i) => i + 1).toSet()),
+              displayScore: firstBall.toString(),
+              pinsStandingBeforeThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
             ),
-            displayScore: firstBall.toString(),
-            pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
-          ),);
-          
+          );
+
           if (firstBall + secondBall == 10) {
-            frame.rolls.add(Roll(
-              pinsDown: secondBall,
-              pinsStandingAfterThrow: {},
-              displayScore: '/',
-              pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
-            ),);
-          } else {
-            frame.rolls.add(Roll(
-              pinsDown: secondBall,
-              pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(
-                List.generate(firstBall + secondBall, (i) => i + 1).toSet(),
+            frame.rolls.add(
+              Roll(
+                pinsDown: secondBall,
+                pinsStandingAfterThrow: {},
+                displayScore: '/',
+                pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
               ),
-              displayScore: secondBall.toString(),
-              pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
-            ),);
+            );
+          } else {
+            frame.rolls.add(
+              Roll(
+                pinsDown: secondBall,
+                pinsStandingAfterThrow: {
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                }.difference(
+                  List.generate(firstBall + secondBall, (i) => i + 1).toSet(),
+                ),
+                displayScore: secondBall.toString(),
+                pinsStandingBeforeThrow: frame.rolls[0].pinsStandingAfterThrow!,
+              ),
+            );
           }
         }
-        
+
         frame.isComplete = true;
-        frame.totalScore = widget.game.frameScores.take(i + 1).reduce((a, b) => a + b);
+        frame.totalScore = widget.game.frameScores
+            .take(i + 1)
+            .reduce((a, b) => a + b);
       }
     }
-    
+
     scoreData.isGameOver = true;
     scoreData.currentFrameIndex = -1;
     scoreData.calculateScores();
-    
+
     return scoreData;
   }
 
@@ -119,37 +149,37 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
     setState(() {
       _isEditingNotes = false;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('備註已更新'),
-        backgroundColor: Colors.green,
-      ),
+      const SnackBar(content: Text('備註已更新'), backgroundColor: Colors.green),
     );
   }
 
   void _deleteGame() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Game'),
-        content: Text('Are you sure you want to delete Game ${widget.game.gameNumber}? This action cannot be undone.'),
-        actions: [
-          AppStandardButton(
-            text: 'Cancel',
-            onPressed: () => Navigator.pop(context),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Delete Game'),
+            content: Text(
+              'Are you sure you want to delete Game ${widget.game.gameNumber}? This action cannot be undone.',
+            ),
+            actions: [
+              AppStandardButton(
+                text: 'Cancel',
+                onPressed: () => Navigator.pop(context),
+              ),
+              AppStandardButton(
+                text: 'Delete',
+                onPressed: () {
+                  Navigator.pop(context); // Close confirmation dialog
+                  Navigator.pop(context); // Close details dialog
+                  widget.onGameDeleted?.call(widget.game);
+                },
+                customColor: Colors.red,
+              ),
+            ],
           ),
-          AppStandardButton(
-            text: 'Delete',
-            onPressed: () {
-              Navigator.pop(context); // Close confirmation dialog
-              Navigator.pop(context); // Close details dialog
-              widget.onGameDeleted?.call(widget.game);
-            },
-            customColor: Colors.red,
-          ),
-        ],
-      ),
     );
   }
 
@@ -173,230 +203,249 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                 color: theme.colorScheme.primary.withOpacity(0.3),
               ),
             ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 標題
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Game ${widget.game.gameNumber} Details',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 20),
-
-            // 分數總覽
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatItem('Total Score', widget.game.score.toString(), theme),
-                  _buildStatItem('Strikes', widget.game.strikes.toString(), theme),
-                  _buildStatItem('Spares', widget.game.spares.toString(), theme),
-                  _buildStatItem('Time', DateFormat('HH:mm').format(widget.game.timestamp), theme),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // 詳細分數表
-            Text(
-              'Score Details',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withOpacity(0.2),
-                ),
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
+                // 標題
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    for (int i = 0; i < widget.game.frameScores.length; i++)
-                      Container(
-                        width: 60,
-                        height: 80,
-                        margin: const EdgeInsets.only(right: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white30),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 20,
-                              child: Center(
-                                child: Text(
-                                  '${i + 1}',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Text(
-                                  widget.game.frameScores[i].toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                    Text(
+                      'Game ${widget.game.gameNumber} Details',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    ),
                   ],
                 ),
-              ),
-            ),
 
-            const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-            // 備註區域
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+                // 分數總覽
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatItem(
+                        'Total Score',
+                        widget.game.score.toString(),
+                        theme,
+                      ),
+                      _buildStatItem(
+                        'Strikes',
+                        widget.game.strikes.toString(),
+                        theme,
+                      ),
+                      _buildStatItem(
+                        'Spares',
+                        widget.game.spares.toString(),
+                        theme,
+                      ),
+                      _buildStatItem(
+                        'Time',
+                        DateFormat('HH:mm').format(widget.game.timestamp),
+                        theme,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 詳細分數表
                 Text(
-                  'Notes',
+                  'Score Details',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _isEditingNotes = !_isEditingNotes;
-                    });
-                  },
-                  icon: Icon(
-                    _isEditingNotes ? Icons.close : Icons.edit,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
-            if (_isEditingNotes)
-              Column(
-                children: [
-                  TextField(
-                    controller: _notesController,
-                    maxLines: 3,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Add notes...',
-                      hintStyle: const TextStyle(color: Colors.white54),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.white30),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.white30),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: theme.colorScheme.primary),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.1),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withOpacity(0.2),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (int i = 0; i < widget.game.frameScores.length; i++)
+                          Container(
+                            width: 60,
+                            height: 80,
+                            margin: const EdgeInsets.only(right: 4),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white30),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                  child: Center(
+                                    child: Text(
+                                      '${i + 1}',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      widget.game.frameScores[i].toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 備註區域
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Notes',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isEditingNotes = !_isEditingNotes;
+                        });
+                      },
+                      icon: Icon(
+                        _isEditingNotes ? Icons.close : Icons.edit,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                if (_isEditingNotes)
+                  Column(
                     children: [
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Save Notes',
-                          onPressed: _saveNotes,
-                          isPrimary: true,
+                      TextField(
+                        controller: _notesController,
+                        maxLines: 3,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Add notes...',
+                          hintStyle: const TextStyle(color: Colors.white54),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.white30),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.white30),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.1),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppStandardButton(
+                              text: 'Save Notes',
+                              onPressed: _saveNotes,
+                              isPrimary: true,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
-                  ),
-                ],
-              )
-            else
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  widget.game.notes?.isNotEmpty == true 
-                    ? widget.game.notes!
-                    : 'No notes yet',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: widget.game.notes?.isNotEmpty == true 
-                      ? Colors.white
-                      : Colors.white54,
-                  ),
-                ),
-              ),
-
-            const SizedBox(height: 24),
-
-            // 底部按鈕
-            Row(
-              children: [
-                                  Expanded(
-                    child: AppStandardButton(
-                      text: 'Delete',
-                      onPressed: _deleteGame,
-                      customColor: Colors.red,
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.game.notes?.isNotEmpty == true
+                          ? widget.game.notes!
+                          : 'No notes yet',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color:
+                            widget.game.notes?.isNotEmpty == true
+                                ? Colors.white
+                                : Colors.white54,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: AppStandardButton(
-                      text: 'Close',
-                      onPressed: () => Navigator.pop(context),
-                      isPrimary: true,
+
+                const SizedBox(height: 24),
+
+                // 底部按鈕
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppStandardButton(
+                        text: 'Delete',
+                        onPressed: _deleteGame,
+                        customColor: Colors.red,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppStandardButton(
+                        text: 'Close',
+                        onPressed: () => Navigator.pop(context),
+                        isPrimary: true,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
           ),
         ),
       ),
@@ -416,9 +465,7 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: Colors.white70,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
         ),
       ],
     );
@@ -446,4 +493,4 @@ void showGameDetailDialog(
       );
     },
   );
-} 
+}

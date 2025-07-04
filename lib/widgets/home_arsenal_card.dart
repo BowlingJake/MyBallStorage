@@ -16,11 +16,7 @@ LinearGradient createMatteOverlay(List<Color> brandColors) {
 
 /// Home page Arsenal card with the same design as ArsenalBallCard but optimized for horizontal scrolling
 class HomeArsenalCard extends StatelessWidget {
-
-  const HomeArsenalCard({
-    required this.ball, super.key,
-    this.onTap,
-  });
+  const HomeArsenalCard({required this.ball, super.key, this.onTap});
   final ArsenalBall ball;
   final VoidCallback? onTap;
 
@@ -72,134 +68,134 @@ class HomeArsenalCard extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-              // Ball name at the top (white text with shadow)
-              Text(
-                ball.name,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      offset: const Offset(1, 1),
-                      blurRadius: 3,
-                      color: Colors.black.withOpacity(0.7),
+                    // Ball name at the top (white text with shadow)
+                    Text(
+                      ball.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            offset: const Offset(1, 1),
+                            blurRadius: 3,
+                            color: Colors.black.withOpacity(0.7),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              const SizedBox(height: 8),
-              // Ball image in the center (3D effect from popout detail)
-              Expanded(
-                flex: 4,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Spotlight 背景光源
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          radius: 0.8,
-                          colors: [
-                            Colors.white.withOpacity(0.15),
-                            Colors.white.withOpacity(0.08),
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.5, 1.0],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.white.withOpacity(0.06),
-                            blurRadius: 22,
+                    const SizedBox(height: 8),
+                    // Ball image in the center (3D effect from popout detail)
+                    Expanded(
+                      flex: 4,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Spotlight 背景光源
+                          Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                radius: 0.8,
+                                colors: [
+                                  Colors.white.withOpacity(0.15),
+                                  Colors.white.withOpacity(0.08),
+                                  Colors.transparent,
+                                ],
+                                stops: const [0.0, 0.5, 1.0],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.06),
+                                  blurRadius: 22,
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 球的陰影
+                          Positioned(
+                            bottom: 6,
+                            child: Container(
+                              width: 50,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.05),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.elliptical(25, 6),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 20,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 2),
+                                    color: Colors.black.withOpacity(0.15),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 球圖片 (3D 效果)
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.12),
+                            ),
+                            child: ClipOval(
+                              child: Stack(
+                                children: [
+                                  // 球圖片
+                                  Image.asset(
+                                    ball.imagePath,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    filterQuality: FilterQuality.high,
+                                  ),
+                                  // 接觸陰影 - 球底部內側的窄暗帶
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: RadialGradient(
+                                        center: const Alignment(0, 0.7),
+                                        radius: 0.6,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.25),
+                                        ],
+                                        stops: const [0.7, 1.0],
+                                      ),
+                                    ),
+                                  ),
+                                  // 內陰影疊加層
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: RadialGradient(
+                                        center: const Alignment(-0.3, -0.3),
+                                        radius: 0.8,
+                                        colors: [
+                                          Colors.black.withOpacity(0.15),
+                                          Colors.black.withOpacity(0.05),
+                                          Colors.transparent,
+                                        ],
+                                        stops: const [0.0, 0.4, 0.8],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    // 球的陰影
-                    Positioned(
-                      bottom: 6,
-                      child: Container(
-                        width: 50,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.05),
-                          borderRadius: const BorderRadius.all(
-                            Radius.elliptical(25, 6),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 20,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 2),
-                              color: Colors.black.withOpacity(0.15),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // 球圖片 (3D 效果)
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.12),
-                      ),
-                      child: ClipOval(
-                        child: Stack(
-                          children: [
-                            // 球圖片
-                            Image.asset(
-                              ball.imagePath,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                              filterQuality: FilterQuality.high,
-                            ),
-                            // 接觸陰影 - 球底部內側的窄暗帶
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  center: const Alignment(0, 0.7),
-                                  radius: 0.6,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.25),
-                                  ],
-                                  stops: const [0.7, 1.0],
-                                ),
-                              ),
-                            ),
-                            // 內陰影疊加層
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  center: const Alignment(-0.3, -0.3),
-                                  radius: 0.8,
-                                  colors: [
-                                    Colors.black.withOpacity(0.15),
-                                    Colors.black.withOpacity(0.05),
-                                    Colors.transparent,
-                                  ],
-                                  stops: const [0.0, 0.4, 0.8],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     const SizedBox(height: 8),
                   ],
                 ),
@@ -210,4 +206,4 @@ class HomeArsenalCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

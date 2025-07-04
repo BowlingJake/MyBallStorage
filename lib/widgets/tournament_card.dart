@@ -8,11 +8,7 @@ import 'package:intl/intl.dart'; // 用於日期格式化
 /// 用於在主頁顯示單個錦標賽資訊的卡片
 /// 使用 StandardAppCard 作為基礎，以保持風格統一
 class TournamentCard extends StatelessWidget {
-
-  const TournamentCard({
-    required this.tournament, super.key,
-    this.onTap,
-  });
+  const TournamentCard({required this.tournament, super.key, this.onTap});
   final Tournament tournament;
   final VoidCallback? onTap;
 
@@ -34,7 +30,9 @@ class TournamentCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              tournament.type == TournamentType.championship ? Iconsax.cup : Iconsax.medal_star,
+              tournament.type == TournamentType.championship
+                  ? Iconsax.cup
+                  : Iconsax.medal_star,
               color: theme.colorScheme.primary,
               size: 32,
             ),
@@ -98,4 +96,4 @@ class TournamentCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

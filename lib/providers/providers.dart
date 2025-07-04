@@ -22,7 +22,7 @@ final ballListProvider = FutureProvider<List<BowlingBall>>((ref) {
 // 計算型 Provider - 檢查是否需要顯示 Onboarding
 final shouldShowOnboardingProvider = Provider<bool>((ref) {
   final authState = ref.watch(authProvider);
-  
+
   if (authState.status != AuthStatus.authenticated) {
     return false;
   }
@@ -30,7 +30,7 @@ final shouldShowOnboardingProvider = Provider<bool>((ref) {
   // 當 auth 狀態確定後，監聽其他 providers
   final onboardingCompleted = ref.watch(onboardingProvider);
   final userProfile = ref.watch(userProfileProvider);
-  
+
   // 如果 onboarding 未完成，總是要顯示
   if (!onboardingCompleted) {
     return true;
@@ -38,11 +38,12 @@ final shouldShowOnboardingProvider = Provider<bool>((ref) {
 
   // 如果 onboarding 已完成，但 profile 不完整，也要顯示
   // (userProfile 為 null 也算不完整)
-  final isProfileComplete = ref.read(userProfileProvider.notifier).isProfileComplete;
+  final isProfileComplete =
+      ref.read(userProfileProvider.notifier).isProfileComplete;
   if (!isProfileComplete) {
     return true;
   }
-  
+
   // 所有條件都滿足，不顯示 onboarding
   return false;
-}); 
+});

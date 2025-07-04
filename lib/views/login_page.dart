@@ -27,7 +27,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _signInWithApple() async {
     print('Attempting Apple Sign-In...');
   }
-  
+
   // Placeholder for Phone Sign-In logic
   Future<void> _signInWithPhone() async {
     print('Attempting Phone Sign-In...');
@@ -41,13 +41,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       // 以訪客身份登入
       await ref.read(authProvider.notifier).loginAsGuest();
-      
+
       // 登入成功後，AppRouter 會自動導航到主頁（跳過 Onboarding）
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('訪客登入失敗：$e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('訪客登入失敗：$e')));
       }
     } finally {
       if (mounted) {
@@ -61,7 +61,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       body: Stack(
         children: [
@@ -79,11 +79,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           if (_isLoading)
             ColoredBox(
               color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             ),
-          
+
           // Login UI
           SafeArea(
             child: Column(
@@ -119,7 +117,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: Colors.white.withOpacity(0.85),
                           letterSpacing: 1.2,
-                           shadows: [
+                          shadows: [
                             const Shadow(
                               color: Colors.black38,
                               blurRadius: 10,
@@ -172,7 +170,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Custom Apple Sign-in Button
                           SignInButtonBuilder(
                             text: '使用 Apple 帳戶登入',
@@ -193,7 +191,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             text: '使用手機號碼登入',
                             icon: Icons.phone_iphone,
                             onPressed: _isLoading ? () {} : _signInWithPhone,
-                            backgroundColor: theme.colorScheme.primary.withOpacity(0.9),
+                            backgroundColor: theme.colorScheme.primary
+                                .withOpacity(0.9),
                             fontSize: 16,
                             height: 50,
                             width: double.infinity,

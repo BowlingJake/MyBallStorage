@@ -1,12 +1,14 @@
 import 'dart:convert';
 
-class PracticeRecord { // 每局分數資料
+class PracticeRecord {
+  // 每局分數資料
 
   PracticeRecord({
     required this.id,
     required this.date,
     required this.location,
-    required this.games, this.oilPattern,
+    required this.games,
+    this.oilPattern,
   });
 
   factory PracticeRecord.fromJson(Map<String, dynamic> json) => PracticeRecord(
@@ -38,4 +40,4 @@ class PracticeRecord { // 每局分數資料
   static String listToJson(List<PracticeRecord> records) {
     return json.encode(records.map((e) => e.toJson()).toList());
   }
-} 
+}

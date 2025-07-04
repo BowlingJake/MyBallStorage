@@ -33,10 +33,7 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
             filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               width: size.width * 0.85,
-              constraints: const BoxConstraints(
-                maxWidth: 400,
-                minWidth: 280,
-              ),
+              constraints: const BoxConstraints(maxWidth: 400, minWidth: 280),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: theme.colorScheme.surface.withOpacity(0.2).withAlpha(40),
@@ -47,7 +44,10 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                 boxShadow: AppGlows.medium,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -71,12 +71,16 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                           ),
                         ),
                         GestureDetector(
-                          onTapDown: (_) => setState(() => _isCloseButtonPressed = true),
+                          onTapDown:
+                              (_) =>
+                                  setState(() => _isCloseButtonPressed = true),
                           onTapUp: (_) {
                             setState(() => _isCloseButtonPressed = false);
                             Navigator.of(context).pop();
                           },
-                          onTapCancel: () => setState(() => _isCloseButtonPressed = false),
+                          onTapCancel:
+                              () =>
+                                  setState(() => _isCloseButtonPressed = false),
                           child: AnimatedScale(
                             scale: closeButtonScale,
                             duration: const Duration(milliseconds: 150),
@@ -97,7 +101,7 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     Row(
                       children: [
                         Expanded(
@@ -111,7 +115,8 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
                                 context: context,
                                 barrierDismissible: false,
                                 barrierColor: Colors.black.withOpacity(0.7),
-                                builder: (context) => const CreateBallBagDialog(),
+                                builder:
+                                    (context) => const CreateBallBagDialog(),
                               );
                             },
                           ),
@@ -148,7 +153,6 @@ class _BallBagOptionsDialogState extends State<BallBagOptionsDialog> {
 }
 
 class _ModernOptionButton extends StatefulWidget {
-
   const _ModernOptionButton({
     required this.title,
     required this.subtitle,
@@ -191,8 +195,16 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
             borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               colors: [
-                Color.lerp(const Color(0xFF003B5C), Colors.white, brightnessFactor)!,
-                Color.lerp(const Color(0xFF001824), Colors.white, brightnessFactor)!,
+                Color.lerp(
+                  const Color(0xFF003B5C),
+                  Colors.white,
+                  brightnessFactor,
+                )!,
+                Color.lerp(
+                  const Color(0xFF001824),
+                  Colors.white,
+                  brightnessFactor,
+                )!,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -201,16 +213,22 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
             ),
             // Pressed 狀態下的 Inner Shadow
-            boxShadow: _isPressed ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 2,
-                spreadRadius: -1,
-              ),
-            ] : null,
+            boxShadow:
+                _isPressed
+                    ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 2,
+                        spreadRadius: -1,
+                      ),
+                    ]
+                    : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // 增加 Padding
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ), // 增加 Padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -224,14 +242,16 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
                     height: 1.1,
                     shadows: [
                       Shadow(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withOpacity(0.5),
                         blurRadius: 4,
                       ),
                     ],
                   ),
                   textAlign: TextAlign.center,
                 ),
-                 Text(
+                Text(
                   widget.subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: const Color(0xFFE6F3FF).withOpacity(0.7),
@@ -247,4 +267,4 @@ class _ModernOptionButtonState extends State<_ModernOptionButton> {
       ),
     );
   }
-} 
+}

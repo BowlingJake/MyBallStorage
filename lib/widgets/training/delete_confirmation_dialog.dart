@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 
 // 刪除確認對話框
 class DeleteConfirmationDialog extends StatelessWidget {
-
   const DeleteConfirmationDialog({
-    required this.title, required this.message, required this.onConfirm, super.key,
+    required this.title,
+    required this.message,
+    required this.onConfirm,
+    super.key,
   });
   final String title;
   final String message;
@@ -25,10 +27,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
           children: [
             Container(
               width: size.width * 0.8,
-              constraints: const BoxConstraints(
-                maxWidth: 350,
-                minWidth: 280,
-              ),
+              constraints: const BoxConstraints(maxWidth: 350, minWidth: 280),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: Colors.transparent,
@@ -45,9 +44,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
                   Positioned.fill(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                      child: Container(
-                        color: Colors.white.withOpacity(0.10),
-                      ),
+                      child: Container(color: Colors.white.withOpacity(0.10)),
                     ),
                   ),
                   // 內容
@@ -70,14 +67,18 @@ class DeleteConfirmationDialog extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 28,
+                              ),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // 說明文字
                         Text(
                           message,
@@ -87,9 +88,9 @@ class DeleteConfirmationDialog extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        
+
                         const SizedBox(height: 32),
-                        
+
                         // 按鈕 - 使用 AppStandardButton
                         Row(
                           children: [
@@ -147,4 +148,4 @@ void showTrainingDeleteDialog(
       );
     },
   );
-} 
+}

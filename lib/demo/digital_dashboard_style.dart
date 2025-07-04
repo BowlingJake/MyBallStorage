@@ -11,7 +11,8 @@ class DigitalDashboardStyle extends StatefulWidget {
   State<DigitalDashboardStyle> createState() => _DigitalDashboardStyleState();
 }
 
-class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with TickerProviderStateMixin {
+class _DigitalDashboardStyleState extends State<DigitalDashboardStyle>
+    with TickerProviderStateMixin {
   late AnimationController _counterController;
   late AnimationController _progressController;
 
@@ -22,7 +23,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       duration: const Duration(seconds: 2),
       vsync: this,
     )..forward();
-    
+
     _progressController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -45,11 +46,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1E293B),
-              Color(0xFF0F172A),
-              Color(0xFF020617),
-            ],
+            colors: [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF020617)],
             stops: [0.0, 0.6, 1.0],
           ),
         ),
@@ -89,9 +86,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: borderColor ?? const Color(0xFF334155),
-        ),
+        border: Border.all(color: borderColor ?? const Color(0xFF334155)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.3),
@@ -105,10 +100,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
           ),
         ],
       ),
-      child: Padding(
-        padding: padding,
-        child: child,
-      ),
+      child: Padding(padding: padding, child: child),
     );
   }
 
@@ -232,19 +224,24 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: (kpi['positive']! as bool)
-                          ? const Color(0xFF10B981).withOpacity(0.2)
-                          : const Color(0xFFEF4444).withOpacity(0.2),
+                      color:
+                          (kpi['positive']! as bool)
+                              ? const Color(0xFF10B981).withOpacity(0.2)
+                              : const Color(0xFFEF4444).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       kpi['change']! as String,
                       style: TextStyle(
-                        color: (kpi['positive']! as bool)
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFFEF4444),
+                        color:
+                            (kpi['positive']! as bool)
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFEF4444),
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -269,7 +266,9 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                   AnimatedBuilder(
                     animation: _counterController,
                     builder: (context, child) {
-                      final animatedValue = ((kpi['value']! as int) * _counterController.value).round();
+                      final animatedValue =
+                          ((kpi['value']! as int) * _counterController.value)
+                              .round();
                       return Text(
                         animatedValue.toString(),
                         style: TextStyle(
@@ -307,11 +306,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
         children: [
           Row(
             children: [
-              const Icon(
-                Iconsax.chart_1,
-                color: Color(0xFF06B6D4),
-                size: 20,
-              ),
+              const Icon(Iconsax.chart_1, color: Color(0xFF06B6D4), size: 20),
               const SizedBox(width: 10),
               const Text(
                 '性能趨勢分析',
@@ -478,11 +473,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       children: [
         const Row(
           children: [
-            Icon(
-              Iconsax.percentage_circle,
-              color: Color(0xFF64748B),
-              size: 20,
-            ),
+            Icon(Iconsax.percentage_circle, color: Color(0xFF64748B), size: 20),
             SizedBox(width: 10),
             Text(
               '進度指標',
@@ -494,14 +485,15 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
             ),
           ],
         ).animate(delay: 800.ms).fadeIn().slideX(begin: -0.3),
-        
+
         const SizedBox(height: 15),
-        
+
         ...metrics.asMap().entries.map((entry) {
           final index = entry.key;
           final metric = entry.value;
-          final progress = (metric['current']! as int) / (metric['target']! as int);
-          
+          final progress =
+              (metric['current']! as int) / (metric['target']! as int);
+
           return Container(
             margin: const EdgeInsets.only(bottom: 15),
             child: _buildDashboardCard(
@@ -529,7 +521,9 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
                                 color: metric['color']! as Color,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                fontFeatures: const [FontFeature.tabularFigures()],
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
                               ),
                             ),
                             Text(
@@ -597,11 +591,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
         children: [
           const Row(
             children: [
-              Icon(
-                Iconsax.data_2,
-                color: Color(0xFF64748B),
-                size: 20,
-              ),
+              Icon(Iconsax.data_2, color: Color(0xFF64748B), size: 20),
               SizedBox(width: 10),
               Text(
                 '最近比賽記錄',
@@ -614,7 +604,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // 表格標題
           Container(
             padding: const EdgeInsets.all(12),
@@ -671,78 +661,97 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
               ],
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // 表格數據
           ...tableData.asMap().entries.map((entry) {
             final index = entry.key;
             final row = entry.value;
-            
+
             return Container(
-              margin: const EdgeInsets.only(bottom: 4),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: index == 0 
-                  ? const Color(0xFF3B82F6).withOpacity(0.1)
-                  : Colors.transparent,
-                borderRadius: BorderRadius.circular(6),
-                border: index == 0 
-                  ? Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3))
-                  : null,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      row['date']! as String,
-                      style: TextStyle(
-                        color: index == 0 ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        index == 0
+                            ? const Color(0xFF3B82F6).withOpacity(0.1)
+                            : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border:
+                        index == 0
+                            ? Border.all(
+                              color: const Color(0xFF3B82F6).withOpacity(0.3),
+                            )
+                            : null,
                   ),
-                  Expanded(
-                    child: Text(
-                      '${row['score']}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: index == 0 ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          row['date']! as String,
+                          style: TextStyle(
+                            color:
+                                index == 0
+                                    ? const Color(0xFF3B82F6)
+                                    : const Color(0xFF94A3B8),
+                            fontSize: 12,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '${row['strikes']}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: index == 0 ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                      Expanded(
+                        child: Text(
+                          '${row['score']}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                index == 0
+                                    ? const Color(0xFF3B82F6)
+                                    : const Color(0xFF94A3B8),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '${row['spares']}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: index == 0 ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                      Expanded(
+                        child: Text(
+                          '${row['strikes']}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                index == 0
+                                    ? const Color(0xFF3B82F6)
+                                    : const Color(0xFF94A3B8),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        child: Text(
+                          '${row['spares']}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                index == 0
+                                    ? const Color(0xFF3B82F6)
+                                    : const Color(0xFF94A3B8),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ).animate(delay: (1100 + index * 100).ms).fadeIn().slideX(begin: 0.2);
+                )
+                .animate(delay: (1100 + index * 100).ms)
+                .fadeIn()
+                .slideX(begin: 0.2);
           }),
         ],
       ),
@@ -861,11 +870,7 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
         children: [
           Row(
             children: [
-              Icon(
-                Iconsax.chart,
-                color: Color(0xFF3B82F6),
-                size: 20,
-              ),
+              Icon(Iconsax.chart, color: Color(0xFF3B82F6), size: 20),
               SizedBox(width: 10),
               Text(
                 'Digital Dashboard 風格特色',
@@ -890,4 +895,4 @@ class _DigitalDashboardStyleState extends State<DigitalDashboardStyle> with Tick
       ),
     ).animate(delay: 1600.ms).fadeIn().slideY(begin: 0.3);
   }
-} 
+}

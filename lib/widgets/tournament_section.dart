@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 class TournamentSection extends StatelessWidget {
-
   const TournamentSection({
     super.key,
     this.tournamentItems,
@@ -23,13 +22,18 @@ class TournamentSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('My Tournament', style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ) ?? TextStyle(
-              fontSize: 20, 
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),),
+            Text(
+              'My Tournament',
+              style:
+                  Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ) ??
+                  TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
             TextButton(
               onPressed: onSeeAllPressed ?? () => print('See All Tournaments'),
               style: TextButton.styleFrom(
@@ -67,8 +71,10 @@ class TournamentSection extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
-                            Icons.event, 
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), 
+                            Icons.event,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
                             size: 40,
                           ),
                         );
@@ -80,22 +86,37 @@ class TournamentSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(item['name']!, style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ) ?? TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),),
+                        Text(
+                          item['name']!,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ) ??
+                              TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                         const SizedBox(height: 4),
-                        Text('Location: ${item['location']}', style: Theme.of(context).textTheme.bodyMedium ?? TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),),
-                        Text('AVG: ${item['avg']}', style: Theme.of(context).textTheme.bodyMedium ?? TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),),
+                        Text(
+                          'Location: ${item['location']}',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium ??
+                              TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        Text(
+                          'AVG: ${item['avg']}',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium ??
+                              TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                       ],
                     ),
                   ),
@@ -127,11 +148,12 @@ class TournamentSection extends StatelessWidget {
     return List.generate(
       3,
       (index) => {
-        'photoUrl': 'https://via.placeholder.com/80x80/f66b97/FFFFFF?Text=Event${index+1}',
+        'photoUrl':
+            'https://via.placeholder.com/80x80/f66b97/FFFFFF?Text=Event${index + 1}',
         'name': 'Tournament Name ${index + 1}',
         'location': 'Location ${index + 1}',
         'avg': (200 + index * 5.5).toStringAsFixed(2),
       },
     );
   }
-} 
+}

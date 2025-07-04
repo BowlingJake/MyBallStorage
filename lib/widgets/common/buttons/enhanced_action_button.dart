@@ -5,9 +5,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 /// Enhanced Action Button with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強動作按鈕
 class EnhancedActionButton extends StatefulWidget {
-
   const EnhancedActionButton({
-    required this.text, required this.icon, required this.color, required this.onPressed, super.key,
+    required this.text,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+    super.key,
     this.isPrimary = false,
     this.enabled = true,
     this.width,
@@ -40,14 +43,16 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(begin: 1, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-    
-    _glowAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 1,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _glowAnimation = Tween<double>(
+      begin: 0.3,
+      end: 0.6,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -79,7 +84,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final buttonColor = widget.enabled ? widget.color : Colors.grey;
-    
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -93,9 +98,10 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
               width: widget.width,
               height: widget.height,
               decoration: BoxDecoration(
-                color: widget.isPrimary && widget.enabled
-                    ? buttonColor.withOpacity(0.15)
-                    : Colors.transparent,
+                color:
+                    widget.isPrimary && widget.enabled
+                        ? buttonColor.withOpacity(0.15)
+                        : Colors.transparent,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: buttonColor.withOpacity(0.5),
@@ -119,16 +125,17 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  gradient: _isPressed 
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          buttonColor.withOpacity(0.1),
-                          buttonColor.withOpacity(0.05),
-                        ],
-                      )
-                    : null,
+                  gradient:
+                      _isPressed
+                          ? LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              buttonColor.withOpacity(0.1),
+                              buttonColor.withOpacity(0.05),
+                            ],
+                          )
+                          : null,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -140,14 +147,10 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                         color: buttonColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(
-                        widget.icon,
-                        size: 18,
-                        color: buttonColor,
-                      ),
+                      child: Icon(widget.icon, size: 18, color: buttonColor),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Text with enhanced styling
                     Flexible(
                       child: Text(
@@ -161,7 +164,7 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    
+
                     // Scanning effect when pressed
                     if (_isPressed) ...[
                       const SizedBox(width: 8),
@@ -170,7 +173,9 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
                         height: 12,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(buttonColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            buttonColor,
+                          ),
                         ),
                       ),
                     ],
@@ -188,9 +193,12 @@ class _EnhancedActionButtonState extends State<EnhancedActionButton>
 /// Professional Data Button for specific use cases
 /// 專業數據按鈕，用於特定用途
 class ProfessionalDataButton extends StatelessWidget {
-
   const ProfessionalDataButton({
-    required this.label, required this.value, required this.icon, required this.color, super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    super.key,
     this.onTap,
   });
   final String label;
@@ -202,7 +210,7 @@ class ProfessionalDataButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
       onTap: () {
         if (onTap != null) {
@@ -215,9 +223,7 @@ class ProfessionalDataButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
+          border: Border.all(color: color.withOpacity(0.3)),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.1),
@@ -229,11 +235,7 @@ class ProfessionalDataButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 24,
-            ),
+            Icon(icon, color: color, size: 24),
             const SizedBox(height: 8),
             Text(
               value,
@@ -256,4 +258,4 @@ class ProfessionalDataButton extends StatelessWidget {
       ),
     ).animate().fadeIn().scale();
   }
-} 
+}

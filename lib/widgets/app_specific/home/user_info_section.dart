@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 
 class UserInfoSection extends ConsumerWidget {
-
   const UserInfoSection({
     super.key,
     this.userName = 'Jake Cheng',
@@ -27,9 +26,9 @@ class UserInfoSection extends ConsumerWidget {
       constraints: constraints,
       enableGlow: false, // 關閉光暈效果，讓卡片完全透明
       // 移除卡片預設的垂直邊距，因為外部容器會處理
-      margin: EdgeInsets.zero, 
+      margin: EdgeInsets.zero,
       // 增加內部 padding 以提供足夠的呼吸空間
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18), 
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -50,7 +49,11 @@ class UserInfoSection extends ConsumerWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
+                  Icon(
+                    Iconsax.location,
+                    size: 16,
+                    color: Colors.white.withOpacity(0.7),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     location,
@@ -78,10 +81,7 @@ class UserInfoSection extends ConsumerWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [
-            accentColor.withOpacity(0.6),
-            Colors.white.withOpacity(0.1),
-          ],
+          colors: [accentColor.withOpacity(0.6), Colors.white.withOpacity(0.1)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -98,22 +98,23 @@ class UserInfoSection extends ConsumerWidget {
           ),
         ],
       ),
-      child: userPhotoUrl != null
-          ? ClipOval(
-              child: Image.network(
-                userPhotoUrl!,
-                fit: BoxFit.cover,
-                width: 52,
-                height: 52,
+      child:
+          userPhotoUrl != null
+              ? ClipOval(
+                child: Image.network(
+                  userPhotoUrl!,
+                  fit: BoxFit.cover,
+                  width: 52,
+                  height: 52,
+                ),
+              )
+              : Center(
+                child: Icon(
+                  Iconsax.user,
+                  color: Colors.white.withOpacity(0.9),
+                  size: 28,
+                ),
               ),
-            )
-          : Center(
-              child: Icon(
-                Iconsax.user,
-                color: Colors.white.withOpacity(0.9),
-                size: 28,
-              ),
-            ),
     );
   }
-} 
+}

@@ -11,10 +11,12 @@ class CreateBallBagDialog extends ConsumerStatefulWidget {
   const CreateBallBagDialog({super.key});
 
   @override
-  ConsumerState<CreateBallBagDialog> createState() => _CreateBallBagDialogState();
+  ConsumerState<CreateBallBagDialog> createState() =>
+      _CreateBallBagDialogState();
 }
 
-class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with SingleTickerProviderStateMixin {
+class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog>
+    with SingleTickerProviderStateMixin {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final selectedBalls = <ArsenalBall>{};
@@ -80,7 +82,9 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                     ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(28),
-                      color: theme.colorScheme.surface.withOpacity(0.2).withAlpha(40),
+                      color: theme.colorScheme.surface
+                          .withOpacity(0.2)
+                          .withAlpha(40),
                       border: Border.all(
                         color: theme.colorScheme.primary.withOpacity(0.4),
                         width: 1.5,
@@ -103,11 +107,12 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                               Expanded(
                                 child: Text(
                                   'Create New Ball Bag',
-                                  style: theme.textTheme.headlineMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.2,
-                                  ),
+                                  style: theme.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                      ),
                                 ),
                               ),
                               GestureDetector(
@@ -117,15 +122,21 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                   decoration: BoxDecoration(
                                     color: Colors.black.withOpacity(0.58),
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white.withOpacity(0.8)),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
                                   ),
-                                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+                                  child: const Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // Scrollable Content
                           Expanded(
                             child: SingleChildScrollView(
@@ -140,7 +151,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                     onChanged: (value) => setState(() {}),
                                   ),
                                   const SizedBox(height: 16),
-                                  
+
                                   // Description Input
                                   _buildTextField(
                                     controller: descriptionController,
@@ -149,82 +160,98 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
                                     maxLines: 2,
                                   ),
                                   const SizedBox(height: 20),
-                                  
+
                                   // Ball Selection Header
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
                                         'Select Balls',
-                                        style: theme.textTheme.titleLarge?.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: theme.textTheme.titleLarge
+                                            ?.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
                                         '(${selectedBalls.length}/$bagCapacity)',
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: selectedBalls.length >= bagCapacity 
-                                              ? Colors.redAccent 
-                                              : Colors.white.withOpacity(0.7),
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color:
+                                                  selectedBalls.length >=
+                                                          bagCapacity
+                                                      ? Colors.redAccent
+                                                      : Colors.white
+                                                          .withOpacity(0.7),
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  
+
                                   // Ball Selection List
                                   Container(
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    child: allBalls.isEmpty
-                                        ? const Center(
-                                            child: Padding(
-                                              padding: EdgeInsets.all(32),
-                                              child: Text(
-                                                'No balls available in your arsenal.',
-                                                style: TextStyle(color: Colors.white70),
-                                                textAlign: TextAlign.center,
+                                    child:
+                                        allBalls.isEmpty
+                                            ? const Center(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(32),
+                                                child: Text(
+                                                  'No balls available in your arsenal.',
+                                                  style: TextStyle(
+                                                    color: Colors.white70,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ),
+                                            )
+                                            : ListView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              padding: const EdgeInsets.all(8),
+                                              itemCount: allBalls.length,
+                                              itemBuilder: (context, index) {
+                                                final ball = allBalls[index];
+                                                final isSelected = selectedBalls
+                                                    .contains(ball);
+                                                final isCapacityReached =
+                                                    selectedBalls.length >=
+                                                    bagCapacity;
+
+                                                return _SelectableBallCard(
+                                                  ball: ball,
+                                                  isSelected: isSelected,
+                                                  isEnabled:
+                                                      !isCapacityReached ||
+                                                      isSelected,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (isSelected) {
+                                                        selectedBalls.remove(
+                                                          ball,
+                                                        );
+                                                      } else if (!isCapacityReached) {
+                                                        selectedBalls.add(ball);
+                                                      }
+                                                    });
+                                                  },
+                                                );
+                                              },
                                             ),
-                                          )
-                                        : ListView.builder(
-                                            shrinkWrap: true,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            padding: const EdgeInsets.all(8),
-                                            itemCount: allBalls.length,
-                                            itemBuilder: (context, index) {
-                                              final ball = allBalls[index];
-                                              final isSelected = selectedBalls.contains(ball);
-                                              final isCapacityReached = selectedBalls.length >= bagCapacity;
-                                              
-                                              return _SelectableBallCard(
-                                                ball: ball,
-                                                isSelected: isSelected,
-                                                isEnabled: !isCapacityReached || isSelected,
-                                                onTap: () {
-                                                  setState(() {
-                                                    if (isSelected) {
-                                                      selectedBalls.remove(ball);
-                                                    } else if (!isCapacityReached) {
-                                                      selectedBalls.add(ball);
-                                                    }
-                                                  });
-                                                },
-                                              );
-                                            },
-                                          ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
                           const SizedBox(height: 20),
-                          
+
                           // Action Buttons
                           Row(
                             children: [
@@ -274,7 +301,10 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
       onChanged: onChanged,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 16,
+        ),
         prefixIcon: Icon(icon, color: Colors.white, size: 22),
         labelText: label,
         labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
@@ -288,10 +318,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
       ),
     );
@@ -299,7 +326,6 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog> with 
 }
 
 class _DialogActionButton extends StatelessWidget {
-
   const _DialogActionButton({
     required this.text,
     required this.onPressed,
@@ -317,9 +343,10 @@ class _DialogActionButton extends StatelessWidget {
     final buttonStyle = OutlinedButton.styleFrom(
       padding: const EdgeInsets.symmetric(vertical: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      side: isPrimary
-          ? BorderSide(color: theme.colorScheme.primary.withOpacity(0.3))
-          : BorderSide(color: Colors.white.withOpacity(0.5)),
+      side:
+          isPrimary
+              ? BorderSide(color: theme.colorScheme.primary.withOpacity(0.3))
+              : BorderSide(color: Colors.white.withOpacity(0.5)),
     );
     final textStyle = TextStyle(
       fontSize: 16,
@@ -332,13 +359,14 @@ class _DialogActionButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: isPrimary && isEnabled
-              ? const LinearGradient(
-                  colors: [Color(0xFF003B5C), Color(0xFF052C43)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          gradient:
+              isPrimary && isEnabled
+                  ? const LinearGradient(
+                    colors: [Color(0xFF003B5C), Color(0xFF052C43)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
           boxShadow: isPrimary && isEnabled ? AppGlows.small : null,
         ),
         child: OutlinedButton(
@@ -352,7 +380,6 @@ class _DialogActionButton extends StatelessWidget {
 }
 
 class _SelectableBallCard extends StatefulWidget {
-
   const _SelectableBallCard({
     required this.ball,
     required this.isSelected,
@@ -386,17 +413,21 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
           transform: Matrix4.translationValues(0, -elevation / 2, 0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            gradient: widget.isSelected
-                ? const LinearGradient(
-                    colors: [Color(0xFF003B5C), Color(0xFF052C43)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
+            gradient:
+                widget.isSelected
+                    ? const LinearGradient(
+                      colors: [Color(0xFF003B5C), Color(0xFF052C43)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                    : null,
             color: widget.isSelected ? null : Colors.black.withOpacity(0.2),
-            border: widget.isSelected
-                ? Border.all(color: theme.colorScheme.primary.withOpacity(0.5))
-                : null,
+            border:
+                widget.isSelected
+                    ? Border.all(
+                      color: theme.colorScheme.primary.withOpacity(0.5),
+                    )
+                    : null,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
@@ -424,17 +455,23 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: widget.isSelected
-                          ? theme.colorScheme.primary
-                          : Colors.black.withOpacity(0.3),
+                      color:
+                          widget.isSelected
+                              ? theme.colorScheme.primary
+                              : Colors.black.withOpacity(0.3),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3),
                         width: 1.5,
                       ),
                     ),
-                    child: widget.isSelected
-                        ? const Icon(Icons.check, color: Colors.white, size: 24)
-                        : null,
+                    child:
+                        widget.isSelected
+                            ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 24,
+                            )
+                            : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -466,7 +503,10 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.sports_baseball, color: Colors.white70),
+                    child: const Icon(
+                      Icons.sports_baseball,
+                      color: Colors.white70,
+                    ),
                   ),
                 ],
               ),
@@ -476,4 +516,4 @@ class _SelectableBallCardState extends State<_SelectableBallCard> {
       ),
     );
   }
-} 
+}

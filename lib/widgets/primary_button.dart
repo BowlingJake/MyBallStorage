@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MyCustomButton extends StatelessWidget { // 新增一個參數來控制是否有文字描邊
+class MyCustomButton extends StatelessWidget {
+  // 新增一個參數來控制是否有文字描邊
 
   const MyCustomButton({
-    required this.text, super.key,
+    required this.text,
+    super.key,
     this.onPressed,
     this.hasTextStroke = false, // 預設沒有文字描邊
   });
@@ -25,10 +27,12 @@ class MyCustomButton extends StatelessWidget { // 新增一個參數來控制是
     // 如果需要文字描邊 (這是一個簡化的實現，可能需要更複雜的方案以達到完美效果)
     if (hasTextStroke) {
       textStyle = textStyle.copyWith(
-        foreground: Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1 // 你可以根據 Figma 調整描邊寬度，這裡假設為1
-          ..color = const Color(0xFF000000), // 描邊顏色 000000
+        foreground:
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth =
+                  1 // 你可以根據 Figma 調整描邊寬度，這裡假設為1
+              ..color = const Color(0xFF000000), // 描邊顏色 000000
       );
     }
 
@@ -42,9 +46,9 @@ class MyCustomButton extends StatelessWidget { // 新增一個參數來控制是
           vertical: 12, // 稍微增加垂直padding以改善外觀
         ),
         minimumSize: const Size(0, 44), // 增加最小高度以改善觸摸體驗
-                                  // Figma 上的 W:115 Hug 可能是特定文字下的寬度
-                                  // 如果需要固定寬度，可以設為 Size(115, 44)
-                                  // 但通常按鈕寬度 'Hug' 內容會更好
+        // Figma 上的 W:115 Hug 可能是特定文字下的寬度
+        // 如果需要固定寬度，可以設為 Size(115, 44)
+        // 但通常按鈕寬度 'Hug' 內容會更好
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20), // 圓角 20
         ),

@@ -48,24 +48,25 @@ class TrainingPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: records.isEmpty
-                ? Center(
-                    child: Text(
-                      '尚未新增練習紀錄\n請點右上角「新增」',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body.copyWith(color: Colors.grey),
+            child:
+                records.isEmpty
+                    ? Center(
+                      child: Text(
+                        '尚未新增練習紀錄\n請點右上角「新增」',
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.body.copyWith(color: Colors.grey),
+                      ),
+                    )
+                    : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: records.length,
+                      itemBuilder: (context, index) {
+                        return PracticeRecordCard(
+                          record: records[index],
+                          index: index,
+                        );
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: records.length,
-                    itemBuilder: (context, index) {
-                      return PracticeRecordCard(
-                        record: records[index],
-                        index: index,
-                      );
-                    },
-                  ),
           ),
         ],
       ),

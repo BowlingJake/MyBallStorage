@@ -34,7 +34,10 @@ class WeaponLibraryHomePage extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 16,
+                            ),
                             backgroundColor: Colors.blue,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -44,12 +47,18 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const BallLibraryPage()),
+                              MaterialPageRoute(
+                                builder: (context) => const BallLibraryPage(),
+                              ),
                             );
                           },
                           child: Row(
                             children: [
-                              const Icon(Icons.inventory_2_outlined, color: Colors.white, size: 28),
+                              const Icon(
+                                Icons.inventory_2_outlined,
+                                color: Colors.white,
+                                size: 28,
+                              ),
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Column(
@@ -65,7 +74,9 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      viewModel.myArsenal.isEmpty ? '還沒有球，點此查看與添加' : '查看已添加的 ${viewModel.myArsenal.length} 個球具',
+                                      viewModel.myArsenal.isEmpty
+                                          ? '還沒有球，點此查看與添加'
+                                          : '查看已添加的 ${viewModel.myArsenal.length} 個球具',
                                       style: const TextStyle(
                                         color: Colors.white70,
                                         fontSize: 14,
@@ -74,7 +85,11 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.white70,
+                                size: 16,
+                              ),
                             ],
                           ),
                         ),
@@ -86,10 +101,16 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           // 球類資料庫 Button (Half Width)
                           Expanded(
                             child: Container(
-                              margin: const EdgeInsets.only(right: 6, bottom: 12),
+                              margin: const EdgeInsets.only(
+                                right: 6,
+                                bottom: 12,
+                              ),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                    horizontal: 16,
+                                  ),
                                   backgroundColor: Colors.green,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -100,14 +121,23 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const WeaponLibraryPage(readOnly: true),
+                                      builder:
+                                          (context) => const WeaponLibraryPage(
+                                            readOnly: true,
+                                          ),
                                     ),
                                   );
                                 },
                                 child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .center, // Center content vertically
                                   children: [
-                                    Icon(Icons.list_alt_outlined, color: Colors.white, size: 28),
+                                    Icon(
+                                      Icons.list_alt_outlined,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
                                     SizedBox(height: 8),
                                     Text(
                                       '球類資料庫',
@@ -127,10 +157,16 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           // 排行榜 Button (Half Width)
                           Expanded(
                             child: Container(
-                              margin: const EdgeInsets.only(left: 6, bottom: 12),
+                              margin: const EdgeInsets.only(
+                                left: 6,
+                                bottom: 12,
+                              ),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                    horizontal: 16,
+                                  ),
                                   backgroundColor: Colors.orange,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -139,13 +175,24 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('排行榜功能即將推出！', style: AppTextStyles.subtitle)),
+                                    const SnackBar(
+                                      content: Text(
+                                        '排行榜功能即將推出！',
+                                        style: AppTextStyles.subtitle,
+                                      ),
+                                    ),
                                   );
                                 },
                                 child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .center, // Center content vertically
                                   children: [
-                                    Icon(Icons.leaderboard_outlined, color: Colors.white, size: 28),
+                                    Icon(
+                                      Icons.leaderboard_outlined,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
                                     SizedBox(height: 8),
                                     Text(
                                       '排行榜',
@@ -170,10 +217,16 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           // 待更新 Button (Half Width)
                           Expanded(
                             child: Container(
-                              margin: const EdgeInsets.only(right: 6, bottom: 12),
+                              margin: const EdgeInsets.only(
+                                right: 6,
+                                bottom: 12,
+                              ),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                    horizontal: 16,
+                                  ),
                                   backgroundColor: Colors.grey, // 使用灰色背景
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -182,13 +235,24 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
+                                    const SnackBar(
+                                      content: Text(
+                                        '此功能待更新！',
+                                        style: AppTextStyles.body,
+                                      ),
+                                    ),
                                   );
                                 },
                                 child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .center, // Center content vertically
                                   children: [
-                                    Icon(Icons.help_outline, color: Colors.white, size: 28), // 使用問號圖標
+                                    Icon(
+                                      Icons.help_outline,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ), // 使用問號圖標
                                     SizedBox(height: 8),
                                     Text(
                                       '待更新',
@@ -208,11 +272,18 @@ class WeaponLibraryHomePage extends StatelessWidget {
                           // 待更新 Button 2 (Half Width)
                           Expanded(
                             child: Container(
-                              margin: const EdgeInsets.only(left: 6, bottom: 12),
+                              margin: const EdgeInsets.only(
+                                left: 6,
+                                bottom: 12,
+                              ),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                                  backgroundColor: Colors.grey.shade600, // 使用深灰色背景
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                    horizontal: 16,
+                                  ),
+                                  backgroundColor:
+                                      Colors.grey.shade600, // 使用深灰色背景
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -220,13 +291,24 @@ class WeaponLibraryHomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('此功能待更新！', style: AppTextStyles.body)),
+                                    const SnackBar(
+                                      content: Text(
+                                        '此功能待更新！',
+                                        style: AppTextStyles.body,
+                                      ),
+                                    ),
                                   );
                                 },
                                 child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .center, // Center content vertically
                                   children: [
-                                    Icon(Icons.build_circle_outlined, color: Colors.white, size: 28), // 使用工具圖標
+                                    Icon(
+                                      Icons.build_circle_outlined,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ), // 使用工具圖標
                                     SizedBox(height: 8),
                                     Text(
                                       '球具分析',

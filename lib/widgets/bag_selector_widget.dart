@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 /// 球袋選擇器 Widget，參考 Ball Library filter 樣式
 class BagSelectorWidget extends StatelessWidget {
-
   const BagSelectorWidget({
-    required this.selectedBagType, required this.onChanged, super.key,
+    required this.selectedBagType,
+    required this.onChanged,
+    super.key,
   });
   final BallBagType selectedBagType;
   final ValueChanged<BallBagType?> onChanged;
@@ -14,7 +15,7 @@ class BagSelectorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -37,20 +38,24 @@ class BagSelectorWidget extends StatelessWidget {
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
                 ),
-                items: BallBagType.values.map((bagType) {
-                  return DropdownMenuItem<BallBagType>(
-                    value: bagType,
-                    child: Text(
-                      bagType.displayName,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  );
-                }).toList(),
+                items:
+                    BallBagType.values.map((bagType) {
+                      return DropdownMenuItem<BallBagType>(
+                        value: bagType,
+                        child: Text(
+                          bagType.displayName,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
                 onChanged: onChanged,
                 isExpanded: true,
                 buttonStyleData: ButtonStyleData(
                   height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -96,4 +101,4 @@ class BagSelectorWidget extends StatelessWidget {
       ),
     );
   }
-} 
+}

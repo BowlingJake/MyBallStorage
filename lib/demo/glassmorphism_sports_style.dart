@@ -34,29 +34,29 @@ class GlassmorphismSportsStyle extends StatelessWidget {
               children: [
                 // 標題區域
                 _buildHeaderSection(context),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // 用戶統計卡片
                 _buildUserStatsCard(context),
-                
+
                 const SizedBox(height: 25),
-                
+
                 // 球櫃展示
                 _buildArsenalShowcase(context),
-                
+
                 const SizedBox(height: 25),
-                
+
                 // 成就系統
                 _buildAchievementSystem(context),
-                
+
                 const SizedBox(height: 25),
-                
+
                 // 性能圖表
                 _buildPerformanceChart(context),
-                
+
                 const SizedBox(height: 30),
-                
+
                 // 風格說明
                 _buildStyleDescription(context),
               ],
@@ -90,9 +90,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: child,
         ),
@@ -173,9 +171,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                 color: Colors.white.withOpacity(0.9),
               ),
             ).animate().scale(delay: 300.ms, duration: 600.ms),
-            
+
             const SizedBox(width: 25),
-            
+
             // 用戶信息
             Expanded(
               child: Column(
@@ -197,9 +195,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                       ],
                     ),
                   ).animate(delay: 400.ms).fadeIn().slideX(begin: 0.3),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   Row(
                     children: [
                       Icon(
@@ -217,15 +215,18 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                       ),
                     ],
                   ).animate(delay: 500.ms).fadeIn().slideX(begin: 0.3),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // 閃光效果的等級標籤
                   Shimmer.fromColors(
                     baseColor: Colors.white.withOpacity(0.6),
                     highlightColor: Colors.white,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(15),
@@ -254,10 +255,18 @@ class GlassmorphismSportsStyle extends StatelessWidget {
 
   Widget _buildArsenalShowcase(BuildContext context) {
     final balls = [
-      {'name': 'Jackal EXJ', 'brand': 'Motiv', 'color': const Color(0xFFFF6B9D)},
+      {
+        'name': 'Jackal EXJ',
+        'brand': 'Motiv',
+        'color': const Color(0xFFFF6B9D),
+      },
       {'name': 'Phaze II', 'brand': 'Storm', 'color': const Color(0xFF4ECDC4)},
       {'name': 'IQ Tour', 'brand': 'Storm', 'color': const Color(0xFFFFE66D)},
-      {'name': 'Hustle Ink', 'brand': 'Roto Grip', 'color': const Color(0xFF8B5CF6)},
+      {
+        'name': 'Hustle Ink',
+        'brand': 'Roto Grip',
+        'color': const Color(0xFF8B5CF6),
+      },
     ];
 
     return Column(
@@ -265,11 +274,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(
-              Iconsax.box,
-              color: Colors.white,
-              size: 24,
-            ),
+            const Icon(Iconsax.box, color: Colors.white, size: 24),
             const SizedBox(width: 12),
             Text(
               '我的武器庫',
@@ -288,9 +293,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
             ),
           ],
         ).animate(delay: 300.ms).fadeIn().slideX(begin: -0.3),
-        
+
         const SizedBox(height: 20),
-        
+
         SizedBox(
           height: 140,
           child: ListView.builder(
@@ -300,7 +305,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
               final ball = balls[index];
               return Container(
                 width: 110,
-                margin: EdgeInsets.only(right: index < balls.length - 1 ? 15 : 0),
+                margin: EdgeInsets.only(
+                  right: index < balls.length - 1 ? 15 : 0,
+                ),
                 child: _buildGlassContainer(
                   height: 140,
                   width: 110,
@@ -322,16 +329,18 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: (ball['color']! as Color).withOpacity(0.4),
+                                color: (ball['color']! as Color).withOpacity(
+                                  0.4,
+                                ),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
                             ],
                           ),
                         ).animate(delay: (400 + index * 100).ms).scale(),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         Text(
                           ball['name']! as String,
                           style: const TextStyle(
@@ -343,9 +352,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ).animate(delay: (500 + index * 100).ms).fadeIn(),
-                        
+
                         const SizedBox(height: 4),
-                        
+
                         Text(
                           ball['brand']! as String,
                           style: TextStyle(
@@ -378,11 +387,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(
-              Iconsax.award,
-              color: Colors.white,
-              size: 24,
-            ),
+            const Icon(Iconsax.award, color: Colors.white, size: 24),
             const SizedBox(width: 12),
             Text(
               '成就系統',
@@ -401,13 +406,13 @@ class GlassmorphismSportsStyle extends StatelessWidget {
             ),
           ],
         ).animate(delay: 600.ms).fadeIn().slideX(begin: -0.3),
-        
+
         const SizedBox(height: 20),
-        
+
         ...achievements.asMap().entries.map((entry) {
           final index = entry.key;
           final achievement = entry.value;
-          
+
           return Container(
             margin: const EdgeInsets.only(bottom: 15),
             child: _buildGlassContainer(
@@ -442,9 +447,9 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         size: 20,
                       ),
                     ).animate(delay: (700 + index * 100).ms).scale(),
-                    
+
                     const SizedBox(width: 20),
-                    
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -470,7 +475,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     Text(
                       '${((achievement['progress']! as double) * 100).toInt()}%',
                       style: TextStyle(
@@ -501,11 +506,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(
-                  Iconsax.chart,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                Icon(Iconsax.chart, color: Colors.white, size: 20),
                 SizedBox(width: 10),
                 Text(
                   '分數趨勢',
@@ -587,11 +588,7 @@ class GlassmorphismSportsStyle extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(
-                  Iconsax.brush,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                Icon(Iconsax.brush, color: Colors.white, size: 24),
                 SizedBox(width: 12),
                 Text(
                   'Glassmorphism Sports 風格特色',
@@ -619,4 +616,4 @@ class GlassmorphismSportsStyle extends StatelessWidget {
       ),
     ).animate(delay: 1200.ms).fadeIn().slideY(begin: 0.3);
   }
-} 
+}

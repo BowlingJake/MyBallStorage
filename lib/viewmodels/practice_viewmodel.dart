@@ -8,7 +8,8 @@ class PracticeViewModel extends ChangeNotifier {
   static const String _storageKey = 'practice_records';
   final List<PracticeRecord> _records = [];
 
-  UnmodifiableListView<PracticeRecord> get records => UnmodifiableListView(_records);
+  UnmodifiableListView<PracticeRecord> get records =>
+      UnmodifiableListView(_records);
 
   Future<void> loadRecords() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,4 +46,4 @@ class PracticeViewModel extends ChangeNotifier {
     saveRecords();
     notifyListeners();
   }
-} 
+}

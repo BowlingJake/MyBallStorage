@@ -6,9 +6,10 @@ import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
 
 class AddGamesDialog extends StatefulWidget {
-
   const AddGamesDialog({
-    required this.trainingId, required this.scoringMethod, super.key,
+    required this.trainingId,
+    required this.scoringMethod,
+    super.key,
   });
   final String trainingId;
   final String scoringMethod;
@@ -51,7 +52,18 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
         return {};
       } else {
         // 第一球沒全倒，第二球顯示已倒的瓶子
-        return {1,2,3,4,5,6,7,8,9,10}.difference(frame.rolls[0].pinsStandingAfterThrow ?? {});
+        return {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(frame.rolls[0].pinsStandingAfterThrow ?? {});
       }
     }
     return {};
@@ -68,7 +80,8 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
       return pinsDown == 10 ? 'X' : pinsDown.toString();
     } else {
       // 第二球
-      if (frame.rolls[0].pinsDown < 10 && frame.rolls[0].pinsDown + pinsDown == 10) {
+      if (frame.rolls[0].pinsDown < 10 &&
+          frame.rolls[0].pinsDown + pinsDown == 10) {
         return '/';
       }
       return pinsDown.toString();
@@ -86,10 +99,7 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              '新增遊戲',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('新增遊戲', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
             Wrap(
               spacing: 4,
@@ -101,26 +111,50 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
                       if (currentFrameIndex == i) {
                         showDialog(
                           context: context,
-                          builder: (context) => PinSelectorPopupWidget(
-                            initialPinsDown: _getInitialPinsDown(frames[i]),
-                            pinStandingAssetPath: 'assets/images/pin_standing.svg',
-                            pinFallenAssetPath: 'assets/images/pin_fallen.svg',
-                          ),
+                          builder:
+                              (context) => PinSelectorPopupWidget(
+                                initialPinsDown: _getInitialPinsDown(frames[i]),
+                                pinStandingAssetPath:
+                                    'assets/images/pin_standing.svg',
+                                pinFallenAssetPath:
+                                    'assets/images/pin_fallen.svg',
+                              ),
                         ).then((pinsHit) {
                           if (pinsHit != null) {
                             setState(() {
                               final pinsDown = pinsHit.length;
                               final roll = Roll(
                                 pinsDown: pinsDown,
-                                pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
-                                displayScore: _getDisplayScore(frames[i], pinsDown),
-                                pinsStandingBeforeThrow: frames[i].rolls.isEmpty ? 
-                                  {1,2,3,4,5,6,7,8,9,10} : 
-                                  frames[i].rolls.last.pinsStandingAfterThrow ?? {},
+                                pinsStandingAfterThrow: {
+                                  1,
+                                  2,
+                                  3,
+                                  4,
+                                  5,
+                                  6,
+                                  7,
+                                  8,
+                                  9,
+                                  10,
+                                }.difference(pinsHit),
+                                displayScore: _getDisplayScore(
+                                  frames[i],
+                                  pinsDown,
+                                ),
+                                pinsStandingBeforeThrow:
+                                    frames[i].rolls.isEmpty
+                                        ? {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+                                        : frames[i]
+                                                .rolls
+                                                .last
+                                                .pinsStandingAfterThrow ??
+                                            {},
                               );
                               frames[i].rolls.add(roll);
-                              
-                              if (frames[i].rolls.length == 2 || (frames[i].rolls.length == 1 && pinsDown == 10)) {
+
+                              if (frames[i].rolls.length == 2 ||
+                                  (frames[i].rolls.length == 1 &&
+                                      pinsDown == 10)) {
                                 frames[i].isComplete = true;
                                 if (i < 9) {
                                   currentFrameIndex = i + 1;
@@ -136,8 +170,14 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
                       frameNumber: i + 1,
                       availableWidth: frameWidth,
                       isCurrentFrame: currentFrameIndex == i,
-                      ball1Score: frames[i].rolls.isNotEmpty ? frames[i].rolls[0].displayScore : null,
-                      ball2Score: frames[i].rolls.length > 1 ? frames[i].rolls[1].displayScore : null,
+                      ball1Score:
+                          frames[i].rolls.isNotEmpty
+                              ? frames[i].rolls[0].displayScore
+                              : null,
+                      ball2Score:
+                          frames[i].rolls.length > 1
+                              ? frames[i].rolls[1].displayScore
+                              : null,
                       frameTotalScore: frames[i].totalScore?.toString(),
                     ),
                   ),
@@ -171,4 +211,4 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
       ),
     );
   }
-} 
+}

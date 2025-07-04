@@ -2,16 +2,13 @@ import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 class TrainingEmptyState extends StatelessWidget {
-
-  const TrainingEmptyState({
-    required this.onAddRecord, super.key,
-  });
+  const TrainingEmptyState({required this.onAddRecord, super.key});
   final VoidCallback onAddRecord;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -32,9 +29,9 @@ class TrainingEmptyState extends StatelessWidget {
                 color: theme.colorScheme.primary,
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 標題
             Text(
               'Start Your Bowling Journey',
@@ -44,9 +41,9 @@ class TrainingEmptyState extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // 描述
             Text(
               'Record your training sessions\nTrack your progress',
@@ -56,9 +53,9 @@ class TrainingEmptyState extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // Add Record 按鈕 - 使用 AppStandardButton
             AppStandardButton(
               text: 'Add Training Record',
@@ -70,4 +67,4 @@ class TrainingEmptyState extends StatelessWidget {
       ),
     );
   }
-} 
+}

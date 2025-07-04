@@ -14,7 +14,8 @@ class CyberpunkTechStyle extends StatefulWidget {
   State<CyberpunkTechStyle> createState() => _CyberpunkTechStyleState();
 }
 
-class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProviderStateMixin {
+class _CyberpunkTechStyleState extends State<CyberpunkTechStyle>
+    with TickerProviderStateMixin {
   late AnimationController _scanController;
   late AnimationController _pulseController;
   late AnimationController _matrixController;
@@ -26,7 +27,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       duration: const Duration(seconds: 3),
       vsync: this,
     )..repeat();
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -54,7 +55,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         children: [
           // 背景矩陣雨效果
           _buildMatrixBackground(),
-          
+
           // 主要內容
           SafeArea(
             child: SingleChildScrollView(
@@ -64,34 +65,34 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                 children: [
                   // 標題區域
                   _buildHeaderSection(context),
-                  
+
                   const SizedBox(height: 30),
-                  
+
                   // 用戶資料顯示器
                   _buildUserTerminal(context),
-                  
+
                   const SizedBox(height: 25),
-                  
+
                   // 系統監控面板
                   _buildSystemMonitor(context),
-                  
+
                   const SizedBox(height: 25),
-                  
+
                   // 武器庫掃描器
                   _buildArsenalScanner(context),
-                  
+
                   const SizedBox(height: 25),
-                  
+
                   // 網路活動圖表
                   _buildNetworkActivity(context),
-                  
+
                   const SizedBox(height: 25),
-                  
+
                   // 威脅分析
                   _buildThreatAnalysis(context),
-                  
+
                   const SizedBox(height: 30),
-                  
+
                   // 風格說明
                   _buildStyleDescription(context),
                 ],
@@ -110,9 +111,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         return SizedBox(
           width: double.infinity,
           height: double.infinity,
-          child: CustomPaint(
-            painter: MatrixPainter(_matrixController.value),
-          ),
+          child: CustomPaint(painter: MatrixPainter(_matrixController.value)),
         );
       },
     );
@@ -131,9 +130,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: glowColor.withOpacity(0.6),
-        ),
+        border: Border.all(color: glowColor.withOpacity(0.6)),
         boxShadow: [
           BoxShadow(
             color: glowColor.withOpacity(0.3),
@@ -163,10 +160,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             padding: padding,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  glowColor.withOpacity(0.05),
-                  Colors.transparent,
-                ],
+                colors: [glowColor.withOpacity(0.05), Colors.transparent],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -208,12 +202,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
-                    shadows: [
-                      Shadow(
-                        color: Color(0xFF00FFFF),
-                        blurRadius: 10,
-                      ),
-                    ],
+                    shadows: [Shadow(color: Color(0xFF00FFFF), blurRadius: 10)],
                   ),
                   speed: const Duration(milliseconds: 100),
                 ),
@@ -254,10 +243,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   color: Color(0xFF00FF00),
                   shape: BoxShape.circle,
                   boxShadow: [
-                    BoxShadow(
-                      color: Color(0xFF00FF00),
-                      blurRadius: 6,
-                    ),
+                    BoxShadow(color: Color(0xFF00FF00), blurRadius: 6),
                   ],
                 ),
               ).animate(delay: 300.ms).scale(),
@@ -274,7 +260,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // 用戶信息
           AnimatedTextKit(
             animatedTexts: [
@@ -291,9 +277,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             ],
             isRepeatingAnimation: false,
           ),
-          
+
           const Spacer(),
-          
+
           // 掃描線
           AnimatedBuilder(
             animation: _scanController,
@@ -304,7 +290,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      const Color(0xFF00FFFF).withOpacity(_scanController.value),
+                      const Color(
+                        0xFF00FFFF,
+                      ).withOpacity(_scanController.value),
                       Colors.transparent,
                     ],
                     stops: [
@@ -335,11 +323,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
       children: [
         const Row(
           children: [
-            Icon(
-              Iconsax.monitor,
-              color: Color(0xFF00FFFF),
-              size: 20,
-            ),
+            Icon(Iconsax.monitor, color: Color(0xFF00FFFF), size: 20),
             SizedBox(width: 10),
             Text(
               'SYSTEM_MONITOR.EXE',
@@ -352,9 +336,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             ),
           ],
         ).animate(delay: 600.ms).fadeIn().slideX(begin: -0.3),
-        
+
         const SizedBox(height: 15),
-        
+
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -395,7 +379,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                           fontWeight: FontWeight.bold,
                           shadows: [
                             Shadow(
-                              color: (metric['color']! as Color).withOpacity(_pulseController.value * 0.5),
+                              color: (metric['color']! as Color).withOpacity(
+                                _pulseController.value * 0.5,
+                              ),
                               blurRadius: 10,
                             ),
                           ],
@@ -407,7 +393,9 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                   LinearProgressIndicator(
                     value: (metric['value']! as int) / 100,
                     backgroundColor: Colors.black.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(metric['color']! as Color),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      metric['color']! as Color,
+                    ),
                     minHeight: 4,
                   ),
                 ],
@@ -457,11 +445,15 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF6B6B).withOpacity(_scanController.value),
+                      color: const Color(
+                        0xFFFF6B6B,
+                      ).withOpacity(_scanController.value),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFF6B6B).withOpacity(_scanController.value * 0.5),
+                          color: const Color(
+                            0xFFFF6B6B,
+                          ).withOpacity(_scanController.value * 0.5),
                           blurRadius: 8,
                         ),
                       ],
@@ -471,75 +463,74 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           ...weapons.asMap().entries.map((entry) {
             final index = entry.key;
             final weapon = entry.value;
-            final threatColor = weapon['threat'] == 'HIGH' 
-              ? const Color(0xFFFF6B6B)
-              : weapon['threat'] == 'MEDIUM'
-                ? const Color(0xFFFFE66D)
-                : const Color(0xFF4ECDC4);
-                
+            final threatColor =
+                weapon['threat'] == 'HIGH'
+                    ? const Color(0xFFFF6B6B)
+                    : weapon['threat'] == 'MEDIUM'
+                    ? const Color(0xFFFFE66D)
+                    : const Color(0xFF4ECDC4);
+
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: threatColor.withOpacity(0.3),
-                ),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: threatColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: threatColor.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
                           color: threatColor,
-                          blurRadius: 4,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(color: threatColor, blurRadius: 4),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      weapon['name']!,
-                      style: const TextStyle(
-                        color: Color(0xFF00FFFF),
-                        fontSize: 12,
-                        fontFamily: 'monospace',
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          weapon['name']!,
+                          style: const TextStyle(
+                            color: Color(0xFF00FFFF),
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ),
+                      Text(
+                        weapon['threat']!,
+                        style: TextStyle(
+                          color: threatColor,
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        weapon['status']!,
+                        style: TextStyle(
+                          color: const Color(0xFF00FF00).withOpacity(0.8),
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    weapon['threat']!,
-                    style: TextStyle(
-                      color: threatColor,
-                      fontSize: 10,
-                      fontFamily: 'monospace',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    weapon['status']!,
-                    style: TextStyle(
-                      color: const Color(0xFF00FF00).withOpacity(0.8),
-                      fontSize: 10,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                ],
-              ),
-            ).animate(delay: (800 + index * 150).ms).fadeIn().slideX(begin: 0.3);
+                )
+                .animate(delay: (800 + index * 150).ms)
+                .fadeIn()
+                .slideX(begin: 0.3);
           }),
         ],
       ),
@@ -556,11 +547,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         children: [
           const Row(
             children: [
-              Icon(
-                Iconsax.activity,
-                color: Color(0xFF8B5CF6),
-                size: 20,
-              ),
+              Icon(Iconsax.activity, color: Color(0xFF8B5CF6), size: 20),
               SizedBox(width: 10),
               Text(
                 'NETWORK_ACTIVITY.LOG',
@@ -640,11 +627,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         children: [
           const Row(
             children: [
-              Icon(
-                Iconsax.shield_search,
-                color: Color(0xFFFFE66D),
-                size: 20,
-              ),
+              Icon(Iconsax.shield_search, color: Color(0xFFFFE66D), size: 20),
               SizedBox(width: 10),
               Text(
                 'THREAT_ANALYSIS.BAT',
@@ -658,7 +641,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
             ],
           ),
           const SizedBox(height: 20),
-          
+
           AnimatedTextKit(
             animatedTexts: [
               TyperAnimatedText(
@@ -688,11 +671,7 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
         children: [
           const Row(
             children: [
-              Icon(
-                Iconsax.code,
-                color: Color(0xFF00FFFF),
-                size: 20,
-              ),
+              Icon(Iconsax.code, color: Color(0xFF00FFFF), size: 20),
               SizedBox(width: 10),
               Text(
                 'STYLE_INFO.TXT',
@@ -722,18 +701,16 @@ class _CyberpunkTechStyleState extends State<CyberpunkTechStyle> with TickerProv
 }
 
 class MatrixPainter extends CustomPainter {
-  
   MatrixPainter(this.animationValue);
   final double animationValue;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF00FF00).withOpacity(0.1);
-    
+    final paint = Paint()..color = const Color(0xFF00FF00).withOpacity(0.1);
+
     const double spacing = 30;
     final random = math.Random(42);
-    
+
     for (double x = 0; x < size.width; x += spacing) {
       final offset = (animationValue * size.height * 2) % (size.height + 100);
       for (var y = -100 + offset; y < size.height + 100; y += spacing) {
@@ -749,5 +726,6 @@ class MatrixPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(MatrixPainter oldDelegate) => oldDelegate.animationValue != animationValue;
-} 
+  bool shouldRepaint(MatrixPainter oldDelegate) =>
+      oldDelegate.animationValue != animationValue;
+}

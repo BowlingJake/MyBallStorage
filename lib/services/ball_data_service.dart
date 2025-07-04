@@ -11,8 +11,9 @@ class BallDataService {
     if (_cachedBalls != null) {
       return _cachedBalls!;
     }
-    final response =
-        await rootBundle.loadString('assets/bowling_ball_data.json');
+    final response = await rootBundle.loadString(
+      'assets/bowling_ball_data.json',
+    );
     final List<dynamic> data = json.decode(response);
 
     final balls = data.map((e) => BowlingBall.fromJson(e)).toList();

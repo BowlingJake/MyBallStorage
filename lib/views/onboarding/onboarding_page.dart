@@ -13,11 +13,11 @@ class OnboardingPage extends ConsumerStatefulWidget {
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   late PageController _pageController;
   int _currentPage = 0;
-  
+
   // 表單控制器
   final _nicknameController = TextEditingController();
   final _papController = TextEditingController();
-  
+
   String _selectedHand = '';
   String _selectedBallPath = '';
 
@@ -60,16 +60,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   Future<void> _completeOnboarding() async {
     // 儲存使用者檔案
-    await ref.read(userProfileProvider.notifier).updateProfile(
-      nickname: _nicknameController.text,
-      hand: _selectedHand,
-      ballPath: _selectedBallPath,
-      pap: _papController.text,
-    );
-    
+    await ref
+        .read(userProfileProvider.notifier)
+        .updateProfile(
+          nickname: _nicknameController.text,
+          hand: _selectedHand,
+          ballPath: _selectedBallPath,
+          pap: _papController.text,
+        );
+
     // 標記 Onboarding 完成
     await ref.read(onboardingProvider.notifier).completeOnboarding();
-    
+
     // 導航到主頁
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
@@ -110,7 +112,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           children: [
             // 進度指示器
             _buildProgressIndicator(),
-            
+
             // 頁面內容
             Expanded(
               child: PageView(
@@ -152,7 +154,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 ],
               ),
             ),
-            
+
             // 導航按鈕
             _buildNavigationButtons(),
           ],
@@ -171,9 +173,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
-                color: index <= _currentPage 
-                    ? Theme.of(context).primaryColor 
-                    : Colors.grey.shade300,
+                color:
+                    index <= _currentPage
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -210,4 +213,4 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       ),
     );
   }
-} 
+}

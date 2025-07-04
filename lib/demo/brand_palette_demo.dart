@@ -29,11 +29,7 @@ class BrandPaletteDemoPage extends StatelessWidget {
             // 標題區域
             Row(
               children: [
-                Icon(
-                  Icons.palette,
-                  color: theme.colorScheme.primary,
-                  size: 28,
-                ),
+                Icon(Icons.palette, color: theme.colorScheme.primary, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -57,9 +53,9 @@ class BrandPaletteDemoPage extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 色環卡片網格 - 類似 Library 頁面佈局
             GridView.builder(
               shrinkWrap: true,
@@ -73,19 +69,19 @@ class BrandPaletteDemoPage extends StatelessWidget {
               itemCount: brands.length,
               itemBuilder: (context, index) {
                 final brand = brands[index];
-                return _ColorRingCard(
-                  ball: _createSampleBall(brand),
-                );
+                return _ColorRingCard(ball: _createSampleBall(brand));
               },
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // 設計說明
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(
+                  0.3,
+                ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: theme.colorScheme.outlineVariant.withOpacity(0.5),
@@ -135,10 +131,7 @@ class BrandPaletteDemoPage extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             ),
           ),
         ],
@@ -152,7 +145,10 @@ class BrandPaletteDemoPage extends StatelessWidget {
       core: 'Demo Core',
       cover: 'Demo Cover',
       layout: '4.5" x 4" x 2"',
-      imagePath: brand == 'Storm' ? 'assets/images/Jackal EXJ.jpg' : 'assets/images/placeholder_ball.png',
+      imagePath:
+          brand == 'Storm'
+              ? 'assets/images/Jackal EXJ.jpg'
+              : 'assets/images/placeholder_ball.png',
       brand: brand,
       dateAdded: DateTime.now(),
       bagType: BallBagType.practice,
@@ -162,7 +158,6 @@ class BrandPaletteDemoPage extends StatelessWidget {
 
 /// 色環設計卡片 - 仿造 Library 頁面卡片佈局
 class _ColorRingCard extends StatelessWidget {
-  
   const _ColorRingCard({required this.ball});
   final ArsenalBall ball;
 
@@ -171,14 +166,11 @@ class _ColorRingCard extends StatelessWidget {
     final theme = Theme.of(context);
     final brandPalette = getBrandTonalPalette(ball.brand, theme);
     final brandColor = brandPalette.shade600; // 使用較深的品牌色作為圓環
-    
+
     return Container(
       decoration: BoxDecoration(
         // 4px 品牌色圓環套在整個卡片外面
-        border: Border.all(
-          color: brandColor,
-          width: 4,
-        ),
+        border: Border.all(color: brandColor, width: 4),
         borderRadius: BorderRadius.circular(20), // 圓角略大以配合邊框
         boxShadow: [
           BoxShadow(
@@ -188,10 +180,10 @@ class _ColorRingCard extends StatelessWidget {
           ),
         ],
       ),
-              child: Container(
-          decoration: BoxDecoration(
-            // 透明背景卡片
-            color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          // 透明背景卡片
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(16), // 內側圓角稍小
         ),
         child: Padding(
@@ -215,33 +207,34 @@ class _ColorRingCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: ball.name == 'Jackal EXJ' 
-                      ? Image.asset(
-                          ball.imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Center(
+                    child:
+                        ball.name == 'Jackal EXJ'
+                            ? Image.asset(
+                              ball.imagePath,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    Icons.sports_volleyball,
+                                    size: 48,
+                                    color: Colors.grey[400],
+                                  ),
+                                );
+                              },
+                            )
+                            : Center(
                               child: Icon(
                                 Icons.sports_volleyball,
                                 size: 48,
                                 color: Colors.grey[400],
                               ),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Icon(
-                            Icons.sports_volleyball,
-                            size: 48,
-                            color: Colors.grey[400],
-                          ),
-                        ),
+                            ),
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // 球名稱 - 類似 Library 頁面樣式
               Text(
                 ball.name,
@@ -252,9 +245,9 @@ class _ColorRingCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              
+
               const SizedBox(height: 4),
-              
+
               // 品牌名稱
               Text(
                 ball.brand,
@@ -263,9 +256,9 @@ class _ColorRingCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // 詳細資訊 - 類似 Library 頁面
               Row(
                 children: [
@@ -287,9 +280,9 @@ class _ColorRingCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 4),
-              
+
               Row(
                 children: [
                   Icon(
@@ -310,9 +303,9 @@ class _ColorRingCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // 底部品牌色指示條
               Container(
                 width: double.infinity,
@@ -338,4 +331,4 @@ class _ColorRingCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/models/tournament.dart';          // Import Model
+import 'package:bowlingarsenal_app/models/tournament.dart'; // Import Model
 import 'package:bowlingarsenal_app/shared/enums.dart'; // Import the shared enum
 import 'package:bowlingarsenal_app/theme/text_styles.dart';
 import 'package:bowlingarsenal_app/viewmodels/tournament_viewmodel.dart'; // Import ViewModel
@@ -7,7 +7,7 @@ import 'package:bowlingarsenal_app/viewmodels/weapon_library_viewmodel.dart';
 import 'package:bowlingarsenal_app/views/add_match_record_page.dart';
 import 'package:bowlingarsenal_app/views/basic_tournament_info_page.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';       // Import intl for date formatting
+import 'package:intl/intl.dart'; // Import intl for date formatting
 import 'package:provider/provider.dart'; // Import Provider
 
 // Define enum for dialog result (REMOVED)
@@ -44,43 +44,55 @@ class TournamentRecordPage extends StatelessWidget {
                   onTap: () {
                     // --- Navigate to AddMatchRecordPage on tap ---
                     print('Navigating for tournament: ${tournament.name}');
-                    
+
                     // Access the ViewModel to get ball objects
-                    final weaponViewModel = context.read<WeaponLibraryViewModel>();
-                    final List<BowlingBall> selectedBallObjects = tournament.selectedBallNames
-                        .map((name) {
-                          // Find the ball in the ViewModel's arsenal list
-                          try {
-                            return weaponViewModel.myArsenal.firstWhere((ball) => ball.ball == name);
-                          } catch (e) {
-                            // Handle case where ball might not be found (e.g., deleted after tournament creation)
-                            print('Error finding ball: $name in tournament record. Error: $e');
-                            return null; // Return null if not found
-                          }
-                        })
-                        .where((ball) => ball != null) // Filter out any nulls
-                        .cast<BowlingBall>()
-                        .toList();
+                    final weaponViewModel =
+                        context.read<WeaponLibraryViewModel>();
+                    final List<BowlingBall> selectedBallObjects =
+                        tournament.selectedBallNames
+                            .map((name) {
+                              // Find the ball in the ViewModel's arsenal list
+                              try {
+                                return weaponViewModel.myArsenal.firstWhere(
+                                  (ball) => ball.ball == name,
+                                );
+                              } catch (e) {
+                                // Handle case where ball might not be found (e.g., deleted after tournament creation)
+                                print(
+                                  'Error finding ball: $name in tournament record. Error: $e',
+                                );
+                                return null; // Return null if not found
+                              }
+                            })
+                            .where(
+                              (ball) => ball != null,
+                            ) // Filter out any nulls
+                            .cast<BowlingBall>()
+                            .toList();
 
                     // Optional: Check if all balls were found
-                    if (selectedBallObjects.length != tournament.selectedBallNames.length) {
-                       print('Warning: Could not find all ball objects for tournament ${tournament.id}');
-                       // Decide how to handle this - maybe show a message or proceed anyway?
+                    if (selectedBallObjects.length !=
+                        tournament.selectedBallNames.length) {
+                      print(
+                        'Warning: Could not find all ball objects for tournament ${tournament.id}',
+                      );
+                      // Decide how to handle this - maybe show a message or proceed anyway?
                     }
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddMatchRecordPage(
-                          tournamentId: tournament.id,
-                          tournamentName: tournament.name,
-                          tournamentLocation: tournament.location,
-                          tournamentDate: tournament.startDate,
-                          tournamentType: tournament.type,
-                          openFormat: tournament.openFormat,
-                          mqGamesPerSession: tournament.mqGamesPerSession,
-                          selectedBalls: selectedBallObjects,
-                        ),
+                        builder:
+                            (context) => AddMatchRecordPage(
+                              tournamentId: tournament.id,
+                              tournamentName: tournament.name,
+                              tournamentLocation: tournament.location,
+                              tournamentDate: tournament.startDate,
+                              tournamentType: tournament.type,
+                              openFormat: tournament.openFormat,
+                              mqGamesPerSession: tournament.mqGamesPerSession,
+                              selectedBalls: selectedBallObjects,
+                            ),
                       ),
                     );
                   },
@@ -94,7 +106,9 @@ class TournamentRecordPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const BasicTournamentInfoPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const BasicTournamentInfoPage(),
+                  ),
                 );
               },
               child: const Text('建立賽事', style: AppTextStyles.button),
@@ -115,43 +129,52 @@ class TournamentRecordPage extends StatelessWidget {
         onTap: () {
           // --- Navigate to AddMatchRecordPage on tap ---
           print('Navigating for tournament: ${tournament.name}');
-          
+
           // Access the ViewModel to get ball objects
           final weaponViewModel = context.read<WeaponLibraryViewModel>();
-          final selectedBallObjects = tournament.selectedBallNames
-              .map((name) {
-                // Find the ball in the ViewModel's arsenal list
-                try {
-                  return weaponViewModel.myArsenal.firstWhere((ball) => ball.ball == name);
-                } catch (e) {
-                  // Handle case where ball might not be found (e.g., deleted after tournament creation)
-                  print('Error finding ball: $name in tournament record. Error: $e');
-                  return null; // Return null if not found
-                }
-              })
-              .where((ball) => ball != null) // Filter out any nulls
-              .cast<BowlingBall>()
-              .toList();
+          final selectedBallObjects =
+              tournament.selectedBallNames
+                  .map((name) {
+                    // Find the ball in the ViewModel's arsenal list
+                    try {
+                      return weaponViewModel.myArsenal.firstWhere(
+                        (ball) => ball.ball == name,
+                      );
+                    } catch (e) {
+                      // Handle case where ball might not be found (e.g., deleted after tournament creation)
+                      print(
+                        'Error finding ball: $name in tournament record. Error: $e',
+                      );
+                      return null; // Return null if not found
+                    }
+                  })
+                  .where((ball) => ball != null) // Filter out any nulls
+                  .cast<BowlingBall>()
+                  .toList();
 
           // Optional: Check if all balls were found
-          if (selectedBallObjects.length != tournament.selectedBallNames.length) {
-             print('Warning: Could not find all ball objects for tournament ${tournament.id}');
-             // Decide how to handle this - maybe show a message or proceed anyway?
+          if (selectedBallObjects.length !=
+              tournament.selectedBallNames.length) {
+            print(
+              'Warning: Could not find all ball objects for tournament ${tournament.id}',
+            );
+            // Decide how to handle this - maybe show a message or proceed anyway?
           }
 
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddMatchRecordPage(
-                tournamentId: tournament.id,
-                tournamentName: tournament.name,
-                tournamentLocation: tournament.location,
-                tournamentDate: tournament.startDate,
-                tournamentType: tournament.type,
-                openFormat: tournament.openFormat,
-                mqGamesPerSession: tournament.mqGamesPerSession,
-                selectedBalls: selectedBallObjects,
-              ),
+              builder:
+                  (context) => AddMatchRecordPage(
+                    tournamentId: tournament.id,
+                    tournamentName: tournament.name,
+                    tournamentLocation: tournament.location,
+                    tournamentDate: tournament.startDate,
+                    tournamentType: tournament.type,
+                    openFormat: tournament.openFormat,
+                    mqGamesPerSession: tournament.mqGamesPerSession,
+                    selectedBalls: selectedBallObjects,
+                  ),
             ),
           );
         },
@@ -160,9 +183,9 @@ class TournamentRecordPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BasicTournamentInfoPage(
-                tournamentToEdit: tournament,
-              ),
+              builder:
+                  (context) =>
+                      BasicTournamentInfoPage(tournamentToEdit: tournament),
             ),
           );
         },
@@ -173,8 +196,8 @@ class TournamentRecordPage extends StatelessWidget {
             children: [
               // Left side: Icon or tournament type indicator
               Icon(
-                tournament.type == TournamentType.open 
-                    ? Icons.public 
+                tournament.type == TournamentType.open
+                    ? Icons.public
                     : Icons.shield, // Example icons
                 size: 40,
                 color: Theme.of(context).colorScheme.primary,
@@ -187,42 +210,57 @@ class TournamentRecordPage extends StatelessWidget {
                   children: [
                     Text(
                       tournament.name,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           // Format date range
-                          tournament.endDate == null || tournament.startDate == tournament.endDate
-                            ? DateFormat('yyyy-MM-dd').format(tournament.startDate) // Single day
-                            : '${DateFormat('yyyy-MM-dd').format(tournament.startDate)} - ${DateFormat('yyyy-MM-dd').format(tournament.endDate!)}', // Date range
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                          tournament.endDate == null ||
+                                  tournament.startDate == tournament.endDate
+                              ? DateFormat('yyyy-MM-dd').format(
+                                tournament.startDate,
+                              ) // Single day
+                              : '${DateFormat('yyyy-MM-dd').format(tournament.startDate)} - ${DateFormat('yyyy-MM-dd').format(tournament.endDate!)}', // Date range
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[700]),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                        const Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             tournament.location,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.grey[700]),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                     // Optionally display number of games or avg score later
-                     // const SizedBox(height: 4),
-                     // Text('已記錄 ${tournament.games.length} 局', style: TextStyle(color: Colors.grey)),
+                    // Optionally display number of games or avg score later
+                    // const SizedBox(height: 4),
+                    // Text('已記錄 ${tournament.games.length} 局', style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ),

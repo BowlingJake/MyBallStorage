@@ -21,17 +21,9 @@ class _EditUserPageState extends State<EditUserPage> {
   String? _preferredHand;
   String? _preferredBallPath;
 
-  final List<String> _handOptions = [
-    '右手單手',
-    '左手單手',
-    '右手雙手',
-    '左手雙手',
-  ];
+  final List<String> _handOptions = ['右手單手', '左手單手', '右手雙手', '左手雙手'];
 
-  final List<String> _ballPathOptions = [
-    '曲球',
-    '飛碟球',
-  ];
+  final List<String> _ballPathOptions = ['曲球', '飛碟球'];
 
   @override
   void initState() {
@@ -120,12 +112,15 @@ class _EditUserPageState extends State<EditUserPage> {
                   labelText: '慣用手',
                   labelStyle: AppTextStyles.body,
                 ),
-                items: _handOptions
-                    .map((hand) => DropdownMenuItem(
-                          value: hand,
-                          child: Text(hand, style: AppTextStyles.body),
-                        ),)
-                    .toList(),
+                items:
+                    _handOptions
+                        .map(
+                          (hand) => DropdownMenuItem(
+                            value: hand,
+                            child: Text(hand, style: AppTextStyles.body),
+                          ),
+                        )
+                        .toList(),
                 onChanged: (value) => setState(() => _preferredHand = value),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -141,13 +136,17 @@ class _EditUserPageState extends State<EditUserPage> {
                   labelText: '慣用球路',
                   labelStyle: AppTextStyles.body,
                 ),
-                items: _ballPathOptions
-                    .map((path) => DropdownMenuItem(
-                          value: path,
-                          child: Text(path, style: AppTextStyles.body),
-                        ),)
-                    .toList(),
-                onChanged: (value) => setState(() => _preferredBallPath = value),
+                items:
+                    _ballPathOptions
+                        .map(
+                          (path) => DropdownMenuItem(
+                            value: path,
+                            child: Text(path, style: AppTextStyles.body),
+                          ),
+                        )
+                        .toList(),
+                onChanged:
+                    (value) => setState(() => _preferredBallPath = value),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '請選擇慣用球路';
@@ -183,16 +182,26 @@ class _EditUserPageState extends State<EditUserPage> {
                         labelStyle: AppTextStyles.body,
                       ),
                       items: const [
-                        DropdownMenuItem(value: '無', child: Text('無', style: AppTextStyles.body)),
-                        DropdownMenuItem(value: '上', child: Text('上', style: AppTextStyles.body)),
-                        DropdownMenuItem(value: '下', child: Text('下', style: AppTextStyles.body)),
+                        DropdownMenuItem(
+                          value: '無',
+                          child: Text('無', style: AppTextStyles.body),
+                        ),
+                        DropdownMenuItem(
+                          value: '上',
+                          child: Text('上', style: AppTextStyles.body),
+                        ),
+                        DropdownMenuItem(
+                          value: '下',
+                          child: Text('下', style: AppTextStyles.body),
+                        ),
                       ],
-                      onChanged: (value) => setState(() {
-                        _papOffsetType = value!;
-                        if (_papOffsetType == '無') {
-                          _papOffsetController.clear();
-                        }
-                      }),
+                      onChanged:
+                          (value) => setState(() {
+                            _papOffsetType = value!;
+                            if (_papOffsetType == '無') {
+                              _papOffsetController.clear();
+                            }
+                          }),
                     ),
                   ),
                   if (_papOffsetType != '無') ...[

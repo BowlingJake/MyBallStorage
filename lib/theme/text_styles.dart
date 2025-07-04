@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
-  static const TextStyle defaultText = TextStyle(
-    fontFamily: 'Noto Sans TC',
-  );
+  static const TextStyle defaultText = TextStyle(fontFamily: 'Noto Sans TC');
 
   static const TextStyle title = TextStyle(
     fontFamily: 'Noto Sans TC',
@@ -33,4 +31,4 @@ class AppTextStyles {
     fontSize: 12,
     color: Colors.grey,
   );
-} 
+}

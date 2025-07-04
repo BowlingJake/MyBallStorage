@@ -5,12 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ArsenalSection extends ConsumerStatefulWidget {
-
-  const ArsenalSection({
-    super.key,
-    this.onSeeAllPressed,
-    this.onItemPressed,
-  });
+  const ArsenalSection({super.key, this.onSeeAllPressed, this.onItemPressed});
   final VoidCallback? onSeeAllPressed;
   final void Function(int index)? onItemPressed;
 
@@ -89,7 +84,7 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
                 },
               ),
             ),
-            
+
             const SizedBox(height: 12),
             if (arsenalBalls.length > 1)
               Center(
@@ -105,9 +100,10 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
                       height: 6,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(3),
-                        color: _currentIndex == index 
-                          ? accentColor 
-                          : Colors.white.withOpacity(0.3),
+                        color:
+                            _currentIndex == index
+                                ? accentColor
+                                : Colors.white.withOpacity(0.3),
                       ),
                     ),
                   ),
@@ -118,4 +114,4 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
       ),
     );
   }
-} 
+}

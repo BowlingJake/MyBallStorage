@@ -13,4 +13,4 @@ BowlingBall arsenalBallToBowlingBall(ArsenalBall arsenalBall) {
     core: arsenalBall.core,
     imageUrl: arsenalBall.imagePath, // imagePath 映射到 imageUrl
   );
-} 
+}

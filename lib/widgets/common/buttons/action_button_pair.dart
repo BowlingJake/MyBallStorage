@@ -4,9 +4,10 @@ import 'package:getwidget/getwidget.dart';
 /// A reusable widget that displays two action buttons side by side.
 /// Can be used across different pages for consistent button styling.
 class ActionButtonPair extends StatelessWidget {
-
   const ActionButtonPair({
-    required this.primaryButtonText, required this.secondaryButtonText, super.key,
+    required this.primaryButtonText,
+    required this.secondaryButtonText,
+    super.key,
     this.onPrimaryPressed,
     this.onSecondaryPressed,
     this.spacing = 12,
@@ -51,4 +52,4 @@ class ActionButtonPair extends StatelessWidget {
       ],
     );
   }
-} 
+}

@@ -23,19 +23,15 @@ class _DarkTechStyleState extends State<DarkTechStyle>
   @override
   void initState() {
     super.initState();
-    
+
     // 脈衝動畫 - 輕微但明顯
     _pulseController = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
     )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(
-      begin: 0.92,
-      end: 1.08,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ),);
+    _pulseAnimation = Tween<double>(begin: 0.92, end: 1.08).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
     // 圖表動畫
     _chartController = AnimationController(
@@ -74,7 +70,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
         children: [
           // 添加細微的背景線條效果
           _buildBackgroundGrid(),
-          
+
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -84,29 +80,29 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   children: [
                     // 頂部導航
                     _buildTopBar(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // 主標題
                     _buildMainTitle(),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // 保齡球數據統計卡片
                     _buildBowlingStats(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // 成績趨勢圖表
                     _buildPerformanceChart(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // 球具分析
                     _buildBallAnalysis(),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // 最近比賽記錄
                     _buildRecentMatches(),
                   ],
@@ -139,9 +135,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
           icon: Icons.arrow_back,
           onTap: () => Navigator.pop(context),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // 狀態指示器 - 增加動態效果
         AnimatedBuilder(
           animation: _pulseAnimation,
@@ -152,15 +148,18 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                 color: const Color(0xFF2E7D32).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Color.lerp(
-                    const Color(0xFF4CAF50),
-                    const Color(0xFF81C784),
-                    _pulseAnimation.value,
-                  )!,
+                  color:
+                      Color.lerp(
+                        const Color(0xFF4CAF50),
+                        const Color(0xFF81C784),
+                        _pulseAnimation.value,
+                      )!,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4CAF50).withOpacity(_pulseAnimation.value * 0.3),
+                    color: const Color(
+                      0xFF4CAF50,
+                    ).withOpacity(_pulseAnimation.value * 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),
@@ -176,10 +175,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                       color: Color(0xFF4CAF50),
                       shape: BoxShape.circle,
                       boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF4CAF50),
-                          blurRadius: 4,
-                        ),
+                        BoxShadow(color: Color(0xFF4CAF50), blurRadius: 4),
                       ],
                     ),
                   ),
@@ -198,16 +194,18 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             );
           },
         ),
-        
+
         const Spacer(),
-        
+
         // 設定按鈕 - 添加發光效果
         AnimatedBuilder(
           animation: _glowAnimation,
           builder: (context, child) {
             return _buildButton(
               icon: Icons.analytics_outlined,
-              backgroundColor: const Color(0xFF1E88E5).withOpacity(0.1 + _glowAnimation.value * 0.1),
+              backgroundColor: const Color(
+                0xFF1E88E5,
+              ).withOpacity(0.1 + _glowAnimation.value * 0.1),
               iconColor: Color.lerp(
                 const Color(0xFF1E88E5),
                 const Color(0xFF42A5F5),
@@ -237,17 +235,23 @@ class _DarkTechStyleState extends State<DarkTechStyle>
           color: backgroundColor ?? const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: shouldGlow 
-              ? (iconColor ?? const Color(0xFF1E88E5)).withOpacity(0.4)
-              : const Color(0xFF404040),
+            color:
+                shouldGlow
+                    ? (iconColor ?? const Color(0xFF1E88E5)).withOpacity(0.4)
+                    : const Color(0xFF404040),
           ),
-          boxShadow: shouldGlow ? [
-            BoxShadow(
-              color: (iconColor ?? const Color(0xFF1E88E5)).withOpacity(0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-            ),
-          ] : null,
+          boxShadow:
+              shouldGlow
+                  ? [
+                    BoxShadow(
+                      color: (iconColor ?? const Color(0xFF1E88E5)).withOpacity(
+                        0.3,
+                      ),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Icon(
           icon,
@@ -270,7 +274,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF1E88E5).withOpacity(_pulseAnimation.value * 0.2),
+                    color: const Color(
+                      0xFF1E88E5,
+                    ).withOpacity(_pulseAnimation.value * 0.2),
                     blurRadius: 20,
                     spreadRadius: 3,
                   ),
@@ -292,9 +298,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             );
           },
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // 副標題
         const Text(
           'Bowling Performance Dashboard',
@@ -304,9 +310,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             fontWeight: FontWeight.w500,
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // 描述框 - 增加漸變效果
         Container(
           padding: const EdgeInsets.all(16),
@@ -320,9 +326,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFF1E88E5).withOpacity(0.3),
-            ),
+            border: Border.all(color: const Color(0xFF1E88E5).withOpacity(0.3)),
           ),
           child: const Text(
             '專業運動數據分析界面\n清晰的數據可視化 + 深色護眼設計\n適合專業球員和數據分析需求',
@@ -349,9 +353,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             color: Color(0xFFFFFFFF),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         Row(
           children: [
             Expanded(
@@ -404,23 +408,27 @@ class _DarkTechStyleState extends State<DarkTechStyle>
       animation: Listenable.merge([_pulseAnimation, _glowAnimation]),
       builder: (context, child) {
         final delay = index * 0.3;
-        final animValue = math.sin((_glowAnimation.value * 2 * math.pi) + delay);
-        
+        final animValue = math.sin(
+          (_glowAnimation.value * 2 * math.pi) + delay,
+        );
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 const Color(0xFF1E1E1E),
-                Color.lerp(const Color(0xFF1E1E1E), color, 0.05 + animValue * 0.02)!,
+                Color.lerp(
+                  const Color(0xFF1E1E1E),
+                  color,
+                  0.05 + animValue * 0.02,
+                )!,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.3 + animValue * 0.2),
-            ),
+            border: Border.all(color: color.withOpacity(0.3 + animValue * 0.2)),
             boxShadow: [
               BoxShadow(
                 color: color.withOpacity(0.1 + animValue * 0.1),
@@ -440,11 +448,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                       color: color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      icon,
-                      color: color,
-                      size: 18,
-                    ),
+                    child: Icon(icon, color: color, size: 18),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -467,20 +471,14 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   shadows: [
-                    Shadow(
-                      color: color.withOpacity(0.5),
-                      blurRadius: 4,
-                    ),
+                    Shadow(color: color.withOpacity(0.5), blurRadius: 4),
                   ],
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Color(0xFF757575),
-                  fontSize: 11,
-                ),
+                style: const TextStyle(color: Color(0xFF757575), fontSize: 11),
               ),
             ],
           ),
@@ -506,7 +504,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(0xFF1E88E5).withOpacity(0.2 + _glowAnimation.value * 0.2),
+              color: const Color(
+                0xFF1E88E5,
+              ).withOpacity(0.2 + _glowAnimation.value * 0.2),
             ),
             boxShadow: [
               BoxShadow(
@@ -545,16 +545,13 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   const Spacer(),
                   const Text(
                     'Last 10 games',
-                    style: TextStyle(
-                      color: Color(0xFF9E9E9E),
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 12),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 增強的圖表
               _buildEnhancedChart(),
             ],
@@ -576,8 +573,10 @@ class _DarkTechStyleState extends State<DarkTechStyle>
             children: List.generate(10, (index) {
               final baseHeight = 40 + (index * 3.0) + (math.sin(index) * 15);
               final height = baseHeight * _chartAnimation.value;
-              final glowIntensity = math.sin((_glowAnimation.value * 2 * math.pi) + (index * 0.3));
-              
+              final glowIntensity = math.sin(
+                (_glowAnimation.value * 2 * math.pi) + (index * 0.3),
+              );
+
               return Container(
                 width: 16,
                 height: height,
@@ -585,7 +584,11 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   gradient: LinearGradient(
                     colors: [
                       const Color(0xFF1E88E5),
-                      Color.lerp(const Color(0xFF1E88E5), const Color(0xFF64B5F6), glowIntensity * 0.5)!,
+                      Color.lerp(
+                        const Color(0xFF1E88E5),
+                        const Color(0xFF64B5F6),
+                        glowIntensity * 0.5,
+                      )!,
                     ],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
@@ -593,7 +596,9 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1E88E5).withOpacity(0.3 + glowIntensity * 0.2),
+                      color: const Color(
+                        0xFF1E88E5,
+                      ).withOpacity(0.3 + glowIntensity * 0.2),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -620,9 +625,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF43A047).withOpacity(0.3),
-        ),
+        border: Border.all(color: const Color(0xFF43A047).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -652,21 +655,36 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           Row(
             children: [
               Expanded(
-                child: _buildBallCard('Jackal EXJ', '192 avg', const Color(0xFF1E88E5), 0),
+                child: _buildBallCard(
+                  'Jackal EXJ',
+                  '192 avg',
+                  const Color(0xFF1E88E5),
+                  0,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildBallCard('Phaze II', '184 avg', const Color(0xFF43A047), 1),
+                child: _buildBallCard(
+                  'Phaze II',
+                  '184 avg',
+                  const Color(0xFF43A047),
+                  1,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildBallCard('IQ Tour', '179 avg', const Color(0xFFFF9800), 2),
+                child: _buildBallCard(
+                  'IQ Tour',
+                  '179 avg',
+                  const Color(0xFFFF9800),
+                  2,
+                ),
               ),
             ],
           ),
@@ -680,16 +698,16 @@ class _DarkTechStyleState extends State<DarkTechStyle>
       animation: _glowAnimation,
       builder: (context, child) {
         final delay = index * 0.5;
-        final animValue = math.sin((_glowAnimation.value * 2 * math.pi) + delay);
-        
+        final animValue = math.sin(
+          (_glowAnimation.value * 2 * math.pi) + delay,
+        );
+
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: color.withOpacity(0.3 + animValue * 0.2),
-            ),
+            border: Border.all(color: color.withOpacity(0.3 + animValue * 0.2)),
             boxShadow: [
               BoxShadow(
                 color: color.withOpacity(0.1 + animValue * 0.1),
@@ -705,18 +723,11 @@ class _DarkTechStyleState extends State<DarkTechStyle>
                 height: 32,
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
-                    colors: [
-                      color.withOpacity(0.3),
-                      color.withOpacity(0.1),
-                    ],
+                    colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.sports_baseball,
-                  color: color,
-                  size: 16,
-                ),
+                child: Icon(Icons.sports_baseball, color: color, size: 16),
               ),
               const SizedBox(height: 8),
               Text(
@@ -757,9 +768,7 @@ class _DarkTechStyleState extends State<DarkTechStyle>
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFFF9800).withOpacity(0.3),
-        ),
+        border: Border.all(color: const Color(0xFFFF9800).withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -789,20 +798,40 @@ class _DarkTechStyleState extends State<DarkTechStyle>
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
-          _buildMatchRow('Tournament A', '195', 'Yesterday', const Color(0xFF4CAF50)),
+
+          _buildMatchRow(
+            'Tournament A',
+            '195',
+            'Yesterday',
+            const Color(0xFF4CAF50),
+          ),
           const SizedBox(height: 8),
-          _buildMatchRow('League Match', '187', '3 days ago', const Color(0xFF1E88E5)),
+          _buildMatchRow(
+            'League Match',
+            '187',
+            '3 days ago',
+            const Color(0xFF1E88E5),
+          ),
           const SizedBox(height: 8),
-          _buildMatchRow('Practice', '203', '1 week ago', const Color(0xFFFF9800)),
+          _buildMatchRow(
+            'Practice',
+            '203',
+            '1 week ago',
+            const Color(0xFFFF9800),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMatchRow(String match, String score, String date, Color scoreColor) {
+  Widget _buildMatchRow(
+    String match,
+    String score,
+    String date,
+    Color scoreColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -862,15 +891,17 @@ class _DarkTechStyleState extends State<DarkTechStyle>
 
 // 背景網格繪製器
 class GridPainter extends CustomPainter {
-  
   GridPainter(this.animationValue);
   final double animationValue;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF1E88E5).withOpacity(0.05 + animationValue * 0.05)
-      ..strokeWidth = 1;
+    final paint =
+        Paint()
+          ..color = const Color(
+            0xFF1E88E5,
+          ).withOpacity(0.05 + animationValue * 0.05)
+          ..strokeWidth = 1;
 
     // 繪製垂直線
     for (var i = 0; i < size.width; i += 50) {

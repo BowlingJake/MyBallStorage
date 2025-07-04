@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 
 /// 新增遊戲方式選擇器對話框
 class AddGameSelectorDialog extends StatelessWidget {
-
   const AddGameSelectorDialog({
-    required this.dayId, required this.nextGameNumber, super.key,
+    required this.dayId,
+    required this.nextGameNumber,
+    super.key,
   });
   final String dayId;
   final int nextGameNumber;
@@ -34,94 +35,92 @@ class AddGameSelectorDialog extends StatelessWidget {
                 color: theme.colorScheme.primary.withOpacity(0.3),
               ),
             ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 標題
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                // 標題
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Choose Adding Method',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
                 Text(
-                  'Choose Adding Method',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  'Choose input method for Game $nextGameNumber',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white),
+
+                const SizedBox(height: 24),
+
+                // 選項列表
+                _buildOptionCard(
+                  context,
+                  icon: Icons.speed,
+                  title: 'Quick Input',
+                  subtitle: 'Only input total score, Strikes, Spares',
+                  description: 'Suitable for quick basic data recording',
+                  color: Colors.blue,
+                  onTap: () => _showSimpleDialog(context),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildOptionCard(
+                  context,
+                  icon: Icons.grid_on,
+                  title: 'Detailed Scoring',
+                  subtitle: 'Use complete score table frame-by-frame input',
+                  description: 'Get complete score statistics and analysis',
+                  color: Colors.purple,
+                  onTap: () => _showAdvancedDialog(context),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 說明文字
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.blue,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Recommend using detailed scoring for more accurate statistics',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade300,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'Choose input method for Game $nextGameNumber',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // 選項列表
-            _buildOptionCard(
-              context,
-              icon: Icons.speed,
-              title: 'Quick Input',
-              subtitle: 'Only input total score, Strikes, Spares',
-              description: 'Suitable for quick basic data recording',
-              color: Colors.blue,
-              onTap: () => _showSimpleDialog(context),
-            ),
-
-            const SizedBox(height: 16),
-
-            _buildOptionCard(
-              context,
-              icon: Icons.grid_on,
-              title: 'Detailed Scoring',
-              subtitle: 'Use complete score table frame-by-frame input',
-              description: 'Get complete score statistics and analysis',
-              color: Colors.purple,
-              onTap: () => _showAdvancedDialog(context),
-            ),
-
-            const SizedBox(height: 24),
-
-            // 說明文字
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.blue.withOpacity(0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: Colors.blue,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child:                     Text(
-                      'Recommend using detailed scoring for more accurate statistics',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.blue.shade300,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
           ),
         ),
       ),
@@ -145,9 +144,7 @@ class AddGameSelectorDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Row(
           children: [
@@ -157,11 +154,7 @@ class AddGameSelectorDialog extends StatelessWidget {
                 color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+              child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -178,16 +171,16 @@ class AddGameSelectorDialog extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: color,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: color),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white60,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.white60),
                   ),
                 ],
               ),
@@ -205,7 +198,11 @@ class AddGameSelectorDialog extends StatelessWidget {
 
   Future<void> _showSimpleDialog(BuildContext context) async {
     Navigator.pop(context); // 關閉選擇器
-    final result = await showAddGameSimpleDialog(context, dayId, nextGameNumber);
+    final result = await showAddGameSimpleDialog(
+      context,
+      dayId,
+      nextGameNumber,
+    );
     if (result != null) {
       Navigator.pop(context, result); // 返回結果到原始調用者
     }
@@ -213,7 +210,11 @@ class AddGameSelectorDialog extends StatelessWidget {
 
   Future<void> _showAdvancedDialog(BuildContext context) async {
     Navigator.pop(context); // 關閉選擇器
-    final result = await showAddGameAdvancedDialog(context, dayId, nextGameNumber);
+    final result = await showAddGameAdvancedDialog(
+      context,
+      dayId,
+      nextGameNumber,
+    );
     if (result != null) {
       Navigator.pop(context, result); // 返回結果到原始調用者
     }
@@ -239,4 +240,4 @@ Future<GameRecord?> showAddGameSelectorDialog(
       );
     },
   );
-} 
+}

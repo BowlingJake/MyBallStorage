@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class BallCardWidget extends StatelessWidget {
-
   const BallCardWidget({
-    required this.title, required this.stat1, required this.stat2, required this.stat3, super.key,
+    required this.title,
+    required this.stat1,
+    required this.stat2,
+    required this.stat3,
+    super.key,
     this.onTap,
   });
   final String title;
@@ -56,10 +59,9 @@ class BallCardWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium!
-                  .copyWith(color: Colors.white),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium!.copyWith(color: Colors.white),
             ),
             const SizedBox(height: 16),
             Padding(
@@ -87,18 +89,16 @@ class BallCardWidget extends StatelessWidget {
       children: [
         Text(
           value,
-          style: Theme.of(ctx)
-              .textTheme
-              .titleMedium!
-              .copyWith(color: Colors.white),
+          style: Theme.of(
+            ctx,
+          ).textTheme.titleMedium!.copyWith(color: Colors.white),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: Theme.of(ctx)
-              .textTheme
-              .bodySmall!
-              .copyWith(color: Colors.white70),
+          style: Theme.of(
+            ctx,
+          ).textTheme.bodySmall!.copyWith(color: Colors.white70),
         ),
       ],
     );
@@ -108,15 +108,24 @@ class BallCardWidget extends StatelessWidget {
 class _TopCurveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    final path = Path()
-      ..moveTo(0, size.height * 0.8)
-      ..quadraticBezierTo(
-          size.width * 0.2, size.height, size.width * 0.5, size.height,)
-      ..quadraticBezierTo(
-          size.width * 0.8, size.height, size.width, size.height * 0.8,)
-      ..lineTo(size.width, 0)
-      ..lineTo(0, 0)
-      ..close();
+    final path =
+        Path()
+          ..moveTo(0, size.height * 0.8)
+          ..quadraticBezierTo(
+            size.width * 0.2,
+            size.height,
+            size.width * 0.5,
+            size.height,
+          )
+          ..quadraticBezierTo(
+            size.width * 0.8,
+            size.height,
+            size.width,
+            size.height * 0.8,
+          )
+          ..lineTo(size.width, 0)
+          ..lineTo(0, 0)
+          ..close();
     return path;
   }
 

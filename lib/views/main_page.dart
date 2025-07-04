@@ -7,7 +7,6 @@ import 'package:bowlingarsenal_app/views/weapon_library_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -38,16 +37,16 @@ class _MainPageState extends State<MainPage> {
         centerTitle: true,
         title: SizedBox(
           height: 44,
-          child: SvgPicture.asset(
-            'assets/images/logo_placeholder.png',
-          ),
+          child: SvgPicture.asset('assets/images/logo_placeholder.png'),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, size: 28),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('還沒有新通知', style: AppTextStyles.body)),
+                const SnackBar(
+                  content: Text('還沒有新通知', style: AppTextStyles.body),
+                ),
               );
             },
           ),
@@ -64,10 +63,21 @@ class _MainPageState extends State<MainPage> {
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.account_circle, size: 32, color: Colors.blueGrey),
+                    child: Icon(
+                      Icons.account_circle,
+                      size: 32,
+                      color: Colors.blueGrey,
+                    ),
                   ),
                   SizedBox(width: 8),
-                  Text('鄭行越', style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold)),
+                  Text(
+                    '鄭行越',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -86,22 +96,13 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(Icons.sports_handball),
             label: '武器庫',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.stadium),
-            label: '比賽記錄',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.stadium), label: '比賽記錄'),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
             label: '訓練模式',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '個人檔案',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '設定',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: '個人檔案'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
         ],
       ),
     );

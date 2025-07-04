@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 /// 訓練日球具使用情況組件
 class TrainingDayEquipment extends StatelessWidget {
-
   const TrainingDayEquipment({
-    required this.summary, required this.theme, super.key,
+    required this.summary,
+    required this.theme,
+    super.key,
   });
   final TrainingDaySummary summary;
   final ThemeData theme;
@@ -13,7 +14,7 @@ class TrainingDayEquipment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final equipmentUsage = summary.equipmentUsage;
-    
+
     if (equipmentUsage.isEmpty) {
       return Row(
         children: [
@@ -37,26 +38,29 @@ class TrainingDayEquipment extends StatelessWidget {
     return Wrap(
       spacing: 16,
       runSpacing: 4,
-      children: equipmentUsage.entries.map((entry) {
-        final ball = entry.key;
-        final games = entry.value;
-        games.sort(); // 排序局數
-        
-        // 解析品牌顏色
-        Color brandColor;
-        try {
-          brandColor = Color(int.parse(ball.brandColor.replaceFirst('#', '0xFF')));
-        } catch (e) {
-          brandColor = theme.colorScheme.primary;
-        }
-        
-        return _buildEquipmentItem(
-          ball: ball,
-          games: games,
-          brandColor: brandColor,
-          theme: theme,
-        );
-      }).toList(),
+      children:
+          equipmentUsage.entries.map((entry) {
+            final ball = entry.key;
+            final games = entry.value;
+            games.sort(); // 排序局數
+
+            // 解析品牌顏色
+            Color brandColor;
+            try {
+              brandColor = Color(
+                int.parse(ball.brandColor.replaceFirst('#', '0xFF')),
+              );
+            } catch (e) {
+              brandColor = theme.colorScheme.primary;
+            }
+
+            return _buildEquipmentItem(
+              ball: ball,
+              games: games,
+              brandColor: brandColor,
+              theme: theme,
+            );
+          }).toList(),
     );
   }
 
@@ -98,4 +102,4 @@ class TrainingDayEquipment extends StatelessWidget {
       ),
     );
   }
-} 
+}

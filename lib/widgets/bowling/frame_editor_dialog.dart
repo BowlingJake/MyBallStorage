@@ -2,9 +2,9 @@ import 'package:bowlingarsenal_app/logic/scoring_logic.dart';
 import 'package:flutter/material.dart';
 
 class FrameEditorDialog extends StatefulWidget {
-
   const FrameEditorDialog({
-    required this.frameNumber, super.key,
+    required this.frameNumber,
+    super.key,
     this.frame,
     this.onScoreSubmitted,
   });
@@ -25,9 +25,15 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
   @override
   void initState() {
     super.initState();
-    _firstRollController = TextEditingController(text: widget.frame?.firstRoll?.toString() ?? '');
-    _secondRollController = TextEditingController(text: widget.frame?.secondRoll?.toString() ?? '');
-    _thirdRollController = TextEditingController(text: widget.frame?.thirdRoll?.toString() ?? '');
+    _firstRollController = TextEditingController(
+      text: widget.frame?.firstRoll?.toString() ?? '',
+    );
+    _secondRollController = TextEditingController(
+      text: widget.frame?.secondRoll?.toString() ?? '',
+    );
+    _thirdRollController = TextEditingController(
+      text: widget.frame?.thirdRoll?.toString() ?? '',
+    );
     _showThirdRoll = widget.frameNumber == 10;
   }
 
@@ -42,7 +48,8 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
   void _submitScores() {
     final firstRoll = int.tryParse(_firstRollController.text);
     final secondRoll = int.tryParse(_secondRollController.text);
-    final thirdRoll = _showThirdRoll ? int.tryParse(_thirdRollController.text) : null;
+    final thirdRoll =
+        _showThirdRoll ? int.tryParse(_thirdRollController.text) : null;
 
     if (widget.onScoreSubmitted != null) {
       widget.onScoreSubmitted!(firstRoll, secondRoll, thirdRoll);
@@ -55,9 +62,7 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
       return;
     }
 
-    final frame = Frame(
-      frameNumber: widget.frameNumber,
-    );
+    final frame = Frame(frameNumber: widget.frameNumber);
     frame.setRolls(firstRoll, secondRoll, thirdRoll);
 
     Navigator.of(context).pop(frame);
@@ -116,11 +121,8 @@ class _FrameEditorDialogState extends State<FrameEditorDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        ElevatedButton(
-          onPressed: _submitScores,
-          child: const Text('Save'),
-        ),
+        ElevatedButton(onPressed: _submitScores, child: const Text('Save')),
       ],
     );
   }
-} 
+}

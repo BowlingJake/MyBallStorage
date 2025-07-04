@@ -26,9 +26,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
     final data = await _svc.loadProfile();
     setState(() {
       _nickname = data['nickname'] ?? '';
-      _hand     = data['hand']     ?? '';
+      _hand = data['hand'] ?? '';
       _ballPath = data['ballPath'] ?? '';
-      _pap      = data['pap']      ?? '';
+      _pap = data['pap'] ?? '';
     });
   }
 

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 class DashboardStatItem extends StatelessWidget {
-
   const DashboardStatItem({
-    required this.theme, required this.value, required this.label, required this.unit, required this.progressColor, super.key,
+    required this.theme,
+    required this.value,
+    required this.label,
+    required this.unit,
+    required this.progressColor,
+    super.key,
     this.isPercentage = false,
     this.glow = false,
   });
@@ -24,32 +28,35 @@ class DashboardStatItem extends StatelessWidget {
         SizedBox(
           width: 68,
           height: 68,
-          child: isPercentage
-              ? GFProgressBar(
-                  percentage: value / 100,
-                  radius: 68,
-                  type: GFProgressType.circular,
-                  backgroundColor: theme.colorScheme.onSurface.withOpacity(0.08),
-                  progressBarColor: progressColor,
-                  child: Text(
-                    '${value.toStringAsFixed(0)}$unit',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                      fontSize: 18,
+          child:
+              isPercentage
+                  ? GFProgressBar(
+                    percentage: value / 100,
+                    radius: 68,
+                    type: GFProgressType.circular,
+                    backgroundColor: theme.colorScheme.onSurface.withOpacity(
+                      0.08,
+                    ),
+                    progressBarColor: progressColor,
+                    child: Text(
+                      '${value.toStringAsFixed(0)}$unit',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  )
+                  : Center(
+                    child: Text(
+                      value.toStringAsFixed(0),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
+                        fontSize: 22,
+                      ),
                     ),
                   ),
-                )
-              : Center(
-                  child: Text(
-                    value.toStringAsFixed(0),
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary,
-                      fontSize: 22,
-                    ),
-                  ),
-                ),
         ),
         const SizedBox(height: 6),
         Text(
@@ -63,4 +70,4 @@ class DashboardStatItem extends StatelessWidget {
       ],
     );
   }
-} 
+}

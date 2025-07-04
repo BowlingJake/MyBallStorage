@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 /// 木雕文字組件 - 強烈的雕刻效果，像真的刻在木頭上
 class WoodCarvedText extends StatelessWidget {
-
   const WoodCarvedText({
-    required this.text, super.key,
+    required this.text,
+    super.key,
     this.fontSize = 20.0,
     this.fontWeight = FontWeight.bold,
     this.textColor,
@@ -23,7 +23,8 @@ class WoodCarvedText extends StatelessWidget {
     // 更強烈的木雕配色
     final defaultTextColor = textColor ?? const Color(0xFF3E2723); // 非常深的木色
     final defaultShadowColor = shadowColor ?? Colors.black.withOpacity(0.6);
-    final defaultHighlightColor = highlightColor ?? Colors.white.withOpacity(0.8);
+    final defaultHighlightColor =
+        highlightColor ?? Colors.white.withOpacity(0.8);
 
     return Stack(
       children: [
@@ -40,7 +41,7 @@ class WoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 中層陰影
         Transform.translate(
           offset: const Offset(2, 2),
@@ -54,7 +55,7 @@ class WoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 淺層陰影
         Transform.translate(
           offset: const Offset(1, 1),
@@ -68,7 +69,7 @@ class WoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 強烈高光層 - 左上方
         Transform.translate(
           offset: const Offset(-1.5, -1.5),
@@ -82,7 +83,7 @@ class WoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 次高光層
         Transform.translate(
           offset: const Offset(-0.5, -0.5),
@@ -96,7 +97,7 @@ class WoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 主文字層 - 深度雕刻效果
         Text(
           text,
@@ -134,9 +135,9 @@ class WoodCarvedText extends StatelessWidget {
 
 /// 超深度木雕文字組件 - 極致的雕刻效果
 class DeepWoodCarvedText extends StatelessWidget {
-
   const DeepWoodCarvedText({
-    required this.text, super.key,
+    required this.text,
+    super.key,
     this.fontSize = 20.0,
     this.fontWeight = FontWeight.bold,
     this.textColor,
@@ -165,7 +166,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 深層陰影
         Transform.translate(
           offset: const Offset(3, 3),
@@ -179,7 +180,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 中層陰影
         Transform.translate(
           offset: const Offset(2, 2),
@@ -193,7 +194,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 淺層陰影
         Transform.translate(
           offset: const Offset(1, 1),
@@ -207,7 +208,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 強烈高光 - 左上方
         Transform.translate(
           offset: const Offset(-2, -2),
@@ -221,7 +222,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 中等高光
         Transform.translate(
           offset: const Offset(-1, -1),
@@ -235,7 +236,7 @@ class DeepWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 主文字層 - 極深雕刻
         Text(
           text,
@@ -279,9 +280,9 @@ class DeepWoodCarvedText extends StatelessWidget {
 
 /// 白色木雕文字組件 - 針對深色背景的白色雕刻效果
 class WhiteWoodCarvedText extends StatelessWidget {
-
   const WhiteWoodCarvedText({
-    required this.text, super.key,
+    required this.text,
+    super.key,
     this.fontSize = 20.0,
     this.fontWeight = FontWeight.bold,
   });
@@ -306,7 +307,7 @@ class WhiteWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 中等陰影
         Transform.translate(
           offset: const Offset(1, 1),
@@ -320,7 +321,7 @@ class WhiteWoodCarvedText extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 主文字層 - 白色雕刻
         Text(
           text,
@@ -348,4 +349,4 @@ class WhiteWoodCarvedText extends StatelessWidget {
       ],
     );
   }
-} 
+}

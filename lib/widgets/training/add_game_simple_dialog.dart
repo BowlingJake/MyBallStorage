@@ -8,9 +8,10 @@ import 'package:flutter/services.dart';
 /// 簡化版新增遊戲對話框
 /// 快速輸入分數而不需要詳細的格數據
 class AddGameSimpleDialog extends StatefulWidget {
-
   const AddGameSimpleDialog({
-    required this.dayId, required this.nextGameNumber, super.key,
+    required this.dayId,
+    required this.nextGameNumber,
+    super.key,
   });
   final String dayId;
   final int nextGameNumber;
@@ -80,123 +81,126 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                 color: theme.colorScheme.primary.withOpacity(0.3),
               ),
             ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 標題
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Add Game ${widget.nextGameNumber}',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  // 標題
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Add Game ${widget.nextGameNumber}',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, color: Colors.white),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // 分數輸入
+                  _buildNumberField(
+                    controller: _scoreController,
+                    label: 'Total Score',
+                    hint: '0-300',
+                    maxValue: 300,
+                    isRequired: true,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Strikes 和 Spares 輸入
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildNumberField(
+                          controller: _strikesController,
+                          label: 'Strikes',
+                          hint: '0-10',
+                          maxValue: 10,
+                          isRequired: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildNumberField(
+                          controller: _sparesController,
+                          label: 'Spares',
+                          hint: '0-10',
+                          maxValue: 10,
+                          isRequired: true,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 備註輸入
+                  TextFormField(
+                    controller: _notesController,
+                    maxLines: 3,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Notes (Optional)',
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      hintText: 'Performance, thoughts...',
+                      hintStyle: const TextStyle(color: Colors.white54),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.white30),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.white30),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.1),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+
+                  const SizedBox(height: 24),
+
+                  // 底部按鈕
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Cancel',
+                          onPressed: () => Navigator.pop(context),
+                          customColor: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Save',
+                          onPressed: _saveGame,
+                          customColor: theme.colorScheme.primary,
+                          isPrimary: true,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-
-              const SizedBox(height: 24),
-
-              // 分數輸入
-              _buildNumberField(
-                controller: _scoreController,
-                label: 'Total Score',
-                hint: '0-300',
-                maxValue: 300,
-                isRequired: true,
-              ),
-
-              const SizedBox(height: 16),
-
-              // Strikes 和 Spares 輸入
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNumberField(
-                      controller: _strikesController,
-                      label: 'Strikes',
-                      hint: '0-10',
-                      maxValue: 10,
-                      isRequired: true,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildNumberField(
-                      controller: _sparesController,
-                      label: 'Spares',
-                      hint: '0-10',
-                      maxValue: 10,
-                      isRequired: true,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // 備註輸入
-              TextFormField(
-                controller: _notesController,
-                maxLines: 3,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Notes (Optional)',
-                  labelStyle: const TextStyle(color: Colors.white70),
-                  hintText: 'Performance, thoughts...',
-                  hintStyle: const TextStyle(color: Colors.white54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.white30),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.white30),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.1),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 底部按鈕
-              Row(
-                children: [
-                  Expanded(
-                    child: AppStandardButton(
-                      text: 'Cancel',
-                      onPressed: () => Navigator.pop(context),
-                      customColor: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: AppStandardButton(
-                      text: 'Save',
-                      onPressed: _saveGame,
-                      customColor: theme.colorScheme.primary,
-                      isPrimary: true,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+            ),
           ),
         ),
       ),
@@ -233,7 +237,10 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
@@ -277,4 +284,4 @@ Future<GameRecord?> showAddGameSimpleDialog(
       );
     },
   );
-} 
+}

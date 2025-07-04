@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 
 /// 訓練日摘要卡片的頭部組件
 class TrainingDayHeader extends StatelessWidget {
-
   const TrainingDayHeader({
-    required this.summary, required this.isSelectionMode, required this.isSelected, required this.theme, super.key,
+    required this.summary,
+    required this.isSelectionMode,
+    required this.isSelected,
+    required this.theme,
+    super.key,
   });
   final TrainingDaySummary summary;
   final bool isSelectionMode;
@@ -22,24 +25,25 @@ class TrainingDayHeader extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : Colors.transparent,
+              color:
+                  isSelected ? theme.colorScheme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.5),
+                color:
+                    isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface.withOpacity(0.5),
                 width: 2,
               ),
             ),
-            child: isSelected
-                ? Icon(
-                    Icons.check,
-                    size: 16,
-                    color: theme.colorScheme.onPrimary,
-                  )
-                : null,
+            child:
+                isSelected
+                    ? Icon(
+                      Icons.check,
+                      size: 16,
+                      color: theme.colorScheme.onPrimary,
+                    )
+                    : null,
           ),
           const SizedBox(width: 12),
         ],
@@ -64,7 +68,10 @@ class TrainingDayHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
@@ -87,4 +94,4 @@ class TrainingDayHeader extends StatelessWidget {
       ],
     );
   }
-} 
+}

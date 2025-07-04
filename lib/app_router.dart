@@ -17,16 +17,12 @@ class AppRouter extends ConsumerWidget {
     switch (authState.status) {
       case AuthStatus.unknown:
         // 正在檢查認證狀態，顯示載入畫面
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-        
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+
       case AuthStatus.unauthenticated:
         // 未認證，顯示登入頁面
         return const LoginPage();
-        
+
       case AuthStatus.authenticated:
         // 已認證，檢查是否需要顯示 Onboarding
         if (shouldShowOnboarding) {
@@ -43,7 +39,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String onboarding = '/onboarding';
   static const String home = '/home';
-  
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
@@ -54,12 +50,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HomePage());
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(
-              child: Text('頁面不存在'),
-            ),
-          ),
+          builder: (_) => const Scaffold(body: Center(child: Text('頁面不存在'))),
         );
     }
   }
-} 
+}

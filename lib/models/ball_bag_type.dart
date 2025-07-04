@@ -4,6 +4,6 @@ enum BallBagType {
   practice('Practice');
 
   const BallBagType(this.displayName);
-  
+
   final String displayName;
-} 
+}

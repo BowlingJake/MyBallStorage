@@ -6,13 +6,13 @@ import 'package:intl/intl.dart';
 
 // 訓練記錄數據模型
 class TrainingSession {
-
   TrainingSession({
     required this.id,
     required this.title,
     required this.date,
     required this.center,
-    required this.isHousePattern, required this.scoringMethod, // 新增計分方式, required this.createdAt, this.oilPatternName,
+    required this.isHousePattern,
+    required this.scoringMethod, // 新增計分方式, required this.createdAt, this.oilPatternName,
     this.oilPatternLength,
   });
   final String id;
@@ -28,9 +28,9 @@ class TrainingSession {
 
 // 訓練記錄卡片組件 - Professional Dark Glass 風格
 class TrainingSessionCard extends StatefulWidget {
-
   const TrainingSessionCard({
-    required this.session, super.key,
+    required this.session,
+    super.key,
     this.onTap,
     this.onDelete,
     this.onEdit,
@@ -52,7 +52,7 @@ class TrainingSessionCard extends StatefulWidget {
   State<TrainingSessionCard> createState() => _TrainingSessionCardState();
 }
 
-class _TrainingSessionCardState extends State<TrainingSessionCard> 
+class _TrainingSessionCardState extends State<TrainingSessionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -61,12 +61,12 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOutCubic,
@@ -95,7 +95,8 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
   String _getOilPatternDisplay() {
     if (widget.session.isHousePattern) {
       return 'House Pattern';
-    } else if (widget.session.oilPatternName?.isNotEmpty == true || widget.session.oilPatternLength?.isNotEmpty == true) {
+    } else if (widget.session.oilPatternName?.isNotEmpty == true ||
+        widget.session.oilPatternLength?.isNotEmpty == true) {
       final name = widget.session.oilPatternName ?? '';
       final length = widget.session.oilPatternLength ?? '';
       if (name.isNotEmpty && length.isNotEmpty) {
@@ -112,11 +113,12 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // 限制標題在20字以內
-    final displayTitle = widget.session.title.length > 20 
-        ? '${widget.session.title.substring(0, 20)}...' 
-        : widget.session.title;
+    final displayTitle =
+        widget.session.title.length > 20
+            ? '${widget.session.title.substring(0, 20)}...'
+            : widget.session.title;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -136,22 +138,25 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               // Professional Dark Glass 風格 - 透明背景
-              color: widget.isSelected 
-                ? theme.colorScheme.primary.withOpacity(0.1)
-                : Colors.transparent,
+              color:
+                  widget.isSelected
+                      ? theme.colorScheme.primary.withOpacity(0.1)
+                      : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: widget.isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.primary.withOpacity(0.5),
+                color:
+                    widget.isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.primary.withOpacity(0.5),
                 width: widget.isSelected ? 2.0 : 1.5,
               ),
               // 微光效果
               boxShadow: [
                 BoxShadow(
-                  color: widget.isSelected
-                    ? theme.colorScheme.primary.withOpacity(0.2)
-                    : theme.colorScheme.primary.withOpacity(0.1),
+                  color:
+                      widget.isSelected
+                          ? theme.colorScheme.primary.withOpacity(0.2)
+                          : theme.colorScheme.primary.withOpacity(0.1),
                   blurRadius: widget.isSelected ? 16 : 12,
                   offset: const Offset(0, 4),
                 ),
@@ -174,28 +179,33 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: widget.isSelected 
-                            ? theme.colorScheme.primary
-                            : Colors.transparent,
+                          color:
+                              widget.isSelected
+                                  ? theme.colorScheme.primary
+                                  : Colors.transparent,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: widget.isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurface.withOpacity(0.5),
+                            color:
+                                widget.isSelected
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface.withOpacity(
+                                      0.5,
+                                    ),
                             width: 2,
                           ),
                         ),
-                        child: widget.isSelected
-                          ? Icon(
-                              Icons.check,
-                              size: 16,
-                              color: theme.colorScheme.onPrimary,
-                            )
-                          : null,
+                        child:
+                            widget.isSelected
+                                ? Icon(
+                                  Icons.check,
+                                  size: 16,
+                                  color: theme.colorScheme.onPrimary,
+                                )
+                                : null,
                       ),
                       const SizedBox(width: 12),
                     ],
-                    
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +230,9 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                DateFormat('yyyy.MM.dd').format(widget.session.date),
+                                DateFormat(
+                                  'yyyy.MM.dd',
+                                ).format(widget.session.date),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w500,
@@ -231,14 +243,17 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                               Icon(
                                 Icons.location_on,
                                 size: 14,
-                                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
                               ),
                               const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   widget.session.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                     fontSize: 13,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -253,14 +268,17 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                               Icon(
                                 Iconsax.drop,
                                 size: 14,
-                                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
                               ),
                               const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   _getOilPatternDisplay(),
                                   style: TextStyle(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -316,7 +334,7 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                       ),
                   ],
                 ),
-                
+
                 // 展開內容（僅在非選擇模式且展開時顯示）
                 if (!widget.isSelectionMode)
                   ClipRect(
@@ -352,12 +370,15 @@ class _TrainingSessionCardState extends State<TrainingSessionCard>
                                     onPressed: () async {
                                       final result = await showDialog(
                                         context: context,
-                                        builder: (context) => AddGamesDialog(
-                                          trainingId: widget.session.id,
-                                          scoringMethod: widget.session.scoringMethod,
-                                        ),
+                                        builder:
+                                            (context) => AddGamesDialog(
+                                              trainingId: widget.session.id,
+                                              scoringMethod:
+                                                  widget.session.scoringMethod,
+                                            ),
                                       );
-                                      if (result != null && widget.onAddGames != null) {
+                                      if (result != null &&
+                                          widget.onAddGames != null) {
                                         widget.onAddGames!();
                                       }
                                     },

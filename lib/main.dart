@@ -8,15 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   AppErrorHandler.initialize();
 
   AppErrorHandler.runGuarded(() {
-    runApp(
-      const ProviderScope(
-        child: MyApp(),
-      ),
-    );
+    runApp(const ProviderScope(child: MyApp()));
   });
 }
 

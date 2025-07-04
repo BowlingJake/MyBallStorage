@@ -6,22 +6,33 @@ import 'package:flutter/material.dart';
 
 // 編輯訓練記錄彈窗 - 樣式與新增彈窗同步
 class EditTrainingRecordDialog extends StatefulWidget {
-
   const EditTrainingRecordDialog({
-    required this.summary, super.key,
+    required this.summary,
+    super.key,
     this.onRecordUpdated,
   });
   final TrainingDaySummary summary;
-  final Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated;
+  final Function(
+    String title,
+    DateTime date,
+    String center,
+    String? oilPatternName,
+    String? oilPatternLength,
+    bool isHousePattern,
+    String scoringMethod,
+    String inputMethod,
+  )?
+  onRecordUpdated;
 
   @override
-  State<EditTrainingRecordDialog> createState() => _EditTrainingRecordDialogState();
+  State<EditTrainingRecordDialog> createState() =>
+      _EditTrainingRecordDialogState();
 }
 
 class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  
+
   // 表單控制器
   late final TextEditingController _titleController;
   late final TextEditingController _centerNameController;
@@ -30,15 +41,15 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
   late DateTime _selectedDate;
   late bool _isHousePattern;
   // 移除計分方式和輸入方式的變數，因為不允許編輯
-  
+
   // 2步表單流程狀態
   int _currentStep = 0;
   final PageController _pageController = PageController();
-  
+
   // 動畫控制器
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  
+
   // 表單驗證狀態
   bool _step1Valid = false;
 
@@ -48,12 +59,16 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     // 預填入現有數據
     _titleController = TextEditingController(text: widget.summary.title);
     _centerNameController = TextEditingController(text: widget.summary.center);
-    _oilPatternNameController = TextEditingController(text: widget.summary.oilPatternName ?? '');
-    _oilPatternLengthController = TextEditingController(text: widget.summary.oilPatternLength ?? '');
+    _oilPatternNameController = TextEditingController(
+      text: widget.summary.oilPatternName ?? '',
+    );
+    _oilPatternLengthController = TextEditingController(
+      text: widget.summary.oilPatternLength ?? '',
+    );
     _selectedDate = widget.summary.date;
     _isHousePattern = widget.summary.isHousePattern;
     // 不再需要初始化計分方式和輸入方式變數，因為不允許編輯
-    
+
     _initAnimations();
     _validateStep1();
   }
@@ -63,11 +78,11 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
-    
+
     _fadeController.forward();
   }
 
@@ -84,7 +99,9 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
 
   void _validateStep1() {
     setState(() {
-      _step1Valid = _titleController.text.isNotEmpty && _centerNameController.text.isNotEmpty;
+      _step1Valid =
+          _titleController.text.isNotEmpty &&
+          _centerNameController.text.isNotEmpty;
     });
   }
 
@@ -119,7 +136,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
       _showValidationMessage('Please enter session title and bowling center');
       return;
     }
-    
+
     if (_currentStep < 1) {
       setState(() {
         _currentStep++;
@@ -157,18 +174,22 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
   void _updateRecord() {
     if (_formKey.currentState!.validate()) {
       widget.onRecordUpdated?.call(
-          _titleController.text,
-          _selectedDate,
-          _centerNameController.text,
-          _oilPatternNameController.text.isEmpty ? null : _oilPatternNameController.text,
-          _oilPatternLengthController.text.isEmpty ? null : _oilPatternLengthController.text,
-          _isHousePattern,
-          widget.summary.scoringMethod, // 保持原有的計分方式，不允許編輯
-          widget.summary.inputMethod, // 保持原有的輸入方式，不允許編輯
-        );
-      
+        _titleController.text,
+        _selectedDate,
+        _centerNameController.text,
+        _oilPatternNameController.text.isEmpty
+            ? null
+            : _oilPatternNameController.text,
+        _oilPatternLengthController.text.isEmpty
+            ? null
+            : _oilPatternLengthController.text,
+        _isHousePattern,
+        widget.summary.scoringMethod, // 保持原有的計分方式，不允許編輯
+        widget.summary.inputMethod, // 保持原有的輸入方式，不允許編輯
+      );
+
       Navigator.of(context).pop();
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Row(
@@ -180,7 +201,9 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
           ),
           backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
       );
     }
@@ -188,10 +211,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: _buildDialog(),
-    );
+    return FadeTransition(opacity: _fadeAnimation, child: _buildDialog());
   }
 
   Widget _buildDialog() {
@@ -337,9 +357,10 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
                 height: 3,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(2),
-                  color: i <= _currentStep
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface.withOpacity(0.2),
+                  color:
+                      i <= _currentStep
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withOpacity(0.2),
                 ),
               ),
             ),
@@ -358,10 +379,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
         child: PageView(
           controller: _pageController,
           physics: const NeverScrollableScrollPhysics(),
-          children: [
-            _buildStep1(),
-            _buildStep2(),
-          ],
+          children: [_buildStep1(), _buildStep2()],
         ),
       ),
     );
@@ -444,11 +462,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
               color: theme.colorScheme.primary.withOpacity(0.3),
             ),
           ),
-          child: Icon(
-            icon,
-            color: theme.colorScheme.primary,
-            size: 16,
-          ),
+          child: Icon(icon, color: theme.colorScheme.primary, size: 16),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -485,9 +499,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
         color: theme.colorScheme.surface.withOpacity(0.1),
       ),
       child: TextFormField(
@@ -497,7 +509,11 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          prefixIcon: Icon(icon, color: theme.colorScheme.primary.withOpacity(0.7), size: 18),
+          prefixIcon: Icon(
+            icon,
+            color: theme.colorScheme.primary.withOpacity(0.7),
+            size: 18,
+          ),
           labelStyle: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.primary.withOpacity(0.8),
           ),
@@ -508,7 +524,10 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
           isDense: true,
         ),
         validator: (value) {
@@ -530,9 +549,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
-          ),
+          border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
           color: theme.colorScheme.surface.withOpacity(0.1),
         ),
         child: Row(
@@ -632,11 +649,7 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(
-          icon,
-          color: theme.colorScheme.primary,
-          size: 16,
-        ),
+        Icon(icon, color: theme.colorScheme.primary, size: 16),
         const SizedBox(width: 8),
         Text(
           title,
@@ -657,9 +670,15 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary.withOpacity(0.1) : Colors.transparent,
+          color:
+              isSelected
+                  ? theme.colorScheme.primary.withOpacity(0.1)
+                  : Colors.transparent,
           border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.3),
+            color:
+                isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withOpacity(0.3),
             width: isSelected ? 1.5 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -668,9 +687,10 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
           text,
           textAlign: TextAlign.center,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: isSelected 
-              ? theme.colorScheme.primary 
-              : theme.colorScheme.onSurface.withOpacity(0.8),
+            color:
+                isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withOpacity(0.8),
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
@@ -698,9 +718,10 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
             child: AppStandardButton(
               text: _currentStep == 1 ? 'Update Session' : 'Next',
               icon: _currentStep == 1 ? Icons.check : Icons.arrow_forward,
-              onPressed: (_currentStep == 0 ? _step1Valid : true)
-                  ? (_currentStep == 1 ? _updateRecord : _nextStep)
-                  : () {},
+              onPressed:
+                  (_currentStep == 0 ? _step1Valid : true)
+                      ? (_currentStep == 1 ? _updateRecord : _nextStep)
+                      : () {},
               enabled: _currentStep == 0 ? _step1Valid : true,
               isPrimary: true,
               height: 40,
@@ -714,9 +735,19 @@ class _EditTrainingRecordDialogState extends State<EditTrainingRecordDialog>
 
 // 顯示編輯訓練記錄彈窗的輔助函數
 void showEditTrainingRecordDialog(
-  BuildContext context, 
+  BuildContext context,
   TrainingDaySummary summary,
-  Function(String title, DateTime date, String center, String? oilPatternName, String? oilPatternLength, bool isHousePattern, String scoringMethod, String inputMethod)? onRecordUpdated,
+  Function(
+    String title,
+    DateTime date,
+    String center,
+    String? oilPatternName,
+    String? oilPatternLength,
+    bool isHousePattern,
+    String scoringMethod,
+    String inputMethod,
+  )?
+  onRecordUpdated,
 ) {
   showDialog(
     context: context,
@@ -728,4 +759,4 @@ void showEditTrainingRecordDialog(
       );
     },
   );
-} 
+}

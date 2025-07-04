@@ -9,9 +9,9 @@ import 'package:intl/intl.dart';
 /// Enhanced Training Day Card with Professional Dark Tech Style
 /// 具有專業深色科技風格的增強訓練日卡片
 class EnhancedTrainingDayCard extends StatefulWidget {
-
   const EnhancedTrainingDayCard({
-    required this.summary, super.key,
+    required this.summary,
+    super.key,
     this.onTap,
     this.onDelete,
     this.onAddGame,
@@ -34,7 +34,8 @@ class EnhancedTrainingDayCard extends StatefulWidget {
   final Function(GameRecord)? onGameDelete;
 
   @override
-  State<EnhancedTrainingDayCard> createState() => _EnhancedTrainingDayCardState();
+  State<EnhancedTrainingDayCard> createState() =>
+      _EnhancedTrainingDayCardState();
 }
 
 class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
@@ -42,11 +43,11 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
   late AnimationController _expansionController;
   late AnimationController _pulseController;
   late AnimationController _scanController;
-  
+
   late Animation<double> _expansionAnimation;
   late Animation<double> _pulseAnimation;
   late Animation<double> _scanAnimation;
-  
+
   bool _isExpanded = false;
   int _selectedTabIndex = 0;
 
@@ -61,12 +62,12 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _scanController = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
@@ -76,14 +77,15 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       parent: _expansionController,
       curve: Curves.easeInOutCubic,
     );
-    
+
     _pulseAnimation = Tween<double>(begin: 0.8, end: 1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-    
-    _scanAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _scanController, curve: Curves.linear),
-    );
+
+    _scanAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _scanController, curve: Curves.linear));
   }
 
   @override
@@ -121,7 +123,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: AnimatedBuilder(
@@ -146,29 +148,34 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic,
         decoration: BoxDecoration(
-          color: widget.isSelected
-              ? theme.colorScheme.primary.withOpacity(0.15)
-              : Colors.transparent,
+          color:
+              widget.isSelected
+                  ? theme.colorScheme.primary.withOpacity(0.15)
+                  : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: widget.isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.primary.withOpacity(0.3),
+            color:
+                widget.isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.primary.withOpacity(0.3),
             width: widget.isSelected ? 2.0 : 1.0,
           ),
           boxShadow: [
             // 主光暈效果
             BoxShadow(
-              color: widget.isSelected
-                  ? theme.colorScheme.primary.withOpacity(0.3)
-                  : theme.colorScheme.primary.withOpacity(0.1),
+              color:
+                  widget.isSelected
+                      ? theme.colorScheme.primary.withOpacity(0.3)
+                      : theme.colorScheme.primary.withOpacity(0.1),
               blurRadius: widget.isSelected ? 20 : 12,
               spreadRadius: widget.isSelected ? 3 : 1,
             ),
             // 掃描線效果
             if (!widget.isSelectionMode)
               BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(_scanAnimation.value * 0.1),
+                color: theme.colorScheme.primary.withOpacity(
+                  _scanAnimation.value * 0.1,
+                ),
                 blurRadius: 8 + (_scanAnimation.value * 4),
                 spreadRadius: _scanAnimation.value * 2,
               ),
@@ -196,7 +203,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             children: [
               // 主要內容區域
               _buildMainContent(theme),
-              
+
               // 展開內容
               AnimatedBuilder(
                 animation: _expansionAnimation,
@@ -224,14 +231,14 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         children: [
           // 頭部區域
           _buildHeader(theme),
-          
+
           const SizedBox(height: 16),
-          
+
           // 統計資訊區域
           _buildQuickStats(theme),
-          
+
           const SizedBox(height: 16),
-          
+
           // 底部資訊區域
           _buildInfoRow(theme),
         ],
@@ -247,7 +254,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           _buildSelectionCheckbox(theme),
           const SizedBox(width: 16),
         ],
-        
+
         // 標題和日期
         Expanded(
           child: Column(
@@ -283,10 +290,10 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             ],
           ),
         ),
-        
+
         // 遊戲數量徽章
         _buildGamesBadge(theme),
-        
+
         // 控制按鈕組
         if (!widget.isSelectionMode) ...[
           const SizedBox(width: 12),
@@ -302,24 +309,21 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        color: widget.isSelected
-            ? theme.colorScheme.primary
-            : Colors.transparent,
+        color:
+            widget.isSelected ? theme.colorScheme.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: widget.isSelected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurface.withOpacity(0.5),
+          color:
+              widget.isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withOpacity(0.5),
           width: 2,
         ),
       ),
-      child: widget.isSelected
-          ? const Icon(
-              Icons.check,
-              size: 18,
-              color: Colors.white,
-            )
-          : null,
+      child:
+          widget.isSelected
+              ? const Icon(Icons.check, size: 18, color: Colors.white)
+              : null,
     );
   }
 
@@ -371,9 +375,9 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             onTap: widget.onEdit!,
             tooltip: 'Edit Training Day',
           ),
-        
+
         const SizedBox(width: 8),
-        
+
         // 刪除按鈕
         if (widget.onDelete != null)
           _buildControlButton(
@@ -382,12 +386,13 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             onTap: widget.onDelete!,
             tooltip: 'Delete Training Day',
           ),
-        
+
         const SizedBox(width: 8),
-        
+
         // 展開指示器
         _buildControlButton(
-          icon: _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+          icon:
+              _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
           color: theme.colorScheme.primary,
           onTap: _toggleExpanded,
           tooltip: _isExpanded ? 'Collapse' : 'Expand',
@@ -412,9 +417,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Material(
           color: Colors.transparent,
@@ -424,21 +427,18 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
               onTap();
             },
             borderRadius: BorderRadius.circular(16),
-            child: rotation != null
-                ? AnimatedRotation(
-                    turns: rotation,
-                    duration: const Duration(milliseconds: 300),
-                    child: Icon(
-                      icon,
-                      size: 18,
-                      color: color.withOpacity(0.8),
-                    ),
-                  )
-                : Icon(
-                    icon,
-                    size: 18,
-                    color: color.withOpacity(0.8),
-                  ),
+            child:
+                rotation != null
+                    ? AnimatedRotation(
+                      turns: rotation,
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        icon,
+                        size: 18,
+                        color: color.withOpacity(0.8),
+                      ),
+                    )
+                    : Icon(icon, size: 18, color: color.withOpacity(0.8)),
           ),
         ),
       ),
@@ -451,9 +451,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -467,7 +465,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
               theme.colorScheme.primary,
             ),
           ),
-          
+
           // 最高分
           Expanded(
             child: _buildStatItem(
@@ -478,7 +476,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
               Colors.green,
             ),
           ),
-          
+
           // Strike %
           Expanded(
             child: _buildStatItem(
@@ -494,15 +492,17 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, IconData icon, String value, String label, Color color) {
+  Widget _buildStatItem(
+    ThemeData theme,
+    IconData icon,
+    String value,
+    String label,
+    Color color,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: color,
-        ),
+        Icon(icon, size: 20, color: color),
         const SizedBox(height: 6),
         Text(
           value,
@@ -529,13 +529,9 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       children: [
         // 球館
         Expanded(
-          child: _buildInfoItem(
-            theme,
-            Iconsax.location,
-            widget.summary.center,
-          ),
+          child: _buildInfoItem(theme, Iconsax.location, widget.summary.center),
         ),
-        
+
         // 油圖
         Expanded(
           child: _buildInfoItem(
@@ -544,7 +540,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
             widget.summary.oilPatternDisplay,
           ),
         ),
-        
+
         // 計分方式
         Expanded(
           child: _buildInfoItem(
@@ -561,11 +557,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 12,
-          color: theme.colorScheme.primary.withOpacity(0.7),
-        ),
+        Icon(icon, size: 12, color: theme.colorScheme.primary.withOpacity(0.7)),
         const SizedBox(width: 4),
         Flexible(
           child: Text(
@@ -583,7 +575,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
 
   Widget _buildExpandedContent(ThemeData theme) {
     if (!_isExpanded) return const SizedBox.shrink();
-    
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Column(
@@ -602,17 +594,17 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
               ),
             ),
           ),
-          
+
           // 標籤頁
           _buildTabBar(theme),
-          
+
           const SizedBox(height: 16),
-          
+
           // 標籤內容
           _buildTabContent(theme),
-          
+
           const SizedBox(height: 16),
-          
+
           // 新增遊戲按鈕
           if (widget.onAddGame != null)
             SizedBox(
@@ -636,9 +628,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -651,7 +641,7 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
 
   Widget _buildTab(ThemeData theme, int index, String label, IconData icon) {
     final isSelected = _selectedTabIndex == index;
-    
+
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -662,13 +652,17 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isSelected 
-              ? theme.colorScheme.primary.withOpacity(0.2)
-              : Colors.transparent,
+            color:
+                isSelected
+                    ? theme.colorScheme.primary.withOpacity(0.2)
+                    : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
-            border: isSelected 
-              ? Border.all(color: theme.colorScheme.primary.withOpacity(0.5))
-              : null,
+            border:
+                isSelected
+                    ? Border.all(
+                      color: theme.colorScheme.primary.withOpacity(0.5),
+                    )
+                    : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -676,17 +670,14 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
               Icon(
                 icon,
                 size: 16,
-                color: isSelected 
-                  ? theme.colorScheme.primary 
-                  : Colors.white70,
+                color: isSelected ? theme.colorScheme.primary : Colors.white70,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isSelected 
-                    ? theme.colorScheme.primary 
-                    : Colors.white70,
+                  color:
+                      isSelected ? theme.colorScheme.primary : Colors.white70,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 13,
                 ),
@@ -716,17 +707,11 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-          ),
+          border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
         ),
         child: Column(
           children: [
-            const Icon(
-              Iconsax.game,
-              size: 48,
-              color: Colors.white30,
-            ),
+            const Icon(Iconsax.game, size: 48, color: Colors.white30),
             const SizedBox(height: 12),
             Text(
               'No games recorded yet',
@@ -738,45 +723,42 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         ),
       );
     }
-    
+
     return Column(
-      children: widget.summary.games.asMap().entries.map((entry) {
-        final index = entry.key;
-        final game = entry.value;
-        
-        return Padding(
-          padding: EdgeInsets.only(bottom: index < widget.summary.games.length - 1 ? 8 : 0),
-          child: EnhancedGameItem(
-            game: game,
-            theme: theme,
-            onTap: () => widget.onGameTap?.call(game),
-            onDelete: () => widget.onGameDelete?.call(game),
-          ),
-        );
-      }).toList(),
+      children:
+          widget.summary.games.asMap().entries.map((entry) {
+            final index = entry.key;
+            final game = entry.value;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index < widget.summary.games.length - 1 ? 8 : 0,
+              ),
+              child: EnhancedGameItem(
+                game: game,
+                theme: theme,
+                onTap: () => widget.onGameTap?.call(game),
+                onDelete: () => widget.onGameDelete?.call(game),
+              ),
+            );
+          }).toList(),
     );
   }
 
   Widget _buildEquipmentContent(ThemeData theme) {
     final equipmentUsage = widget.summary.equipmentUsage;
-    
+
     if (equipmentUsage.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-          ),
+          border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
         ),
         child: Column(
           children: [
-            const Icon(
-              Iconsax.box,
-              size: 48,
-              color: Colors.white30,
-            ),
+            const Icon(Iconsax.box, size: 48, color: Colors.white30),
             const SizedBox(height: 12),
             Text(
               'No equipment data recorded',
@@ -788,62 +770,63 @@ class _EnhancedTrainingDayCardState extends State<EnhancedTrainingDayCard>
         ),
       );
     }
-    
+
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: equipmentUsage.entries.map((entry) {
-        final ball = entry.key;
-        final games = entry.value;
-        
-        // 解析品牌顏色
-        Color brandColor;
-        try {
-          brandColor = Color(int.parse(ball.brandColor.replaceFirst('#', '0xFF')));
-        } catch (e) {
-          brandColor = theme.colorScheme.primary;
-        }
-        
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: brandColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: brandColor.withOpacity(0.3),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: brandColor,
-                  shape: BoxShape.circle,
-                ),
+      children:
+          equipmentUsage.entries.map((entry) {
+            final ball = entry.key;
+            final games = entry.value;
+
+            // 解析品牌顏色
+            Color brandColor;
+            try {
+              brandColor = Color(
+                int.parse(ball.brandColor.replaceFirst('#', '0xFF')),
+              );
+            } catch (e) {
+              brandColor = theme.colorScheme.primary;
+            }
+
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: brandColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: brandColor.withOpacity(0.3)),
               ),
-              const SizedBox(width: 8),
-              Text(
-                ball.name,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: brandColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    ball.name,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '(${games.length})',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: brandColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 4),
-              Text(
-                '(${games.length})',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: brandColor,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
     );
   }
-} 
+}

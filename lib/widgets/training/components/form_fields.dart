@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 
 /// 練習標題輸入欄位
 class SessionTitleField extends StatelessWidget {
-
-  const SessionTitleField({
-    required this.controller, super.key,
-  });
+  const SessionTitleField({required this.controller, super.key});
   final TextEditingController controller;
 
   @override
@@ -52,9 +49,10 @@ class SessionTitleField extends StatelessWidget {
 
 /// 日期選擇器
 class DateSelector extends StatelessWidget {
-
   const DateSelector({
-    required this.selectedDate, required this.onDateSelected, super.key,
+    required this.selectedDate,
+    required this.onDateSelected,
+    super.key,
   });
   final DateTime selectedDate;
   final Function(BuildContext) onDateSelected;
@@ -68,25 +66,16 @@ class DateSelector extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.3),
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            const Icon(
-              Icons.calendar_today,
-              color: Colors.white70,
-              size: 20,
-            ),
+            const Icon(Icons.calendar_today, color: Colors.white70, size: 20),
             const SizedBox(width: 12),
             Text(
               '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
         ),
@@ -97,10 +86,7 @@ class DateSelector extends StatelessWidget {
 
 /// 地點輸入欄位
 class LocationField extends StatelessWidget {
-
-  const LocationField({
-    required this.controller, super.key,
-  });
+  const LocationField({required this.controller, super.key});
   final TextEditingController controller;
 
   @override
@@ -142,9 +128,12 @@ class LocationField extends StatelessWidget {
 
 /// 油型選擇器組件
 class OilPatternSelector extends StatefulWidget {
-
   const OilPatternSelector({
-    required this.isHousePattern, required this.nameController, required this.lengthController, required this.onHousePatternChanged, super.key,
+    required this.isHousePattern,
+    required this.nameController,
+    required this.lengthController,
+    required this.onHousePatternChanged,
+    super.key,
   });
   final bool isHousePattern;
   final TextEditingController nameController;
@@ -161,75 +150,82 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
   void _showTooltip(BuildContext context) {
     final renderBox = context.findRenderObject()! as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
-    
+
     _tooltipOverlay = OverlayEntry(
-      builder: (context) => Stack(
-        children: [
-          GestureDetector(
-            onTap: _hideTooltip,
-            child: Container(
-              color: Colors.transparent,
-              width: double.infinity,
-              height: double.infinity,
-            ),
-          ),
-          Positioned(
-            left: position.dx - 50,
-            top: position.dy + 40,
-            child: Material(
-              color: Colors.transparent,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                        child: Container(
-                          color: Colors.white.withOpacity(0.15),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 260,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                        ),
-                      ),
-                      child: RichText(
-                        text: const TextSpan(
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            height: 1.3,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'House Pattern: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: 'Default oil pattern used by bowling centers\n\n'),
-                            TextSpan(
-                              text: 'Custom Pattern: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: 'Professional patterns (e.g., PBA patterns)'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+      builder:
+          (context) => Stack(
+            children: [
+              GestureDetector(
+                onTap: _hideTooltip,
+                child: Container(
+                  color: Colors.transparent,
+                  width: double.infinity,
+                  height: double.infinity,
                 ),
               ),
-            ),
+              Positioned(
+                left: position.dx - 50,
+                top: position.dy + 40,
+                child: Material(
+                  color: Colors.transparent,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                            child: Container(
+                              color: Colors.white.withOpacity(0.15),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 260,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                          child: RichText(
+                            text: const TextSpan(
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                height: 1.3,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'House Pattern: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                  text:
+                                      'Default oil pattern used by bowling centers\n\n',
+                                ),
+                                TextSpan(
+                                  text: 'Custom Pattern: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                  text:
+                                      'Professional patterns (e.g., PBA patterns)',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
-    
+
     Overlay.of(context).insert(_tooltipOverlay!);
   }
 
@@ -251,9 +247,7 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -265,24 +259,26 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
             children: [
               const Text(
                 'Oil Pattern (Optional)',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
               // House Pattern 按鈕
               GestureDetector(
                 onTap: () => widget.onHousePatternChanged(true),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: widget.isHousePattern 
-                        ? Colors.white.withOpacity(0.3)
-                        : Colors.white.withOpacity(0.1),
+                    color:
+                        widget.isHousePattern
+                            ? Colors.white.withOpacity(0.3)
+                            : Colors.white.withOpacity(0.1),
                     border: Border.all(
-                      color: widget.isHousePattern 
-                          ? Colors.white.withOpacity(0.8)
-                          : Colors.white.withOpacity(0.3),
+                      color:
+                          widget.isHousePattern
+                              ? Colors.white.withOpacity(0.8)
+                              : Colors.white.withOpacity(0.3),
                       width: widget.isHousePattern ? 2 : 1,
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -292,16 +288,19 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
-                      fontWeight: widget.isHousePattern ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight:
+                          widget.isHousePattern
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Custom Pattern 選項
           if (!widget.isHousePattern) ...[
             // Pattern Name 欄位
@@ -310,7 +309,10 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Pattern Name (e.g., Cheetah)',
-                labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
+                labelStyle: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 12,
+                ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                   borderRadius: BorderRadius.circular(8),
@@ -321,12 +323,15 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
                 ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Pattern Length 欄位
             TextFormField(
               controller: widget.lengthController,
@@ -334,7 +339,10 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Pattern Length (feet)',
-                labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
+                labelStyle: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 12,
+                ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
                   borderRadius: BorderRadius.circular(8),
@@ -345,7 +353,10 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
                 ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.1),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
             ),
           ] else ...[
@@ -357,18 +368,13 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'Use Custom Pattern',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
             ),
@@ -377,4 +383,4 @@ class _OilPatternSelectorState extends State<OilPatternSelector> {
       ),
     );
   }
-} 
+}

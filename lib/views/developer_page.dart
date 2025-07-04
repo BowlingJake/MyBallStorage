@@ -20,14 +20,14 @@ class DeveloperPage extends StatelessWidget {
         children: [
           _buildSectionTitle(context, 'APP 標準按鈕 (App Standard Button)'),
           const SizedBox(height: 16),
-          
+
           // 僅文字按鈕
           AppStandardButton(
             text: '僅文字按鈕',
             onPressed: () => _showSnackBar(context, '文字按鈕被點擊'),
           ),
           const SizedBox(height: 12),
-          
+
           // 僅圖示按鈕
           AppStandardButton(
             icon: Icons.star,
@@ -35,7 +35,7 @@ class DeveloperPage extends StatelessWidget {
             width: 60,
           ),
           const SizedBox(height: 12),
-          
+
           // 圖示 + 文字按鈕
           AppStandardButton(
             text: 'Filter',
@@ -44,7 +44,7 @@ class DeveloperPage extends StatelessWidget {
             width: 120,
           ),
           const SizedBox(height: 12),
-          
+
           // 停用狀態按鈕
           AppStandardButton(
             text: '停用按鈕',
@@ -53,16 +53,16 @@ class DeveloperPage extends StatelessWidget {
             enabled: false,
           ),
           const SizedBox(height: 12),
-          
+
           // 自適應寬度按鈕
           AppStandardButton(
             text: '這是一個很長的按鈕文字範例',
             icon: Icons.text_fields,
             onPressed: () => _showSnackBar(context, '長文字按鈕被點擊'),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           _buildSectionTitle(context, 'Glow Border Button (原型)'),
           const SizedBox(height: 16),
           GlowBorderButton(
@@ -72,11 +72,19 @@ class DeveloperPage extends StatelessWidget {
 
           _buildSectionTitle(context, '顏色 (Colors)'),
           const SizedBox(height: 8),
-          _buildColorSwatch(context, 'Primary/Accent', theme.colorScheme.primary),
+          _buildColorSwatch(
+            context,
+            'Primary/Accent',
+            theme.colorScheme.primary,
+          ),
           _buildColorSwatch(context, 'Background', theme.colorScheme.surface),
           _buildColorSwatch(context, 'Surface', theme.colorScheme.surface),
           _buildColorSwatch(context, 'On Primary', theme.colorScheme.onPrimary),
-          _buildColorSwatch(context, 'On Background', theme.colorScheme.onSurface),
+          _buildColorSwatch(
+            context,
+            'On Background',
+            theme.colorScheme.onSurface,
+          ),
           const SizedBox(height: 24),
 
           _buildSectionTitle(context, '文字樣式 (Typography)'),
@@ -96,18 +104,12 @@ class DeveloperPage extends StatelessWidget {
 
   void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 1),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
     );
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.headlineSmall,
-    );
+    return Text(title, style: Theme.of(context).textTheme.headlineSmall);
   }
 
   Widget _buildColorSwatch(BuildContext context, String name, Color color) {
@@ -119,9 +121,10 @@ class DeveloperPage extends StatelessWidget {
         child: Text(
           name,
           style: TextStyle(
-            color: ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+            color:
+                ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -136,4 +139,4 @@ class DeveloperPage extends StatelessWidget {
       child: Text(name, style: style),
     );
   }
-} 
+}

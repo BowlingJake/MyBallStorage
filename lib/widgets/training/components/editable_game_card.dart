@@ -6,9 +6,11 @@ import 'package:iconsax/iconsax.dart';
 /// 可編輯的遊戲卡片組件
 /// 支持內聯編輯分數、Strikes、Spares等數據
 class EditableGameCard extends StatefulWidget {
-
   const EditableGameCard({
-    required this.game, required this.theme, required this.onGameSaved, super.key,
+    required this.game,
+    required this.theme,
+    required this.onGameSaved,
+    super.key,
     this.onGameCanceled,
     this.onGameDelete,
     this.isEditing = false,
@@ -29,7 +31,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
   late TextEditingController _strikesController;
   late TextEditingController _sparesController;
   late TextEditingController _notesController;
-  
+
   bool _isEditing = false;
   bool _hasChanges = false;
 
@@ -37,12 +39,18 @@ class _EditableGameCardState extends State<EditableGameCard> {
   void initState() {
     super.initState();
     _isEditing = widget.isEditing;
-    
-    _scoreController = TextEditingController(text: widget.game.score.toString());
-    _strikesController = TextEditingController(text: widget.game.strikes.toString());
-    _sparesController = TextEditingController(text: widget.game.spares.toString());
+
+    _scoreController = TextEditingController(
+      text: widget.game.score.toString(),
+    );
+    _strikesController = TextEditingController(
+      text: widget.game.strikes.toString(),
+    );
+    _sparesController = TextEditingController(
+      text: widget.game.spares.toString(),
+    );
     _notesController = TextEditingController(text: widget.game.notes ?? '');
-    
+
     // 監聽變化
     _scoreController.addListener(_onFieldChanged);
     _strikesController.addListener(_onFieldChanged);
@@ -69,18 +77,18 @@ class _EditableGameCardState extends State<EditableGameCard> {
     final score = int.tryParse(_scoreController.text) ?? 0;
     final strikes = int.tryParse(_strikesController.text) ?? 0;
     final spares = int.tryParse(_sparesController.text) ?? 0;
-    
+
     // 驗證數據
     if (score < 0 || score > 300) {
       _showErrorDialog('分數必須在 0-300 之間');
       return;
     }
-    
+
     if (strikes < 0 || strikes > 12) {
       _showErrorDialog('Strike 數量必須在 0-12 之間');
       return;
     }
-    
+
     if (spares < 0 || spares > 10) {
       _showErrorDialog('Spare 數量必須在 0-10 之間');
       return;
@@ -122,16 +130,17 @@ class _EditableGameCardState extends State<EditableGameCard> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('輸入錯誤'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('確定'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('輸入錯誤'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('確定'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -141,34 +150,39 @@ class _EditableGameCardState extends State<EditableGameCard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _isEditing 
-          ? widget.theme.colorScheme.primary.withOpacity(0.1)
-          : widget.theme.colorScheme.surface.withOpacity(0.05),
+        color:
+            _isEditing
+                ? widget.theme.colorScheme.primary.withOpacity(0.1)
+                : widget.theme.colorScheme.surface.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _isEditing 
-            ? widget.theme.colorScheme.primary.withOpacity(0.5)
-            : widget.theme.colorScheme.primary.withOpacity(0.2),
+          color:
+              _isEditing
+                  ? widget.theme.colorScheme.primary.withOpacity(0.5)
+                  : widget.theme.colorScheme.primary.withOpacity(0.2),
           width: _isEditing ? 2 : 1,
         ),
-        boxShadow: _isEditing ? [
-          BoxShadow(
-            color: widget.theme.colorScheme.primary.withOpacity(0.1),
-            blurRadius: 8,
-            spreadRadius: 1,
-          ),
-        ] : null,
+        boxShadow:
+            _isEditing
+                ? [
+                  BoxShadow(
+                    color: widget.theme.colorScheme.primary.withOpacity(0.1),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ]
+                : null,
       ),
       child: Column(
         children: [
           // 頭部 - 局數和控制按鈕
           _buildHeader(),
-          
+
           const SizedBox(height: 16),
-          
+
           // 主要內容區域
           if (_isEditing) _buildEditingContent() else _buildDisplayContent(),
-          
+
           // 編輯模式下的操作按鈕
           if (_isEditing) ...[
             const SizedBox(height: 16),
@@ -203,9 +217,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
             ),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // 標題
         Expanded(
           child: Text(
@@ -216,7 +230,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
             ),
           ),
         ),
-        
+
         // 控制按鈕
         if (!_isEditing) ...[
           IconButton(
@@ -248,9 +262,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
             color: _getScoreColor(widget.game.score),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Strikes
         Expanded(
           child: _buildStatDisplay(
@@ -260,9 +274,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
             color: Colors.green,
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Spares
         Expanded(
           child: _buildStatDisplay(
@@ -293,9 +307,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
                 maxLength: 3,
               ),
             ),
-            
+
             const SizedBox(width: 12),
-            
+
             // Strikes
             Expanded(
               child: _buildEditField(
@@ -306,9 +320,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
                 maxLength: 2,
               ),
             ),
-            
+
             const SizedBox(width: 12),
-            
+
             // Spares
             Expanded(
               child: _buildEditField(
@@ -321,9 +335,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // 備註輸入
         _buildEditField(
           controller: _notesController,
@@ -392,9 +406,7 @@ class _EditableGameCardState extends State<EditableGameCard> {
         labelText: label,
         prefixIcon: Icon(icon, size: 18),
         counterText: '', // 隱藏字符計數
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
@@ -410,9 +422,10 @@ class _EditableGameCardState extends State<EditableGameCard> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
-      inputFormatters: inputType == TextInputType.number 
-        ? [FilteringTextInputFormatter.digitsOnly]
-        : null,
+      inputFormatters:
+          inputType == TextInputType.number
+              ? [FilteringTextInputFormatter.digitsOnly]
+              : null,
     );
   }
 
@@ -431,9 +444,9 @@ class _EditableGameCardState extends State<EditableGameCard> {
             ),
           ),
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // 保存按鈕
         Expanded(
           child: ElevatedButton.icon(

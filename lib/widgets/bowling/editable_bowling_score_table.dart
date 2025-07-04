@@ -5,9 +5,11 @@ import 'package:bowlingarsenal_app/widgets/bowling/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
 
 class EditableBowlingScoreTable extends StatefulWidget {
-
   const EditableBowlingScoreTable({
-    required this.scoreData, required this.modifiedFrames, required this.onCellEdit, super.key,
+    required this.scoreData,
+    required this.modifiedFrames,
+    required this.onCellEdit,
+    super.key,
     this.width,
   });
   final BowlingScoreData scoreData;
@@ -16,7 +18,8 @@ class EditableBowlingScoreTable extends StatefulWidget {
   final double? width;
 
   @override
-  _EditableBowlingScoreTableState createState() => _EditableBowlingScoreTableState();
+  _EditableBowlingScoreTableState createState() =>
+      _EditableBowlingScoreTableState();
 }
 
 class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
@@ -43,9 +46,20 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
       final pinsDown = pinsHit.length;
       final newRoll = Roll(
         pinsDown: pinsDown,
-        pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
+        pinsStandingAfterThrow: {
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+        }.difference(pinsHit),
         displayScore: pinsDown == 10 ? 'X' : pinsDown.toString(),
-        pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
+        pinsStandingBeforeThrow: {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
       );
       frame.rolls.add(newRoll);
       widget.scoreData.calculateScores();
@@ -79,8 +93,10 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
               ),
               child: ScoreFrameWidget(
                 frameNumber: index + 1,
-                ball1Score: frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
-                ball2Score: frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
+                ball1Score:
+                    frame.rolls.isNotEmpty ? frame.rolls[0].displayScore : null,
+                ball2Score:
+                    frame.rolls.length > 1 ? frame.rolls[1].displayScore : null,
                 frameTotalScore: frame.totalScore?.toString(),
                 availableWidth: frameWidth,
               ),
@@ -92,7 +108,10 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: widget.modifiedFrames.contains(9) ? Colors.red : Colors.transparent,
+                  color:
+                      widget.modifiedFrames.contains(9)
+                          ? Colors.red
+                          : Colors.transparent,
                   width: widget.modifiedFrames.contains(9) ? 2 : 0,
                 ),
               ),
@@ -109,4 +128,4 @@ class _EditableBowlingScoreTableState extends State<EditableBowlingScoreTable> {
       ),
     );
   }
-} 
+}

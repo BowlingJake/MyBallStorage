@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 /// 現代化底部導覽列組件
 /// 使用動畫浮動樣式
 class ModernBottomNavigation extends StatelessWidget {
-
   const ModernBottomNavigation({
-    required this.currentIndex, required this.onTap, super.key,
+    required this.currentIndex,
+    required this.onTap,
+    super.key,
   });
   final int currentIndex;
   final Function(int) onTap;
@@ -19,5 +20,3 @@ class ModernBottomNavigation extends StatelessWidget {
     );
   }
 }
-
- 

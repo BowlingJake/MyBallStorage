@@ -3,9 +3,11 @@ import 'package:bowlingarsenal_app/shared/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class TrainingPageAppBar extends StatelessWidget {
-
   const TrainingPageAppBar({
-    required this.controller, required this.onCreateRecord, required this.onShowDeleteDialog, super.key,
+    required this.controller,
+    required this.onCreateRecord,
+    required this.onShowDeleteDialog,
+    super.key,
   });
   final TrainingController controller;
   final VoidCallback onCreateRecord;
@@ -14,18 +16,19 @@ class TrainingPageAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
       expandedHeight: 120,
-      leading: controller.isSelectionMode
-          ? IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: controller.toggleSelectionMode,
-            )
-          : null,
+      leading:
+          controller.isSelectionMode
+              ? IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: controller.toggleSelectionMode,
+              )
+              : null,
       flexibleSpace: FlexibleSpaceBar(
         title: Text(
           controller.isSelectionMode
@@ -58,8 +61,8 @@ class TrainingPageAppBar extends StatelessWidget {
             }
           },
           child: Text(
-            controller.selectedCount == controller.trainingDays.length 
-                ? AppStrings.cancelSelection 
+            controller.selectedCount == controller.trainingDays.length
+                ? AppStrings.cancelSelection
                 : AppStrings.selectAll,
             style: const TextStyle(color: Colors.white),
           ),
@@ -75,9 +78,10 @@ class TrainingPageAppBar extends StatelessWidget {
         // 選擇模式按鈕
         IconButton(
           icon: const Icon(Icons.select_all, color: Colors.white),
-          onPressed: controller.hasTrainingData
-              ? controller.toggleSelectionMode
-              : null,
+          onPressed:
+              controller.hasTrainingData
+                  ? controller.toggleSelectionMode
+                  : null,
         ),
         // 新增按鈕
         IconButton(
@@ -87,4 +91,4 @@ class TrainingPageAppBar extends StatelessWidget {
       ];
     }
   }
-} 
+}

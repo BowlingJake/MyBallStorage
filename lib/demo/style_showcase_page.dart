@@ -10,7 +10,7 @@ class StyleShowcasePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('APP 風格展示'),
@@ -36,69 +36,77 @@ class StyleShowcasePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             Expanded(
               child: ListView(
                 children: [
-
-                  
                   _buildStyleCard(
                     context,
                     title: 'Cyberpunk Tech',
                     subtitle: '科技未來風格',
-                    description: '賽博朋克科技感 + 霓虹發光效果\n終端機風格 + 掃描線動畫\n適合科技愛好者和未來主義用戶',
+                    description:
+                        '賽博朋克科技感 + 霓虹發光效果\n終端機風格 + 掃描線動畫\n適合科技愛好者和未來主義用戶',
                     icon: Iconsax.cpu,
                     gradient: const LinearGradient(
                       colors: [Color(0xFF00FFFF), Color(0xFF8B5CF6)],
                     ),
                     features: ['🌆 賽博朋克', '💫 霓虹發光', '⚡ 掃描動畫', '🔮 科幻感'],
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CyberpunkTechStyle()),
-                    ),
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CyberpunkTechStyle(),
+                          ),
+                        ),
                   ),
-                  
+
                   const SizedBox(height: 25),
-                  
+
                   _buildStyleCard(
                     context,
                     title: 'Digital Dashboard',
                     subtitle: '數字儀表板風格',
-                    description: '專業數據可視化 + 豐富圖表展示\n等寬字體數字 + KPI指標卡片\n適合數據分析和專業用途',
+                    description:
+                        '專業數據可視化 + 豐富圖表展示\n等寬字體數字 + KPI指標卡片\n適合數據分析和專業用途',
                     icon: Iconsax.chart,
                     gradient: const LinearGradient(
                       colors: [Color(0xFF3B82F6), Color(0xFF1E40AF)],
                     ),
                     features: ['📊 數據圖表', '📈 KPI指標', '🔢 等寬字體', '📋 專業表格'],
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const DigitalDashboardStyle()),
-                    ),
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DigitalDashboardStyle(),
+                          ),
+                        ),
                   ),
-                  
-                  const SizedBox(height: 25),
-                  
 
-                  
+                  const SizedBox(height: 25),
+
                   _buildStyleCard(
                     context,
                     title: 'Professional Dark',
                     subtitle: '專業深色風格',
-                    description: '專業運動數據分析界面 + 清晰數據可視化\n深色護眼設計 + 專業圖表展示\n適合專業球員和數據分析需求',
+                    description:
+                        '專業運動數據分析界面 + 清晰數據可視化\n深色護眼設計 + 專業圖表展示\n適合專業球員和數據分析需求',
                     icon: Iconsax.chart_2,
                     gradient: const LinearGradient(
                       colors: [Color(0xFF121212), Color(0xFF1E88E5)],
                     ),
                     features: ['📊 運動數據', '🎯 專業分析', '👁️ 護眼深色', '📈 成績追蹤'],
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const DarkTechStyle()),
-                    ),
+                    onTap:
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DarkTechStyle(),
+                          ),
+                        ),
                   ),
                 ],
               ),
             ),
-            
+
             // 底部提示
             Container(
               padding: const EdgeInsets.all(16),
@@ -146,19 +154,23 @@ class StyleShowcasePage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          gradient: gradient.colors.first.withOpacity(0.05) != Colors.transparent
-            ? LinearGradient(
-                colors: gradient.colors.map((c) => c.withOpacity(0.05)).toList(),
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
+          gradient:
+              gradient.colors.first.withOpacity(0.05) != Colors.transparent
+                  ? LinearGradient(
+                    colors:
+                        gradient.colors
+                            .map((c) => c.withOpacity(0.05))
+                            .toList(),
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
           border: Border.all(
             color: gradient.colors.first.withOpacity(0.2),
             width: 1.5,
@@ -194,11 +206,7 @@ class StyleShowcasePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    child: Icon(icon, color: Colors.white, size: 28),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -237,9 +245,9 @@ class StyleShowcasePage extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // 描述
               Text(
                 description,
@@ -248,31 +256,39 @@ class StyleShowcasePage extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // 特色功能
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: features.map((feature) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: gradient.colors.first.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: gradient.colors.first.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Text(
-                    feature,
-                    style: TextStyle(
-                      color: gradient.colors.first,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),).toList(),
+                children:
+                    features
+                        .map(
+                          (feature) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: gradient.colors.first.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: gradient.colors.first.withOpacity(0.2),
+                              ),
+                            ),
+                            child: Text(
+                              feature,
+                              style: TextStyle(
+                                color: gradient.colors.first,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -280,4 +296,4 @@ class StyleShowcasePage extends StatelessWidget {
       ),
     );
   }
-} 
+}

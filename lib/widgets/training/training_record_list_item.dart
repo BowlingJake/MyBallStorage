@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 class TrainingRecordListItem extends StatelessWidget {
-
   const TrainingRecordListItem({
-    required this.record, required this.theme, required this.onTap, required this.isLastItem, required this.index, super.key,
+    required this.record,
+    required this.theme,
+    required this.onTap,
+    required this.isLastItem,
+    required this.index,
+    super.key,
   });
   final TrainingRecord record;
   final ThemeData theme;
@@ -69,4 +73,4 @@ class TrainingRecordListItem extends StatelessWidget {
       ],
     );
   }
-} 
+}

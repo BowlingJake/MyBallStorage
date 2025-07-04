@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
 class TrainingPageAppBarActions extends StatelessWidget {
-
   const TrainingPageAppBarActions({
-    required this.isSelectionMode, required this.selectedCount, required this.totalCount, required this.onToggleSelectionMode, required this.onSelectAll, required this.onClearAll, required this.onDeleteSelected, super.key,
+    required this.isSelectionMode,
+    required this.selectedCount,
+    required this.totalCount,
+    required this.onToggleSelectionMode,
+    required this.onSelectAll,
+    required this.onClearAll,
+    required this.onDeleteSelected,
+    super.key,
   });
   final bool isSelectionMode;
   final int selectedCount;
@@ -32,13 +38,10 @@ class TrainingPageAppBarActions extends StatelessWidget {
         ),
         IconButton(
           onPressed: onDeleteSelected,
-          icon: const Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
+          icon: const Icon(Icons.delete, color: Colors.red),
           tooltip: 'Delete Selected',
         ),
       ],
     );
   }
-} 
+}

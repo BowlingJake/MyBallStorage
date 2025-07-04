@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// Professional Dark 背景組件 - 專業深色風格
 /// 使用指定的圖片作為背景，並提供深色疊加效果
 class ProfessionalDarkBackground extends StatelessWidget {
-
   const ProfessionalDarkBackground({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.backgroundImage = 'images/Sport_Tech_Background.png',
     this.overlayColor = Colors.black,
     this.overlayOpacity = 0.6,
@@ -24,12 +24,9 @@ class ProfessionalDarkBackground extends StatelessWidget {
         children: [
           // 背景圖片
           Positioned.fill(
-            child: Image.asset(
-              backgroundImage,
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset(backgroundImage, fit: BoxFit.cover),
           ),
-          
+
           // 使用 CustomPaint 繪製帶有 "開孔" 的疊加層
           Positioned.fill(
             child: CustomPaint(
@@ -39,7 +36,7 @@ class ProfessionalDarkBackground extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // 主要內容
           child,
         ],
@@ -50,7 +47,6 @@ class ProfessionalDarkBackground extends StatelessWidget {
 
 /// 一個自訂的繪製器，用於繪製一個帶有矩形孔洞的疊加層。
 class _OverlayPainter extends CustomPainter {
-
   _OverlayPainter({required this.overlayColor, this.cutoutRects});
   final Color overlayColor;
   final List<Rect>? cutoutRects;
@@ -73,7 +69,7 @@ class _OverlayPainter extends CustomPainter {
         );
       }
     }
-    
+
     // 將最終的路徑 (可能帶有孔洞) 繪製到畫布上
     canvas.drawPath(path, paint);
   }
@@ -82,6 +78,6 @@ class _OverlayPainter extends CustomPainter {
   bool shouldRepaint(covariant _OverlayPainter oldDelegate) {
     // 僅當顏色或開孔區域列表發生變化時才重繪
     return oldDelegate.overlayColor != overlayColor ||
-           oldDelegate.cutoutRects != cutoutRects;
+        oldDelegate.cutoutRects != cutoutRects;
   }
-} 
+}

@@ -1,1 +1,3 @@
-﻿import 'a.dart'; class B extends A {}
+import 'a.dart';
+
+class B extends A {}

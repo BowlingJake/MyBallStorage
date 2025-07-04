@@ -4,20 +4,31 @@ import 'package:flutter/material.dart';
 enum _DialogView { selection, details, layoutInput }
 
 /// 共用的顯示 Layout 設定與詳細資料的 Dialog
-void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback onUpdated) {
+void showBallActionDialog(
+  BuildContext context,
+  BowlingBall ball,
+  VoidCallback onUpdated,
+) {
   var currentView = _DialogView.selection;
 
   // Keep track of layout input values within the dialog's state
   String? handType = ball.handType ?? 'One Handed';
   String? layoutType = ball.layoutType ?? 'Duel';
-  final field1 = TextEditingController(text: ball.layoutValues?.elementAtOrNull(0) ?? '');
-  final field2 = TextEditingController(text: ball.layoutValues?.elementAtOrNull(1) ?? '');
-  final field3 = TextEditingController(text: ball.layoutValues?.elementAtOrNull(2) ?? '');
+  final field1 = TextEditingController(
+    text: ball.layoutValues?.elementAtOrNull(0) ?? '',
+  );
+  final field2 = TextEditingController(
+    text: ball.layoutValues?.elementAtOrNull(1) ?? '',
+  );
+  final field3 = TextEditingController(
+    text: ball.layoutValues?.elementAtOrNull(2) ?? '',
+  );
 
   showDialog(
     context: context,
     // Use StatefulBuilder to manage the internal state (current view)
-    builder: (dialogContext) { // Use a different context name to avoid confusion
+    builder: (dialogContext) {
+      // Use a different context name to avoid confusion
       return StatefulBuilder(
         builder: (statefulContext, setState) {
           Widget content;
@@ -54,18 +65,20 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Hand Type Selection
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ChoiceChip(
                         label: const Text('1 Handed'),
                         selected: handType == 'One Handed',
-                        onSelected: (_) => setState(() => handType = 'One Handed'),
+                        onSelected:
+                            (_) => setState(() => handType = 'One Handed'),
                       ),
                       ChoiceChip(
                         label: const Text('2 Handed'),
                         selected: handType == 'Two Handed',
-                        onSelected: (_) => setState(() => handType = 'Two Handed'),
+                        onSelected:
+                            (_) => setState(() => handType = 'Two Handed'),
                       ),
                     ],
                   ),
@@ -91,17 +104,25 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildLayoutField(field1, layoutType == 'Duel', isAngle: true),
+                      _buildLayoutField(
+                        field1,
+                        layoutType == 'Duel',
+                        isAngle: true,
+                      ),
                       const Text('  X  ', style: TextStyle(fontSize: 10)),
                       _buildLayoutField(field2, false),
                       const Text('  X  ', style: TextStyle(fontSize: 10)),
-                      _buildLayoutField(field3, layoutType == 'Duel', isAngle: true),
+                      _buildLayoutField(
+                        field3,
+                        layoutType == 'Duel',
+                        isAngle: true,
+                      ),
                     ],
                   ),
                 ],
               );
               actions = [
-                 TextButton(
+                TextButton(
                   onPressed: () {
                     setState(() {
                       handType = null;
@@ -113,8 +134,8 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
                       ball.layoutType = null;
                       ball.layoutValues = null;
                     });
-                     // Optionally call onUpdated if clearing should persist immediately
-                     // onUpdated();
+                    // Optionally call onUpdated if clearing should persist immediately
+                    // onUpdated();
                   },
                   child: const Text('清空'),
                 ),
@@ -147,7 +168,7 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
               actions = [
                 TextButton(
                   onPressed: () {
-                     Navigator.pop(dialogContext); // Close the dialog fully
+                    Navigator.pop(dialogContext); // Close the dialog fully
                   },
                   child: const Text('取消'), // This cancels the whole operation
                 ),
@@ -181,9 +202,12 @@ void showBallActionDialog(BuildContext context, BowlingBall ball, VoidCallback o
   );
 }
 
-
 // Helper function for layout fields remains the same
-Widget _buildLayoutField(TextEditingController controller, bool showAngle, {bool isAngle = false}) {
+Widget _buildLayoutField(
+  TextEditingController controller,
+  bool showAngle, {
+  bool isAngle = false,
+}) {
   return SizedBox(
     width: 30,
     child: Row(

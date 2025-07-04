@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ScoreFrameWidget extends StatelessWidget {
-
-  const ScoreFrameWidget({required this.frameNumber, required this.availableWidth, // 新增參數, super.key,, super.key,
+  const ScoreFrameWidget({
+    required this.frameNumber,
+    required this.availableWidth, // 新增參數, super.key,, super.key,, super.key,, super.key,
     this.ball1Score,
     this.ball2Score,
     this.ball3Score, // 只有第10格才可能用到
@@ -30,7 +31,9 @@ class ScoreFrameWidget extends StatelessWidget {
     final totalScoreHeight = (availableWidth - 2) * 0.3; // 減去邊框寬度
 
     // 計算小格子的寬度，考慮邊框寬度
-    final smallBoxWidth = (availableWidth - (isTenthFrame ? 3 : 2)) / (isTenthFrame ? 3 : 2); // 減去邊框寬度
+    final smallBoxWidth =
+        (availableWidth - (isTenthFrame ? 3 : 2)) /
+        (isTenthFrame ? 3 : 2); // 減去邊框寬度
 
     return Container(
       width: availableWidth,
@@ -100,9 +103,7 @@ class ScoreFrameWidget extends StatelessWidget {
           Container(
             height: totalScoreHeight,
             width: double.infinity,
-            decoration: const BoxDecoration(
-              border: Border(top: borderSide),
-            ),
+            decoration: const BoxDecoration(border: Border(top: borderSide)),
             child: Center(
               child: Text(
                 frameTotalScore ?? '',
@@ -123,11 +124,12 @@ class ScoreFrameWidget extends StatelessWidget {
     double width,
     double height,
     BorderSide border, {
-    required double fontSize, bool isLeftMost = false,
+    required double fontSize,
+    bool isLeftMost = false,
     bool isRightMost = false,
   }) {
     Widget displayWidget;
-    
+
     if (score == 'X') {
       displayWidget = SvgPicture.asset(
         'assets/images/strike_symbol.svg',
@@ -143,10 +145,7 @@ class ScoreFrameWidget extends StatelessWidget {
     } else {
       displayWidget = Text(
         score ?? '',
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
       );
     }
 

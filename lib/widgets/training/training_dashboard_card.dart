@@ -2,9 +2,12 @@ import 'package:bowlingarsenal_app/widgets/training/dashboard_stat_item.dart';
 import 'package:flutter/material.dart';
 
 class TrainingDashboardCard extends StatelessWidget {
-
   const TrainingDashboardCard({
-    required this.theme, required this.strikePercentage, required this.sparePercentage, required this.averageScore, super.key,
+    required this.theme,
+    required this.strikePercentage,
+    required this.sparePercentage,
+    required this.averageScore,
+    super.key,
   });
   final ThemeData theme;
   final double strikePercentage;
@@ -16,9 +19,7 @@ class TrainingDashboardCard extends StatelessWidget {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       color: theme.colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
@@ -67,4 +68,4 @@ class TrainingDashboardCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

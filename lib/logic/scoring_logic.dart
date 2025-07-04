@@ -1,6 +1,5 @@
 // lib/logic/scoring_logic.dart
 class Frame {
-
   Frame({required this.frameNumber});
   final int frameNumber;
   int? firstRoll;
@@ -10,7 +9,8 @@ class Frame {
   bool get isTenthFrame => frameNumber == 10;
 
   bool get isStrike => firstRoll == 10;
-  bool get isSpare => firstRoll != null && (firstRoll! + (secondRoll ?? 0)) == 10;
+  bool get isSpare =>
+      firstRoll != null && (firstRoll! + (secondRoll ?? 0)) == 10;
 
   void setRolls(int? r1, int? r2, [int? r3]) {
     firstRoll = r1;
@@ -22,7 +22,10 @@ class Frame {
 }
 
 class BowlingScorerLogic {
-  List<Frame> frames = List.generate(10, (index) => Frame(frameNumber: index + 1));
+  List<Frame> frames = List.generate(
+    10,
+    (index) => Frame(frameNumber: index + 1),
+  );
   int totalScore = 0;
 
   void calculateScores() {
@@ -39,9 +42,12 @@ class BowlingScorerLogic {
       } else if (frames[i].isSpare && i < 9) {
         frameScore = 10 + _spareBonus(i);
       } else {
-        frameScore = (frames[i].firstRoll ?? 0) + (frames[i].secondRoll ?? 0) + (frames[i].thirdRoll ?? 0);
+        frameScore =
+            (frames[i].firstRoll ?? 0) +
+            (frames[i].secondRoll ?? 0) +
+            (frames[i].thirdRoll ?? 0);
       }
-      
+
       totalScore += frameScore;
       frames[i].score = totalScore;
     }
@@ -53,13 +59,14 @@ class BowlingScorerLogic {
     // Look ahead to next frame
     final nextFrame = frames[frameIndex + 1];
     if (nextFrame.firstRoll == null) return 0;
-    
+
     // Strike in next frame
     if (nextFrame.isStrike) {
       if (frameIndex + 1 < 9) {
         final nextNextFrame = frames[frameIndex + 2];
         return 10 + (nextNextFrame.firstRoll ?? 0);
-      } else { // 10th frame
+      } else {
+        // 10th frame
         return 10 + (nextFrame.secondRoll ?? 0);
       }
     } else {
@@ -77,4 +84,4 @@ class BowlingScorerLogic {
     frames[frameIndex].setRolls(r1, r2, r3);
     calculateScores();
   }
-} 
+}

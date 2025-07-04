@@ -1,18 +1,21 @@
-
 class Roll {
-
   Roll({
     required this.pinsDown,
-    required this.displayScore, required this.pinsStandingBeforeThrow, this.pinsStandingAfterThrow,
+    required this.displayScore,
+    required this.pinsStandingBeforeThrow,
+    this.pinsStandingAfterThrow,
   });
 
   factory Roll.fromJson(Map<String, dynamic> json) => Roll(
     pinsDown: json['pinsDown'] as int,
-    pinsStandingAfterThrow: json['pinsStandingAfterThrow'] != null
-        ? Set<int>.from(json['pinsStandingAfterThrow'] as List)
-        : null,
+    pinsStandingAfterThrow:
+        json['pinsStandingAfterThrow'] != null
+            ? Set<int>.from(json['pinsStandingAfterThrow'] as List)
+            : null,
     displayScore: json['displayScore'] as String,
-    pinsStandingBeforeThrow: Set<int>.from(json['pinsStandingBeforeThrow'] as List),
+    pinsStandingBeforeThrow: Set<int>.from(
+      json['pinsStandingBeforeThrow'] as List,
+    ),
   );
   final int pinsDown;
   final Set<int>? pinsStandingAfterThrow;
@@ -29,7 +32,6 @@ class Roll {
 
 /// 表示單一局 (Frame) 的記錄
 class Frame {
-
   Frame({
     required this.frameNumber,
     required this.rolls,
@@ -52,7 +54,6 @@ class Frame {
 
   final List<Roll> rolls;
 
-
   int? totalScore;
 
   bool isComplete;
@@ -64,8 +65,8 @@ class Frame {
     'isComplete': isComplete,
   };
 }
-class BowlingScoreData {
 
+class BowlingScoreData {
   BowlingScoreData({
     required this.frames,
     this.currentFrameIndex = 0,
@@ -81,13 +82,15 @@ class BowlingScoreData {
     );
   }
 
-  factory BowlingScoreData.fromJson(Map<String, dynamic> json) => BowlingScoreData(
-    frames: (json['frames'] as List).map((f) => Frame.fromJson(f)).toList(),
-    currentFrameIndex: json['currentFrameIndex'] as int? ?? 0,
-    currentRollIndex: json['currentRollIndex'] as int? ?? 0,
-    pinsStanding: Set<int>.from(json['pinsStanding'] as List),
-    isGameOver: json['isGameOver'] as bool? ?? false,
-  );
+  factory BowlingScoreData.fromJson(Map<String, dynamic> json) =>
+      BowlingScoreData(
+        frames: (json['frames'] as List).map((f) => Frame.fromJson(f)).toList(),
+        currentFrameIndex: json['currentFrameIndex'] as int? ?? 0,
+        currentRollIndex: json['currentRollIndex'] as int? ?? 0,
+        pinsStanding: Set<int>.from(json['pinsStanding'] as List),
+        isGameOver: json['isGameOver'] as bool? ?? false,
+      );
+
   /// 包含 10 局的列表
   final List<Frame> frames;
   int currentFrameIndex;
@@ -122,7 +125,8 @@ class BowlingScoreData {
       if (currentFrame.rolls.isNotEmpty) {
         final firstRoll = currentFrame.rolls[0];
 
-        if (firstRoll.pinsDown == 10) { // Strike
+        if (firstRoll.pinsDown == 10) {
+          // Strike
           frameScore = 10;
           // Strike 的獎勵是後面兩次投球的擊倒瓶數
           final nextTwoRolls = _getNextRolls(i, 2);
@@ -131,7 +135,9 @@ class BowlingScoreData {
             frameScore += nextTwoRolls[1].pinsDown;
             frameScorable = true; // 獎勵球數夠了，本局分數可以確定
           }
-        } else if (currentFrame.rolls.length > 1 && (firstRoll.pinsDown + currentFrame.rolls[1].pinsDown) == 10) { // Spare
+        } else if (currentFrame.rolls.length > 1 &&
+            (firstRoll.pinsDown + currentFrame.rolls[1].pinsDown) == 10) {
+          // Spare
           frameScore = 10;
           // Spare 的獎勵是後面一次投球的擊倒瓶數
           final nextRoll = _getNextRolls(i, 1);
@@ -139,7 +145,8 @@ class BowlingScoreData {
             frameScore += nextRoll[0].pinsDown;
             frameScorable = true; // 獎勵球數夠了，本局分數可以確定
           }
-        } else if (currentFrame.rolls.length > 1) { // Open Frame (非 Strike 也非 Spare)
+        } else if (currentFrame.rolls.length > 1) {
+          // Open Frame (非 Strike 也非 Spare)
           frameScore = firstRoll.pinsDown + currentFrame.rolls[1].pinsDown;
           frameScorable = true; // Open Frame 兩球投完，分數確定
         }
@@ -149,8 +156,8 @@ class BowlingScoreData {
         cumulativeScore += frameScore;
         currentFrame.totalScore = cumulativeScore;
       } else {
-         // 如果分數還不能確定 (例如 Strike/Spare 的獎勵球還沒投)，則本局總分暫時為 null
-         // cumulativeScore 不會更新
+        // 如果分數還不能確定 (例如 Strike/Spare 的獎勵球還沒投)，則本局總分暫時為 null
+        // cumulativeScore 不會更新
       }
     }
 
@@ -160,8 +167,10 @@ class BowlingScoreData {
 
     if (tenthFrame.rolls.isNotEmpty) {
       final first = tenthFrame.rolls[0].pinsDown;
-      final second = tenthFrame.rolls.length > 1 ? tenthFrame.rolls[1].pinsDown : 0;
-      final third = tenthFrame.rolls.length > 2 ? tenthFrame.rolls[2].pinsDown : 0;
+      final second =
+          tenthFrame.rolls.length > 1 ? tenthFrame.rolls[1].pinsDown : 0;
+      final third =
+          tenthFrame.rolls.length > 2 ? tenthFrame.rolls[2].pinsDown : 0;
 
       if (tenthFrame.rolls.length == 1) {
         // 只打一球，分數暫不確定

@@ -6,11 +6,7 @@ import 'package:provider/provider.dart';
 
 /// 列出所有保齡球（可搜尋），點擊選擇，長按查看詳情
 class WeaponLibraryPage extends StatefulWidget {
-  
-  const WeaponLibraryPage({
-    super.key,
-    this.readOnly = false,
-  });
+  const WeaponLibraryPage({super.key, this.readOnly = false});
   final bool readOnly;
 
   @override
@@ -42,12 +38,13 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
     );
   }
 
-  Widget _buildSearchFilterDropdown(BuildContext context, WeaponLibraryViewModel viewModel) {
+  Widget _buildSearchFilterDropdown(
+    BuildContext context,
+    WeaponLibraryViewModel viewModel,
+  ) {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        
-      ),
+      child: Row(),
     );
   }
 
@@ -67,28 +64,32 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.readOnly ? '球類清單' : '選擇武器 (${_selectedBalls.length})'),
-        actions: widget.readOnly
-            ? null
-            : [
-                TextButton(
-                  child: const Text('取消選取'),
-                  onPressed: () => setState(_selectedBalls.clear),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: _selectedBalls.isEmpty
-                        ? null
-                        : () => Navigator.pop(context, _selectedBalls),
-                    child: Text('新增 (${_selectedBalls.length})'),
+        title: Text(
+          widget.readOnly ? '球類清單' : '選擇武器 (${_selectedBalls.length})',
+        ),
+        actions:
+            widget.readOnly
+                ? null
+                : [
+                  TextButton(
+                    child: const Text('取消選取'),
+                    onPressed: () => setState(_selectedBalls.clear),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed:
+                          _selectedBalls.isEmpty
+                              ? null
+                              : () => Navigator.pop(context, _selectedBalls),
+                      child: Text('新增 (${_selectedBalls.length})'),
+                    ),
+                  ),
+                ],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -100,29 +101,33 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                 labelText: '搜尋球名',
                 prefixIcon: Icon(Icons.search),
                 // 使用 theme 處理 border 等樣式
-                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 12,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             _buildSearchFilterDropdown(context, viewModel),
             const SizedBox(height: 8),
             Expanded(
-              child: searchResults.isEmpty
-                  ? const Center(
-                      child: Text(
-                        '找不到符合條件的球。',
-                        style: TextStyle(color: Colors.grey),
-                        textAlign: TextAlign.center,
+              child:
+                  searchResults.isEmpty
+                      ? const Center(
+                        child: Text(
+                          '找不到符合條件的球。',
+                          style: TextStyle(color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                      : ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          final ball = searchResults[index];
+                          return _buildBallCard(context, ball);
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      itemCount: searchResults.length,
-                      itemBuilder: (context, index) {
-                        final ball = searchResults[index];
-                        return _buildBallCard(context, ball);
-                      },
-                    ),
             ),
           ],
         ),
@@ -141,25 +146,28 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
         margin: const EdgeInsets.symmetric(vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: isSelected
-              ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
-              : BorderSide.none,
+          side:
+              isSelected
+                  ? BorderSide(color: Theme.of(context).primaryColor, width: 2)
+                  : BorderSide.none,
         ),
-        color: isSelected
-            ? Theme.of(context).primaryColorLight.withOpacity(0.3)
-            : null,
+        color:
+            isSelected
+                ? Theme.of(context).primaryColorLight.withOpacity(0.3)
+                : null,
         child: InkWell(
-          onTap: widget.readOnly
-              ? null
-              : () {
-                  setState(() {
-                    if (isSelected) {
-                      _selectedBalls.remove(ball);
-                    } else {
-                      _selectedBalls.add(ball);
-                    }
-                  });
-                },
+          onTap:
+              widget.readOnly
+                  ? null
+                  : () {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedBalls.remove(ball);
+                      } else {
+                        _selectedBalls.add(ball);
+                      }
+                    });
+                  },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -178,7 +186,11 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Center(
-                          child: Icon(Icons.sports_baseball, color: Colors.white70, size: 30),
+                          child: Icon(
+                            Icons.sports_baseball,
+                            color: Colors.white70,
+                            size: 30,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -208,7 +220,10 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                     children: [
                       Text(
                         ball.ball,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
@@ -230,8 +245,11 @@ class _WeaponLibraryPageState extends State<WeaponLibraryPage> {
                 if (isSelected && !widget.readOnly)
                   Padding(
                     padding: const EdgeInsets.only(left: 4),
-                    child: Icon(Icons.check_circle,
-                        color: Theme.of(context).primaryColor, size: 20,),
+                    child: Icon(
+                      Icons.check_circle,
+                      color: Theme.of(context).primaryColor,
+                      size: 20,
+                    ),
                   ),
               ],
             ),

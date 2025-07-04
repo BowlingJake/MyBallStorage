@@ -17,11 +17,9 @@ const Color darkBackgroundColor = Color(0xFF0F0F0F);
 /// 卡片、對話框等元件的表面顏色，比背景稍亮以創造層次
 const Color darkSurfaceColor = Color(0xFF1E1E1E);
 
-
 // --- 淺色主題用的顏色 (來自你的原始檔案) ---
 /// 一個清新、健康的顏色，適合做為淺色模式的主題色
 const Color primaryColorLight = Color(0xFFA3D5DC);
-
 
 // ===========================================================================
 // 2. 深色主題 (Dark Theme)：數據驅動機能美學
@@ -31,21 +29,90 @@ const Color primaryColorLight = Color(0xFFA3D5DC);
 // 建立一個基礎的 TextTheme，英文字體使用 Inter，並將 Noto Sans TC 作為備用
 TextTheme _buildTextTheme(TextTheme base) {
   return base.copyWith(
-    displayLarge: GoogleFonts.inter(textStyle: base.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
-    displayMedium: GoogleFonts.inter(textStyle: base.displayMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
-    displaySmall: GoogleFonts.inter(textStyle: base.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 4, color: accentColor)])),
-    headlineLarge: GoogleFonts.inter(textStyle: base.headlineLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
-    headlineMedium: GoogleFonts.inter(textStyle: base.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
-    headlineSmall: GoogleFonts.inter(textStyle: base.headlineSmall?.copyWith(fontWeight: FontWeight.w500, color: Colors.white, shadows: [const Shadow(blurRadius: 3, color: accentColor)])),
-    titleLarge: GoogleFonts.inter(textStyle: base.titleLarge?.copyWith(fontWeight: FontWeight.w500, color: const Color(0xFFF5F5F5))),
-    titleMedium: GoogleFonts.inter(textStyle: base.titleMedium?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.15, color: const Color(0xFFF5F5F5))),
-    titleSmall: GoogleFonts.inter(textStyle: base.titleSmall?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.1, color: const Color(0xFFF5F5F5))),
-    bodyLarge: GoogleFonts.inter(textStyle: base.bodyLarge?.copyWith(color: const Color(0xFFE0E0E0))),
-    bodyMedium: GoogleFonts.inter(textStyle: base.bodyMedium?.copyWith(color: const Color(0xFFE0E0E0))),
-    bodySmall: GoogleFonts.inter(textStyle: base.bodySmall?.copyWith(color: const Color(0xFFBDBDBD))),
-    labelLarge: GoogleFonts.robotoMono(textStyle: base.labelLarge?.copyWith(fontWeight: FontWeight.w500, color: accentColor, shadows: [const Shadow(blurRadius: 2, color: accentColor)])),
-    labelMedium: GoogleFonts.robotoMono(textStyle: base.labelMedium?.copyWith(color: const Color(0xFFBDBDBD))),
-    labelSmall: GoogleFonts.robotoMono(textStyle: base.labelSmall?.copyWith(color: const Color(0xFFBDBDBD))),
+    displayLarge: GoogleFonts.inter(
+      textStyle: base.displayLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 4, color: accentColor)],
+      ),
+    ),
+    displayMedium: GoogleFonts.inter(
+      textStyle: base.displayMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 4, color: accentColor)],
+      ),
+    ),
+    displaySmall: GoogleFonts.inter(
+      textStyle: base.displaySmall?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 4, color: accentColor)],
+      ),
+    ),
+    headlineLarge: GoogleFonts.inter(
+      textStyle: base.headlineLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 3, color: accentColor)],
+      ),
+    ),
+    headlineMedium: GoogleFonts.inter(
+      textStyle: base.headlineMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 3, color: accentColor)],
+      ),
+    ),
+    headlineSmall: GoogleFonts.inter(
+      textStyle: base.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+        shadows: [const Shadow(blurRadius: 3, color: accentColor)],
+      ),
+    ),
+    titleLarge: GoogleFonts.inter(
+      textStyle: base.titleLarge?.copyWith(
+        fontWeight: FontWeight.w500,
+        color: const Color(0xFFF5F5F5),
+      ),
+    ),
+    titleMedium: GoogleFonts.inter(
+      textStyle: base.titleMedium?.copyWith(
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.15,
+        color: const Color(0xFFF5F5F5),
+      ),
+    ),
+    titleSmall: GoogleFonts.inter(
+      textStyle: base.titleSmall?.copyWith(
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.1,
+        color: const Color(0xFFF5F5F5),
+      ),
+    ),
+    bodyLarge: GoogleFonts.inter(
+      textStyle: base.bodyLarge?.copyWith(color: const Color(0xFFE0E0E0)),
+    ),
+    bodyMedium: GoogleFonts.inter(
+      textStyle: base.bodyMedium?.copyWith(color: const Color(0xFFE0E0E0)),
+    ),
+    bodySmall: GoogleFonts.inter(
+      textStyle: base.bodySmall?.copyWith(color: const Color(0xFFBDBDBD)),
+    ),
+    labelLarge: GoogleFonts.robotoMono(
+      textStyle: base.labelLarge?.copyWith(
+        fontWeight: FontWeight.w500,
+        color: accentColor,
+        shadows: [const Shadow(blurRadius: 2, color: accentColor)],
+      ),
+    ),
+    labelMedium: GoogleFonts.robotoMono(
+      textStyle: base.labelMedium?.copyWith(color: const Color(0xFFBDBDBD)),
+    ),
+    labelSmall: GoogleFonts.robotoMono(
+      textStyle: base.labelSmall?.copyWith(color: const Color(0xFFBDBDBD)),
+    ),
   );
 }
 
@@ -59,11 +126,12 @@ final ThemeData darkTheme = ThemeData(
   fontFamilyFallback: const ['Noto Sans TC'],
 
   // --- 核心顏色配置 ---
-  scaffoldBackgroundColor: Colors.transparent, // 背景由 ProfessionalDarkBackground 提供
+  scaffoldBackgroundColor:
+      Colors.transparent, // 背景由 ProfessionalDarkBackground 提供
   colorScheme: const ColorScheme.dark(
     primary: accentColor,
     onPrimary: Color(0xFFFFFFFF), // 在強調色上的文字改為純白
-    secondary: accentColor, 
+    secondary: accentColor,
     onSecondary: Color(0xFFFFFFFF), // 主要文字改為更亮的灰白
     surface: darkSurfaceColor,
     error: Color(0xFFE57373), // 稍亮的紅色以提高可見度
@@ -103,16 +171,11 @@ final ThemeData darkTheme = ThemeData(
   cardTheme: CardTheme(
     color: Colors.transparent, // 全域卡片背景設為透明
     elevation: 0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   ),
 
   // 圖示
-  iconTheme: const IconThemeData(
-    color: accentColor,
-    size: 24,
-  ),
+  iconTheme: const IconThemeData(color: accentColor, size: 24),
 
   // 按鈕
   // 1. 線框按鈕 (主要的行動呼籲 Call-to-Action)
@@ -142,16 +205,13 @@ final ThemeData darkTheme = ThemeData(
   ),
 );
 
-
 // ===========================================================================
 // 3. 淺色主題 (Light Theme)：清新健康風 (來自你的原始檔案，稍作整理)
 // ===========================================================================
 final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: primaryColorLight,
-  ),
+  colorScheme: ColorScheme.fromSeed(seedColor: primaryColorLight),
   appBarTheme: const AppBarTheme(
     backgroundColor: primaryColorLight,
     foregroundColor: Colors.white,
@@ -166,9 +226,7 @@ final ThemeData lightTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: primaryColorLight,
       foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       elevation: 2,
       shadowColor: Colors.black26,
@@ -185,11 +243,7 @@ class AppGlows {
 
   /// 小光暈 - 用於按鈕等小型元件
   static List<BoxShadow> get small => [
-    BoxShadow(
-      color: _glowColor,
-      blurRadius: 8,
-      spreadRadius: 2,
-    ),
+    BoxShadow(color: _glowColor, blurRadius: 8, spreadRadius: 2),
   ];
 
   /// 中光暈 - 用於卡片、彈窗等中型元件

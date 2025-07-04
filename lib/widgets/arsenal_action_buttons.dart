@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 /// Two action buttons shown on the MyArsenalPage.
 class ArsenalActionButtons extends StatelessWidget {
-
   const ArsenalActionButtons({
     super.key,
     this.onAddPressed,

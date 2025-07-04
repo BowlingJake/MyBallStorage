@@ -18,7 +18,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final trainingTabProvider = StateProvider<BottomNavTab>((ref) => BottomNavTab.training);
+final trainingTabProvider = StateProvider<BottomNavTab>(
+  (ref) => BottomNavTab.training,
+);
 
 class MyTrainingPage extends ConsumerWidget {
   const MyTrainingPage({super.key});
@@ -36,14 +38,18 @@ class MyTrainingPage extends ConsumerWidget {
             TrainingPageAppBar(
               controller: controller,
               onCreateRecord: () => _showCreateRecordDialog(context, ref),
-              onShowDeleteDialog: () => _showDeleteConfirmationDialog(context, controller),
+              onShowDeleteDialog:
+                  () => _showDeleteConfirmationDialog(context, controller),
             ),
             TrainingListView(
               controller: controller,
               onCreateRecord: () => _showCreateRecordDialog(context, ref),
-              onAddGame: (dayId) => _showAddGameDialog(context, dayId, controller),
-              onEditRecord: (dayId) => _showEditRecordDialog(context, dayId, controller),
-              onDeleteDay: (dayId) => _showDeleteDayDialog(context, dayId, controller),
+              onAddGame:
+                  (dayId) => _showAddGameDialog(context, dayId, controller),
+              onEditRecord:
+                  (dayId) => _showEditRecordDialog(context, dayId, controller),
+              onDeleteDay:
+                  (dayId) => _showDeleteDayDialog(context, dayId, controller),
               onGameTap: (game) => _showGameDetails(context, game, controller),
               onGameDelete: (game) => _onGameDelete(context, game, controller),
             ),
@@ -60,7 +66,7 @@ class MyTrainingPage extends ConsumerWidget {
   void _onBottomNavTapped(BuildContext context, int index, WidgetRef ref) {
     final tab = BottomNavTab.values[index];
     final notifier = ref.read(trainingTabProvider.notifier);
-    
+
     switch (tab) {
       case BottomNavTab.home:
         notifier.state = BottomNavTab.home;
@@ -84,24 +90,22 @@ class MyTrainingPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _onGameDelete(BuildContext context, GameRecord game, TrainingController controller) async {
+  Future<void> _onGameDelete(
+    BuildContext context,
+    GameRecord game,
+    TrainingController controller,
+  ) async {
     try {
       final success = await controller.deleteGame(game);
       if (context.mounted && success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('遊戲已刪除'),
-            backgroundColor: Colors.red,
-          ),
+          const SnackBar(content: Text('遊戲已刪除'), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('刪除遊戲時發生錯誤: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('刪除遊戲時發生錯誤: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -111,87 +115,106 @@ class MyTrainingPage extends ConsumerWidget {
 
   void _showCreateRecordDialog(BuildContext context, WidgetRef ref) {
     final controller = ref.read(trainingControllerProvider);
-    showCreateTrainingRecordDialog(
-      context,
-      (title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod, inputMethod) async {
-        try {
-          final id = await controller.createTrainingRecord(
-            title: title,
-            date: date,
-            center: center,
-            oilPatternName: oilPatternName,
-            oilPatternLength: oilPatternLength,
-            isHousePattern: isHousePattern,
-            scoringMethod: scoringMethod,
-            inputMethod: inputMethod,
+    showCreateTrainingRecordDialog(context, (
+      title,
+      date,
+      center,
+      oilPatternName,
+      oilPatternLength,
+      isHousePattern,
+      scoringMethod,
+      inputMethod,
+    ) async {
+      try {
+        final id = await controller.createTrainingRecord(
+          title: title,
+          date: date,
+          center: center,
+          oilPatternName: oilPatternName,
+          oilPatternLength: oilPatternLength,
+          isHousePattern: isHousePattern,
+          scoringMethod: scoringMethod,
+          inputMethod: inputMethod,
+        );
+
+        if (context.mounted && id.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.trainingRecordCreated),
+              backgroundColor: Colors.green,
+            ),
           );
-          
-          if (context.mounted && id.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(AppStrings.trainingRecordCreated),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('創建訓練記錄時發生錯誤: $e'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
         }
-      },
-    );
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('創建訓練記錄時發生錯誤: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
   }
 
-  void _showEditRecordDialog(BuildContext context, String dayId, TrainingController controller) {
+  void _showEditRecordDialog(
+    BuildContext context,
+    String dayId,
+    TrainingController controller,
+  ) {
     final record = controller.getTrainingDay(dayId);
     if (record == null) return;
 
-    showEditTrainingRecordDialog(
-      context,
-      record,
-      (title, date, center, oilPatternName, oilPatternLength, isHousePattern, scoringMethod, inputMethod) async {
-        try {
-          final success = await controller.updateTrainingRecord(
-            dayId,
-            title: title,
-            date: date,
-            center: center,
-            oilPatternName: oilPatternName,
-            oilPatternLength: oilPatternLength,
-            isHousePattern: isHousePattern,
-            scoringMethod: scoringMethod,
-            inputMethod: inputMethod,
+    showEditTrainingRecordDialog(context, record, (
+      title,
+      date,
+      center,
+      oilPatternName,
+      oilPatternLength,
+      isHousePattern,
+      scoringMethod,
+      inputMethod,
+    ) async {
+      try {
+        final success = await controller.updateTrainingRecord(
+          dayId,
+          title: title,
+          date: date,
+          center: center,
+          oilPatternName: oilPatternName,
+          oilPatternLength: oilPatternLength,
+          isHousePattern: isHousePattern,
+          scoringMethod: scoringMethod,
+          inputMethod: inputMethod,
+        );
+
+        if (context.mounted && success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.trainingRecordUpdated),
+              backgroundColor: Colors.green,
+            ),
           );
-          
-          if (context.mounted && success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(AppStrings.trainingRecordUpdated),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('更新訓練記錄時發生錯誤: $e'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
         }
-      },
-    );
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('更新訓練記錄時發生錯誤: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    });
   }
 
-  void _showDeleteDayDialog(BuildContext context, String dayId, TrainingController controller) {
+  void _showDeleteDayDialog(
+    BuildContext context,
+    String dayId,
+    TrainingController controller,
+  ) {
     showTrainingDeleteDialog(
       context,
       title: AppStrings.deleteTrainingDay,
@@ -221,22 +244,30 @@ class MyTrainingPage extends ConsumerWidget {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, TrainingController controller) {
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    TrainingController controller,
+  ) {
     final stats = controller.getSelectionStats();
     final selectedCount = stats['days']!;
     final totalGames = stats['games']!;
-    
+
     showTrainingDeleteDialog(
       context,
       title: AppStrings.deleteTrainingDays,
-      message: AppStrings.formatConfirmDeleteMultiple(selectedCount, totalGames),
+      message: AppStrings.formatConfirmDeleteMultiple(
+        selectedCount,
+        totalGames,
+      ),
       onConfirm: () async {
         try {
           final deletedCount = await controller.deleteSelectedDays();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppStrings.formatTrainingDaysDeleted(deletedCount)),
+                content: Text(
+                  AppStrings.formatTrainingDaysDeleted(deletedCount),
+                ),
                 backgroundColor: Colors.red,
               ),
             );
@@ -255,7 +286,11 @@ class MyTrainingPage extends ConsumerWidget {
     );
   }
 
-  void _showGameDetails(BuildContext context, GameRecord game, TrainingController controller) {
+  void _showGameDetails(
+    BuildContext context,
+    GameRecord game,
+    TrainingController controller,
+  ) {
     showGameDetailDialog(
       context,
       game,
@@ -284,7 +319,11 @@ class MyTrainingPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _showAddGameDialog(BuildContext context, String dayId, TrainingController controller) async {
+  Future<void> _showAddGameDialog(
+    BuildContext context,
+    String dayId,
+    TrainingController controller,
+  ) async {
     final record = controller.getTrainingDay(dayId);
     if (record == null) return;
 
@@ -313,10 +352,7 @@ class MyTrainingPage extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('添加遊戲時發生錯誤: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('添加遊戲時發生錯誤: $e'), backgroundColor: Colors.red),
         );
       }
     }

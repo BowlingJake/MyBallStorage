@@ -34,7 +34,7 @@ RadialGradient createMatteOverlay(List<Color> brandColors) {
   final primaryColor = brandColors.isNotEmpty ? brandColors.first : Colors.grey;
   final matteColor1 = adjustHue(primaryColor, 15);
   final matteColor2 = adjustHue(primaryColor, -12);
-  
+
   return RadialGradient(
     center: const Alignment(0.3, -0.2),
     radius: 1.4,
@@ -52,9 +52,10 @@ RadialGradient createMatteOverlay(List<Color> brandColors) {
 class _MetalTexturePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey[400]!.withOpacity(0.08)
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = Colors.grey[400]!.withOpacity(0.08)
+          ..style = PaintingStyle.fill;
 
     // 創建細微的點狀紋理
     for (double x = 0; x < size.width; x += 16) {
@@ -66,9 +67,10 @@ class _MetalTexturePainter extends CustomPainter {
     }
 
     // 添加細微的對角線紋理
-    final linePaint = Paint()
-      ..color = Colors.grey[300]!.withOpacity(0.05)
-      ..strokeWidth = 0.5;
+    final linePaint =
+        Paint()
+          ..color = Colors.grey[300]!.withOpacity(0.05)
+          ..strokeWidth = 0.5;
 
     for (var i = -size.height; i < size.width + size.height; i += 24) {
       canvas.drawLine(
@@ -96,10 +98,11 @@ class _GridPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = gridColor
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = gridColor
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke;
 
     for (var i = spacing; i < size.width; i += spacing) {
       canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
@@ -113,13 +116,17 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _GridPainter oldDelegate) {
     return oldDelegate.gridColor != gridColor ||
-           oldDelegate.strokeWidth != strokeWidth ||
-           oldDelegate.spacing != spacing;
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.spacing != spacing;
   }
 }
 
 class _SpecValue extends StatelessWidget {
-  const _SpecValue({required this.label, required this.value, required this.theme});
+  const _SpecValue({
+    required this.label,
+    required this.value,
+    required this.theme,
+  });
 
   final String label;
   final String value;
@@ -185,7 +192,7 @@ class _InfoChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.4), width: 1),
+        border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -195,7 +202,9 @@ class _InfoChip extends StatelessWidget {
           Flexible(
             child: Text(
               label,
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -207,7 +216,6 @@ class _InfoChip extends StatelessWidget {
 
 // Custom Card Item Widget with Color Ring Design
 class _BallCardItem extends StatelessWidget {
-
   const _BallCardItem({
     required this.ball,
     required this.theme,
@@ -228,9 +236,13 @@ class _BallCardItem extends StatelessWidget {
     final brandColor = brandPalette.primary;
     final hsvColor = HSVColor.fromColor(brandColor);
 
-    final highlightColor = hsvColor.withValue( (hsvColor.value + 0.3).clamp(0.0, 1.0) ).withSaturation( (hsvColor.saturation - 0.2).clamp(0.0, 1.0) ).toColor();
-    final shadowColor = hsvColor.withValue( (hsvColor.value - 0.4).clamp(0.0, 1.0) ).toColor();
-
+    final highlightColor =
+        hsvColor
+            .withValue((hsvColor.value + 0.3).clamp(0.0, 1.0))
+            .withSaturation((hsvColor.saturation - 0.2).clamp(0.0, 1.0))
+            .toColor();
+    final shadowColor =
+        hsvColor.withValue((hsvColor.value - 0.4).clamp(0.0, 1.0)).toColor();
 
     final brandGradient = LinearGradient(
       begin: Alignment.topLeft,
@@ -313,27 +325,42 @@ class _BallCardItem extends StatelessWidget {
                               height: 80,
                               fit: BoxFit.cover,
                               // 圖片載入時顯示佔位符
-                              loadingBuilder: (context, child, loadingProgress) {
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
                                 if (loadingProgress == null) return child;
                                 return Center(
                                   child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                        : null,
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
                                     strokeWidth: 2,
                                   ),
                                 );
                               },
                               // 圖片載入失敗時顯示錯誤圖示
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.error_outline, color: Colors.grey, size: 40),
+                              errorBuilder:
+                                  (context, error, stackTrace) => const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.grey,
+                                    size: 40,
+                                  ),
                             ),
                           ),
-                           // 添加霧面效果的 overlay
+                          // 添加霧面效果的 overlay
                           Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: createMatteOverlay(brandPalette.getAllShades()),
+                              gradient: createMatteOverlay(
+                                brandPalette.getAllShades(),
+                              ),
                             ),
                           ),
                         ],
@@ -359,20 +386,22 @@ class _BallCardItem extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          
+
                           const SizedBox(height: 4),
 
                           // 品牌
                           Text(
                             cleanBrandName(ball.brand),
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.8),
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.8,
+                              ),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
 
                           const SizedBox(height: 8),
-                          
+
                           // 核心和球皮資訊
                           Row(
                             children: [
@@ -403,7 +432,10 @@ class _BallCardItem extends StatelessWidget {
                   top: 0,
                   right: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: ringColor.withOpacity(0.2),
                       borderRadius: const BorderRadius.only(
@@ -447,11 +479,11 @@ class _BallCardItem extends StatelessWidget {
 }
 
 class BallListView extends StatelessWidget {
-
   const BallListView({
-    required this.bowlingBalls, super.key,
-    this.searchText = '',
+    required this.bowlingBalls,
     required this.onBallTapped,
+    super.key,
+    this.searchText = '',
   });
   final List<BowlingBall> bowlingBalls;
   final String searchText;
@@ -460,11 +492,13 @@ class BallListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (bowlingBalls.isEmpty) {
       return Center(
         child: Text(
-          searchText.isNotEmpty ? 'No balls match your search.' : 'No balls in your arsenal yet.',
+          searchText.isNotEmpty
+              ? 'No balls match your search.'
+              : 'No balls in your arsenal yet.',
           style: theme.textTheme.bodyMedium,
         ),
       );
@@ -504,4 +538,3 @@ class BallListView extends StatelessWidget {
     );
   }
 }
-

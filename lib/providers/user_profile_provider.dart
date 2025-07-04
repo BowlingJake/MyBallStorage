@@ -13,7 +13,8 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
   Future<void> loadProfile() async {
     try {
       final profileData = await _userService.loadProfile();
-      if (profileData['nickname'] != null && profileData['nickname']!.isNotEmpty) {
+      if (profileData['nickname'] != null &&
+          profileData['nickname']!.isNotEmpty) {
         state = UserProfile(
           nickname: profileData['nickname']!,
           hand: profileData['hand'] ?? '',
@@ -53,13 +54,14 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
   }
 
   bool get isProfileComplete {
-    return state != null && 
-           state!.nickname.isNotEmpty && 
-           state!.hand.isNotEmpty;
+    return state != null &&
+        state!.nickname.isNotEmpty &&
+        state!.hand.isNotEmpty;
   }
 }
 
 // Provider 定義
-final userProfileProvider = StateNotifierProvider<UserProfileNotifier, UserProfile?>((ref) {
-  return UserProfileNotifier();
-}); 
+final userProfileProvider =
+    StateNotifierProvider<UserProfileNotifier, UserProfile?>((ref) {
+      return UserProfileNotifier();
+    });

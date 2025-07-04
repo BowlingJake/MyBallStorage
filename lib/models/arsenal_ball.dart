@@ -1,7 +1,6 @@
 import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
 
 class ArsenalBall {
-
   const ArsenalBall({
     required this.name,
     required this.core,

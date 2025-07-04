@@ -12,14 +12,17 @@ import 'package:flutter/material.dart';
 enum StandardAppCardVariant {
   /// 標準卡片 - 用於獨立顯示
   standard,
+
   /// 嵌套卡片 - 用於在容器內顯示，具有更強的視覺對比
   nested,
 }
 
-class StandardAppCard extends StatelessWidget { // 卡片變體
+class StandardAppCard extends StatelessWidget {
+  // 卡片變體
 
   const StandardAppCard({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.onTap,
     this.margin = const EdgeInsets.symmetric(vertical: 8),
     this.padding = const EdgeInsets.all(16),
@@ -55,16 +58,16 @@ class StandardAppCard extends StatelessWidget { // 卡片變體
         decoration: BoxDecoration(
           // 1. 統一樣式 - 圓角
           borderRadius: borderRadius,
-          
+
           // 2. 新樣式 - 背景完全透明
           color: Colors.transparent,
-          
+
           // 3. 可調樣式 - 邊框 (嵌套卡片更明顯)
           border: Border.all(
             color: accentColor.withOpacity(borderOpacity),
             width: 1.5,
           ),
-          
+
           // 4. 可選樣式 - 光暈效果 (使用統一的 Glow Token)
           boxShadow: enableGlow ? AppGlows.medium : null,
         ),
@@ -72,4 +75,4 @@ class StandardAppCard extends StatelessWidget { // 卡片變體
       ),
     );
   }
-} 
+}
