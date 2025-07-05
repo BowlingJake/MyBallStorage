@@ -44,17 +44,17 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
 
   @override
   Widget build(BuildContext context) {
-    final arsenalBalls = ref.watch(userBallsProvider);
+    final arsenalBallsAsync = ref.watch(userBallsProvider);
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
 
     return SectionContainer(
       title: 'My Arsenal',
       onSeeAllPressed: widget.onSeeAllPressed ?? () => print('See All Arsenal'),
-      child: Column(
-        children: [
-          if (arsenalBalls.isEmpty)
-            const Center(
+      child: arsenalBallsAsync.when(
+        data: (arsenalBalls) {
+          if (arsenalBalls.isEmpty) {
+            return const Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
@@ -62,56 +62,64 @@ class _ArsenalSectionState extends ConsumerState<ArsenalSection> {
                   style: TextStyle(color: Colors.white70),
                 ),
               ),
-            )
-          else ...[
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                itemCount: arsenalBalls.length,
-                itemBuilder: (context, index) {
-                  final ball = arsenalBalls[index];
-                  return ArsenalCard(
-                    ball: ball,
-                    onTap: () {
-                      if (widget.onItemPressed != null) {
-                        widget.onItemPressed!(index);
-                      } else {
-                        print('View Arsenal Item ${index + 1}: ${ball.name}');
-                      }
-                    },
-                  );
-                },
+            );
+          }
+          return Column(
+            children: [
+              SizedBox(
+                height: 180,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: arsenalBalls.length,
+                  itemBuilder: (context, index) {
+                    final ball = arsenalBalls[index];
+                    return ArsenalCard(
+                      ball: ball,
+                      onTap: () {
+                        if (widget.onItemPressed != null) {
+                          widget.onItemPressed!(index);
+                        } else {
+                          print('View Arsenal Item ${index + 1}: ${ball.name}');
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-
-            const SizedBox(height: 12),
-            if (arsenalBalls.length > 1)
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    arsenalBalls.length,
-                    (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentIndex == index ? 16 : 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
-                        color:
-                            _currentIndex == index
-                                ? accentColor
-                                : Colors.white.withOpacity(0.3),
+              const SizedBox(height: 12),
+              if (arsenalBalls.length > 1)
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      arsenalBalls.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentIndex == index ? 16 : 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          color: _currentIndex == index
+                              ? accentColor
+                              : Colors.white.withOpacity(0.3),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-          ],
-        ],
+            ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Text(
+            'Error loading arsenal: $error',
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
       ),
     );
   }
