@@ -6,6 +6,7 @@ import 'package:bowlingarsenal_app/providers/auth_provider.dart';
 import 'package:bowlingarsenal_app/providers/onboarding_provider.dart';
 import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
 import 'package:bowlingarsenal_app/services/ball_data_service.dart';
+import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 
@@ -54,6 +55,11 @@ final shouldShowOnboardingProvider = Provider<bool>((ref) {
 
   // 所有條件都滿足，不顯示 onboarding
   return false;
+});
+
+// Service Providers
+final userPreferencesServiceProvider = Provider<UserPreferencesService>((ref) {
+  return UserPreferencesService();
 });
 
 // --- Ball Library Filter and Sort Providers ---

@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -95,7 +95,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _setDefaultGuestProfile() async {
-    final userService = UserPreferencesService();
+    final userService = _ref.read(userPreferencesServiceProvider);
     await userService.saveProfile(
       nickname: '訪客使用者',
       hand: '右手',
@@ -113,13 +113,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await prefs.setBool('onboarding_completed', true); // 開發者跳過 Onboarding
 
       // 設定預設的開發者檔案
-      final userService = UserPreferencesService();
-      await userService.saveProfile(
-        nickname: '開發者',
-        hand: '右手',
-        ballPath: '直球',
-        pap: '4 3/4 x 3/4 up',
-      );
+      await _setDefaultDeveloperProfile();
       
       // 手動觸發使用者檔案 provider 更新
       await _ref.read(userProfileProvider.notifier).loadProfile();
@@ -134,6 +128,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
         error: e.toString(),
       );
     }
+  }
+
+  Future<void> _setDefaultDeveloperProfile() async {
+    final userService = _ref.read(userPreferencesServiceProvider);
+    await userService.saveProfile(
+      nickname: '開發者',
+      hand: '右手',
+      ballPath: '直球',
+      pap: '4 3/4 x 3/4 up',
+    );
   }
 
   Future<void> logout() async {
