@@ -1,169 +1,62 @@
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/controllers/onboarding_controller.dart';
 import 'package:bowlingarsenal_app/views/onboarding/onboarding_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class OnboardingPage extends ConsumerStatefulWidget {
+class OnboardingPage extends ConsumerWidget {
   const OnboardingPage({super.key});
 
   @override
-  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(onboardingControllerProvider);
+    final controllerNotifier = ref.read(onboardingControllerProvider.notifier);
 
-class _OnboardingPageState extends ConsumerState<OnboardingPage> {
-  late PageController _pageController;
-  int _currentPage = 0;
-
-  // 表單控制器
-  final _nicknameController = TextEditingController();
-  final _papController = TextEditingController();
-
-  String _selectedHand = '';
-  String _selectedBallPath = '';
-
-  final List<String> _handOptions = ['右手', '左手'];
-  final List<String> _ballPathOptions = ['直球', '飛碟球', '曲球', '勾球'];
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _nicknameController.dispose();
-    _papController.dispose();
-    super.dispose();
-  }
-
-  void _nextPage() {
-    if (_currentPage < 4) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      _completeOnboarding();
-    }
-  }
-
-  void _previousPage() {
-    if (_currentPage > 0) {
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  Future<void> _completeOnboarding() async {
-    // 儲存使用者檔案
-    await ref
-        .read(userProfileProvider.notifier)
-        .updateProfile(
-          nickname: _nicknameController.text,
-          hand: _selectedHand,
-          ballPath: _selectedBallPath,
-          pap: _papController.text,
-        );
-
-    // 標記 Onboarding 完成
-    await ref.read(onboardingProvider.notifier).completeOnboarding();
-
-    // 導航到主頁
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    }
-  }
-
-  bool _canProceed() {
-    switch (_currentPage) {
-      case 0:
-        return true; // 歡迎頁面
-      case 1:
-        return _nicknameController.text.isNotEmpty;
-      case 2:
-        return _selectedHand.isNotEmpty;
-      case 3:
-        return _selectedBallPath.isNotEmpty;
-      case 4:
-        return _papController.text.isNotEmpty;
-      default:
-        return false;
-    }
-  }
-
-  void _updateState() {
-    setState(() {});
-  }
-
-  void _skipPAP() {
-    _papController.text = '待設定';
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             // 進度指示器
-            _buildProgressIndicator(),
+            _buildProgressIndicator(context, controller.currentPage),
 
             // 頁面內容
             Expanded(
               child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
+                controller: controller.pageController,
+                onPageChanged: controller.onPageChanged,
                 children: [
                   OnboardingPages.buildWelcomePage(context),
                   OnboardingPages.buildNicknamePage(
-                    controller: _nicknameController,
-                    onChanged: _updateState,
+                    controller: controller.nicknameController,
+                    onChanged: () {}, // 由 Controller 的 listener 處理
                   ),
                   OnboardingPages.buildHandPage(
-                    options: _handOptions,
-                    selectedValue: _selectedHand,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedHand = value;
-                      });
-                    },
+                    options: controller.handOptions,
+                    selectedValue: controller.selectedHand,
+                    onChanged: controllerNotifier.setSelectedHand,
                   ),
                   OnboardingPages.buildBallPathPage(
-                    options: _ballPathOptions,
-                    selectedValue: _selectedBallPath,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBallPath = value;
-                      });
-                    },
+                    options: controller.ballPathOptions,
+                    selectedValue: controller.selectedBallPath,
+                    onChanged: controllerNotifier.setSelectedBallPath,
                   ),
                   OnboardingPages.buildPAPPage(
-                    controller: _papController,
-                    onChanged: _updateState,
-                    onSkip: _skipPAP,
+                    controller: controller.papController,
+                    onChanged: () {}, // 由 Controller 的 listener 處理
+                    onSkip: controllerNotifier.skipPAP,
                   ),
                 ],
               ),
             ),
 
             // 導航按鈕
-            _buildNavigationButtons(),
+            _buildNavigationButtons(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProgressIndicator() {
+  Widget _buildProgressIndicator(BuildContext context, int currentPage) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -174,7 +67,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
                 color:
-                    index <= _currentPage
+                    index <= currentPage
                         ? Theme.of(context).primaryColor
                         : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2),
@@ -186,15 +79,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildNavigationButtons(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(onboardingControllerProvider);
+    final controllerNotifier = ref.read(onboardingControllerProvider.notifier);
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          if (_currentPage > 0)
+          if (controller.currentPage > 0)
             Expanded(
               child: ElevatedButton(
-                onPressed: _previousPage,
+                onPressed: controllerNotifier.previousPage,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey.shade200,
                   foregroundColor: Colors.black,
@@ -202,11 +98,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 child: const Text('上一步'),
               ),
             ),
-          if (_currentPage > 0) const SizedBox(width: 16),
+          if (controller.currentPage > 0) const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton(
-              onPressed: _canProceed() ? _nextPage : null,
-              child: Text(_currentPage == 4 ? '完成設定' : '下一步'),
+              onPressed: controller.canProceed()
+                  ? () => controllerNotifier.nextPage(context, ref)
+                  : null,
+              child: Text(controller.currentPage == 4 ? '完成設定' : '下一步'),
             ),
           ),
         ],

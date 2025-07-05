@@ -4,10 +4,11 @@ import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
 import 'package:bowlingarsenal_app/repositories/arsenal_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final bottomIndexProvider = StateProvider<int>((ref) => 0);
-final selectedBagTypeProvider = StateProvider<BallBagType>(
-  (ref) => BallBagType.all,
-);
+// 移除 bottomIndexProvider
+// final bottomIndexProvider = StateProvider<int>((ref) => 0);
+
+final selectedBagTypeProvider =
+    StateProvider<BallBagType>((ref) => BallBagType.all);
 
 /// 提供 ArsenalRepository 的實例
 final arsenalRepositoryProvider = Provider<ArsenalRepository>((ref) {

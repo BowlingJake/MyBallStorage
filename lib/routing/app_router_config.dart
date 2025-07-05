@@ -13,6 +13,7 @@ import 'package:bowlingarsenal_app/my_training_page.dart';
 import 'package:bowlingarsenal_app/views/developer_page.dart';
 import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
+import 'package:bowlingarsenal_app/providers/providers.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -33,9 +34,6 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 // 2. 建立主要的 routerProvider
 final routerProvider = Provider<GoRouter>((ref) {
-  // 監聽 authProvider 的變化
-  final authState = ref.watch(authProvider);
-
   return GoRouter(
     // 3. 設定初始路由
     initialLocation: '/login',
@@ -95,7 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     // 6. 設定重導向邏輯 (核心)
     redirect: (BuildContext context, GoRouterState state) {
       // 讀取最新的認證和引導頁狀態
-      final isAuthenticated = authState.isAuthenticated;
+      final isAuthenticated = ref.read(authProvider).isAuthenticated;
       final shouldShowOnboarding = !ref.read(onboardingProvider);
       
       final isLoggingIn = state.matchedLocation == '/login';

@@ -33,21 +33,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     print('Attempting Phone Sign-In...');
   }
 
-  Future<void> _doGuestLogin() async {
+  Future<void> _handleLoginAction(Future<void> Function() loginFuture) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // 以訪客身份登入
-      await ref.read(authProvider.notifier).loginAsGuest();
-
-      // 登入成功後，AppRouter 會自動導航到主頁（跳過 Onboarding）
+      // 呼叫傳入的登入操作
+      await loginFuture();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('訪客登入失敗：$e')));
+        ).showSnackBar(SnackBar(content: Text('登入失敗：$e')));
       }
     } finally {
       if (mounted) {
@@ -58,28 +56,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  Future<void> _doDeveloperLogin() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _doGuestLogin() async {
+    await _handleLoginAction(ref.read(authProvider.notifier).loginAsGuest);
+  }
 
-    try {
-      // 以開發者身份登入
-      await ref.read(authProvider.notifier).loginAsDeveloper();
-      // 登入成功後，AppRouter 會自動導航到主頁（跳過 Onboarding）
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('開發者登入失敗：$e')));
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+  Future<void> _doDeveloperLogin() async {
+    await _handleLoginAction(ref.read(authProvider.notifier).loginAsDeveloper);
   }
 
   @override

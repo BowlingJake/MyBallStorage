@@ -8,25 +8,34 @@ import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
+
+import 'package:bowlingarsenal_app/providers/providers.dart'; // 引入全局 providers
 
 /// A simple page showing the user's arsenal.
 class MyArsenalPage extends ConsumerWidget {
   const MyArsenalPage({super.key});
 
+  int _calculateCurrentIndex(String location) {
+    if (location.startsWith('/library') || location.startsWith('/my-arsenal')) {
+      return 1;
+    }
+    if (location.startsWith('/training')) {
+      return 3;
+    }
+    if (location.startsWith('/settings')) {
+      return 4;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(bottomIndexProvider);
+    final location = GoRouterState.of(context).matchedLocation;
     final selectedBagType = ref.watch(selectedBagTypeProvider);
     final balls = ref.watch(filteredBallsProvider);
     final theme = Theme.of(context);
-
-    // 確保進入 Arsenal 頁面時，bottomIndexProvider 設置為正確的索引（1）
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (currentIndex != 1) {
-        ref.read(bottomIndexProvider.notifier).state = 1;
-      }
-    });
 
     return ProfessionalDarkBackground(
       child: Scaffold(
@@ -113,8 +122,23 @@ class MyArsenalPage extends ConsumerWidget {
         // 現代化浮動按鈕
         floatingActionButton: _buildModernFAB(theme, context),
         bottomNavigationBar: ModernBottomNavigation(
-          currentIndex: currentIndex, // 使用 bottomIndexProvider 的狀態
-          onTap: (index) => _handleBottomNavigation(context, index, ref),
+          currentIndex: _calculateCurrentIndex(location),
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                context.go('/');
+                break;
+              case 1:
+                context.go('/library');
+                break;
+              case 3:
+                context.go('/training');
+                break;
+              case 4:
+                context.go('/settings');
+                break;
+            }
+          },
         ),
       ),
     );
@@ -191,26 +215,5 @@ class MyArsenalPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void _handleBottomNavigation(BuildContext context, int index, WidgetRef ref) {
-    switch (index) {
-      case 0: // 首頁
-        Navigator.of(context).pop(); // 返回首頁
-      case 1: // Arsenal
-        // 已經在 Arsenal 頁面，不需要導航
-        break;
-      case 2: // 中央按鈕 (新增)
-        print('Add button tapped in Arsenal');
-      // TODO: 實現新增球的功能
-      case 3: // 訓練
-        print('Training button tapped in Arsenal');
-      // TODO: 導航到訓練頁面
-      case 4: // 設定
-        print('Settings button tapped in Arsenal');
-      // TODO: 導航到設定頁面
-    }
-    // 更新當前索引
-    ref.read(bottomIndexProvider.notifier).state = index;
   }
 }

@@ -12,84 +12,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
-class HomePage extends ConsumerStatefulWidget {
+import 'package:bowlingarsenal_app/providers/providers.dart'; // 引入全局 providers
+
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
-  @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends ConsumerState<HomePage> {
-  int _selectedIndex = 0; // 用於 BottomNavigationBar
-  final _userCardKey = GlobalKey(); // 1. 建立一個 GlobalKey 來追蹤使用者卡片
-  Rect? _userCardRect; // 2. 用於儲存卡片的矩形區域
-
-  void _calculateUserCardRect() {
-    if (!mounted) return;
-
-    final renderBox =
-        _userCardKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final size = renderBox.size;
-      final position = renderBox.localToGlobal(Offset.zero);
-      final newRect = Rect.fromLTWH(
-        position.dx,
-        position.dy,
-        size.width,
-        size.height,
-      );
-
-      // 檢查是否需要更新，避免不必要的重繪
-      if (_userCardRect != newRect) {
-        setState(() {
-          _userCardRect = newRect;
-        });
-      }
+  int _calculateCurrentIndex(String location) {
+    // 假設：0=首頁, 1=資料庫/球庫, 2=新增(不處理), 3=訓練, 4=個人
+    if (location.startsWith('/library') || location.startsWith('/my-arsenal')) {
+      return 1;
     }
-  }
-
-  void _onItemTapped(int index) {
-    // If the selected tab is tapped again, do nothing.
-    if (index == _selectedIndex) {
-      return;
+    if (location.startsWith('/training')) {
+      return 3;
     }
-
-    // Handle navigation logic
-    switch (index) {
-      case 0: // Home
-        // Already on home, do nothing or setState if needed
-        setState(() {
-          _selectedIndex = 0;
-        });
-        break;
-      case 1: // Ball Library
-        context.go('/library');
-        break;
-      case 2: // Center 'Add' button - Placeholder
-        print('Add button tapped');
-        // TODO: Implement 'Add' functionality or route
-        break;
-      case 3: // Training
-        context.go('/training');
-        break;
-      case 4: // Settings
-        context.go('/settings');
-        break;
+    if (location.startsWith('/settings')) { // 假設個人頁的路徑是 /settings
+      return 4;
     }
-
-    print('Bottom Nav Tapped: $index');
+    // 所有其他路徑，包括 '/'，都預設選中首頁
+    return 0;
   }
 
   @override
-  Widget build(BuildContext context) {
-    // 每次 build 後都延遲計算卡片位置，以應對佈局變化
-    WidgetsBinding.instance.addPostFrameCallback((_) => _calculateUserCardRect());
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 在 build 方法頂部
+    final location = GoRouterState.of(context).matchedLocation;
     final themeMode = ref.watch(themeProvider);
 
     return ProfessionalDarkBackground(
-      cutoutRects:
-          _userCardRect != null ? [_userCardRect!] : null, // 將 Rect 傳遞給背景
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -134,7 +83,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 // 將 Key 附加到一個非 const 的父元件上
                 Align(
                   child: Container(
-                    key: _userCardKey, // 把 Key "貼" 在這裡
                     constraints: const BoxConstraints(maxWidth: 400),
                     child: const UserInfoSection(),
                   ),
@@ -164,8 +112,29 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
         bottomNavigationBar: ModernBottomNavigation(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+          // currentIndex 直接由當前路徑計算得出
+          currentIndex: _calculateCurrentIndex(location),
+
+          // onTap 只負責導航，不再更新任何 Provider
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                // 已經在首頁，可以不處理或 context.go('/')
+                context.go('/');
+                break;
+              case 1:
+                // 點擊 Tab 1 預設去 Library
+                context.go('/library');
+                break;
+              case 3:
+                context.go('/training');
+                break;
+              case 4:
+                context.go('/settings'); // 假設個人頁的路徑是 /settings
+                break;
+              // case 2 (新增按鈕) 通常有自己的特殊處理，此處忽略
+            }
+          },
         ),
       ),
     );

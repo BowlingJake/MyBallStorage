@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/shared/enums.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final trainingTabProvider = StateProvider<BottomNavTab>(
-  (ref) => BottomNavTab.training,
-); 
+// 移除 trainingTabProvider
+// final trainingTabProvider =
+//     StateProvider<BottomNavTab>((ref) => BottomNavTab.training); 

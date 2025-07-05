@@ -13,6 +13,9 @@ export 'auth_provider.dart';
 export 'onboarding_provider.dart';
 export 'user_profile_provider.dart';
 
+/// 全局底部導覽列索引
+final bottomNavProvider = StateProvider<int>((ref) => 0);
+
 /// 提供 BallDataService 實例的 Provider
 final ballDataServiceProvider = Provider<BallDataService>((ref) {
   return BallDataService();

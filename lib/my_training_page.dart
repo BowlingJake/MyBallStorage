@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:bowlingarsenal_app/ball_library_page.dart';
-import 'package:bowlingarsenal_app/providers/training_providers.dart';
+import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/shared/enums.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
@@ -15,9 +15,22 @@ import 'package:go_router/go_router.dart';
 class MyTrainingPage extends ConsumerWidget {
   const MyTrainingPage({super.key});
 
+  int _calculateCurrentIndex(String location) {
+    if (location.startsWith('/library') || location.startsWith('/my-arsenal')) {
+      return 1;
+    }
+    if (location.startsWith('/training')) {
+      return 3;
+    }
+    if (location.startsWith('/settings')) {
+      return 4;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTab = ref.watch(trainingTabProvider);
+    final location = GoRouterState.of(context).matchedLocation;
 
     return ProfessionalDarkBackground(
       child: Scaffold(
@@ -29,43 +42,25 @@ class MyTrainingPage extends ConsumerWidget {
           ],
         ),
         bottomNavigationBar: ModernBottomNavigation(
-          currentIndex: currentTab.index,
-          onTap: (index) => _onBottomNavTapped(context, index, ref),
+          currentIndex: _calculateCurrentIndex(location),
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                context.go('/');
+                break;
+              case 1:
+                context.go('/library');
+                break;
+              case 3:
+                context.go('/training');
+                break;
+              case 4:
+                context.go('/settings');
+                break;
+            }
+          },
         ),
       ),
     );
-  }
-
-  void _onBottomNavTapped(BuildContext context, int index, WidgetRef ref) {
-    final tab = BottomNavTab.values[index];
-    final notifier = ref.read(trainingTabProvider.notifier);
-
-    // Update the state regardless of the navigation action
-    notifier.state = tab;
-
-    switch (tab) {
-      case BottomNavTab.home:
-        context.go('/');
-        break;
-      case BottomNavTab.library:
-        context.go('/library');
-        break;
-      case BottomNavTab.add:
-        // The add button on the bottom nav might need a new home for its logic,
-        // potentially a global service or a new provider.
-        // For now, let's log it.
-        if (kDebugMode) {
-          print('Add button on BottomNav tapped. Logic needs relocation.');
-        }
-        break;
-      case BottomNavTab.training:
-        // Already on the training page, do nothing.
-        break;
-      case BottomNavTab.profile:
-        if (kDebugMode) {
-          log('Profile button tapped in Training');
-        }
-        break;
-    }
   }
 }
