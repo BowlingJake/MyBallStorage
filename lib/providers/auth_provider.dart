@@ -104,6 +104,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
+  Future<void> loginAsDeveloper() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('userId', 'developer');
+      await prefs.setBool('isDeveloperMode', true);
+      await prefs.setBool('onboarding_completed', true); // 開發者跳過 Onboarding
+
+      // 設定預設的開發者檔案
+      final userService = UserPreferencesService();
+      await userService.saveProfile(
+        nickname: '開發者',
+        hand: '右手',
+        ballPath: '直球',
+        pap: '4 3/4 x 3/4 up',
+      );
+      
+      // 手動觸發使用者檔案 provider 更新
+      await _ref.read(userProfileProvider.notifier).loadProfile();
+
+      state = const AuthState(
+        status: AuthStatus.authenticated,
+        userId: 'developer',
+      );
+    } catch (e) {
+      state = AuthState(
+        status: AuthStatus.unauthenticated,
+        error: e.toString(),
+      );
+    }
+  }
+
   Future<void> logout() async {
     try {
       final prefs = await SharedPreferences.getInstance();

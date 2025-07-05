@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:bowlingarsenal_app/models/arsenal_ball.dart';
+import 'package:bowlingarsenal_app/providers/arsenal_providers.dart';
 import 'package:bowlingarsenal_app/theme/theme.dart';
 import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:flutter/material.dart';

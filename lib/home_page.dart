@@ -9,7 +9,6 @@ import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_section.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/modern_tournament_section.dart';
 import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/widgets/user_info_section.dart';
 import 'package:flutter/material.dart';
@@ -186,16 +185,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                   },
                 ),
                 const SizedBox(height: 24),
-                ModernTournamentSection(
-                  onSeeAllPressed: () {
-                    print('Navigate to Tournament Page');
-                    // TODO: 導航到錦標賽頁面
-                  },
-                  onTournamentPressed: (tournament) {
-                    print('Tournament ${tournament.name} pressed');
-                    // TODO: 導航到錦標賽詳細頁面
-                  },
-                ),
+                // ModernTournamentSection(
+                //   onSeeAllPressed: () {
+                //     print('Navigate to Tournament Page');
+                //   },
+                //   onTournamentPressed: (tournament) {
+                //     print('Tournament ${tournament.name} pressed');
+                //   },
+                // ),
                 const SizedBox(height: 80), // 增加底部空間以確保內容不被導航欄遮擋
               ],
             ),

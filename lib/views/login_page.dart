@@ -58,6 +58,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  Future<void> _doDeveloperLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 以開發者身份登入
+      await ref.read(authProvider.notifier).loginAsDeveloper();
+      // 登入成功後，AppRouter 會自動導航到主頁（跳過 Onboarding）
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('開發者登入失敗：$e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -209,6 +233,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 color: Colors.white.withOpacity(0.9),
                                 decoration: TextDecoration.underline,
                                 decorationColor: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // 開發者快速通道按鈕
+                          GestureDetector(
+                            onTap: _isLoading ? null : _doDeveloperLogin,
+                            child: Text(
+                              '開發者快速通道',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.white.withOpacity(0.6),
                               ),
                             ),
                           ),

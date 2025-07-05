@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/providers/arsenal_providers.dart';
 import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/widgets/app_specific/arsenal/arsenal_card.dart';
 import 'package:bowlingarsenal_app/widgets/common/cards/section_container.dart';
