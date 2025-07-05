@@ -7,10 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  AppErrorHandler.initialize();
-
   AppErrorHandler.runGuarded(() {
     runApp(const ProviderScope(child: MyApp()));
   });

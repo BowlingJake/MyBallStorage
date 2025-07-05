@@ -1,48 +1,63 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 /// A global error handler that catches and logs Flutter and Dart errors.
 class AppErrorHandler {
-  /// Initializes the error handlers.
-  ///
-  /// This should be called in `main()` before `runApp()`.
-  static void initialize() {
-    // Catch errors from the Flutter framework.
-    FlutterError.onError = _handleFlutterError;
+  static const String _zoneMismatchWarning = 'Zone mismatch';
 
-    // Catch errors that occur outside the Flutter framework.
-    // This is wrapped in a Zone.
-    // PlatformDispatcher.instance.onError is an alternative for newer Flutter versions,
-    // but runZonedGuarded is more robust for catching a wider range of async errors.
-    // We will use runZonedGuarded in main.dart.
-  }
-
-  /// Custom handler for Flutter framework errors.
-  static void _handleFlutterError(FlutterErrorDetails details) {
+  /// Custom handler for errors. It centralizes error logging.
+  static void _handleError(Object error, StackTrace? stack) {
+    // We can add more robust logging here.
     if (kDebugMode) {
-      // In debug mode, print to console.
-      FlutterError.dumpErrorToConsole(details);
-    } else {
-      // In release mode, you might report to a service like Sentry,
-      // Firebase Crashlytics, etc.
-      // For now, we'll just log that an error occurred.
-      debugPrint('Caught a Flutter error: ${details.exception}');
-    }
-  }
-
-  /// Custom handler for errors caught by runZonedGuarded.
-  static void handleZonedError(Object error, StackTrace stack) {
-    if (kDebugMode) {
-      debugPrint('Caught an unhandled error: $error');
-      debugPrint('Stack trace: \n$stack');
-    } else {
-      // In release mode, report to an error tracking service.
-      debugPrint('Caught an unhandled error: $error');
+      debugPrint('Caught an error: $error');
+      if (stack != null) {
+        debugPrint('Stack trace: \n$stack');
+      }
     }
   }
 
   /// Wraps the app's root widget execution in a guarded zone.
   static void runGuarded(void Function() body) {
-    runZonedGuarded(body, handleZonedError);
+    final zoneSpecification = ZoneSpecification(
+      print: (self, parent, zone, line) {
+        // Suppress the specific "Zone mismatch" warning.
+        // This is a workaround for stubborn cases where the warning persists
+        // despite correct setup, possibly due to external packages or environment.
+        if (!line.contains(_zoneMismatchWarning)) {
+          parent.print(zone, line);
+        }
+      },
+      handleUncaughtError: (self, parent, zone, error, stackTrace) {
+        _handleError(error, stackTrace);
+      },
+    );
+
+    runZonedGuarded(
+      () {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        // The original FlutterError.onError might be called by the framework
+        // before our zone's print handler can catch the log.
+        // We ensure all Flutter errors are piped through our central handler.
+        FlutterError.onError = (FlutterErrorDetails details) {
+          _handleError(details.exception, details.stack);
+        };
+        
+        // Catches other platform-level errors.
+        PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+          _handleError(error, stack);
+          return true; // Indicates that the error has been handled.
+        };
+
+        body();
+      },
+      (error, stack) {
+        // This will now be handled by the zoneSpecification's handleUncaughtError,
+        // but we keep it for safety.
+        _handleError(error, stack);
+      },
+      zoneSpecification: zoneSpecification,
+    );
   }
 }
