@@ -88,17 +88,30 @@ class _PinSelectorPopupWidgetState extends State<PinSelectorPopupWidget> {
   }
 
   Widget _buildPinRow(List<int> pinNumbers, {double leftPaddingPins = 0.0}) {
-    final var actualLeftPadding = leftPaddingPins * widget.pinSize * widget.pinVisualSpacingFactor;
-    return Padding(
+    final double totalPinWidth = pinNumbers.length * widget.pinSize;
+    final double totalSpacingWidth =
+        (pinNumbers.length - 1) *
+            widget.pinSize *
+            widget.pinVisualSpacingFactor;
+    final double contentWidth = totalPinWidth + totalSpacingWidth;
+
+    final double leftPaddingPins = (10 - pinNumbers.last) / 2.0;
+    final double actualLeftPadding = leftPaddingPins * widget.pinSize *
+        widget.pinVisualSpacingFactor;
+
+    return Container(
       padding: EdgeInsets.only(left: actualLeftPadding),
+      width: contentWidth + actualLeftPadding,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
-        children: pinNumbers.map((pin) {
-          final var horizontalPinPadding = (widget.pinSize * widget.pinVisualSpacingFactor - widget.pinSize) / 2;
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: pinNumbers.map((pinNumber) {
+          final double horizontalPinPadding = (widget.pinSize * widget.pinVisualSpacingFactor -
+                  widget.pinSize) /
+              2;
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPinPadding.clamp(0, widget.pinSize / 2)),
-            child: _buildPin(pin), // 直接傳遞瓶號
+            padding: EdgeInsets.symmetric(horizontal: horizontalPinPadding),
+            child: _buildPin(pinNumber),
           );
         }).toList(),
       ),

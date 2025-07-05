@@ -196,6 +196,12 @@ class TrainingController extends ChangeNotifier {
     return _dataService.getTrainingDay(dayId);
   }
 
+  /// 獲取指定訓練日的遊戲數量
+  int getGameCount(String dayId) {
+    final day = _dataService.getTrainingDay(dayId);
+    return day?.totalGames ?? 0;
+  }
+
   /// 檢查是否選中某個訓練日
   bool isDaySelected(String dayId) {
     return _selectedDayIds.contains(dayId);

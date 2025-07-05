@@ -8,6 +8,11 @@ import 'package:bowlingarsenal_app/views/login_page.dart';
 import 'package:bowlingarsenal_app/views/onboarding/onboarding_page.dart';
 import 'package:bowlingarsenal_app/providers/auth_provider.dart';
 import 'package:bowlingarsenal_app/providers/onboarding_provider.dart';
+import 'package:bowlingarsenal_app/ball_library_page.dart';
+import 'package:bowlingarsenal_app/my_training_page.dart';
+import 'package:bowlingarsenal_app/views/developer_page.dart';
+import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
+import 'package:bowlingarsenal_app/views/settings_page.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -52,6 +57,31 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'onboarding',
         builder: (context, state) => const OnboardingPage(),
       ),
+      GoRoute(
+        path: '/library',
+        name: 'library',
+        builder: (context, state) => const BallLibraryPage(),
+      ),
+      GoRoute(
+        path: '/training',
+        name: 'training',
+        builder: (context, state) => const MyTrainingPage(),
+      ),
+      GoRoute(
+        path: '/my-arsenal',
+        name: 'my-arsenal',
+        builder: (context, state) => const MyArsenalPage(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/developer',
+        name: 'developer',
+        builder: (context, state) => const DeveloperPage(),
+      ),
     ],
 
     // 5. 設定錯誤頁面
@@ -70,6 +100,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       
       final isLoggingIn = state.matchedLocation == '/login';
       final isOnboarding = state.matchedLocation == '/onboarding';
+      final isAtRoot = state.matchedLocation == '/';
 
       // 案例 1: 使用者未認證
       if (!isAuthenticated) {
@@ -87,6 +118,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggingIn || isOnboarding) {
         return '/';
       }
+      
+      // 如果用戶已認證，但嘗試訪問登入頁，將他們導向主頁
+      if(isAuthenticated && isLoggingIn) return '/';
 
       // 所有其他情況，不進行重導向
       return null;

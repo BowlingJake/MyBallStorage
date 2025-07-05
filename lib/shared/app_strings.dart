@@ -14,6 +14,8 @@ class AppStrings {
   // 訓練記錄操作
   static const String trainingRecordCreated = '訓練記錄「{title}」已建立！';
   static const String trainingRecordUpdated = '訓練記錄已更新！';
+  static const String trainingRecordDeleted = '訓練記錄已刪除';
+  static const String trainingRecordsDeleted = '已刪除 {count} 筆訓練記錄';
   static const String trainingDayDeleted = 'Training day deleted';
   static const String trainingDaysDeleted =
       '{count} training day{plural} deleted';

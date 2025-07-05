@@ -1,11 +1,7 @@
 // lib/home_page.dart
 import 'dart:ui'; // For BackdropFilter
 
-import 'package:bowlingarsenal_app/ball_library_page.dart';
-import 'package:bowlingarsenal_app/my_training_page.dart';
 import 'package:bowlingarsenal_app/providers/theme_provider.dart';
-import 'package:bowlingarsenal_app/views/developer_page.dart';
-import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_section.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
@@ -13,6 +9,7 @@ import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/widgets/user_info_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
 class HomePage extends ConsumerStatefulWidget {
@@ -59,41 +56,24 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     // Handle navigation logic
     switch (index) {
-      case 0:
-        // Tapped on the home tab, set state to reflect this.
+      case 0: // Home
+        // Already on home, do nothing or setState if needed
         setState(() {
           _selectedIndex = 0;
         });
         break;
-      case 2:
-        // Tapped on the center 'Add' button.
-        setState(() {
-          _selectedIndex = index;
-        });
-        print('Add button tapped');
-        // TODO: Implement 'Add' functionality
-        break;
       case 1: // Ball Library
+        context.go('/library');
+        break;
+      case 2: // Center 'Add' button - Placeholder
+        print('Add button tapped');
+        // TODO: Implement 'Add' functionality or route
+        break;
       case 3: // Training
+        context.go('/training');
+        break;
       case 4: // Settings
-        // For navigation tabs, push the new page.
-        // The _selectedIndex is not updated to keep the home tab visually active
-        // and avoid UI flicker on return.
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) {
-            switch (index) {
-              case 1:
-                return const BallLibraryPage();
-              case 3:
-                return const MyTrainingPage();
-              case 4:
-                return const SettingsPage();
-              default:
-                return const SizedBox.shrink(); // Should not happen
-            }
-          }),
-        );
+        context.go('/settings');
         break;
     }
 
@@ -137,14 +117,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             IconButton(
               icon: const Icon(Icons.developer_mode_outlined),
               color: Theme.of(context).colorScheme.onSurface,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DeveloperPage(),
-                  ),
-                );
-              },
+              onPressed: () => context.go('/developer'),
             ),
           ],
           backgroundColor: Colors.transparent,
@@ -170,15 +143,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const SizedBox(height: 24),
 
                 ArsenalSection(
-                  onSeeAllPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => const ProviderScope(child: MyArsenalPage()),
-                      ),
-                    );
-                  },
+                  onSeeAllPressed: () => context.go('/my-arsenal'),
                   onItemPressed: (index) {
                     print('Arsenal Item $index pressed');
                     // TODO: 導航到球詳細頁面
@@ -253,13 +218,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 icon: Iconsax.setting_2,
                 title: 'Settings',
                 onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsPage(),
-                    ),
-                  );
+                  Navigator.pop(context); // Close the drawer first
+                  context.go('/settings');
                 },
               ),
               _buildDrawerItem(

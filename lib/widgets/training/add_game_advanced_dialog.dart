@@ -20,8 +20,11 @@ class AddGameAdvancedDialog extends StatefulWidget {
 }
 
 class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late GameRecord _gameRecord;
   late BowlingScoreData _scoreData;
   final _notesController = TextEditingController();
+  final List<int> _frameScores = [];
 
   @override
   void initState() {
@@ -45,15 +48,16 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
     var totalScore = 0;
     var strikes = 0;
     var spares = 0;
-    final var frameScores = <int>[];
+
+    _frameScores.clear();
 
     for (var i = 0; i < _scoreData.frames.length; i++) {
       final frame = _scoreData.frames[i];
       if (frame.totalScore != null) {
         totalScore = frame.totalScore!;
-        frameScores.add(frame.totalScore!);
+        _frameScores.add(frame.totalScore!);
       } else {
-        frameScores.add(0);
+        _frameScores.add(0);
       }
 
       if (frame.rolls.isNotEmpty) {
@@ -66,18 +70,18 @@ class _AddGameAdvancedDialogState extends State<AddGameAdvancedDialog> {
       }
     }
 
-    final game = GameRecord(
+    _gameRecord = GameRecord(
       id: '${widget.dayId}_game_${DateTime.now().millisecondsSinceEpoch}',
       gameNumber: widget.nextGameNumber,
       score: totalScore,
-      frameScores: frameScores,
+      frameScores: _frameScores,
       strikes: strikes,
       spares: spares,
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       timestamp: DateTime.now(),
     );
 
-    Navigator.of(context).pop(game);
+    Navigator.of(context).pop(_gameRecord);
   }
 
   @override
