@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/logic/scoring/scoring_strategy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,10 +12,12 @@ class AddGameSimpleDialog extends StatefulWidget {
   const AddGameSimpleDialog({
     required this.dayId,
     required this.nextGameNumber,
+    required this.scoringMode,
     super.key,
   });
   final String dayId;
   final int nextGameNumber;
+  final ScoringMode scoringMode;
 
   @override
   State<AddGameSimpleDialog> createState() => _AddGameSimpleDialogState();
@@ -103,6 +106,45 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
                         icon: const Icon(Icons.close, color: Colors.white),
                       ),
                     ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 顯示選擇的計分方法
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: (widget.scoringMode == ScoringMode.traditional 
+                          ? const Color(0xFF00B2A9) 
+                          : const Color(0xFFFF6B35)).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: (widget.scoringMode == ScoringMode.traditional 
+                            ? const Color(0xFF00B2A9) 
+                            : const Color(0xFFFF6B35)).withOpacity(0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: widget.scoringMode == ScoringMode.traditional 
+                              ? const Color(0xFF00B2A9) 
+                              : const Color(0xFFFF6B35),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '計分方法: ${widget.scoringMode == ScoringMode.traditional ? "傳統計分" : "Current計分"}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 24),
@@ -268,8 +310,9 @@ class _AddGameSimpleDialogState extends State<AddGameSimpleDialog> {
 Future<GameRecord?> showAddGameSimpleDialog(
   BuildContext context,
   String dayId,
-  int nextGameNumber,
-) async {
+  int nextGameNumber, {
+  required ScoringMode scoringMode,
+}) async {
   return showDialog<GameRecord>(
     context: context,
     barrierDismissible: false,
@@ -280,6 +323,7 @@ Future<GameRecord?> showAddGameSimpleDialog(
         child: AddGameSimpleDialog(
           dayId: dayId,
           nextGameNumber: nextGameNumber,
+          scoringMode: scoringMode,
         ),
       );
     },

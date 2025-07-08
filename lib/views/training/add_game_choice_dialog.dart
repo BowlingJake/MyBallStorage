@@ -2,7 +2,14 @@ import 'dart:ui';
 
 import 'package:bowlingarsenal_app/widgets/training/add_game_advanced_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/training/add_game_simple_dialog.dart';
+import 'package:bowlingarsenal_app/logic/scoring/scoring_strategy.dart';
 import 'package:flutter/material.dart';
+
+/// 對話框狀態枚舉
+enum DialogState {
+  scoringMethodSelection, // 選擇計分方法
+  inputMethodSelection,   // 選擇輸入方法
+}
 
 // 1. 重構為 StatefulWidget 以管理自定義提示視窗的狀態
 class AddGameChoiceDialog extends StatefulWidget {
@@ -22,6 +29,10 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
   // 2. 用於管理自定義提示視窗的狀態變數
   OverlayEntry? _overlayEntry;
   final GlobalKey _iconKey = GlobalKey();
+  
+  // 新增：對話框狀態管理
+  DialogState _currentState = DialogState.scoringMethodSelection;
+  ScoringMode? _selectedScoringMode;
 
   @override
   void dispose() {
@@ -63,7 +74,9 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
                           ),
                         ),
                         child: Text(
-                          'Recommend using detailed scoring for more accurate statistics',
+                          _currentState == DialogState.scoringMethodSelection
+                              ? 'Choose the scoring method that matches your game style'
+                              : 'Recommend using detailed scoring for more accurate statistics',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white.withOpacity(0.9),
@@ -88,12 +101,29 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
     _overlayEntry = null;
   }
 
+  // 選擇計分方法後進入輸入方法選擇
+  void _onScoringMethodSelected(ScoringMode mode) {
+    setState(() {
+      _selectedScoringMode = mode;
+      _currentState = DialogState.inputMethodSelection;
+    });
+  }
+
+  // 返回計分方法選擇
+  void _goBackToScoringMethod() {
+    setState(() {
+      _currentState = DialogState.scoringMethodSelection;
+      _selectedScoringMode = null;
+    });
+  }
+
   Future<void> _showSimpleDialog(BuildContext context) async {
     Navigator.pop(context); // Close the selector
     final result = await showAddGameSimpleDialog(
       context,
       widget.dayId,
       widget.gameNumber,
+      scoringMode: _selectedScoringMode!,
     );
     if (result != null && context.mounted) {
       Navigator.pop(context, result); // Return result to the original caller
@@ -106,6 +136,7 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
       context,
       widget.dayId,
       widget.gameNumber,
+      scoringMode: _selectedScoringMode!,
     );
     if (result != null && context.mounted) {
       Navigator.pop(context, result); // Return result to the original caller
@@ -149,29 +180,9 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
                         children: [
                           _buildHeader(context),
                           const SizedBox(height: 8),
-                          Text(
-                            'Choose input method for Game ${widget.gameNumber}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.white70,
-                            ),
-                          ),
+                          _buildDescription(context),
                           const SizedBox(height: 24),
-                          _buildChoiceOption(
-                            context,
-                            title: 'Quick Input',
-                            subtitle: 'Only input total score, Strikes, Spares',
-                            color: Colors.blue,
-                            onTap: () => _showSimpleDialog(context),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildChoiceOption(
-                            context,
-                            title: 'Detailed Scoring',
-                            subtitle:
-                                'Use complete score table frame-by-frame input',
-                            color: Colors.purple,
-                            onTap: () => _showAdvancedDialog(context),
-                          ),
+                          _buildContent(context),
                         ],
                       ),
                     ),
@@ -189,11 +200,26 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Text(
-          'Choose Adding Method',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+        // 返回按鈕 (僅在輸入方法選擇時顯示)
+        if (_currentState == DialogState.inputMethodSelection)
+          IconButton(
+            onPressed: _goBackToScoringMethod,
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        if (_currentState == DialogState.inputMethodSelection)
+          const SizedBox(width: 8),
+        
+        Expanded(
+          child: Text(
+            _currentState == DialogState.scoringMethodSelection
+                ? 'Choose Scoring Method'
+                : 'Choose Input Method',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -208,10 +234,116 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
             size: 20,
           ),
         ),
-        const Spacer(),
+        const SizedBox(width: 8),
         IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescription(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      _currentState == DialogState.scoringMethodSelection
+          ? 'Select scoring method for Game ${widget.gameNumber}'
+          : 'Choose input method for Game ${widget.gameNumber}',
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: Colors.white70,
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    if (_currentState == DialogState.scoringMethodSelection) {
+      return _buildScoringMethodSelection(context);
+    } else {
+      return _buildInputMethodSelection(context);
+    }
+  }
+
+  Widget _buildScoringMethodSelection(BuildContext context) {
+    return Column(
+      children: [
+        _buildChoiceOption(
+          context,
+          title: '傳統計分 (Traditional)',
+          subtitle: 'Strike和Spare會獲得後續球的分數獎勵',
+          description: '完美分數: 300分，適合一般比賽和練習',
+          color: const Color(0xFF00B2A9),
+          onTap: () => _onScoringMethodSelected(ScoringMode.traditional),
+        ),
+        const SizedBox(height: 16),
+        _buildChoiceOption(
+          context,
+          title: 'Current計分 (World Bowling)',
+          subtitle: 'Strike固定30分，計分更直觀簡單',
+          description: '完美分數: 300分，適合現代比賽和訓練',
+          color: const Color(0xFFFF6B35),
+          onTap: () => _onScoringMethodSelected(ScoringMode.current),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInputMethodSelection(BuildContext context) {
+    return Column(
+      children: [
+        // 顯示選擇的計分方法
+        Container(
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: (_selectedScoringMode == ScoringMode.traditional 
+                ? const Color(0xFF00B2A9) 
+                : const Color(0xFFFF6B35)).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: (_selectedScoringMode == ScoringMode.traditional 
+                  ? const Color(0xFF00B2A9) 
+                  : const Color(0xFFFF6B35)).withOpacity(0.5),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: _selectedScoringMode == ScoringMode.traditional 
+                    ? const Color(0xFF00B2A9) 
+                    : const Color(0xFFFF6B35),
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '已選擇: ${_selectedScoringMode == ScoringMode.traditional ? "傳統計分" : "Current計分"}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        _buildChoiceOption(
+          context,
+          title: 'Quick Input',
+          subtitle: 'Only input total score, Strikes, Spares',
+          description: 'Fast recording for basic statistics',
+          color: Colors.blue,
+          onTap: () => _showSimpleDialog(context),
+        ),
+        const SizedBox(height: 16),
+        _buildChoiceOption(
+          context,
+          title: 'Detailed Scoring',
+          subtitle: 'Use complete score table frame-by-frame input',
+          description: 'Complete analysis with detailed statistics',
+          color: Colors.purple,
+          onTap: () => _showAdvancedDialog(context),
         ),
       ],
     );
@@ -221,6 +353,7 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
     BuildContext context, {
     required String title,
     required String subtitle,
+    required String description,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -255,6 +388,16 @@ class _AddGameChoiceDialogState extends State<AddGameChoiceDialog> {
                       color: color.withOpacity(0.8),
                     ),
                   ),
+                  if (description.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -1,5 +1,3 @@
-import 'package:bowlingarsenal_app/controllers/training_controller.dart';
-import 'package:bowlingarsenal_app/views/training/add_game_choice_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -23,18 +21,4 @@ Future<void> showDeleteConfirmationDialog(
   );
 }
 
-Future<void> showAddGameChoiceDialog({
-  required BuildContext context,
-  required String dayId,
-  required TrainingController controller,
-}) async {
-  return showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AddGameChoiceDialog(
-        dayId: dayId,
-        gameNumber: controller.getGameCount(dayId) + 1,
-      );
-    },
-  );
-} 
+ 

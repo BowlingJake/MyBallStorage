@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/bowling/bowling_scorecard_widget.dart';
+import '../logic/scoring/scoring_manager.dart';
+import '../logic/scoring/scoring_strategy.dart';
 
-class DeveloperPage extends StatelessWidget {
+class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
+
+  @override
+  State<DeveloperPage> createState() => _DeveloperPageState();
+}
+
+class _DeveloperPageState extends State<DeveloperPage> {
+  late ScoringManager _scoringManager;
+  late ScoringDemoData _demoData;
+  int _selectedDemoIndex = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+    _scoringManager = ScoringManager();
+    _demoData = ScoringManager.createDemoData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('開發者 - 計分板 UI'),
+        title: const Text('開發者 - 計分策略對比'),
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
@@ -17,238 +36,314 @@ class DeveloperPage extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.black,
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
-        child: _buildScorecard(context),
+        child: _buildDemo(context),
       ),
     );
   }
 
-  Widget _buildScorecard(BuildContext context) {
-    final glowingTextStyle = TextStyle(
-      color: Colors.white.withOpacity(0.8),
-      fontFamily: 'Electrolize',
-      shadows: [
-        for (double i = 1; i < 3; i++)
-          Shadow(color: const Color(0xFF00B2A9), blurRadius: 2 * i),
-      ],
-      fontWeight: FontWeight.bold,
-    );
-
-    return Column(
-      children: [
-        // --- Serial Number Row ---
-        Row(
-          children: List.generate(10, (index) {
-            // Split into two rows of 5 for alignment
-            if (index == 5) {
-              return const SizedBox.shrink(); // This will be handled in the main column split
-            }
-            return Expanded(
-              child: Text(
-                (index + 1).toString(),
-                textAlign: TextAlign.center,
-                style: glowingTextStyle.copyWith(fontSize: 14),
-              ),
-            );
-          }).where((widget) => widget is! SizedBox).toList(),
-        ),
-        const SizedBox(height: 4),
-        // --- First row of frames ---
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (index) => Expanded(child: _buildFrameD(context, index + 1))),
-        ),
-        const SizedBox(height: 12),
-        // --- Serial Number Row for second half ---
-         Row(
-          children: List.generate(10, (index) {
-            if (index < 5) {
-              return const SizedBox.shrink();
-            }
-            return Expanded(
-              child: Text(
-                (index + 1).toString(),
-                textAlign: TextAlign.center,
-                style: glowingTextStyle.copyWith(fontSize: 14),
-              ),
-            );
-          }).where((widget) => widget is! SizedBox).toList(),
-        ),
-        const SizedBox(height: 4),
-        // --- Second row of frames ---
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (index) => Expanded(child: _buildFrameD(context, index + 6))),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStandardFrameBody(BuildContext context, int frameNumber, Color borderColor, Color textColor) {
-    final bool isTenthFrame = frameNumber == 10;
+  Widget _buildDemo(BuildContext context) {
+    final demoGames = _demoData.getAllDemoGames();
+    final currentDemo = demoGames[_selectedDemoIndex];
     
-    Widget scoreArea;
-    if (isTenthFrame) {
-      scoreArea = Row(
-        children: [
-          Expanded(child: _buildSmallScoreBox(context, '', borderColor, textColor)),
-          Expanded(child: _buildSmallScoreBox(context, '', borderColor, textColor)),
-          Expanded(child: _buildSmallScoreBox(context, '', borderColor, textColor)),
-        ],
-      );
-    } else {
-      scoreArea = Row(
-        children: [
-          Expanded(flex: 1, child: _buildSmallScoreBox(context, '', borderColor, textColor)),
-          Expanded(flex: 1, child: _buildSmallScoreBox(context, 'X', borderColor, textColor)),
-        ],
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Frame Number
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0, bottom: 2.0),
-          child: Text(frameNumber.toString(), style: TextStyle(color: textColor.withOpacity(0.8), fontSize: 12)),
-        ),
-        // Score Area and Cumulative Score
-        Container(
-          height: 50,
-          child: Stack(
-            children: <Widget>[
-              // Cumulative Score Box (bottom layer)
-              Positioned.fill(
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: borderColor, width: 1)),
-                  ),
-                  child: Text('108', style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
-              ),
-              // Top Score Area (top layer)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 25,
-                child: scoreArea,
-              ),
-              // Vertical divider for frames 1-9
-              if (!isTenthFrame)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  bottom: 25,
-                  width: 50, // approx center
-                  child: Center(
-                    child: Container(
-                      width: 1,
-                      color: borderColor,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+        // 示範數據選擇器
+        _buildDemoSelector(demoGames),
+        
+        const SizedBox(height: 20),
+        
+        // 當前示範數據資訊
+        _buildDemoInfo(currentDemo),
+        
+        const SizedBox(height: 30),
+        
+        // 計分對比
+        _buildScoringComparison(currentDemo.rolls),
+        
+        const SizedBox(height: 40),
+        
+        // 使用說明
+        _buildUsageInstructions(),
       ],
-    );
-  }
-
-  Widget _buildSmallScoreBox(BuildContext context, String score, Color borderColor, Color textColor) {
-    return Container(
-      height: 25,
-      decoration: BoxDecoration(
-        border: Border(
-           right: BorderSide(color: borderColor, width: 1)
-        ),
-      ),
-      child: Center(child: Text(score, style: TextStyle(color: textColor, fontSize: 14))),
     );
   }
   
-  Widget _buildFrameD(BuildContext context, int frameNumber) {
-    const accentColor = Color(0xFF00B2A9);
-
-    return AspectRatio(
-      aspectRatio: 1.0,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border(
-            right: BorderSide(color: accentColor, width: 0.5),
-            top: BorderSide(color: accentColor.withOpacity(0.3), width: 0.5),
+  Widget _buildDemoSelector(List<DemoGameData> demoGames) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF00B2A9).withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '選擇示範遊戲：',
+            style: TextStyle(
+              color: Color(0xFF00B2A9),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        child: _buildStandardFrameBodyD(context, frameNumber, accentColor),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: demoGames.asMap().entries.map((entry) {
+              final index = entry.key;
+              final demo = entry.value;
+              final isSelected = index == _selectedDemoIndex;
+              
+              return GestureDetector(
+                onTap: () => setState(() => _selectedDemoIndex = index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF00B2A9) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFF00B2A9),
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    demo.name,
+                    style: TextStyle(
+                      color: isSelected ? Colors.black : const Color(0xFF00B2A9),
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
-
-  Widget _buildStandardFrameBodyD(BuildContext context, int frameNumber, Color accentColor) {
-    final bool isTenthFrame = frameNumber == 10;
-    
-    final glowingTextStyle = TextStyle(
-      color: Colors.white,
-      fontFamily: 'Electrolize',
-      shadows: [
-        for (double i = 1; i < 3; i++) Shadow(color: accentColor, blurRadius: 2 * i),
-      ],
-      fontWeight: FontWeight.bold,
+  
+  Widget _buildDemoInfo(DemoGameData demo) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[600]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            demo.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            demo.description,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '投球數據: ${demo.rolls.join(', ')}',
+            style: const TextStyle(
+              color: Color(0xFF00B2A9),
+              fontSize: 12,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ],
+      ),
     );
-
-    // --- Mock Data to demonstrate different frame states ---
-    // This logic will later be replaced by actual game data.
-    final bool isStrike = !isTenthFrame && (frameNumber == 1 || frameNumber == 3 || frameNumber == 5);
-    final bool isSpare = !isTenthFrame && (frameNumber == 2);
-
-    Widget scoreArea;
-
-    if (isTenthFrame) {
-      scoreArea = Row(
-        children: [
-          Expanded(child: _buildSmallScoreBoxD(context, 'X', accentColor, glowingTextStyle, showRightBorder: true)),
-          Expanded(child: _buildSmallScoreBoxD(context, 'X', accentColor, glowingTextStyle, showRightBorder: true)),
-          Expanded(child: _buildSmallScoreBoxD(context, '7', accentColor, glowingTextStyle, showRightBorder: false)),
-        ],
-      );
-    } else if (isStrike) {
-      // For a strike, we show a single centered 'X' in the top area.
-      scoreArea = Center(child: Text('X', style: glowingTextStyle.copyWith(fontSize: 18)));
-    } else {
-      // For a spare or an open frame, we show two boxes.
-      scoreArea = Row(
-        children: [
-          Expanded(child: _buildSmallScoreBoxD(context, isSpare ? '9' : '8', accentColor, glowingTextStyle, showRightBorder: true)),
-          Expanded(child: _buildSmallScoreBoxD(context, isSpare ? '/' : '1', accentColor, glowingTextStyle, showRightBorder: false)),
-        ],
-      );
-    }
-
+  }
+  
+  Widget _buildScoringComparison(List<int> rolls) {
+    // 計算兩種模式的結果
+    final traditionalManager = ScoringManager(mode: ScoringMode.traditional);
+    final currentManager = ScoringManager(mode: ScoringMode.current);
+    
+    final traditionalFrames = traditionalManager.calculateScores(rolls);
+    final currentFrames = currentManager.calculateScores(rolls);
+    
+    final traditionalTotal = traditionalFrames.isNotEmpty ? traditionalFrames.last.cumulativeScore : 0;
+    final currentTotal = currentFrames.isNotEmpty ? currentFrames.last.cumulativeScore : 0;
+    
     return Column(
       children: [
-        Expanded(flex: 2, child: scoreArea),
-        Container(height: 1, color: accentColor),
-        Expanded(
-          flex: 3,
-          child: Center(
-            child: Text('127', style: glowingTextStyle.copyWith(fontSize: 22)),
-          ),
+        // 傳統計分
+        _buildScoringSection(
+          title: '${traditionalManager.currentStrategyName} (總分: $traditionalTotal)',
+          description: traditionalManager.currentStrategyDescription,
+          frames: traditionalFrames,
+          color: const Color(0xFF00B2A9),
         ),
+        
+        const SizedBox(height: 30),
+        
+        // Current計分
+        _buildScoringSection(
+          title: '${currentManager.currentStrategyName} (總分: $currentTotal)',
+          description: currentManager.currentStrategyDescription,
+          frames: currentFrames,
+          color: const Color(0xFFFF6B35),
+        ),
+        
+        const SizedBox(height: 20),
+        
+        // 分數差異
+        if (traditionalTotal != currentTotal)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '分數差異: ${(traditionalTotal - currentTotal).abs()} 分',
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
-
-  Widget _buildSmallScoreBoxD(BuildContext context, String score, Color accentColor, TextStyle textStyle, {required bool showRightBorder}) {
+  
+  Widget _buildScoringSection({
+    required String title,
+    required String description,
+    required List<BowlingFrame> frames,
+    required Color color,
+  }) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: showRightBorder ? Border(right: BorderSide(color: accentColor.withOpacity(0.5))) : null,
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Center(child: Text(score, style: textStyle)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          BowlingScoreCardWidget(
+            frames: frames,
+            accentColor: color,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUsageInstructions() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF00B2A9).withOpacity(0.3)),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '策略模式使用方法：',
+            style: TextStyle(
+              color: Color(0xFF00B2A9),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 12),
+          Text(
+            '1. 導入管理器：',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'import "lib/logic/scoring/scoring_manager.dart";',
+            style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '2. 建立計分管理器：',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'final manager = ScoringManager(mode: ScoringMode.traditional);',
+            style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '3. 計算分數：',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'final frames = manager.calculateScores([10, 7, 3, 9, 0, ...]);',
+            style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '4. 切換模式：',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'manager.switchMode(ScoringMode.current);',
+            style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 16),
+          Text(
+            '兩種計分模式的主要差異：',
+            style: TextStyle(
+              color: Color(0xFF00B2A9),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '• 傳統模式：Strike和Spare依賴後續投球結果',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          SizedBox(height: 4),
+          Text(
+            '• Current模式：Strike固定30分，Spare=10+第一球，第10格無獎勵球',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+        ],
+      ),
     );
   }
 }

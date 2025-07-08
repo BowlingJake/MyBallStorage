@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/widgets/training/create_training_record_dialo
 import 'package:bowlingarsenal_app/widgets/training/delete_confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/training/edit_training_record_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/training/game_detail_dialog.dart';
+import 'package:bowlingarsenal_app/widgets/training/interactive_scoring_dialog.dart';
 import 'package:bowlingarsenal_app/widgets/training/training_day_summary_card.dart';
 import 'package:bowlingarsenal_app/widgets/training/training_empty_state.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class TrainingListView extends ConsumerWidget {
               onAddGame: () => _showAddGameDialog(context, day.id, ref),
               onEdit: () => _showEditRecordDialog(context, day.id, ref),
               onDelete: () => _showDeleteDayDialog(context, day.id, ref),
-              onGameTap: (game) => _showGameDetails(context, game, ref),
+              onGameTap: (game) => _showInteractiveScoring(context, game, ref),
               onGameDelete: (game) => _onGameDelete(context, game, ref),
             ),
           );
@@ -150,16 +151,30 @@ class TrainingListView extends ConsumerWidget {
     );
   }
 
-  void _showGameDetails(BuildContext context, GameRecord game, WidgetRef ref) {
-    showGameDetailDialog(context, game);
+  void _showInteractiveScoring(BuildContext context, GameRecord game, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => InteractiveScoringDialog(
+        game: game,
+        onGameSaved: (updatedGame) async {
+          final controller = ref.read(trainingControllerProvider);
+          await handleApiCall(
+            context: context,
+            future: controller.updateGame(updatedGame),
+            successMessage: '遊戲分數已更新',
+          );
+        },
+      ),
+    );
   }
 
-  void _showAddGameDialog(BuildContext context, String dayId, WidgetRef ref) {
+  void _showAddGameDialog(BuildContext context, String dayId, WidgetRef ref) async {
     final controller = ref.read(trainingControllerProvider);
-    showAddGameChoiceDialog(
+    await handleApiCall(
       context: context,
-      dayId: dayId,
-      controller: controller,
+      future: controller.addGameToDay(dayId),
+      successMessage: '遊戲已新增',
     );
   }
 }
