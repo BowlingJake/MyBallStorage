@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/score_data.dart';
-import 'package:bowlingarsenal_app/widgets/bowling/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:flutter/material.dart';
 
 class TenthFrameWidget extends StatelessWidget {
@@ -18,56 +18,35 @@ class TenthFrameWidget extends StatelessWidget {
   final Function() onGameComplete;
 
   Future<void> _handleFrameTap(BuildContext context) async {
-    Set<int> initialPinsDown;
+    // 計算最大可選擇的倒瓶數
+    int maxPins = 10;
 
     if (frame.rolls.isEmpty) {
-      // 第一球，10瓶全站立
-      initialPinsDown = {};
+      // 第一球，最多10瓶
+      maxPins = 10;
     } else if (frame.rolls.length == 1) {
       // 第二球
       if (frame.rolls[0].pinsDown == 10) {
-        // 第一球全倒，第二球重置
-        initialPinsDown = {};
+        // 第一球全倒，第二球重置，最多10瓶
+        maxPins = 10;
       } else {
-        // 第一球沒全倒，第二球剩下的瓶
-        initialPinsDown = {
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-        }.difference(frame.rolls[0].pinsStandingAfterThrow!);
+        // 第一球沒全倒，第二球最多剩餘瓶數
+        maxPins = 10 - frame.rolls[0].pinsDown;
       }
     } else if (frame.rolls.length == 2) {
       // 第三球
       if (frame.rolls[0].pinsDown == 10) {
         // 第一球全倒
         if (frame.rolls[1].pinsDown == 10) {
-          // 第二球也全倒，第三球重置
-          initialPinsDown = {};
+          // 第二球也全倒，第三球重置，最多10瓶
+          maxPins = 10;
         } else {
-          // 第二球沒全倒，第三球為第二球剩下的瓶
-          initialPinsDown = {
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-          }.difference(frame.rolls[1].pinsStandingAfterThrow!);
+          // 第二球沒全倒，第三球最多剩餘瓶數
+          maxPins = 10 - frame.rolls[1].pinsDown;
         }
       } else if (frame.rolls[0].pinsDown + frame.rolls[1].pinsDown == 10) {
-        // 前兩球補中，第三球重置
-        initialPinsDown = {};
+        // 前兩球補中，第三球重置，最多10瓶
+        maxPins = 10;
       } else {
         // 不應該有第三球
         return;
@@ -77,39 +56,62 @@ class TenthFrameWidget extends StatelessWidget {
       return;
     }
 
-    final pinsHit = await showDialog<Set<int>>(
+    final selectedPinsDown = await showDialog<int>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return PinSelectorPopupWidget(
-          initialPinsDown: initialPinsDown,
-          pinStandingAssetPath: 'assets/images/pin_standing.svg',
-          pinFallenAssetPath: 'assets/images/pin_fallen.svg',
+        return SimplePinsDownSelector(
+          maxPins: maxPins,
+          initialPinsDown: 0,
         );
       },
     );
 
-    if (pinsHit != null) {
-      final pinsDown = pinsHit.length;
+    if (selectedPinsDown != null) {
+      // 計算倒瓶後剩餘的瓶數
+      Set<int> pinsStandingAfterThrow;
+      Set<int> pinsStandingBeforeThrow;
+      
+      if (frame.rolls.isEmpty) {
+        // 第一球
+        pinsStandingBeforeThrow = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+      } else {
+        pinsStandingBeforeThrow = frame.rolls.last.pinsStandingAfterThrow!;
+      }
+      
+      if (selectedPinsDown == 10) {
+        pinsStandingAfterThrow = {};
+      } else {
+        // 簡化邏輯：根據倒瓶數計算剩餘瓶數
+        if (frame.rolls.isEmpty || 
+            (frame.rolls.isNotEmpty && frame.rolls.last.pinsDown == 10)) {
+          // 第一球或前一球是全倒的情況
+          pinsStandingAfterThrow = {};
+          for (int i = selectedPinsDown + 1; i <= 10; i++) {
+            pinsStandingAfterThrow.add(i);
+          }
+        } else {
+          // 繼續上一球的剩餘瓶數
+          final totalPinsDown = pinsStandingBeforeThrow.length == 10 
+            ? selectedPinsDown 
+            : (10 - pinsStandingBeforeThrow.length) + selectedPinsDown;
+          
+          if (totalPinsDown >= 10) {
+            pinsStandingAfterThrow = {};
+          } else {
+            pinsStandingAfterThrow = {};
+            for (int i = totalPinsDown + 1; i <= 10; i++) {
+              pinsStandingAfterThrow.add(i);
+            }
+          }
+        }
+      }
+      
       final newRoll = Roll(
-        pinsDown: pinsDown,
-        pinsStandingAfterThrow: {
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-        }.difference(pinsHit),
-        displayScore: _getDisplayScore(pinsDown),
-        pinsStandingBeforeThrow:
-            frame.rolls.isEmpty
-                ? {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-                : frame.rolls.last.pinsStandingAfterThrow!,
+        pinsDown: selectedPinsDown,
+        pinsStandingAfterThrow: pinsStandingAfterThrow,
+        displayScore: _getDisplayScore(selectedPinsDown),
+        pinsStandingBeforeThrow: pinsStandingBeforeThrow,
       );
 
       frame.rolls.add(newRoll);

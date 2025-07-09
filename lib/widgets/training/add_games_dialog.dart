@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/models/score_data.dart';
 import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
-import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:bowlingarsenal_app/widgets/score_game_widget.dart';
 import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
@@ -109,52 +109,65 @@ class _AddGamesDialogState extends State<AddGamesDialog> {
                   GestureDetector(
                     onTap: () {
                       if (currentFrameIndex == i) {
-                        showDialog(
+                        // 計算可用的最大倒瓶數
+                        int maxPins = 10;
+                        if (frames[i].rolls.isNotEmpty) {
+                          maxPins = 10 - frames[i].rolls[0].pinsDown;
+                        }
+                        
+                        showDialog<int>(
                           context: context,
                           builder:
-                              (context) => PinSelectorPopupWidget(
-                                initialPinsDown: _getInitialPinsDown(frames[i]),
-                                pinStandingAssetPath:
-                                    'assets/images/pin_standing.svg',
-                                pinFallenAssetPath:
-                                    'assets/images/pin_fallen.svg',
+                              (context) => SimplePinsDownSelector(
+                                maxPins: maxPins,
+                                initialPinsDown: 0,
                               ),
-                        ).then((pinsHit) {
-                          if (pinsHit != null) {
+                        ).then((selectedPinsDown) {
+                          if (selectedPinsDown != null) {
                             setState(() {
-                              final pinsDown = pinsHit.length;
+                              // 計算站立的瓶數
+                              Set<int> pinsStandingAfterThrow;
+                              Set<int> pinsStandingBeforeThrow;
+                              
+                              if (frames[i].rolls.isEmpty) {
+                                // 第一球
+                                pinsStandingBeforeThrow = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+                                if (selectedPinsDown == 10) {
+                                  pinsStandingAfterThrow = {};
+                                } else {
+                                  pinsStandingAfterThrow = {};
+                                  for (int j = selectedPinsDown + 1; j <= 10; j++) {
+                                    pinsStandingAfterThrow.add(j);
+                                  }
+                                }
+                              } else {
+                                // 第二球
+                                pinsStandingBeforeThrow = frames[i].rolls[0].pinsStandingAfterThrow!;
+                                final totalPinsDown = frames[i].rolls[0].pinsDown + selectedPinsDown;
+                                if (totalPinsDown == 10) {
+                                  pinsStandingAfterThrow = {};
+                                } else {
+                                  pinsStandingAfterThrow = {};
+                                  for (int j = totalPinsDown + 1; j <= 10; j++) {
+                                    pinsStandingAfterThrow.add(j);
+                                  }
+                                }
+                              }
+                              
                               final roll = Roll(
-                                pinsDown: pinsDown,
-                                pinsStandingAfterThrow: {
-                                  1,
-                                  2,
-                                  3,
-                                  4,
-                                  5,
-                                  6,
-                                  7,
-                                  8,
-                                  9,
-                                  10,
-                                }.difference(pinsHit),
+                                pinsDown: selectedPinsDown,
+                                pinsStandingAfterThrow: pinsStandingAfterThrow,
                                 displayScore: _getDisplayScore(
                                   frames[i],
-                                  pinsDown,
+                                  selectedPinsDown,
                                 ),
-                                pinsStandingBeforeThrow:
-                                    frames[i].rolls.isEmpty
-                                        ? {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-                                        : frames[i]
-                                                .rolls
-                                                .last
-                                                .pinsStandingAfterThrow ??
-                                            {},
+                                pinsStandingBeforeThrow: pinsStandingBeforeThrow,
                               );
                               frames[i].rolls.add(roll);
 
                               if (frames[i].rolls.length == 2 ||
                                   (frames[i].rolls.length == 1 &&
-                                      pinsDown == 10)) {
+                                      selectedPinsDown == 10)) {
                                 frames[i].isComplete = true;
                                 if (i < 9) {
                                   currentFrameIndex = i + 1;

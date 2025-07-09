@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/score_data.dart';
-import 'package:bowlingarsenal_app/widgets/bowling/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:bowlingarsenal_app/widgets/bowling/score_game_widget.dart';
 import 'package:bowlingarsenal_app/widgets/bowling/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
@@ -95,59 +95,88 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
               }.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
     }
 
-    // 其餘邏輯不變
-    final pinsHit = await showDialog<Set<int>>(
+    // 計算可用的最大倒瓶數
+    int maxPins = 10;
+    if (frameIndex < 9 && currentFrame.rolls.isNotEmpty) {
+      // 第1-9格第二球
+      maxPins = 10 - currentFrame.rolls[0].pinsDown;
+    } else if (frameIndex == 9 && currentFrame.rolls.isNotEmpty) {
+      // 第10格邏輯
+      if (currentFrame.rolls.length == 1 && currentFrame.rolls[0].pinsDown < 10) {
+        maxPins = 10 - currentFrame.rolls[0].pinsDown;
+      }
+      // 其他情況保持 maxPins = 10
+    }
+
+    // 顯示數字選單
+    final selectedPinsDown = await showDialog<int>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return PinSelectorPopupWidget(
-          initialPinsDown: initialPinsDown,
-          pinStandingAssetPath: 'assets/images/pin_standing.svg',
-          pinFallenAssetPath: 'assets/images/pin_fallen.svg',
+        return SimplePinsDownSelector(
+          maxPins: maxPins,
+          initialPinsDown: 0,
         );
       },
     );
 
-    if (pinsHit != null && mounted) {
+    if (selectedPinsDown != null && mounted) {
       setState(() {
-        // 計算擊倒的瓶數
-        final pinsDown = pinsHit.length;
+        // 計算站立的瓶數
+        Set<int> pinsStandingAfterThrow;
+        Set<int> pinsStandingBeforeThrow;
+        
+        if (currentFrame.rolls.isEmpty) {
+          // 第一球
+          pinsStandingBeforeThrow = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+          if (selectedPinsDown == 10) {
+            pinsStandingAfterThrow = {};
+          } else {
+            // 簡化處理：假設倒的是前 selectedPinsDown 個瓶
+            pinsStandingAfterThrow = {};
+            for (int i = selectedPinsDown + 1; i <= 10; i++) {
+              pinsStandingAfterThrow.add(i);
+            }
+          }
+        } else {
+          // 第二球或之後
+          if (frameIndex < 9) {
+            // 第1-9格第二球
+            pinsStandingBeforeThrow = currentFrame.rolls[0].pinsStandingAfterThrow!;
+            pinsStandingAfterThrow = {};
+            final totalPinsDown = currentFrame.rolls[0].pinsDown + selectedPinsDown;
+            if (totalPinsDown < 10) {
+              for (int i = totalPinsDown + 1; i <= 10; i++) {
+                pinsStandingAfterThrow.add(i);
+              }
+            }
+          } else {
+            // 第10格邏輯
+            pinsStandingBeforeThrow = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+            if (selectedPinsDown == 10) {
+              pinsStandingAfterThrow = {};
+            } else {
+              pinsStandingAfterThrow = {};
+              for (int i = selectedPinsDown + 1; i <= 10; i++) {
+                pinsStandingAfterThrow.add(i);
+              }
+            }
+          }
+        }
 
         // 創建新的 Roll 記錄
         final newRoll = Roll(
-          pinsDown: pinsDown,
-          pinsStandingAfterThrow: {
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-          }.difference(pinsHit),
-          displayScore: _getDisplayScore(pinsDown, frameIndex),
-          pinsStandingBeforeThrow: _scoreData.pinsStanding,
+          pinsDown: selectedPinsDown,
+          pinsStandingAfterThrow: pinsStandingAfterThrow,
+          displayScore: _getDisplayScore(selectedPinsDown, frameIndex),
+          pinsStandingBeforeThrow: pinsStandingBeforeThrow,
         );
 
         // 更新當前局的記錄
         currentFrame.rolls.add(newRoll);
 
         // 更新站立的瓶數
-        _scoreData.pinsStanding = {
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-        }.difference(pinsHit);
+        _scoreData.pinsStanding = pinsStandingAfterThrow;
 
         // 檢查是否需要進入下一局
         _checkAndAdvanceFrame(frameIndex, isEdit: isEdit);
@@ -182,35 +211,54 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           10,
         }.difference(currentFrame.rolls[0].pinsStandingAfterThrow!);
       }
-      final pinsHit = await showDialog<Set<int>>(
+      // 計算可用的最大倒瓶數
+      int maxPins = 10;
+      if (currentFrame.rolls[0].pinsDown < 10) {
+        maxPins = 10 - currentFrame.rolls[0].pinsDown;
+      }
+      
+      final selectedPinsDown = await showDialog<int>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext dialogContext) {
-          return PinSelectorPopupWidget(
-            initialPinsDown: initialPinsDown,
-            pinStandingAssetPath: 'assets/images/pin_standing.svg',
-            pinFallenAssetPath: 'assets/images/pin_fallen.svg',
+          return SimplePinsDownSelector(
+            maxPins: maxPins,
+            initialPinsDown: 0,
           );
         },
       );
-      if (pinsHit != null && mounted) {
+      if (selectedPinsDown != null && mounted) {
         setState(() {
-          final pinsDown = pinsHit.length;
+          // 計算站立的瓶數
+          Set<int> pinsStandingAfterThrow;
+          
+          if (currentFrame.rolls[0].pinsDown == 10) {
+            // 第一球全倒的情況
+            if (selectedPinsDown == 10) {
+              pinsStandingAfterThrow = {};
+            } else {
+              pinsStandingAfterThrow = {};
+              for (int i = selectedPinsDown + 1; i <= 10; i++) {
+                pinsStandingAfterThrow.add(i);
+              }
+            }
+          } else {
+            // 第一球不是全倒的情況
+            final totalPinsDown = currentFrame.rolls[0].pinsDown + selectedPinsDown;
+            if (totalPinsDown == 10) {
+              pinsStandingAfterThrow = {};
+            } else {
+              pinsStandingAfterThrow = {};
+              for (int i = totalPinsDown + 1; i <= 10; i++) {
+                pinsStandingAfterThrow.add(i);
+              }
+            }
+          }
+          
           final newRoll = Roll(
-            pinsDown: pinsDown,
-            pinsStandingAfterThrow: {
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10,
-            }.difference(pinsHit),
-            displayScore: _getDisplayScore(pinsDown, frameIndex),
+            pinsDown: selectedPinsDown,
+            pinsStandingAfterThrow: pinsStandingAfterThrow,
+            displayScore: _getDisplayScore(selectedPinsDown, frameIndex),
             pinsStandingBeforeThrow:
                 currentFrame.rolls[0].pinsStandingAfterThrow!,
           );
@@ -220,18 +268,7 @@ class _BowlingScoreTableState extends State<BowlingScoreTable> {
           } else {
             currentFrame.rolls.add(newRoll);
           }
-          _scoreData.pinsStanding = {
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-          }.difference(pinsHit);
+          _scoreData.pinsStanding = pinsStandingAfterThrow;
           _checkAndAdvanceFrame(frameIndex, isEdit: true);
           _scoreData.calculateScores();
         });

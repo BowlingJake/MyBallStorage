@@ -5,7 +5,7 @@ import 'package:bowlingarsenal_app/models/training_record.dart';
 import 'package:bowlingarsenal_app/logic/scoring/scoring_manager.dart';
 import 'package:bowlingarsenal_app/logic/scoring/scoring_strategy.dart';
 import 'package:bowlingarsenal_app/widgets/bowling/bowling_scorecard_widget.dart';
-import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/scoring_dialog_header.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/scoring_dialog_content.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/scoring_dialog_footer.dart';
@@ -68,22 +68,35 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
       return;
     }
 
-    // 計算初始已倒球瓶
-    final initialPinsDown = _getInitialPinsDown(frameIndex);
+    // 計算可用的最大倒瓶數
+    final frameRolls = _getRollsInFrame(frameIndex);
+    int maxPins = 10;
     
-    // 顯示球瓶選擇器
-    final selectedPins = await showDialog<Set<int>>(
+    if (frameRolls.isNotEmpty) {
+      if (frameIndex < 9) {
+        // 第1-9格第二球
+        maxPins = 10 - frameRolls[0];
+      } else {
+        // 第10格邏輯
+        if (frameRolls.length == 1 && frameRolls[0] < 10) {
+          maxPins = 10 - frameRolls[0];
+        }
+        // 其他情況保持 maxPins = 10
+      }
+    }
+    
+    // 顯示數字選單
+    final selectedPinsDown = await showDialog<int>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => PinSelectorPopupWidget(
-        initialPinsDown: initialPinsDown,
-        pinStandingAssetPath: 'assets/images/pin_standing.svg',
-        pinFallenAssetPath: 'assets/images/pin_fallen.svg',
+      builder: (dialogContext) => SimplePinsDownSelector(
+        maxPins: maxPins,
+        initialPinsDown: 0,
       ),
     );
 
-    if (selectedPins != null) {
-      _processPinSelection(frameIndex, selectedPins);
+    if (selectedPinsDown != null) {
+      _processPinSelection(frameIndex, selectedPinsDown);
     }
   }
 
@@ -230,8 +243,8 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
   }
 
   /// 處理球瓶選擇結果
-  void _processPinSelection(int frameIndex, Set<int> selectedPins) {
-    final pinsDown = selectedPins.length;
+  void _processPinSelection(int frameIndex, int selectedPinsDown) {
+    final pinsDown = selectedPinsDown;
     
     // 添加到投球記錄
     _rolls.add(pinsDown);

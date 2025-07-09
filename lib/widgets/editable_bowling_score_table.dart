@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/score_data.dart';
-import 'package:bowlingarsenal_app/widgets/pin_selector_popup_widget.dart';
+import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:bowlingarsenal_app/widgets/score_game_widget.dart';
 import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,28 +18,42 @@ class EditableBowlingScoreTable extends StatelessWidget {
   Future<void> _editFrame(BuildContext context, int frameIdx) async {
     final frame = scoreData.frames[frameIdx];
     if (frame.rolls.isEmpty) return;
-    final var initialPinsDown = <int>{};
+    
     final originalRolls = List<Roll>.from(frame.rolls);
     final wasComplete = frame.isComplete;
     frame.rolls.clear();
     frame.isComplete = false;
-    final pinsHit = await showDialog<Set<int>>(
+    
+    // 計算最大可選擇的倒瓶數（第一球總是10）
+    const maxPins = 10;
+    
+    final selectedPinsDown = await showDialog<int>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return PinSelectorPopupWidget(
-          initialPinsDown: initialPinsDown,
-          pinStandingAssetPath: 'assets/images/pin_standing.svg',
-          pinFallenAssetPath: 'assets/images/pin_fallen.svg',
+        return SimplePinsDownSelector(
+          maxPins: maxPins,
+          initialPinsDown: 0,
         );
       },
     );
-    if (pinsHit != null) {
-      final pinsDown = pinsHit.length;
+    
+    if (selectedPinsDown != null) {
+      // 計算倒瓶後剩餘的瓶數
+      Set<int> pinsStandingAfterThrow;
+      if (selectedPinsDown == 10) {
+        pinsStandingAfterThrow = {};
+      } else {
+        pinsStandingAfterThrow = {};
+        for (int i = selectedPinsDown + 1; i <= 10; i++) {
+          pinsStandingAfterThrow.add(i);
+        }
+      }
+      
       final newRoll = Roll(
-        pinsDown: pinsDown,
-        pinsStandingAfterThrow: {1,2,3,4,5,6,7,8,9,10}.difference(pinsHit),
-        displayScore: pinsDown == 10 ? 'X' : pinsDown.toString(),
+        pinsDown: selectedPinsDown,
+        pinsStandingAfterThrow: pinsStandingAfterThrow,
+        displayScore: selectedPinsDown == 10 ? 'X' : selectedPinsDown.toString(),
         pinsStandingBeforeThrow: {1,2,3,4,5,6,7,8,9,10},
       );
       frame.rolls.add(newRoll);
