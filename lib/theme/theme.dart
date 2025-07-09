@@ -174,7 +174,7 @@ final ThemeData darkTheme = ThemeData(
   ),
 
   // 卡片
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: Colors.transparent, // 全域卡片背景設為透明
     elevation: 0,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -292,7 +292,7 @@ final ThemeData lightTheme = ThemeData(
   ),
 
   // 卡片
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: lightSurfaceColor,
     elevation: 2,
     shadowColor: Colors.black12,
