@@ -25,6 +25,9 @@ linter:
     prefer_final_locals: true
     prefer_const_constructors: true
     prefer_single_quotes: true
+dart_code_metrics:
+  rules:
+    - unused-files
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
