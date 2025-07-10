@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:bowlingarsenal_app/shared/enums.dart';
-import 'package:bowlingarsenal_app/widgets/common/navigation/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/training_list_view.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/training_page_app_bar.dart';
 import 'package:flutter/foundation.dart';

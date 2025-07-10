@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
 import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';

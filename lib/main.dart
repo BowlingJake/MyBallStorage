@@ -1,6 +1,6 @@
 // lib/main.dart
 import 'package:bowlingarsenal_app/core/error/error_handler.dart';
-import 'package:bowlingarsenal_app/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
 import 'package:bowlingarsenal_app/routing/app_router_config.dart';
 import 'package:bowlingarsenal_app/theme/theme.dart';
 import 'package:flutter/material.dart';

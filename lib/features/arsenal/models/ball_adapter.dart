@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/features/arsenal/models/arsenal_ball.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 
 /// 將 ArsenalBall 轉換為 BowlingBall 的適配器函數
 /// 用於在 popout detail 中顯示 Arsenal 中的球

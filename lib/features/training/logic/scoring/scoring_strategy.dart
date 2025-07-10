@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 
 /// 計分策略的抽象介面
 /// 定義了所有計分邏輯必須實作的方法

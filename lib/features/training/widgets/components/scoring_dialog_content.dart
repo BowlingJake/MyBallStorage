@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bowlingarsenal_app/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_action_buttons.dart';
 
 /// 計分對話框內容組件

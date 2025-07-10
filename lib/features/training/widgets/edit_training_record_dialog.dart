@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
-import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 // 編輯訓練記錄彈窗 - 樣式與新增彈窗同步

@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showDeleteConfirmationDialog(

@@ -1,13 +1,13 @@
 // my_arsenal_page.dart
 import 'dart:developer';
 
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:bowlingarsenal_app/features/ball_library/providers/ball_library_providers.dart';
 import '../widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
-import 'package:bowlingarsenal_app/widgets/common/navigation/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle

@@ -1,5 +1,5 @@
-import 'package:bowlingarsenal_app/providers/theme_provider.dart';
-import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';

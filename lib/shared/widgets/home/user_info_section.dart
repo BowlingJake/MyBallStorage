@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/common/cards/standard_app_card.dart'; // 導入新的標準卡片
+import 'package:bowlingarsenal_app/shared/widgets/common/cards/standard_app_card.dart'; // 導入新的標準卡片
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 

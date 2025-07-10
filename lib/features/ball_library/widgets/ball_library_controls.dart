@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:bowlingarsenal_app/shared/widgets/search/search_bar.dart';
 import 'filter_popout.dart';
 

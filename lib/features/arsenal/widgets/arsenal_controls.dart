@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/features/arsenal/models/ball_bag_type.dart';
 import 'package:bowlingarsenal_app/features/arsenal/providers/arsenal_providers.dart';
-import 'package:bowlingarsenal_app/widgets/common/dialogs/ball_bag_options_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/ball_bag_options_dialog.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

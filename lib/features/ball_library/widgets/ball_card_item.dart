@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';

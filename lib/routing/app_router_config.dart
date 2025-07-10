@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/home_page.dart';
-import 'package:bowlingarsenal_app/views/login_page.dart';
+import 'package:bowlingarsenal_app/shared/views/login_page.dart';
 import 'package:bowlingarsenal_app/features/onboarding/views/onboarding_page.dart';
-import 'package:bowlingarsenal_app/providers/auth_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/auth_provider.dart';
 
 import 'package:bowlingarsenal_app/features/ball_library/views/ball_library_page.dart';
 import 'package:bowlingarsenal_app/features/training/views/my_training_page.dart';
-import 'package:bowlingarsenal_app/views/developer_page.dart';
+import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/views/my_arsenal_page.dart';
-import 'package:bowlingarsenal_app/views/settings_page.dart';
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
+import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。

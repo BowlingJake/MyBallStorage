@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 // import '../../../models/bowling_ball.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 // import 'package:getwidget/getwidget.dart'; // GFListTile is no longer used
-import 'package:bowlingarsenal_app/widgets/painters/grid_painter.dart';
-import 'package:bowlingarsenal_app/widgets/painters/metal_texture_painter.dart';
+import 'package:bowlingarsenal_app/shared/widgets/painters/grid_painter.dart';
+import 'package:bowlingarsenal_app/shared/widgets/painters/metal_texture_painter.dart';
 import 'package:bowlingarsenal_app/features/ball_library/widgets/ball_card_item.dart';
 
 class BallListView extends StatelessWidget {

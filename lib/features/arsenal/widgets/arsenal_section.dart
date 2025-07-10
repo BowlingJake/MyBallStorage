@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/features/arsenal/providers/arsenal_providers.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_card.dart';
-import 'package:bowlingarsenal_app/widgets/common/cards/section_container.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/cards/section_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

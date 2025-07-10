@@ -1,18 +1,18 @@
 // lib/home_page.dart
 import 'dart:ui'; // For BackdropFilter
 
-import 'package:bowlingarsenal_app/providers/theme_provider.dart';
-import 'package:bowlingarsenal_app/views/settings_page.dart';
+import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_section.dart';
-import 'package:bowlingarsenal_app/widgets/common/navigation/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
-import 'package:bowlingarsenal_app/widgets/app_specific/home/user_info_section.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/app_specific/home/user_info_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
-import 'package:bowlingarsenal_app/providers/providers.dart'; // 引入全局 providers
+import 'package:bowlingarsenal_app/shared/providers/providers.dart'; // 引入全局 providers
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});

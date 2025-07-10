@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/bowling/bowling_scorecard_widget.dart';
-import '../features/training/logic/scoring/scoring_manager.dart';
-import '../features/training/logic/scoring/scoring_strategy.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_manager.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});

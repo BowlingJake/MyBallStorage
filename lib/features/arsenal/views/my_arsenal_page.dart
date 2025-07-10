@@ -4,14 +4,14 @@ import 'package:bowlingarsenal_app/features/arsenal/models/ball_bag_type.dart';
 import 'package:bowlingarsenal_app/features/arsenal/providers/arsenal_providers.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_ball_card.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_controls.dart';
-import 'package:bowlingarsenal_app/widgets/common/navigation/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 
-import 'package:bowlingarsenal_app/providers/providers.dart'; // 引入全局 providers
+import 'package:bowlingarsenal_app/shared/providers/providers.dart'; // 引入全局 providers
 
 /// A simple page showing the user's arsenal.
 class MyArsenalPage extends ConsumerWidget {

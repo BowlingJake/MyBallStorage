@@ -1,17 +1,17 @@
-// lib/providers/providers.dart
+// lib/shared/providers/providers.dart
 // 統一匯出所有 Provider，方便其他檔案使用
 
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/providers/auth_provider.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/providers/auth_provider.dart';
 import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
-import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
 import 'package:bowlingarsenal_app/features/ball_library/providers/ball_library_providers.dart';
 import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 
 export 'auth_provider.dart';
-export '../features/onboarding/providers/onboarding_provider.dart';
+export '../../features/onboarding/providers/onboarding_provider.dart';
 export 'user_profile_provider.dart';
 // Ball Library providers are now in features/ball_library/providers/ball_library_providers.dart
 // They are re-exported here for backwards compatibility
@@ -52,4 +52,4 @@ final userPreferencesServiceProvider = Provider<UserPreferencesService>((ref) {
   return UserPreferencesService();
 });
 
-// Ball Library filter and sort providers are now in their own module
+// Ball Library filter and sort providers are now in their own module 

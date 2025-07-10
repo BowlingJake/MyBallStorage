@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import '../services/ball_data_service.dart';
 
 // Service Provider

@@ -16,7 +16,6 @@ digraph "" {
   "/features/arsenal/widgets/arsenal_ball_card.dart" [label="arsenal_ball_card"];
   "/features/arsenal/widgets/arsenal_card.dart" [label="arsenal_card"];
   "/features/arsenal/widgets/arsenal_controls.dart" [label="arsenal_controls"];
-  "/features/arsenal/widgets/arsenal_search_bar.dart" [label="arsenal_search_bar"];
   "/features/arsenal/widgets/arsenal_section.dart" [label="arsenal_section"];
   "/features/arsenal/widgets/ball_list_view.dart" [label="ball_list_view"];
   "/features/ball_library/ball_library.dart" [label="ball_library"];
@@ -72,6 +71,34 @@ digraph "" {
   "/services/user_preferences_service.dart" [label="user_preferences_service"];
   "/shared/app_strings.dart" [label="app_strings"];
   "/shared/enums.dart" [label="enums"];
+  "/shared/models/bowling_ball.dart" [label="bowling_ball"];
+  "/shared/models/user_profile.dart" [label="user_profile"];
+  "/shared/providers/auth_provider.dart" [label="auth_provider"];
+  "/shared/providers/theme_provider.dart" [label="theme_provider"];
+  "/shared/providers/user_profile_provider.dart" [label="user_profile_provider"];
+  "/shared/services/training_data_service.dart" [label="training_data_service"];
+  "/shared/services/user_preferences_service.dart" [label="user_preferences_service"];
+  "/shared/views/developer_page.dart" [label="developer_page"];
+  "/shared/views/login_page.dart" [label="login_page"];
+  "/shared/views/settings_page.dart" [label="settings_page"];
+  "/shared/widgets/bowling/bowling_scorecard_widget.dart" [label="bowling_scorecard_widget"];
+  "/shared/widgets/bowling/simple_pins_down_selector.dart" [label="simple_pins_down_selector"];
+  "/shared/widgets/common/ball_image_widget.dart" [label="ball_image_widget"];
+  "/shared/widgets/common/buttons/app_standard_button.dart" [label="app_standard_button"];
+  "/shared/widgets/common/cards/section_container.dart" [label="section_container"];
+  "/shared/widgets/common/cards/standard_app_card.dart" [label="standard_app_card"];
+  "/shared/widgets/common/dialogs/app_dialogs.dart" [label="app_dialogs"];
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" [label="ball_bag_options_dialog"];
+  "/shared/widgets/common/dialogs/confirmation_dialog.dart" [label="confirmation_dialog"];
+  "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" [label="create_ball_bag_dialog"];
+  "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart" [label="edit_ball_bag_dialog"];
+  "/shared/widgets/common/navigation/floating_bottom_navigation.dart" [label="floating_bottom_navigation"];
+  "/shared/widgets/common/navigation/modern_bottom_navigation.dart" [label="modern_bottom_navigation"];
+  "/shared/widgets/common/professional_dark_background.dart" [label="professional_dark_background"];
+  "/shared/widgets/home/user_info_section.dart" [label="user_info_section"];
+  "/shared/widgets/painters/grid_painter.dart" [label="grid_painter"];
+  "/shared/widgets/painters/metal_texture_painter.dart" [label="metal_texture_painter"];
+  "/shared/widgets/search/search_bar.dart" [label="search_bar"];
   "/theme/brand_colors.dart" [label="brand_colors"];
   "/theme/text_styles.dart" [label="text_styles"];
   "/theme/theme.dart" [label="theme"];
@@ -102,6 +129,12 @@ digraph "" {
   "/widgets/common/professional_dark_background.dart" [label="professional_dark_background"];
   "/widgets/painters/grid_painter.dart" [label="grid_painter"];
   "/widgets/painters/metal_texture_painter.dart" [label="metal_texture_painter"];
+  "/_to_be_deleted/cyberpunk_tech_style.dart" [label="cyberpunk_tech_style"];
+  "/_to_be_deleted/dark_tech_style.dart" [label="dark_tech_style"];
+  "/_to_be_deleted/digital_dashboard_style.dart" [label="digital_dashboard_style"];
+  "/_to_be_deleted/empty_bag_widget.dart" [label="empty_bag_widget"];
+  "/_to_be_deleted/enhanced_action_button.dart" [label="enhanced_action_button"];
+  "/_to_be_deleted/primary_button.dart" [label="primary_button"];
   subgraph "cluster~" {
     label="lib";
     "/home_page.dart";
@@ -147,7 +180,6 @@ digraph "" {
           "/features/arsenal/widgets/arsenal_ball_card.dart";
           "/features/arsenal/widgets/arsenal_card.dart";
           "/features/arsenal/widgets/arsenal_controls.dart";
-          "/features/arsenal/widgets/arsenal_search_bar.dart";
           "/features/arsenal/widgets/arsenal_section.dart";
           "/features/arsenal/widgets/ball_list_view.dart";
         }
@@ -269,6 +301,76 @@ digraph "" {
       label="shared";
       "/shared/app_strings.dart";
       "/shared/enums.dart";
+      subgraph "cluster~/shared/models" {
+        label="models";
+        "/shared/models/bowling_ball.dart";
+        "/shared/models/user_profile.dart";
+      }
+      subgraph "cluster~/shared/providers" {
+        label="providers";
+        "/shared/providers/auth_provider.dart";
+        "/shared/providers/theme_provider.dart";
+        "/shared/providers/user_profile_provider.dart";
+      }
+      subgraph "cluster~/shared/services" {
+        label="services";
+        "/shared/services/training_data_service.dart";
+        "/shared/services/user_preferences_service.dart";
+      }
+      subgraph "cluster~/shared/views" {
+        label="views";
+        "/shared/views/developer_page.dart";
+        "/shared/views/login_page.dart";
+        "/shared/views/settings_page.dart";
+      }
+      subgraph "cluster~/shared/widgets" {
+        label="widgets";
+        subgraph "cluster~/shared/widgets/bowling" {
+          label="bowling";
+          "/shared/widgets/bowling/bowling_scorecard_widget.dart";
+          "/shared/widgets/bowling/simple_pins_down_selector.dart";
+        }
+        subgraph "cluster~/shared/widgets/common" {
+          label="common";
+          "/shared/widgets/common/ball_image_widget.dart";
+          "/shared/widgets/common/professional_dark_background.dart";
+          subgraph "cluster~/shared/widgets/common/buttons" {
+            label="buttons";
+            "/shared/widgets/common/buttons/app_standard_button.dart";
+          }
+          subgraph "cluster~/shared/widgets/common/cards" {
+            label="cards";
+            "/shared/widgets/common/cards/section_container.dart";
+            "/shared/widgets/common/cards/standard_app_card.dart";
+          }
+          subgraph "cluster~/shared/widgets/common/dialogs" {
+            label="dialogs";
+            "/shared/widgets/common/dialogs/app_dialogs.dart";
+            "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart";
+            "/shared/widgets/common/dialogs/confirmation_dialog.dart";
+            "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart";
+            "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart";
+          }
+          subgraph "cluster~/shared/widgets/common/navigation" {
+            label="navigation";
+            "/shared/widgets/common/navigation/floating_bottom_navigation.dart";
+            "/shared/widgets/common/navigation/modern_bottom_navigation.dart";
+          }
+        }
+        subgraph "cluster~/shared/widgets/home" {
+          label="home";
+          "/shared/widgets/home/user_info_section.dart";
+        }
+        subgraph "cluster~/shared/widgets/painters" {
+          label="painters";
+          "/shared/widgets/painters/grid_painter.dart";
+          "/shared/widgets/painters/metal_texture_painter.dart";
+        }
+        subgraph "cluster~/shared/widgets/search" {
+          label="search";
+          "/shared/widgets/search/search_bar.dart";
+        }
+      }
     }
     subgraph "cluster~/theme" {
       label="theme";
@@ -342,6 +444,15 @@ digraph "" {
         "/widgets/painters/metal_texture_painter.dart";
       }
     }
+    subgraph "cluster~/_to_be_deleted" {
+      label="_to_be_deleted";
+      "/_to_be_deleted/cyberpunk_tech_style.dart";
+      "/_to_be_deleted/dark_tech_style.dart";
+      "/_to_be_deleted/digital_dashboard_style.dart";
+      "/_to_be_deleted/empty_bag_widget.dart";
+      "/_to_be_deleted/enhanced_action_button.dart";
+      "/_to_be_deleted/primary_button.dart";
+    }
   }
   "/features/arsenal/models/arsenal_ball.dart" -> "/features/arsenal/models/ball_bag_type.dart";
   "/features/arsenal/models/ball_adapter.dart" -> "/features/arsenal/models/arsenal_ball.dart";
@@ -389,10 +500,9 @@ digraph "" {
   "/features/ball_library/services/ball_data_service.dart" -> "/models/bowling_ball.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/models/bowling_ball.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/providers/providers.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/features/arsenal/widgets/arsenal_search_bar.dart";
+  "/features/ball_library/views/ball_library_page.dart" -> "/features/ball_library/providers/ball_library_providers.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/features/ball_library/widgets/ball_detail_popout.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/features/arsenal/widgets/ball_list_view.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/features/ball_library/widgets/filter_popout.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/widgets/common/navigation/modern_bottom_navigation.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/widgets/common/professional_dark_background.dart";
   "/features/ball_library/widgets/ball_card_item.dart" -> "/models/bowling_ball.dart";
@@ -403,7 +513,7 @@ digraph "" {
   "/features/ball_library/widgets/ball_detail_popout.dart" -> "/utils/app_formatters.dart";
   "/features/ball_library/widgets/ball_detail_popout.dart" -> "/widgets/common/ball_image_widget.dart";
   "/features/ball_library/widgets/ball_library_controls.dart" -> "/providers/providers.dart";
-  "/features/ball_library/widgets/ball_library_controls.dart" -> "/features/arsenal/widgets/arsenal_search_bar.dart";
+  "/features/ball_library/widgets/ball_library_controls.dart" -> "/shared/widgets/search/search_bar.dart";
   "/features/ball_library/widgets/ball_library_controls.dart" -> "/features/ball_library/widgets/filter_popout.dart";
   "/features/ball_library/widgets/filter_popout.dart" -> "/providers/providers.dart";
   "/features/onboarding/controllers/onboarding_controller.dart" -> "/providers/providers.dart";
@@ -510,6 +620,25 @@ digraph "" {
   "/routing/app_router_config.dart" -> "/views/settings_page.dart";
   "/routing/app_router_config.dart" -> "/providers/providers.dart";
   "/services/training_data_service.dart" -> "/features/training/models/training_record.dart";
+  "/shared/providers/auth_provider.dart" -> "/providers/user_profile_provider.dart";
+  "/shared/providers/auth_provider.dart" -> "/services/user_preferences_service.dart";
+  "/shared/providers/user_profile_provider.dart" -> "/models/user_profile.dart";
+  "/shared/providers/user_profile_provider.dart" -> "/services/user_preferences_service.dart";
+  "/shared/services/training_data_service.dart" -> "/features/training/models/training_record.dart";
+  "/shared/views/developer_page.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
+  "/shared/views/login_page.dart" -> "/providers/providers.dart";
+  "/shared/views/settings_page.dart" -> "/providers/theme_provider.dart";
+  "/shared/views/settings_page.dart" -> "/widgets/common/professional_dark_background.dart";
+  "/shared/widgets/common/dialogs/app_dialogs.dart" -> "/widgets/common/dialogs/confirmation_dialog.dart";
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/theme/theme.dart";
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/create_ball_bag_dialog.dart";
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/edit_ball_bag_dialog.dart";
+  "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/models/arsenal_ball.dart";
+  "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
+  "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/theme/theme.dart";
+  "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/models/ball_bag_type.dart";
+  "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
+  "/shared/widgets/common/navigation/modern_bottom_navigation.dart" -> "/widgets/common/navigation/floating_bottom_navigation.dart";
   "/utils/game_generator.dart" -> "/features/training/models/training_record.dart";
   "/views/developer_page.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
   "/views/developer_page.dart" -> "/features/training/logic/scoring/scoring_manager.dart";

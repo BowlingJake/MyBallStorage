@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 import 'scoring_strategy.dart';
 
 /// 傳統保齡球計分策略

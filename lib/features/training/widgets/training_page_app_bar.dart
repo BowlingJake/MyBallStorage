@@ -1,7 +1,7 @@
 import 'package:bowlingarsenal_app/features/training/controllers/training_controller.dart';
 import 'package:bowlingarsenal_app/shared/app_strings.dart';
 import 'package:bowlingarsenal_app/utils/ui_helpers.dart';
-import 'package:bowlingarsenal_app/widgets/common/dialogs/app_dialogs.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/app_dialogs.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_training_record_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

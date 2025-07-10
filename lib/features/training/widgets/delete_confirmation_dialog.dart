@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 // 刪除確認對話框

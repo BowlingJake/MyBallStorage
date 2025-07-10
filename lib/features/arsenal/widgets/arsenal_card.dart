@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/features/arsenal/models/arsenal_ball.dart';
-import 'package:bowlingarsenal_app/widgets/common/cards/standard_app_card.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/cards/standard_app_card.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 

@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/theme/brand_colors.dart'; // 導入品牌色定義
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
-import 'package:bowlingarsenal_app/widgets/common/ball_image_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/ball_image_widget.dart';
 // 導入原有的 BowlingBall 模型
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
