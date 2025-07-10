@@ -3,10 +3,9 @@ import 'dart:developer';
 
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
-import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_search_bar.dart';
+import 'package:bowlingarsenal_app/features/ball_library/providers/ball_library_providers.dart';
 import '../widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
-import '../widgets/filter_popout.dart';
 import 'package:bowlingarsenal_app/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:flutter/foundation.dart';

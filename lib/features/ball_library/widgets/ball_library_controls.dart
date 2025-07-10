@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:bowlingarsenal_app/providers/providers.dart';
-import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_search_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/search/search_bar.dart';
 import 'filter_popout.dart';
 
 class BallLibraryControls extends ConsumerWidget {
@@ -25,7 +25,7 @@ class BallLibraryControls extends ConsumerWidget {
         // 搜尋框
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ArsenalSearchBar(
+          child: AppSearchBar(
             searchText: searchText,
             onSearchChanged: (text) {
               ref.read(ballSearchTextProvider.notifier).state = text;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ArsenalSearchBar extends StatelessWidget {
-  const ArsenalSearchBar({
+class AppSearchBar extends StatelessWidget {
+  const AppSearchBar({
     required this.searchText,
     required this.onSearchChanged,
     super.key,
