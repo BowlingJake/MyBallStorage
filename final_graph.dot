@@ -303,7 +303,6 @@ digraph "" {
     }
   }
   "/ball_library_page.dart" -> "/models/bowling_ball.dart";
-  "/ball_library_page.dart" -> "/my_training_page.dart";
   "/ball_library_page.dart" -> "/providers/providers.dart";
   "/ball_library_page.dart" -> "/widgets/arsenal_search_bar.dart";
   "/ball_library_page.dart" -> "/widgets/ball_detail_popout.dart";
@@ -339,7 +338,6 @@ digraph "" {
   "/main.dart" -> "/theme/theme.dart";
   "/models/arsenal_ball.dart" -> "/models/ball_bag_type.dart";
   "/models/ball_adapter.dart" -> "/models/arsenal_ball.dart";
-  "/my_training_page.dart" -> "/ball_library_page.dart";
   "/my_training_page.dart" -> "/providers/providers.dart";
   "/my_training_page.dart" -> "/shared/enums.dart";
   "/my_training_page.dart" -> "/widgets/modern_bottom_navigation.dart";
@@ -350,7 +348,7 @@ digraph "" {
   "/providers/arsenal_providers.dart" -> "/models/arsenal_ball.dart";
   "/providers/arsenal_providers.dart" -> "/models/ball_bag_type.dart";
   "/providers/arsenal_providers.dart" -> "/repositories/arsenal_repository.dart";
-  "/providers/auth_provider.dart" -> "/providers/providers.dart";
+  "/providers/auth_provider.dart" -> "/providers/user_profile_provider.dart";
   "/providers/auth_provider.dart" -> "/services/user_preferences_service.dart";
   "/providers/providers.dart" -> "/models/bowling_ball.dart";
   "/providers/providers.dart" -> "/providers/auth_provider.dart";
@@ -417,10 +415,8 @@ digraph "" {
   "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/models/arsenal_ball.dart";
   "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/providers/arsenal_providers.dart";
   "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/theme/theme.dart";
-  "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/views/my_arsenal_page.dart";
   "/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/models/ball_bag_type.dart";
   "/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/providers/arsenal_providers.dart";
-  "/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/views/my_arsenal_page.dart";
   "/widgets/features/arsenal/arsenal_ball_card.dart" -> "/models/arsenal_ball.dart";
   "/widgets/features/arsenal/arsenal_controls.dart" -> "/models/ball_bag_type.dart";
   "/widgets/features/arsenal/arsenal_controls.dart" -> "/providers/arsenal_providers.dart";

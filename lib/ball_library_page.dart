@@ -2,7 +2,6 @@
 import 'dart:developer';
 
 import 'package:bowlingarsenal_app/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/my_training_page.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_search_bar.dart';
 import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';

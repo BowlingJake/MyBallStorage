@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/providers/providers.dart';
+import 'package:bowlingarsenal_app/providers/user_profile_provider.dart';
 import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -95,7 +95,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _setDefaultGuestProfile() async {
-    final userService = _ref.read(userPreferencesServiceProvider);
+    final userService = UserPreferencesService();
     await userService.saveProfile(
       nickname: '訪客使用者',
       hand: '右手',
@@ -131,7 +131,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _setDefaultDeveloperProfile() async {
-    final userService = _ref.read(userPreferencesServiceProvider);
+    final userService = UserPreferencesService();
     await userService.saveProfile(
       nickname: '開發者',
       hand: '右手',
