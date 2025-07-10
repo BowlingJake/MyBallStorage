@@ -55,7 +55,7 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
-    final allBalls = ref.read(userBallsProvider);
+    final allBallsAsync = ref.watch(userBallsProvider);
     final isCreateEnabled = nameController.text.isNotEmpty;
 
     return Material(
@@ -198,54 +198,60 @@ class _CreateBallBagDialogState extends ConsumerState<CreateBallBagDialog>
                                       color: Colors.black.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    child:
-                                        allBalls.isEmpty
-                                            ? const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(32),
-                                                child: Text(
-                                                  'No balls available in your arsenal.',
-                                                  style: TextStyle(
-                                                    color: Colors.white70,
-                                                  ),
-                                                  textAlign: TextAlign.center,
+                                    child: allBallsAsync.when(
+                                      data: (allBalls) {
+                                        if (allBalls.isEmpty) {
+                                          return const Center(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(32),
+                                              child: Text(
+                                                'No balls available in your arsenal.',
+                                                style: TextStyle(
+                                                  color: Colors.white70,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
-                                            )
-                                            : ListView.builder(
-                                              shrinkWrap: true,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              padding: const EdgeInsets.all(8),
-                                              itemCount: allBalls.length,
-                                              itemBuilder: (context, index) {
-                                                final ball = allBalls[index];
-                                                final isSelected = selectedBalls
-                                                    .contains(ball);
-                                                final isCapacityReached =
-                                                    selectedBalls.length >=
-                                                    bagCapacity;
-
-                                                return _SelectableBallCard(
-                                                  ball: ball,
-                                                  isSelected: isSelected,
-                                                  isEnabled:
-                                                      !isCapacityReached ||
-                                                      isSelected,
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if (isSelected) {
-                                                        selectedBalls.remove(
-                                                          ball,
-                                                        );
-                                                      } else if (!isCapacityReached) {
-                                                        selectedBalls.add(ball);
-                                                      }
-                                                    });
-                                                  },
-                                                );
-                                              },
                                             ),
+                                          );
+                                        }
+                                        return ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          padding: const EdgeInsets.all(8),
+                                          itemCount: allBalls.length,
+                                          itemBuilder: (context, index) {
+                                            final ball = allBalls[index];
+                                            final isSelected = selectedBalls
+                                                .contains(ball);
+                                            final isCapacityReached =
+                                                selectedBalls.length >=
+                                                bagCapacity;
+
+                                            return _SelectableBallCard(
+                                              ball: ball,
+                                              isSelected: isSelected,
+                                              isEnabled:
+                                                  !isCapacityReached ||
+                                                  isSelected,
+                                              onTap: () {
+                                                setState(() {
+                                                  if (isSelected) {
+                                                    selectedBalls.remove(
+                                                      ball,
+                                                    );
+                                                  } else if (!isCapacityReached) {
+                                                    selectedBalls.add(ball);
+                                                  }
+                                                });
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                      loading: () => const Center(child: CircularProgressIndicator()),
+                                      error: (error, stack) => Center(child: Text('Error: $error')),
+                                    ),
                                   ),
                                 ],
                               ),

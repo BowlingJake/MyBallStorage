@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 
 /// 計分對話框操作按鈕組件
 class ScoringActionButtons extends StatelessWidget {

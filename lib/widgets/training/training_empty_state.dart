@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 class TrainingEmptyState extends StatelessWidget {

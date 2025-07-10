@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/models/tournament.dart';
 import 'package:bowlingarsenal_app/shared/enums.dart'; // 導入共享的 enum
-import 'package:bowlingarsenal_app/widgets/standard_app_card.dart';
+import 'package:bowlingarsenal_app/widgets/common/cards/standard_app_card.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart'; // 用於日期格式化

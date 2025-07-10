@@ -4,7 +4,7 @@ import 'package:bowlingarsenal_app/ball_library_page.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 import 'package:bowlingarsenal_app/shared/enums.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/widgets/training/training_list_view.dart';
 import 'package:bowlingarsenal_app/widgets/training/training_page_app_bar.dart';
 import 'package:flutter/foundation.dart';

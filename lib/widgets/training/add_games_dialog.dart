@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/score_data.dart';
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/widgets/bowling/simple_pins_down_selector.dart';
 import 'package:bowlingarsenal_app/widgets/score_game_widget.dart';
 import 'package:bowlingarsenal_app/widgets/tenth_frame_widget.dart';

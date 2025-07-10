@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:bowlingarsenal_app/models/score_data.dart';
 import 'package:bowlingarsenal_app/models/training_record.dart';
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

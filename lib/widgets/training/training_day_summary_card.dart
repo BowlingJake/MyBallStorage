@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/models/training_record.dart';
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/game_list_item.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/training_day_equipment.dart';
 import 'package:bowlingarsenal_app/widgets/training/components/training_day_stats.dart';

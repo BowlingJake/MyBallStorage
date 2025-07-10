@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/widgets/floating_bottom_navigation.dart';
+import 'package:bowlingarsenal_app/widgets/common/navigation/floating_bottom_navigation.dart';
 import 'package:flutter/material.dart';
 
 /// 現代化底部導覽列組件

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/widgets/app_standard_button.dart';
+import 'package:bowlingarsenal_app/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 // 重構的新增訓練記錄彈窗 - 遵循APP標準視覺風格

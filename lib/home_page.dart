@@ -5,7 +5,7 @@ import 'package:bowlingarsenal_app/providers/theme_provider.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
 import 'package:bowlingarsenal_app/widgets/arsenal_section.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/widgets/user_info_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

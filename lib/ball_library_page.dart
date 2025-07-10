@@ -9,7 +9,7 @@ import 'package:bowlingarsenal_app/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/widgets/app_specific/arsenal/ball_list_view.dart';
 import 'package:bowlingarsenal_app/widgets/filter_popout.dart';
 import 'package:bowlingarsenal_app/widgets/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/widgets/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/widgets/common/professional_dark_background.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // 用於 SystemUiOverlayStyle
