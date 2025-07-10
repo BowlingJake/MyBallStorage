@@ -5,13 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/home_page.dart';
 import 'package:bowlingarsenal_app/views/login_page.dart';
-import 'package:bowlingarsenal_app/views/onboarding/onboarding_page.dart';
+import 'package:bowlingarsenal_app/features/onboarding/views/onboarding_page.dart';
 import 'package:bowlingarsenal_app/providers/auth_provider.dart';
-import 'package:bowlingarsenal_app/providers/onboarding_provider.dart';
-import 'package:bowlingarsenal_app/ball_library_page.dart';
-import 'package:bowlingarsenal_app/my_training_page.dart';
+
+import 'package:bowlingarsenal_app/features/ball_library/views/ball_library_page.dart';
+import 'package:bowlingarsenal_app/features/training/views/my_training_page.dart';
 import 'package:bowlingarsenal_app/views/developer_page.dart';
-import 'package:bowlingarsenal_app/views/my_arsenal_page.dart';
+import 'package:bowlingarsenal_app/features/arsenal/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/views/settings_page.dart';
 import 'package:bowlingarsenal_app/providers/providers.dart';
 

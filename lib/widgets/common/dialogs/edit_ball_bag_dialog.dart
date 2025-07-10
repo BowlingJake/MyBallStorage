@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/models/ball_bag_type.dart';
-import 'package:bowlingarsenal_app/providers/arsenal_providers.dart';
+import 'package:bowlingarsenal_app/features/arsenal/models/ball_bag_type.dart';
+import 'package:bowlingarsenal_app/features/arsenal/providers/arsenal_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

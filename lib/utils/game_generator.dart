@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 
 /// 遊戲數據生成器
 /// 負責生成隨機的遊戲記錄和球具資訊

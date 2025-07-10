@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/models/training_record.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 
 /// 訓練數據服務
 /// 負責處理所有與訓練記錄相關的數據操作

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/bowling/bowling_scorecard_widget.dart';
-import '../logic/scoring/scoring_manager.dart';
-import '../logic/scoring/scoring_strategy.dart';
+import '../features/training/logic/scoring/scoring_manager.dart';
+import '../features/training/logic/scoring/scoring_strategy.dart';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -290,7 +290,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'import "lib/logic/scoring/scoring_manager.dart";',
+            'import "lib/features/training/logic/scoring/scoring_manager.dart";',
             style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'monospace'),
           ),
           SizedBox(height: 8),
