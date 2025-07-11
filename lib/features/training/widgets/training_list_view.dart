@@ -72,19 +72,15 @@ class TrainingListView extends ConsumerWidget {
       scoringMethod,
       inputMethod,
     ) async {
-      await handleApiCall(
-        context: context,
-        future: controller.createTrainingRecord(
-          title: title,
-          date: date,
-          center: center,
-          oilPatternName: oilPatternName,
-          oilPatternLength: oilPatternLength,
-          isHousePattern: isHousePattern,
-          scoringMethod: scoringMethod,
-          inputMethod: inputMethod,
-        ),
-        successMessage: AppStrings.trainingRecordCreated,
+      await controller.createTrainingRecord(
+        title: title,
+        date: date,
+        center: center,
+        oilPatternName: oilPatternName,
+        oilPatternLength: oilPatternLength,
+        isHousePattern: isHousePattern,
+        scoringMethod: scoringMethod,
+        inputMethod: inputMethod,
       );
     });
   }
@@ -95,11 +91,7 @@ class TrainingListView extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final controller = ref.read(trainingControllerProvider);
-    await handleApiCall(
-      context: context,
-      future: controller.deleteGame(game),
-      successMessage: '遊戲已刪除',
-    );
+    await controller.deleteGame(game);
   }
 
   void _showEditRecordDialog(
@@ -118,20 +110,16 @@ class TrainingListView extends ConsumerWidget {
       scoringMethod,
       inputMethod,
     ) async {
-      await handleApiCall(
-        context: context,
-        future: controller.updateTrainingRecord(
-          dayId,
-          title: title,
-          date: date,
-          center: center,
-          oilPatternName: oilPatternName,
-          oilPatternLength: oilPatternLength,
-          isHousePattern: isHousePattern,
-          scoringMethod: scoringMethod,
-          inputMethod: inputMethod,
-        ),
-        successMessage: AppStrings.trainingRecordUpdated,
+      await controller.updateTrainingRecord(
+        dayId,
+        title: title,
+        date: date,
+        center: center,
+        oilPatternName: oilPatternName,
+        oilPatternLength: oilPatternLength,
+        isHousePattern: isHousePattern,
+        scoringMethod: scoringMethod,
+        inputMethod: inputMethod,
       );
     });
   }
@@ -142,11 +130,7 @@ class TrainingListView extends ConsumerWidget {
       context,
       itemCount: 1,
       onConfirm: () async {
-        await handleApiCall(
-          context: context,
-          future: controller.deleteTrainingDay(dayId),
-          successMessage: AppStrings.trainingRecordDeleted,
-        );
+        await controller.deleteTrainingDay(dayId);
       },
     );
   }
@@ -162,9 +146,14 @@ class TrainingListView extends ConsumerWidget {
         break;
       }
     }
+
+    if (trainingDay == null) {
+      return;
+    }
     
     // 如果找不到對應的訓練日，使用預設計分方式
-    final scoringMethod = trainingDay?.scoringMethod ?? 'Standard';
+    final scoringMethod = trainingDay.scoringMethod;
+    final dayId = trainingDay.id;
     
     showDialog(
       context: context,
@@ -174,11 +163,7 @@ class TrainingListView extends ConsumerWidget {
         scoringMethod: scoringMethod, // 傳遞計分方式
         onGameSaved: (updatedGame) async {
           final controller = ref.read(trainingControllerProvider);
-          await handleApiCall(
-            context: context,
-            future: controller.updateGame(updatedGame),
-            successMessage: '遊戲分數已更新',
-          );
+          await controller.updateGame(dayId, updatedGame);
         },
       ),
     );
@@ -186,10 +171,6 @@ class TrainingListView extends ConsumerWidget {
 
   void _showAddGameDialog(BuildContext context, String dayId, WidgetRef ref) async {
     final controller = ref.read(trainingControllerProvider);
-    await handleApiCall(
-      context: context,
-      future: controller.addGameToDay(dayId),
-      successMessage: '遊戲已新增',
-    );
+    await controller.addGameToDay(dayId);
   }
 }

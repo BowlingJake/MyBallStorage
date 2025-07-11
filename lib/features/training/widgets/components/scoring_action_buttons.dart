@@ -17,7 +17,7 @@ class ScoringActionButtons extends StatelessWidget {
   });
 
   final VoidCallback onUndo;
-  final VoidCallback onReset;
+  final VoidCallback? onReset;
   final VoidCallback onSave;
   final bool canUndo;
   final bool canReset;
@@ -36,7 +36,7 @@ class ScoringActionButtons extends StatelessWidget {
         // Fix按鈕（原Undo按鈕）
         Expanded(
           child: AppStandardButton(
-            text: isEditMode ? 'Exit Edit' : 'Fix',
+            text: isEditMode ? 'Exit Edit' : 'Edit',
             icon: isEditMode ? Icons.exit_to_app : Icons.edit,
             onPressed: onToggleEdit ?? () {},
             customColor: isEditMode ? Colors.green : Colors.orange,
@@ -46,23 +46,10 @@ class ScoringActionButtons extends StatelessWidget {
         
         const SizedBox(width: 12),
         
-        // Reset按鈕
-        Expanded(
-          child: AppStandardButton(
-            text: 'Reset',
-            icon: Icons.restart_alt,
-            onPressed: onReset,
-            customColor: Colors.red,
-            enabled: canReset,
-          ),
-        ),
-        
-        const SizedBox(width: 12),
-        
         // Save按鈕
         Expanded(
           child: AppStandardButton(
-            text: 'Save Game',
+            text: 'Save',
             icon: Icons.save,
             onPressed: onSave,
             customColor: effectiveAccentColor,

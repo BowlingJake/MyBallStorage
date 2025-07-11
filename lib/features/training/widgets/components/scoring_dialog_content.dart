@@ -23,7 +23,7 @@ class ScoringDialogContent extends StatelessWidget {
   final List<BowlingFrame> frames;
   final Function(int frameIndex) onFrameTapped;
   final VoidCallback onUndo;
-  final VoidCallback onReset;
+  final VoidCallback? onReset;
   final VoidCallback onSave;
   final bool canUndo;
   final bool canReset;

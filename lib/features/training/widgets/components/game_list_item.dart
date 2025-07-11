@@ -77,9 +77,51 @@ class GameListItem extends StatelessWidget {
               ],
             ),
           ),
+          
+          // 刪除按鈕
+          if (onGameDelete != null)
+            IconButton(
+              icon: Icon(
+                Icons.delete_outline,
+                color: theme.colorScheme.error.withOpacity(0.7),
+                size: 20,
+              ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              splashRadius: 18,
+              tooltip: '刪除此遊戲',
+              onPressed: () => _confirmDelete(context),
+            ),
         ],
       ),
     ),
+    );
+  }
+  
+  // 刪除確認對話框
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('確認刪除'),
+        content: Text('您確定要刪除第 ${game.gameNumber} 局遊戲嗎？\n分數：${game.score}'),
+        actions: [
+          TextButton(
+            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text(
+              '刪除',
+              style: TextStyle(color: Colors.red),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              onGameDelete?.call(game);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

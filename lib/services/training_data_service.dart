@@ -99,54 +99,26 @@ class TrainingDataService {
     final existingDay = _trainingDays[dayIndex];
     final updatedGames = <GameRecord>[...existingDay.games, game];
 
-    final updatedDay = TrainingDaySummary(
-      id: existingDay.id,
-      title: existingDay.title,
-      date: existingDay.date,
-      center: existingDay.center,
-      oilPatternName: existingDay.oilPatternName,
-      oilPatternLength: existingDay.oilPatternLength,
-      isHousePattern: existingDay.isHousePattern,
-      scoringMethod: existingDay.scoringMethod,
-      inputMethod: existingDay.inputMethod,
-      games: updatedGames,
-      createdAt: existingDay.createdAt,
-    );
-
-    _trainingDays[dayIndex] = updatedDay;
+    _trainingDays[dayIndex] = existingDay.copyWith(games: updatedGames);
     return true;
   }
 
   // 更新遊戲記錄
-  bool updateGameInDay(GameRecord updatedGame) {
-    for (var dayIndex = 0; dayIndex < _trainingDays.length; dayIndex++) {
-      final dayGames = _trainingDays[dayIndex].games;
-      final gameIndex = dayGames.indexWhere((g) => g.id == updatedGame.id);
+  bool updateGameInDay(String dayId, GameRecord updatedGame) {
+    final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
+    if (dayIndex == -1) return false;
 
-      if (gameIndex != -1) {
-        final updatedGames = <GameRecord>[...dayGames];
-        updatedGames[gameIndex] = updatedGame;
+    final existingDay = _trainingDays[dayIndex];
+    final dayGames = existingDay.games;
+    final gameIndex = dayGames.indexWhere((g) => g.id == updatedGame.id);
 
-        final existingDay = _trainingDays[dayIndex];
-        final updatedDay = TrainingDaySummary(
-          id: existingDay.id,
-          title: existingDay.title,
-          date: existingDay.date,
-          center: existingDay.center,
-          oilPatternName: existingDay.oilPatternName,
-          oilPatternLength: existingDay.oilPatternLength,
-          isHousePattern: existingDay.isHousePattern,
-          scoringMethod: existingDay.scoringMethod,
-          inputMethod: existingDay.inputMethod,
-          games: updatedGames,
-          createdAt: existingDay.createdAt,
-        );
+    if (gameIndex == -1) return false;
+    
+    final updatedGames = List<GameRecord>.from(dayGames);
+    updatedGames[gameIndex] = updatedGame;
 
-        _trainingDays[dayIndex] = updatedDay;
-        return true;
-      }
-    }
-    return false;
+    _trainingDays[dayIndex] = existingDay.copyWith(games: updatedGames);
+    return true;
   }
 
   // 從訓練日中移除遊戲

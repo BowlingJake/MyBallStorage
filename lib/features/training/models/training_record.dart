@@ -131,6 +131,34 @@ class TrainingDaySummary {
   final List<GameRecord> games;
   final DateTime createdAt;
 
+  TrainingDaySummary copyWith({
+    String? id,
+    String? title,
+    DateTime? date,
+    String? center,
+    String? oilPatternName,
+    String? oilPatternLength,
+    bool? isHousePattern,
+    String? scoringMethod,
+    String? inputMethod,
+    List<GameRecord>? games,
+    DateTime? createdAt,
+  }) {
+    return TrainingDaySummary(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      date: date ?? this.date,
+      center: center ?? this.center,
+      oilPatternName: oilPatternName ?? this.oilPatternName,
+      oilPatternLength: oilPatternLength ?? this.oilPatternLength,
+      isHousePattern: isHousePattern ?? this.isHousePattern,
+      scoringMethod: scoringMethod ?? this.scoringMethod,
+      inputMethod: inputMethod ?? this.inputMethod,
+      games: games ?? this.games,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   // 計算摘要統計
   int get totalGames => games.length;
 

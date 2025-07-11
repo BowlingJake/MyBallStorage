@@ -172,11 +172,11 @@ class TrainingController extends ChangeNotifier {
   }
 
   /// 更新遊戲記錄
-  Future<bool> updateGame(GameRecord updatedGame) async {
+  Future<bool> updateGame(String dayId, GameRecord updatedGame) async {
     // 模擬網路延遲
     await Future.delayed(Duration.zero);
 
-    final success = _dataService.updateGameInDay(updatedGame);
+    final success = _dataService.updateGameInDay(dayId, updatedGame);
     if (success) notifyListeners();
     return success;
   }
