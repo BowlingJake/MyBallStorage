@@ -152,11 +152,26 @@ class TrainingListView extends ConsumerWidget {
   }
 
   void _showInteractiveScoring(BuildContext context, GameRecord game, WidgetRef ref) {
+    final controller = ref.read(trainingControllerProvider);
+    
+    // 找到包含此遊戲的訓練日記錄
+    TrainingDaySummary? trainingDay;
+    for (final day in controller.trainingDays) {
+      if (day.games.any((g) => g.id == game.id)) {
+        trainingDay = day;
+        break;
+      }
+    }
+    
+    // 如果找不到對應的訓練日，使用預設計分方式
+    final scoringMethod = trainingDay?.scoringMethod ?? 'Standard';
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => InteractiveScoringDialog(
         game: game,
+        scoringMethod: scoringMethod, // 傳遞計分方式
         onGameSaved: (updatedGame) async {
           final controller = ref.read(trainingControllerProvider);
           await handleApiCall(

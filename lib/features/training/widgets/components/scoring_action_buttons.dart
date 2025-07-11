@@ -10,6 +10,7 @@ class ScoringActionButtons extends StatelessWidget {
     required this.canUndo,
     required this.canReset,
     required this.canSave,
+    this.accentColor,
     super.key,
   });
 
@@ -19,10 +20,12 @@ class ScoringActionButtons extends StatelessWidget {
   final bool canUndo;
   final bool canReset;
   final bool canSave;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveAccentColor = accentColor ?? theme.colorScheme.primary;
     
     return Row(
       children: [
@@ -58,7 +61,7 @@ class ScoringActionButtons extends StatelessWidget {
             text: 'Save Game',
             icon: Icons.save,
             onPressed: onSave,
-            customColor: theme.colorScheme.primary,
+            customColor: effectiveAccentColor,
             isPrimary: canSave,
             enabled: canSave,
           ),

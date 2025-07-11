@@ -49,6 +49,13 @@ class BrandColors {
   /// 發光效果顏色，用於陰影和發光特效
   static const Color glowColor = Color(0x334A9EAF);
 
+  // --- 計分模式顏色 ---
+  /// 傳統計分模式顏色（青色）
+  static const Color traditionalScoringColor = Color(0xFF00B2A9);
+  
+  /// Current計分模式顏色（橘色）
+  static const Color currentScoringColor = Color(0xFFFF6B35);
+
   /// 獲取深色模式的顏色配置
   static ColorScheme get darkColorScheme => const ColorScheme.dark(
     primary: accentColorDark,

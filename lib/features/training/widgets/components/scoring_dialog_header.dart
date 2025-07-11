@@ -5,22 +5,25 @@ class ScoringDialogHeader extends StatelessWidget {
   const ScoringDialogHeader({
     required this.gameNumber,
     required this.onClose,
+    this.accentColor,
     super.key,
   });
 
   final int gameNumber;
   final VoidCallback onClose;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveAccentColor = accentColor ?? theme.colorScheme.primary;
     
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: effectiveAccentColor.withOpacity(0.3),
           ),
         ),
       ),

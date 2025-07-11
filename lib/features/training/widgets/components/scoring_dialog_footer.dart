@@ -5,22 +5,25 @@ class ScoringDialogFooter extends StatelessWidget {
   const ScoringDialogFooter({
     required this.rollsCount,
     required this.totalScore,
+    this.accentColor,
     super.key,
   });
 
   final int rollsCount;
   final int totalScore;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveAccentColor = accentColor ?? theme.colorScheme.primary;
     
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: effectiveAccentColor.withOpacity(0.3),
           ),
         ),
       ),

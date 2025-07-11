@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_manager.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
+import 'package:core_theme/core_theme.dart';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -182,7 +183,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           title: '${traditionalManager.currentStrategyName} (總分: $traditionalTotal)',
           description: traditionalManager.currentStrategyDescription,
           frames: traditionalFrames,
-          color: const Color(0xFF00B2A9),
+          color: BrandColors.traditionalScoringColor,
         ),
         
         const SizedBox(height: 30),
@@ -192,7 +193,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           title: '${currentManager.currentStrategyName} (總分: $currentTotal)',
           description: currentManager.currentStrategyDescription,
           frames: currentFrames,
-          color: const Color(0xFFFF6B35),
+          color: BrandColors.currentScoringColor,
         ),
         
         const SizedBox(height: 20),

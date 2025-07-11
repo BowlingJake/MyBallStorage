@@ -13,6 +13,7 @@ class ScoringDialogContent extends StatelessWidget {
     required this.canUndo,
     required this.canReset,
     required this.canSave,
+    this.accentColor,
     super.key,
   });
 
@@ -24,10 +25,12 @@ class ScoringDialogContent extends StatelessWidget {
   final bool canUndo;
   final bool canReset;
   final bool canSave;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final effectiveAccentColor = accentColor ?? theme.colorScheme.primary;
     
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -40,12 +43,12 @@ class ScoringDialogContent extends StatelessWidget {
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.2),
+                color: effectiveAccentColor.withOpacity(0.2),
               ),
             ),
             child: BowlingScoreCardWidget(
               frames: frames,
-              accentColor: theme.colorScheme.primary,
+              accentColor: effectiveAccentColor,
               textStyle: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -64,6 +67,7 @@ class ScoringDialogContent extends StatelessWidget {
             canUndo: canUndo,
             canReset: canReset,
             canSave: canSave,
+            accentColor: effectiveAccentColor,
           ),
         ],
       ),
