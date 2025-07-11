@@ -11,6 +11,8 @@ class ScoringActionButtons extends StatelessWidget {
     required this.canReset,
     required this.canSave,
     this.accentColor,
+    this.isEditMode = false, // 新增：是否處於修改模式
+    this.onToggleEdit, // 新增：切換修改模式的回調
     super.key,
   });
 
@@ -21,6 +23,8 @@ class ScoringActionButtons extends StatelessWidget {
   final bool canReset;
   final bool canSave;
   final Color? accentColor;
+  final bool isEditMode; // 新增：是否處於修改模式
+  final VoidCallback? onToggleEdit; // 新增：切換修改模式的回調
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +33,14 @@ class ScoringActionButtons extends StatelessWidget {
     
     return Row(
       children: [
-        // Undo按鈕
+        // Fix按鈕（原Undo按鈕）
         Expanded(
           child: AppStandardButton(
-            text: 'Undo',
-            icon: Icons.undo,
-            onPressed: onUndo,
-            customColor: Colors.orange,
-            enabled: canUndo,
+            text: isEditMode ? 'Exit Edit' : 'Fix',
+            icon: isEditMode ? Icons.exit_to_app : Icons.edit,
+            onPressed: onToggleEdit ?? () {},
+            customColor: isEditMode ? Colors.green : Colors.orange,
+            enabled: onToggleEdit != null,
           ),
         ),
         

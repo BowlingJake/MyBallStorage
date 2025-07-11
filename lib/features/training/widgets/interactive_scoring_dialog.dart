@@ -37,6 +37,7 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
   int _currentFrameIndex = 0;
   int _currentRollInFrame = 0; // 當前格內的第幾球 (0或1，第10格可能是2)
   bool _isGameComplete = false;
+  bool _isEditMode = false; // 新增：是否處於修改模式
 
   @override
   void initState() {
@@ -73,8 +74,26 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
 
   /// 處理點擊計分格
   Future<void> _onFrameTapped(int frameIndex) async {
-    if (_isGameComplete) return;
+    if (_isGameComplete && !_isEditMode) return;
     
+    // 修改模式邏輯
+    if (_isEditMode) {
+      if (!_canEditFrame(frameIndex)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No data to edit in this frame'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+        return;
+      }
+      
+      // 在修改模式下編輯指定格
+      await _editFrame(frameIndex);
+      return;
+    }
+    
+    // 正常模式邏輯
     // 檢查是否可以在此格輸入
     if (!_canInputAtFrame(frameIndex)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -392,43 +411,32 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
     }
   }
 
-  /// 保存遊戲
+  /// 儲存遊戲
   void _saveGame() {
-    if (!_isGameComplete) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('請完成遊戲後再保存'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-    
-    // 計算最終統計
+    // 移除完成遊戲的限制，允許部分完成的遊戲也能儲存
     final finalScore = _frames.isNotEmpty ? _frames.last.cumulativeScore : 0;
     final strikes = _countStrikes();
     final spares = _countSpares();
-    
-    // 創建更新的遊戲記錄
+
     final updatedGame = GameRecord(
       id: widget.game.id,
       gameNumber: widget.game.gameNumber,
       score: finalScore,
+      frameScores: _frames.map((f) => f.cumulativeScore).toList(),
       strikes: strikes,
       spares: spares,
-      frameScores: _frames.map((f) => f.cumulativeScore).toList(),
-      ballUsed: widget.game.ballUsed,
       notes: widget.game.notes,
       timestamp: widget.game.timestamp,
+      ballUsed: widget.game.ballUsed,
     );
-    
+
     widget.onGameSaved?.call(updatedGame);
     Navigator.of(context).pop();
     
     // 成功提示
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Game saved! Final score: $finalScore'),
+        content: Text('Game saved! Score: $finalScore'),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
@@ -499,6 +507,140 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
     */
   }
 
+  /// 切換修改模式
+  void _toggleEditMode() {
+    setState(() {
+      _isEditMode = !_isEditMode;
+    });
+    
+    // 顯示修改模式狀態
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isEditMode ? 'Entered Edit Mode - Tap filled frames to edit' : 'Exited Edit Mode'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: _isEditMode ? Colors.orange : Colors.green,
+      ),
+    );
+  }
+
+  /// 檢查指定格是否有數據可以修改
+  bool _canEditFrame(int frameIndex) {
+    if (!_isEditMode) return false;
+    
+    // 計算到該格的投球數
+    int rollsUpToFrame = 0;
+    for (int i = 0; i < frameIndex; i++) {
+      if (i < 9) {
+        // 第1-9格
+        if (rollsUpToFrame < _rolls.length && _rolls[rollsUpToFrame] == 10) {
+          rollsUpToFrame += 1; // Strike只有一球
+        } else {
+          rollsUpToFrame += 2; // 兩球
+        }
+      } else {
+        // 第10格邏輯較複雜，暫時簡化
+        break;
+      }
+    }
+    
+    // 檢查該格是否有數據：需要至少有第一球的數據
+    return rollsUpToFrame < _rolls.length;
+  }
+
+  /// 編輯指定格的數據
+  Future<void> _editFrame(int frameIndex) async {
+    // 計算該格在 _rolls 中的起始位置
+    int rollStartIndex = 0;
+    for (int i = 0; i < frameIndex; i++) {
+      if (i < 9) {
+        // 第1-9格
+        if (rollStartIndex < _rolls.length && _rolls[rollStartIndex] == 10) {
+          rollStartIndex += 1; // Strike只有一球
+        } else {
+          rollStartIndex += 2; // 兩球
+        }
+      } else {
+        // 第10格（暫時簡化）
+        break;
+      }
+    }
+    
+    // 確保有足夠的數據可編輯
+    if (rollStartIndex >= _rolls.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No data to edit in this frame'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    
+    // 取得當前格的數據
+    final currentFirstBall = _rolls[rollStartIndex];
+    final hasSecondBall = rollStartIndex + 1 < _rolls.length && currentFirstBall < 10;
+    final currentSecondBall = hasSecondBall ? _rolls[rollStartIndex + 1] : 0;
+    
+    // 顯示編輯對話框 - 先編輯第一球
+    final newFirstBall = await showDialog<int>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => SimplePinsDownSelector(
+        maxPins: 10,
+        initialPinsDown: currentFirstBall,
+      ),
+    );
+
+    if (newFirstBall == null) return;
+
+    // 如果第一球不是Strike，則需要編輯第二球
+    int? newSecondBall;
+    if (newFirstBall < 10) {
+      newSecondBall = await showDialog<int>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => SimplePinsDownSelector(
+          maxPins: 10 - newFirstBall,
+          initialPinsDown: hasSecondBall ? currentSecondBall : 0,
+        ),
+      );
+      
+      if (newSecondBall == null) return;
+    }
+
+    // 更新 _rolls 列表
+    setState(() {
+      _rolls[rollStartIndex] = newFirstBall;
+      
+      if (newFirstBall == 10) {
+        // Strike：移除第二球（如果存在）
+        if (hasSecondBall) {
+          _rolls.removeAt(rollStartIndex + 1);
+        }
+      } else {
+        // 不是Strike：更新或添加第二球
+        if (hasSecondBall) {
+          _rolls[rollStartIndex + 1] = newSecondBall!;
+        } else {
+          _rolls.insert(rollStartIndex + 1, newSecondBall!);
+        }
+      }
+      
+      // 重新計算分數和狀態
+      _frames = _scoringManager.calculateScores(_rolls);
+      _advanceToNextInput();
+      _isGameComplete = _checkGameCompleteStatus();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Frame ${frameIndex + 1} updated successfully'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -553,8 +695,11 @@ class _InteractiveScoringDialogState extends State<InteractiveScoringDialog> {
                     onSave: _saveGame,
                     canUndo: _rolls.isNotEmpty,
                     canReset: _rolls.isNotEmpty,
-                    canSave: _isGameComplete,
+                    canSave: true, // 允許儲存，即使遊戲未完成
                     accentColor: scoringColor, // 傳遞顏色給內容
+                    scoringModeName: _scoringManager.currentStrategyName, // 傳遞計分模式名稱
+                    isEditMode: _isEditMode, // 傳遞修改模式狀態
+                    onToggleEdit: _toggleEditMode, // 傳遞切換修改模式的方法
                   ),
                 ),
                 ScoringDialogFooter(
