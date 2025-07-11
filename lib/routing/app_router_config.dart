@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/home_page.dart';
 import 'package:bowlingarsenal_app/shared/views/login_page.dart';
 import 'package:bowlingarsenal_app/features/onboarding/views/onboarding_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/auth_provider.dart';
+import 'package:bowlingarsenal_app/routing/auth_guard.dart';
 
 import 'package:bowlingarsenal_app/features/ball_library/views/ball_library_page.dart';
 import 'package:bowlingarsenal_app/features/training/views/my_training_page.dart';
@@ -90,38 +91,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ),
 
-    // 6. 設定重導向邏輯 (核心)
+    // 6. 設定重導向邏輯 (核心) - 使用純函式auth guard
     redirect: (BuildContext context, GoRouterState state) {
       // 讀取最新的認證和引導頁狀態
-      final isAuthenticated = ref.read(authProvider).isAuthenticated;
-      final shouldShowOnboarding = !ref.read(onboardingProvider);
+      final authState = AuthGuardState(
+        isAuthenticated: ref.read(authProvider).isAuthenticated,
+        shouldShowOnboarding: !ref.read(onboardingProvider),
+      );
       
-      final isLoggingIn = state.matchedLocation == '/login';
-      final isOnboarding = state.matchedLocation == '/onboarding';
-      final isAtRoot = state.matchedLocation == '/';
-
-      // 案例 1: 使用者未認證
-      if (!isAuthenticated) {
-        // 如果他不在登入頁，就導向登入頁。否則不動。
-        return isLoggingIn ? null : '/login';
-      }
-
-      // 案例 2: 使用者已認證，但需要顯示引導頁
-      if (shouldShowOnboarding) {
-        // 如果他不在引導頁，就導向引導頁。否則不動。
-        return isOnboarding ? null : '/onboarding';
-      }
-
-      // 案例 3: 使用者已認證且已完成引導，但還停留在登入或引導頁
-      if (isLoggingIn || isOnboarding) {
-        return '/';
-      }
-      
-      // 如果用戶已認證，但嘗試訪問登入頁，將他們導向主頁
-      if(isAuthenticated && isLoggingIn) return '/';
-
-      // 所有其他情況，不進行重導向
-      return null;
+      // 使用純函式進行重導向決策
+      return authGuard(authState, state.matchedLocation);
     },
 
     // 7. 設定狀態監聽，讓路由響應變化

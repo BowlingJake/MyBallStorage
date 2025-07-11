@@ -1,22 +1,29 @@
-class BowlingBall {
-  const BowlingBall({
-    required this.id,
-    required this.name,
-    required this.brand,
-    required this.core,
-    required this.coverstock,
-    required this.coverstockName,
-    required this.factoryFinish,
-    required this.releaseDate,
-    required this.imageUrl,
-    this.rg,
-    this.diff,
-    this.intDiff,
-    this.handType,
-    this.layoutType,
-    this.layoutValues,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'bowling_ball.freezed.dart';
+
+@freezed
+class BowlingBall with _$BowlingBall {
+  const factory BowlingBall({
+    required String id,
+    required String name,
+    required String brand,
+    required String core,
+    required String coverstock,
+    required String coverstockName,
+    required String factoryFinish,
+    required String releaseDate,
+    @Default('https://via.placeholder.com/150') String imageUrl,
+    double? rg,
+    double? diff,
+    double? intDiff,
+    // 用戶自定義數據
+    String? handType,
+    String? layoutType,
+    List<String>? layoutValues,
+  }) = _BowlingBall;
+
+  // 自定義fromJson工廠方法，支持多種JSON格式
   factory BowlingBall.fromJson(Map<String, dynamic> json) {
     // Helper to safely parse double values
     double? tryParseDouble(dynamic value) {
@@ -30,36 +37,15 @@ class BowlingBall {
     }
 
     return BowlingBall(
-      id:
-          json['id'] as String? ??
-          json['Ball'] as String? ??
-          '', // Support both id and Ball
-      name:
-          json['name'] as String? ?? json['Ball'] as String? ?? 'Unknown Ball',
-      brand:
-          json['brand'] as String? ??
-          json['Brand'] as String? ??
-          'Unknown Brand',
+      id: json['id'] as String? ?? json['Ball'] as String? ?? 'unknown',
+      name: json['name'] as String? ?? json['Ball'] as String? ?? 'Unknown Ball',
+      brand: json['brand'] as String? ?? json['Brand'] as String? ?? 'Unknown Brand',
       core: json['core'] as String? ?? json['Core'] as String? ?? '',
-      coverstock:
-          json['coverstock'] as String? ??
-          json['Coverstock Category'] as String? ??
-          '',
-      coverstockName:
-          json['coverstockName'] as String? ??
-          json['Coverstock Name'] as String? ??
-          '',
-      factoryFinish:
-          json['factoryFinish'] as String? ??
-          json['Factory Finish'] as String? ??
-          '',
-      releaseDate:
-          json['releaseDate'] as String? ??
-          json['Release Date'] as String? ??
-          '',
-      imageUrl:
-          json['image_url'] as String? ??
-          'https://via.placeholder.com/150', // Provide a default
+      coverstock: json['coverstock'] as String? ?? json['Coverstock Category'] as String? ?? '',
+      coverstockName: json['coverstockName'] as String? ?? json['Coverstock Name'] as String? ?? '',
+      factoryFinish: json['factoryFinish'] as String? ?? json['Factory Finish'] as String? ?? '',
+      releaseDate: json['releaseDate'] as String? ?? json['Release Date'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? 'https://via.placeholder.com/150',
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
       intDiff: tryParseDouble(json['intDiff'] ?? json['MB Diff']),
@@ -70,24 +56,10 @@ class BowlingBall {
           : null,
     );
   }
-  final String id;
-  final String name;
-  final String brand;
-  final String core;
-  final String coverstock;
-  final String coverstockName;
-  final String factoryFinish;
-  final String releaseDate;
-  final String imageUrl;
-  final double? rg;
-  final double? diff;
-  final double? intDiff;
+}
 
-  // 用戶自定義數據
-  final String? handType;
-  final String? layoutType;
-  final List<String>? layoutValues;
-
+// 擴展方法，包含業務邏輯
+extension BowlingBallExtension on BowlingBall {
   String get combinedCoverstockInfo {
     if (coverstockName.isEmpty && coverstock.isEmpty) {
       return '未知';
@@ -130,59 +102,22 @@ class BowlingBall {
     }
   }
 
-  BowlingBall copyWith({
-    String? id,
-    String? name,
-    String? brand,
-    String? core,
-    String? coverstock,
-    String? coverstockName,
-    String? factoryFinish,
-    String? releaseDate,
-    String? imageUrl,
-    double? rg,
-    double? diff,
-    double? intDiff,
-    String? handType,
-    String? layoutType,
-    List<String>? layoutValues,
-  }) {
-    return BowlingBall(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      brand: brand ?? this.brand,
-      core: core ?? this.core,
-      coverstock: coverstock ?? this.coverstock,
-      coverstockName: coverstockName ?? this.coverstockName,
-      factoryFinish: factoryFinish ?? this.factoryFinish,
-      releaseDate: releaseDate ?? this.releaseDate,
-      imageUrl: imageUrl ?? this.imageUrl,
-      rg: rg ?? this.rg,
-      diff: diff ?? this.diff,
-      intDiff: intDiff ?? this.intDiff,
-      handType: handType ?? this.handType,
-      layoutType: layoutType ?? this.layoutType,
-      layoutValues: layoutValues ?? this.layoutValues,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'brand': brand,
-      'core': core,
-      'coverstock': coverstock,
-      'coverstockName': coverstockName,
-      'factoryFinish': factoryFinish,
-      'releaseDate': releaseDate,
-      'image_url': imageUrl,
-      'rg': rg,
-      'diff': diff,
-      'intDiff': intDiff,
-      'handType': handType,
-      'layoutType': layoutType,
-      'layoutValues': layoutValues,
-    };
-  }
+  /// 自定義toJson方法，確保包含用戶定義的字段
+  Map<String, dynamic> toJsonWithCustomFields() => {
+    'id': id,
+    'name': name,
+    'brand': brand,
+    'core': core,
+    'coverstock': coverstock,
+    'coverstockName': coverstockName,
+    'factoryFinish': factoryFinish,
+    'releaseDate': releaseDate,
+    'image_url': imageUrl,
+    'rg': rg,
+    'diff': diff,
+    'intDiff': intDiff,
+    'handType': handType,
+    'layoutType': layoutType,
+    'layoutValues': layoutValues,
+  };
 }

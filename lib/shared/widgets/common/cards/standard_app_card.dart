@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bowlingarsenal_app/theme/theme.dart'; // 導入主題檔案以使用 AppGlows
+import 'package:core_theme/core_theme.dart';
 
 /// 全應用程式統一的標準卡片元件
 /// 提供了基於 "Professional Analytics" 設計風格的標準外觀：

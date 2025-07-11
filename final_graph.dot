@@ -60,12 +60,6 @@ digraph "" {
   "/features/training/widgets/training_page_app_bar.dart" [label="training_page_app_bar"];
   "/home_page.dart" [label="home_page"];
   "/main.dart" [label="main"];
-  "/models/bowling_ball.dart" [label="bowling_ball"];
-  "/models/user_profile.dart" [label="user_profile"];
-  "/providers/auth_provider.dart" [label="auth_provider"];
-  "/providers/providers.dart" [label="providers"];
-  "/providers/theme_provider.dart" [label="theme_provider"];
-  "/providers/user_profile_provider.dart" [label="user_profile_provider"];
   "/routing/app_router_config.dart" [label="app_router_config"];
   "/services/training_data_service.dart" [label="training_data_service"];
   "/services/user_preferences_service.dart" [label="user_preferences_service"];
@@ -74,6 +68,7 @@ digraph "" {
   "/shared/models/bowling_ball.dart" [label="bowling_ball"];
   "/shared/models/user_profile.dart" [label="user_profile"];
   "/shared/providers/auth_provider.dart" [label="auth_provider"];
+  "/shared/providers/providers.dart" [label="providers"];
   "/shared/providers/theme_provider.dart" [label="theme_provider"];
   "/shared/providers/user_profile_provider.dart" [label="user_profile_provider"];
   "/shared/services/training_data_service.dart" [label="training_data_service"];
@@ -81,6 +76,8 @@ digraph "" {
   "/shared/views/developer_page.dart" [label="developer_page"];
   "/shared/views/login_page.dart" [label="login_page"];
   "/shared/views/settings_page.dart" [label="settings_page"];
+  "/shared/widgets/app_specific/arsenal/empty_bag_widget.dart" [label="empty_bag_widget"];
+  "/shared/widgets/app_specific/home/user_info_section.dart" [label="user_info_section"];
   "/shared/widgets/bowling/bowling_scorecard_widget.dart" [label="bowling_scorecard_widget"];
   "/shared/widgets/bowling/simple_pins_down_selector.dart" [label="simple_pins_down_selector"];
   "/shared/widgets/common/ball_image_widget.dart" [label="ball_image_widget"];
@@ -106,29 +103,6 @@ digraph "" {
   "/utils/color_utils.dart" [label="color_utils"];
   "/utils/game_generator.dart" [label="game_generator"];
   "/utils/ui_helpers.dart" [label="ui_helpers"];
-  "/views/developer_page.dart" [label="developer_page"];
-  "/views/login_page.dart" [label="login_page"];
-  "/views/settings_page.dart" [label="settings_page"];
-  "/widgets/app_specific/arsenal/empty_bag_widget.dart" [label="empty_bag_widget"];
-  "/widgets/app_specific/home/user_info_section.dart" [label="user_info_section"];
-  "/widgets/bowling/bowling_scorecard_widget.dart" [label="bowling_scorecard_widget"];
-  "/widgets/bowling/simple_pins_down_selector.dart" [label="simple_pins_down_selector"];
-  "/widgets/common/ball_image_widget.dart" [label="ball_image_widget"];
-  "/widgets/common/buttons/app_standard_button.dart" [label="app_standard_button"];
-  "/widgets/common/buttons/enhanced_action_button.dart" [label="enhanced_action_button"];
-  "/widgets/common/buttons/primary_button.dart" [label="primary_button"];
-  "/widgets/common/cards/section_container.dart" [label="section_container"];
-  "/widgets/common/cards/standard_app_card.dart" [label="standard_app_card"];
-  "/widgets/common/dialogs/app_dialogs.dart" [label="app_dialogs"];
-  "/widgets/common/dialogs/ball_bag_options_dialog.dart" [label="ball_bag_options_dialog"];
-  "/widgets/common/dialogs/confirmation_dialog.dart" [label="confirmation_dialog"];
-  "/widgets/common/dialogs/create_ball_bag_dialog.dart" [label="create_ball_bag_dialog"];
-  "/widgets/common/dialogs/edit_ball_bag_dialog.dart" [label="edit_ball_bag_dialog"];
-  "/widgets/common/navigation/floating_bottom_navigation.dart" [label="floating_bottom_navigation"];
-  "/widgets/common/navigation/modern_bottom_navigation.dart" [label="modern_bottom_navigation"];
-  "/widgets/common/professional_dark_background.dart" [label="professional_dark_background"];
-  "/widgets/painters/grid_painter.dart" [label="grid_painter"];
-  "/widgets/painters/metal_texture_painter.dart" [label="metal_texture_painter"];
   "/_to_be_deleted/cyberpunk_tech_style.dart" [label="cyberpunk_tech_style"];
   "/_to_be_deleted/dark_tech_style.dart" [label="dark_tech_style"];
   "/_to_be_deleted/digital_dashboard_style.dart" [label="digital_dashboard_style"];
@@ -276,18 +250,6 @@ digraph "" {
         }
       }
     }
-    subgraph "cluster~/models" {
-      label="models";
-      "/models/bowling_ball.dart";
-      "/models/user_profile.dart";
-    }
-    subgraph "cluster~/providers" {
-      label="providers";
-      "/providers/auth_provider.dart";
-      "/providers/providers.dart";
-      "/providers/theme_provider.dart";
-      "/providers/user_profile_provider.dart";
-    }
     subgraph "cluster~/routing" {
       label="routing";
       "/routing/app_router_config.dart";
@@ -309,6 +271,7 @@ digraph "" {
       subgraph "cluster~/shared/providers" {
         label="providers";
         "/shared/providers/auth_provider.dart";
+        "/shared/providers/providers.dart";
         "/shared/providers/theme_provider.dart";
         "/shared/providers/user_profile_provider.dart";
       }
@@ -325,6 +288,17 @@ digraph "" {
       }
       subgraph "cluster~/shared/widgets" {
         label="widgets";
+        subgraph "cluster~/shared/widgets/app_specific" {
+          label="app_specific";
+          subgraph "cluster~/shared/widgets/app_specific/arsenal" {
+            label="arsenal";
+            "/shared/widgets/app_specific/arsenal/empty_bag_widget.dart";
+          }
+          subgraph "cluster~/shared/widgets/app_specific/home" {
+            label="home";
+            "/shared/widgets/app_specific/home/user_info_section.dart";
+          }
+        }
         subgraph "cluster~/shared/widgets/bowling" {
           label="bowling";
           "/shared/widgets/bowling/bowling_scorecard_widget.dart";
@@ -385,65 +359,6 @@ digraph "" {
       "/utils/game_generator.dart";
       "/utils/ui_helpers.dart";
     }
-    subgraph "cluster~/views" {
-      label="views";
-      "/views/developer_page.dart";
-      "/views/login_page.dart";
-      "/views/settings_page.dart";
-    }
-    subgraph "cluster~/widgets" {
-      label="widgets";
-      subgraph "cluster~/widgets/app_specific" {
-        label="app_specific";
-        subgraph "cluster~/widgets/app_specific/arsenal" {
-          label="arsenal";
-          "/widgets/app_specific/arsenal/empty_bag_widget.dart";
-        }
-        subgraph "cluster~/widgets/app_specific/home" {
-          label="home";
-          "/widgets/app_specific/home/user_info_section.dart";
-        }
-      }
-      subgraph "cluster~/widgets/bowling" {
-        label="bowling";
-        "/widgets/bowling/bowling_scorecard_widget.dart";
-        "/widgets/bowling/simple_pins_down_selector.dart";
-      }
-      subgraph "cluster~/widgets/common" {
-        label="common";
-        "/widgets/common/ball_image_widget.dart";
-        "/widgets/common/professional_dark_background.dart";
-        subgraph "cluster~/widgets/common/buttons" {
-          label="buttons";
-          "/widgets/common/buttons/app_standard_button.dart";
-          "/widgets/common/buttons/enhanced_action_button.dart";
-          "/widgets/common/buttons/primary_button.dart";
-        }
-        subgraph "cluster~/widgets/common/cards" {
-          label="cards";
-          "/widgets/common/cards/section_container.dart";
-          "/widgets/common/cards/standard_app_card.dart";
-        }
-        subgraph "cluster~/widgets/common/dialogs" {
-          label="dialogs";
-          "/widgets/common/dialogs/app_dialogs.dart";
-          "/widgets/common/dialogs/ball_bag_options_dialog.dart";
-          "/widgets/common/dialogs/confirmation_dialog.dart";
-          "/widgets/common/dialogs/create_ball_bag_dialog.dart";
-          "/widgets/common/dialogs/edit_ball_bag_dialog.dart";
-        }
-        subgraph "cluster~/widgets/common/navigation" {
-          label="navigation";
-          "/widgets/common/navigation/floating_bottom_navigation.dart";
-          "/widgets/common/navigation/modern_bottom_navigation.dart";
-        }
-      }
-      subgraph "cluster~/widgets/painters" {
-        label="painters";
-        "/widgets/painters/grid_painter.dart";
-        "/widgets/painters/metal_texture_painter.dart";
-      }
-    }
     subgraph "cluster~/_to_be_deleted" {
       label="_to_be_deleted";
       "/_to_be_deleted/cyberpunk_tech_style.dart";
@@ -457,7 +372,7 @@ digraph "" {
   "/features/arsenal/models/arsenal_ball.dart" -> "/features/arsenal/models/ball_bag_type.dart";
   "/features/arsenal/models/ball_adapter.dart" -> "/features/arsenal/models/arsenal_ball.dart";
   "/features/arsenal/models/ball_adapter.dart" -> "/features/arsenal/widgets/ball_list_view.dart";
-  "/features/arsenal/models/ball_adapter.dart" -> "/models/bowling_ball.dart";
+  "/features/arsenal/models/ball_adapter.dart" -> "/shared/models/bowling_ball.dart";
   "/features/arsenal/providers/arsenal_providers.dart" -> "/features/arsenal/repositories/mock_arsenal_repository.dart";
   "/features/arsenal/providers/arsenal_providers.dart" -> "/features/arsenal/models/arsenal_ball.dart";
   "/features/arsenal/providers/arsenal_providers.dart" -> "/features/arsenal/models/ball_bag_type.dart";
@@ -470,23 +385,23 @@ digraph "" {
   "/features/arsenal/views/my_arsenal_page.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
   "/features/arsenal/views/my_arsenal_page.dart" -> "/features/arsenal/widgets/arsenal_ball_card.dart";
   "/features/arsenal/views/my_arsenal_page.dart" -> "/features/arsenal/widgets/arsenal_controls.dart";
-  "/features/arsenal/views/my_arsenal_page.dart" -> "/widgets/common/navigation/modern_bottom_navigation.dart";
-  "/features/arsenal/views/my_arsenal_page.dart" -> "/widgets/common/professional_dark_background.dart";
+  "/features/arsenal/views/my_arsenal_page.dart" -> "/shared/widgets/common/navigation/modern_bottom_navigation.dart";
+  "/features/arsenal/views/my_arsenal_page.dart" -> "/shared/widgets/common/professional_dark_background.dart";
   "/features/arsenal/widgets/arsenal_ball_card.dart" -> "/features/arsenal/models/arsenal_ball.dart";
   "/features/arsenal/widgets/arsenal_card.dart" -> "/features/arsenal/models/arsenal_ball.dart";
-  "/features/arsenal/widgets/arsenal_card.dart" -> "/widgets/common/cards/standard_app_card.dart";
+  "/features/arsenal/widgets/arsenal_card.dart" -> "/shared/widgets/common/cards/standard_app_card.dart";
   "/features/arsenal/widgets/arsenal_controls.dart" -> "/features/arsenal/models/ball_bag_type.dart";
   "/features/arsenal/widgets/arsenal_controls.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
-  "/features/arsenal/widgets/arsenal_controls.dart" -> "/widgets/common/dialogs/ball_bag_options_dialog.dart";
+  "/features/arsenal/widgets/arsenal_controls.dart" -> "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart";
   "/features/arsenal/widgets/arsenal_section.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
   "/features/arsenal/widgets/arsenal_section.dart" -> "/features/arsenal/widgets/arsenal_card.dart";
-  "/features/arsenal/widgets/arsenal_section.dart" -> "/widgets/common/cards/section_container.dart";
-  "/features/arsenal/widgets/ball_list_view.dart" -> "/models/bowling_ball.dart";
+  "/features/arsenal/widgets/arsenal_section.dart" -> "/shared/widgets/common/cards/section_container.dart";
+  "/features/arsenal/widgets/ball_list_view.dart" -> "/shared/models/bowling_ball.dart";
   "/features/arsenal/widgets/ball_list_view.dart" -> "/theme/brand_colors.dart";
   "/features/arsenal/widgets/ball_list_view.dart" -> "/utils/color_utils.dart";
   "/features/arsenal/widgets/ball_list_view.dart" -> "/utils/app_formatters.dart";
-  "/features/arsenal/widgets/ball_list_view.dart" -> "/widgets/painters/grid_painter.dart";
-  "/features/arsenal/widgets/ball_list_view.dart" -> "/widgets/painters/metal_texture_painter.dart";
+  "/features/arsenal/widgets/ball_list_view.dart" -> "/shared/widgets/painters/grid_painter.dart";
+  "/features/arsenal/widgets/ball_list_view.dart" -> "/shared/widgets/painters/metal_texture_painter.dart";
   "/features/arsenal/widgets/ball_list_view.dart" -> "/features/ball_library/widgets/ball_card_item.dart";
   "/features/ball_library/ball_library.dart" -> "/features/ball_library/views/ball_library_page.dart" [style=dashed];
   "/features/ball_library/ball_library.dart" -> "/features/ball_library/widgets/ball_library_controls.dart" [style=dashed];
@@ -495,84 +410,84 @@ digraph "" {
   "/features/ball_library/ball_library.dart" -> "/features/ball_library/widgets/ball_card_item.dart" [style=dashed];
   "/features/ball_library/ball_library.dart" -> "/features/ball_library/providers/ball_library_providers.dart" [style=dashed];
   "/features/ball_library/ball_library.dart" -> "/features/ball_library/services/ball_data_service.dart" [style=dashed];
-  "/features/ball_library/providers/ball_library_providers.dart" -> "/models/bowling_ball.dart";
+  "/features/ball_library/providers/ball_library_providers.dart" -> "/shared/models/bowling_ball.dart";
   "/features/ball_library/providers/ball_library_providers.dart" -> "/features/ball_library/services/ball_data_service.dart";
-  "/features/ball_library/services/ball_data_service.dart" -> "/models/bowling_ball.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/models/bowling_ball.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/providers/providers.dart";
+  "/features/ball_library/services/ball_data_service.dart" -> "/shared/models/bowling_ball.dart";
+  "/features/ball_library/views/ball_library_page.dart" -> "/shared/models/bowling_ball.dart";
+  "/features/ball_library/views/ball_library_page.dart" -> "/shared/providers/providers.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/features/ball_library/providers/ball_library_providers.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/features/ball_library/widgets/ball_detail_popout.dart";
   "/features/ball_library/views/ball_library_page.dart" -> "/features/arsenal/widgets/ball_list_view.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/widgets/common/navigation/modern_bottom_navigation.dart";
-  "/features/ball_library/views/ball_library_page.dart" -> "/widgets/common/professional_dark_background.dart";
-  "/features/ball_library/widgets/ball_card_item.dart" -> "/models/bowling_ball.dart";
+  "/features/ball_library/views/ball_library_page.dart" -> "/shared/widgets/common/navigation/modern_bottom_navigation.dart";
+  "/features/ball_library/views/ball_library_page.dart" -> "/shared/widgets/common/professional_dark_background.dart";
+  "/features/ball_library/widgets/ball_card_item.dart" -> "/shared/models/bowling_ball.dart";
   "/features/ball_library/widgets/ball_card_item.dart" -> "/theme/brand_colors.dart";
   "/features/ball_library/widgets/ball_card_item.dart" -> "/utils/color_utils.dart";
   "/features/ball_library/widgets/ball_card_item.dart" -> "/utils/app_formatters.dart";
-  "/features/ball_library/widgets/ball_detail_popout.dart" -> "/models/bowling_ball.dart";
+  "/features/ball_library/widgets/ball_detail_popout.dart" -> "/shared/models/bowling_ball.dart";
   "/features/ball_library/widgets/ball_detail_popout.dart" -> "/utils/app_formatters.dart";
-  "/features/ball_library/widgets/ball_detail_popout.dart" -> "/widgets/common/ball_image_widget.dart";
-  "/features/ball_library/widgets/ball_library_controls.dart" -> "/providers/providers.dart";
+  "/features/ball_library/widgets/ball_detail_popout.dart" -> "/shared/widgets/common/ball_image_widget.dart";
+  "/features/ball_library/widgets/ball_library_controls.dart" -> "/shared/providers/providers.dart";
   "/features/ball_library/widgets/ball_library_controls.dart" -> "/shared/widgets/search/search_bar.dart";
   "/features/ball_library/widgets/ball_library_controls.dart" -> "/features/ball_library/widgets/filter_popout.dart";
-  "/features/ball_library/widgets/filter_popout.dart" -> "/providers/providers.dart";
-  "/features/onboarding/controllers/onboarding_controller.dart" -> "/providers/providers.dart";
+  "/features/ball_library/widgets/filter_popout.dart" -> "/shared/providers/providers.dart";
+  "/features/onboarding/controllers/onboarding_controller.dart" -> "/shared/providers/providers.dart";
   "/features/onboarding/views/onboarding_page.dart" -> "/features/onboarding/controllers/onboarding_controller.dart";
   "/features/onboarding/views/onboarding_page.dart" -> "/features/onboarding/views/onboarding_pages.dart";
   "/features/training/controllers/training_controller.dart" -> "/features/training/models/training_record.dart";
   "/features/training/controllers/training_controller.dart" -> "/services/training_data_service.dart";
   "/features/training/controllers/training_controller.dart" -> "/utils/game_generator.dart";
-  "/features/training/logic/scoring/current_scoring_strategy.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/logic/scoring/current_scoring_strategy.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
   "/features/training/logic/scoring/current_scoring_strategy.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
-  "/features/training/logic/scoring/scoring_manager.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/logic/scoring/scoring_manager.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
   "/features/training/logic/scoring/scoring_manager.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
   "/features/training/logic/scoring/scoring_manager.dart" -> "/features/training/logic/scoring/traditional_scoring_strategy.dart";
   "/features/training/logic/scoring/scoring_manager.dart" -> "/features/training/logic/scoring/current_scoring_strategy.dart";
-  "/features/training/logic/scoring/scoring_strategy.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
-  "/features/training/logic/scoring/traditional_scoring_strategy.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/logic/scoring/scoring_strategy.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/logic/scoring/traditional_scoring_strategy.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
   "/features/training/logic/scoring/traditional_scoring_strategy.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
-  "/features/training/views/my_training_page.dart" -> "/providers/providers.dart";
+  "/features/training/views/my_training_page.dart" -> "/shared/providers/providers.dart";
   "/features/training/views/my_training_page.dart" -> "/shared/enums.dart";
-  "/features/training/views/my_training_page.dart" -> "/widgets/common/navigation/modern_bottom_navigation.dart";
-  "/features/training/views/my_training_page.dart" -> "/widgets/common/professional_dark_background.dart";
+  "/features/training/views/my_training_page.dart" -> "/shared/widgets/common/navigation/modern_bottom_navigation.dart";
+  "/features/training/views/my_training_page.dart" -> "/shared/widgets/common/professional_dark_background.dart";
   "/features/training/views/my_training_page.dart" -> "/features/training/widgets/training_list_view.dart";
   "/features/training/views/my_training_page.dart" -> "/features/training/widgets/training_page_app_bar.dart";
   "/features/training/widgets/add_games_dialog.dart" -> "/features/training/models/score_data.dart";
-  "/features/training/widgets/add_games_dialog.dart" -> "/widgets/common/buttons/app_standard_button.dart";
-  "/features/training/widgets/add_games_dialog.dart" -> "/widgets/bowling/simple_pins_down_selector.dart";
+  "/features/training/widgets/add_games_dialog.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/add_games_dialog.dart" -> "/shared/widgets/bowling/simple_pins_down_selector.dart";
   "/features/training/widgets/components/enhanced_game_item.dart" -> "/features/training/models/training_record.dart";
   "/features/training/widgets/components/game_list_item.dart" -> "/features/training/models/training_record.dart";
-  "/features/training/widgets/components/scoring_action_buttons.dart" -> "/widgets/common/buttons/app_standard_button.dart";
-  "/features/training/widgets/components/scoring_dialog_content.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/widgets/components/scoring_action_buttons.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/components/scoring_dialog_content.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
   "/features/training/widgets/components/scoring_dialog_content.dart" -> "/features/training/widgets/components/scoring_action_buttons.dart";
   "/features/training/widgets/components/training_day_equipment.dart" -> "/features/training/models/training_record.dart";
   "/features/training/widgets/components/training_day_stats.dart" -> "/features/training/models/training_record.dart";
-  "/features/training/widgets/create_training_record_dialog.dart" -> "/widgets/common/buttons/app_standard_button.dart";
-  "/features/training/widgets/delete_confirmation_dialog.dart" -> "/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/create_training_record_dialog.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/delete_confirmation_dialog.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
   "/features/training/widgets/edit_training_record_dialog.dart" -> "/features/training/models/training_record.dart";
-  "/features/training/widgets/edit_training_record_dialog.dart" -> "/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/edit_training_record_dialog.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
   "/features/training/widgets/game_detail_dialog.dart" -> "/features/training/models/score_data.dart";
   "/features/training/widgets/game_detail_dialog.dart" -> "/features/training/models/training_record.dart";
-  "/features/training/widgets/game_detail_dialog.dart" -> "/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/game_detail_dialog.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/models/training_record.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/logic/scoring/scoring_manager.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
-  "/features/training/widgets/interactive_scoring_dialog.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
-  "/features/training/widgets/interactive_scoring_dialog.dart" -> "/widgets/bowling/simple_pins_down_selector.dart";
+  "/features/training/widgets/interactive_scoring_dialog.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
+  "/features/training/widgets/interactive_scoring_dialog.dart" -> "/shared/widgets/bowling/simple_pins_down_selector.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/widgets/components/scoring_dialog_header.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/widgets/components/scoring_dialog_content.dart";
   "/features/training/widgets/interactive_scoring_dialog.dart" -> "/features/training/widgets/components/scoring_dialog_footer.dart";
   "/features/training/widgets/training_day_summary_card.dart" -> "/features/training/models/training_record.dart";
-  "/features/training/widgets/training_day_summary_card.dart" -> "/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/training_day_summary_card.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
   "/features/training/widgets/training_day_summary_card.dart" -> "/features/training/widgets/components/game_list_item.dart";
   "/features/training/widgets/training_day_summary_card.dart" -> "/features/training/widgets/components/training_day_equipment.dart";
   "/features/training/widgets/training_day_summary_card.dart" -> "/features/training/widgets/components/training_day_stats.dart";
-  "/features/training/widgets/training_empty_state.dart" -> "/widgets/common/buttons/app_standard_button.dart";
+  "/features/training/widgets/training_empty_state.dart" -> "/shared/widgets/common/buttons/app_standard_button.dart";
   "/features/training/widgets/training_list_view.dart" -> "/features/training/controllers/training_controller.dart";
   "/features/training/widgets/training_list_view.dart" -> "/features/training/models/training_record.dart";
   "/features/training/widgets/training_list_view.dart" -> "/shared/app_strings.dart";
   "/features/training/widgets/training_list_view.dart" -> "/utils/ui_helpers.dart";
-  "/features/training/widgets/training_list_view.dart" -> "/widgets/common/dialogs/app_dialogs.dart";
+  "/features/training/widgets/training_list_view.dart" -> "/shared/widgets/common/dialogs/app_dialogs.dart";
   "/features/training/widgets/training_list_view.dart" -> "/features/training/widgets/create_training_record_dialog.dart";
   "/features/training/widgets/training_list_view.dart" -> "/features/training/widgets/delete_confirmation_dialog.dart";
   "/features/training/widgets/training_list_view.dart" -> "/features/training/widgets/edit_training_record_dialog.dart";
@@ -583,78 +498,60 @@ digraph "" {
   "/features/training/widgets/training_page_app_bar.dart" -> "/features/training/controllers/training_controller.dart";
   "/features/training/widgets/training_page_app_bar.dart" -> "/shared/app_strings.dart";
   "/features/training/widgets/training_page_app_bar.dart" -> "/utils/ui_helpers.dart";
-  "/features/training/widgets/training_page_app_bar.dart" -> "/widgets/common/dialogs/app_dialogs.dart";
+  "/features/training/widgets/training_page_app_bar.dart" -> "/shared/widgets/common/dialogs/app_dialogs.dart";
   "/features/training/widgets/training_page_app_bar.dart" -> "/features/training/widgets/create_training_record_dialog.dart";
-  "/home_page.dart" -> "/providers/theme_provider.dart";
-  "/home_page.dart" -> "/views/settings_page.dart";
+  "/home_page.dart" -> "/shared/providers/theme_provider.dart";
+  "/home_page.dart" -> "/shared/views/settings_page.dart";
   "/home_page.dart" -> "/features/arsenal/widgets/arsenal_section.dart";
-  "/home_page.dart" -> "/widgets/common/navigation/modern_bottom_navigation.dart";
-  "/home_page.dart" -> "/widgets/common/professional_dark_background.dart";
-  "/home_page.dart" -> "/widgets/app_specific/home/user_info_section.dart";
+  "/home_page.dart" -> "/shared/widgets/common/navigation/modern_bottom_navigation.dart";
+  "/home_page.dart" -> "/shared/widgets/common/professional_dark_background.dart";
+  "/home_page.dart" -> "/shared/widgets/app_specific/home/user_info_section.dart";
   "/main.dart" -> "/core/error/error_handler.dart";
-  "/main.dart" -> "/providers/theme_provider.dart";
+  "/main.dart" -> "/shared/providers/theme_provider.dart";
   "/main.dart" -> "/routing/app_router_config.dart";
   "/main.dart" -> "/theme/theme.dart";
-  "/providers/auth_provider.dart" -> "/providers/user_profile_provider.dart";
-  "/providers/auth_provider.dart" -> "/services/user_preferences_service.dart";
-  "/providers/providers.dart" -> "/models/bowling_ball.dart";
-  "/providers/providers.dart" -> "/providers/auth_provider.dart";
-  "/providers/providers.dart" -> "/features/onboarding/providers/onboarding_provider.dart";
-  "/providers/providers.dart" -> "/providers/user_profile_provider.dart";
-  "/providers/providers.dart" -> "/features/ball_library/providers/ball_library_providers.dart";
-  "/providers/providers.dart" -> "/services/user_preferences_service.dart";
-  "/providers/providers.dart" -> "/providers/auth_provider.dart" [style=dashed];
-  "/providers/providers.dart" -> "/features/onboarding/providers/onboarding_provider.dart" [style=dashed];
-  "/providers/providers.dart" -> "/providers/user_profile_provider.dart" [style=dashed];
-  "/providers/providers.dart" -> "/features/ball_library/providers/ball_library_providers.dart" [style=dashed];
-  "/providers/user_profile_provider.dart" -> "/models/user_profile.dart";
-  "/providers/user_profile_provider.dart" -> "/services/user_preferences_service.dart";
   "/routing/app_router_config.dart" -> "/home_page.dart";
-  "/routing/app_router_config.dart" -> "/views/login_page.dart";
+  "/routing/app_router_config.dart" -> "/shared/views/login_page.dart";
   "/routing/app_router_config.dart" -> "/features/onboarding/views/onboarding_page.dart";
-  "/routing/app_router_config.dart" -> "/providers/auth_provider.dart";
+  "/routing/app_router_config.dart" -> "/shared/providers/auth_provider.dart";
   "/routing/app_router_config.dart" -> "/features/ball_library/views/ball_library_page.dart";
   "/routing/app_router_config.dart" -> "/features/training/views/my_training_page.dart";
-  "/routing/app_router_config.dart" -> "/views/developer_page.dart";
+  "/routing/app_router_config.dart" -> "/shared/views/developer_page.dart";
   "/routing/app_router_config.dart" -> "/features/arsenal/views/my_arsenal_page.dart";
-  "/routing/app_router_config.dart" -> "/views/settings_page.dart";
-  "/routing/app_router_config.dart" -> "/providers/providers.dart";
+  "/routing/app_router_config.dart" -> "/shared/views/settings_page.dart";
+  "/routing/app_router_config.dart" -> "/shared/providers/providers.dart";
   "/services/training_data_service.dart" -> "/features/training/models/training_record.dart";
-  "/shared/providers/auth_provider.dart" -> "/providers/user_profile_provider.dart";
+  "/shared/providers/auth_provider.dart" -> "/shared/providers/user_profile_provider.dart";
   "/shared/providers/auth_provider.dart" -> "/services/user_preferences_service.dart";
-  "/shared/providers/user_profile_provider.dart" -> "/models/user_profile.dart";
+  "/shared/providers/providers.dart" -> "/shared/models/bowling_ball.dart";
+  "/shared/providers/providers.dart" -> "/shared/providers/auth_provider.dart";
+  "/shared/providers/providers.dart" -> "/features/onboarding/providers/onboarding_provider.dart";
+  "/shared/providers/providers.dart" -> "/shared/providers/user_profile_provider.dart";
+  "/shared/providers/providers.dart" -> "/features/ball_library/providers/ball_library_providers.dart";
+  "/shared/providers/providers.dart" -> "/services/user_preferences_service.dart";
+  "/shared/providers/providers.dart" -> "/shared/providers/auth_provider.dart" [style=dashed];
+  "/shared/providers/providers.dart" -> "/features/onboarding/providers/onboarding_provider.dart" [style=dashed];
+  "/shared/providers/providers.dart" -> "/shared/providers/user_profile_provider.dart" [style=dashed];
+  "/shared/providers/providers.dart" -> "/features/ball_library/providers/ball_library_providers.dart" [style=dashed];
+  "/shared/providers/user_profile_provider.dart" -> "/shared/models/user_profile.dart";
   "/shared/providers/user_profile_provider.dart" -> "/services/user_preferences_service.dart";
   "/shared/services/training_data_service.dart" -> "/features/training/models/training_record.dart";
   "/shared/views/developer_page.dart" -> "/shared/widgets/bowling/bowling_scorecard_widget.dart";
-  "/shared/views/login_page.dart" -> "/providers/providers.dart";
-  "/shared/views/settings_page.dart" -> "/providers/theme_provider.dart";
-  "/shared/views/settings_page.dart" -> "/widgets/common/professional_dark_background.dart";
-  "/shared/widgets/common/dialogs/app_dialogs.dart" -> "/widgets/common/dialogs/confirmation_dialog.dart";
+  "/shared/views/developer_page.dart" -> "/features/training/logic/scoring/scoring_manager.dart";
+  "/shared/views/developer_page.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
+  "/shared/views/login_page.dart" -> "/shared/providers/providers.dart";
+  "/shared/views/settings_page.dart" -> "/shared/providers/theme_provider.dart";
+  "/shared/views/settings_page.dart" -> "/shared/widgets/common/professional_dark_background.dart";
+  "/shared/widgets/common/dialogs/app_dialogs.dart" -> "/shared/widgets/common/dialogs/confirmation_dialog.dart";
   "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/theme/theme.dart";
-  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/create_ball_bag_dialog.dart";
-  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/edit_ball_bag_dialog.dart";
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart";
+  "/shared/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart";
   "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/models/arsenal_ball.dart";
   "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
   "/shared/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/theme/theme.dart";
   "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/models/ball_bag_type.dart";
   "/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
-  "/shared/widgets/common/navigation/modern_bottom_navigation.dart" -> "/widgets/common/navigation/floating_bottom_navigation.dart";
+  "/shared/widgets/common/navigation/modern_bottom_navigation.dart" -> "/shared/widgets/common/navigation/floating_bottom_navigation.dart";
   "/utils/game_generator.dart" -> "/features/training/models/training_record.dart";
-  "/views/developer_page.dart" -> "/widgets/bowling/bowling_scorecard_widget.dart";
-  "/views/developer_page.dart" -> "/features/training/logic/scoring/scoring_manager.dart";
-  "/views/developer_page.dart" -> "/features/training/logic/scoring/scoring_strategy.dart";
-  "/views/login_page.dart" -> "/providers/providers.dart";
-  "/views/settings_page.dart" -> "/providers/theme_provider.dart";
-  "/views/settings_page.dart" -> "/widgets/common/professional_dark_background.dart";
-  "/widgets/common/dialogs/app_dialogs.dart" -> "/widgets/common/dialogs/confirmation_dialog.dart";
-  "/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/theme/theme.dart";
-  "/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/create_ball_bag_dialog.dart";
-  "/widgets/common/dialogs/ball_bag_options_dialog.dart" -> "/widgets/common/dialogs/edit_ball_bag_dialog.dart";
-  "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/models/arsenal_ball.dart";
-  "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
-  "/widgets/common/dialogs/create_ball_bag_dialog.dart" -> "/theme/theme.dart";
-  "/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/models/ball_bag_type.dart";
-  "/widgets/common/dialogs/edit_ball_bag_dialog.dart" -> "/features/arsenal/providers/arsenal_providers.dart";
-  "/widgets/common/navigation/modern_bottom_navigation.dart" -> "/widgets/common/navigation/floating_bottom_navigation.dart";
 }
 

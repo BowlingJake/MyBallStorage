@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/theme/brand_colors.dart';
+import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class BallCardItem extends StatelessWidget {
     final ringColor = brandPalette.shade600;
 
     // 根據品牌主色動態產生金屬光澤的漸層
-    final brandColor = brandPalette.primary;
+    final brandColor = brandPalette[400]!; // 使用MaterialColor的400shade作為主色
     final hsvColor = HSVColor.fromColor(brandColor);
 
     final highlightColor = hsvColor.withValue( (hsvColor.value + 0.3).clamp(0.0, 1.0) ).withSaturation( (hsvColor.saturation - 0.2).clamp(0.0, 1.0) ).toColor();

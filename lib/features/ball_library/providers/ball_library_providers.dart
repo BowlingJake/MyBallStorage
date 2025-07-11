@@ -2,18 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import '../services/ball_data_service.dart';
+import '../repositories/ball_repository.dart';
+import '../repositories/ball_data_repository.dart';
 
 // Service Provider
 final ballDataServiceProvider = Provider<BallDataService>((ref) {
   return BallDataService();
 });
 
+// Repository Provider
+final ballRepositoryProvider = Provider<BallRepository>((ref) {
+  final ballDataService = ref.watch(ballDataServiceProvider);
+  return BallDataRepository(ballDataService);
+});
+
 /// 提供保齡球列表的 FutureProvider
 ///
-/// 會自動處理讀取、快取（由 BallDataService 處理）、錯誤和成功狀態
+/// 現在通過Repository模式進行數據存取，提供更好的抽象和可測試性
 final ballListProvider = FutureProvider<List<BowlingBall>>((ref) {
-  final ballService = ref.watch(ballDataServiceProvider);
-  return ballService.loadBallData();
+  final ballRepository = ref.watch(ballRepositoryProvider);
+  return ballRepository.getAllBalls();
 });
 
 // --- Ball Library Filter and Sort Providers ---

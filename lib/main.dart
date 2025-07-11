@@ -1,8 +1,7 @@
 // lib/main.dart
 import 'package:bowlingarsenal_app/core/error/error_handler.dart';
-import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
 import 'package:bowlingarsenal_app/routing/app_router_config.dart';
-import 'package:bowlingarsenal_app/theme/theme.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +16,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider);
+    final themeMode = ref.watch(currentThemeModeProvider);
+    final lightTheme = ref.watch(lightThemeProvider);
+    final darkTheme = ref.watch(darkThemeProvider);
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(

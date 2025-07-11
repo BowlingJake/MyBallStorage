@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/theme/theme.dart';
+import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/create_ball_bag_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/edit_ball_bag_dialog.dart';
 import 'package:flutter/material.dart';

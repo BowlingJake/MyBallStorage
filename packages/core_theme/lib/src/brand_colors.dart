@@ -1,0 +1,129 @@
+import 'package:flutter/material.dart';
+
+/// 品牌核心顏色定義
+/// 
+/// 定義應用的核心色彩系統，包含深色和淺色模式的顏色配置
+class BrandColors {
+  BrandColors._();
+
+  // ===========================================================================
+  // 設計 DNA：定義核心顏色
+  // ===========================================================================
+
+  // --- 深色主題用的顏色 ---
+  /// 強調色，用於所有可互動的元素和圖表，柔和的護眼藍綠色
+  static const Color accentColorDark = Color(0xFF4A9EAF);
+
+  /// App 的主要背景色，Professional Dark風格的深色背景
+  static const Color darkBackgroundColor = Color(0xFF0F0F0F);
+
+  /// 卡片、對話框等元件的表面顏色，比背景稍亮以創造層次
+  static const Color darkSurfaceColor = Color(0xFF1E1E1E);
+
+  // --- 淺色主題用的顏色 ---
+  /// 強調色，沿用深色模式的藍綠色以保持品牌一致性
+  static const Color accentColorLight = Color(0xFF007A8D);
+
+  /// App 的主要背景色
+  static const Color lightBackgroundColor = Color(0xFFF5F5F7);
+
+  /// 卡片、對話框等元件的表面顏色
+  static const Color lightSurfaceColor = Color(0xFFFFFFFF);
+
+  // --- 語義顏色 ---
+  static const Color errorColor = Color(0xFFE57373);
+  static const Color successColor = Color(0xFF81C784);
+  static const Color warningColor = Color(0xFFFFB74D);
+  static const Color infoColor = Color(0xFF64B5F6);
+
+  // --- 文字顏色 ---
+  static const Color textPrimaryDark = Color(0xFFFFFFFF);
+  static const Color textSecondaryDark = Color(0xFFE0E0E0);
+  static const Color textDisabledDark = Color(0xFFBDBDBD);
+
+  static const Color textPrimaryLight = Color(0xFF000000);
+  static const Color textSecondaryLight = Color(0xFF666666);
+  static const Color textDisabledLight = Color(0xFF999999);
+
+  // --- 效果顏色 ---
+  /// 發光效果顏色，用於陰影和發光特效
+  static const Color glowColor = Color(0x334A9EAF);
+
+  /// 獲取深色模式的顏色配置
+  static ColorScheme get darkColorScheme => const ColorScheme.dark(
+    primary: accentColorDark,
+    onPrimary: textPrimaryDark,
+    secondary: accentColorDark,
+    onSecondary: textPrimaryDark,
+    surface: darkSurfaceColor,
+    onSurface: textPrimaryDark,
+    error: errorColor,
+    onError: textPrimaryDark,
+  );
+
+  /// 獲取淺色模式的顏色配置
+  static ColorScheme get lightColorScheme => const ColorScheme.light(
+    primary: accentColorLight,
+    onPrimary: textPrimaryLight,
+    secondary: accentColorLight,
+    onSecondary: textPrimaryLight,
+    surface: lightSurfaceColor,
+    onSurface: textPrimaryLight,
+    error: errorColor,
+    onError: textPrimaryLight,
+  );
+}
+
+/// 根據品牌名稱獲取品牌調色板
+/// 
+/// 為不同的保齡球品牌提供特定的顏色調色板
+MaterialColor getBrandTonalPalette(String brand, ThemeData theme) {
+  // 定義各品牌的主色調
+  final brandColors = <String, Color>{
+    'Storm': const Color(0xFF8B0000), // 深紅色
+    'Hammer': const Color(0xFF4B0082), // 靛藍色
+    'Ebonite': const Color(0xFF000000), // 黑色
+    'Brunswick': const Color(0xFF006400), // 深綠色
+    'Columbia 300': const Color(0xFF1E90FF), // 道奇藍
+    'Roto Grip': const Color(0xFFFF8C00), // 深橙色
+    'DV8': const Color(0xFF800080), // 紫色
+    'Track': const Color(0xFF228B22), // 森林綠
+    'Motiv': const Color(0xFFDC143C), // 深紅色
+    'Global 900': const Color(0xFF4169E1), // 皇家藍
+  };
+
+  // 獲取品牌主色調，如果品牌不在清單中則使用預設強調色
+  final brandColor = brandColors[brand] ?? 
+    (theme.brightness == Brightness.dark ? BrandColors.accentColorDark : BrandColors.accentColorLight);
+
+  // 根據主色調創建 MaterialColor
+  return _createMaterialColor(brandColor);
+}
+
+/// 根據單一顏色創建MaterialColor
+MaterialColor _createMaterialColor(Color color) {
+  final hsl = HSLColor.fromColor(color);
+  
+  return MaterialColor(color.value, {
+    50: _lighten(hsl, 0.4).toColor(),
+    100: _lighten(hsl, 0.3).toColor(),
+    200: _lighten(hsl, 0.2).toColor(),
+    300: _lighten(hsl, 0.1).toColor(),
+    400: color,
+    500: _darken(hsl, 0.1).toColor(),
+    600: _darken(hsl, 0.2).toColor(),
+    700: _darken(hsl, 0.3).toColor(),
+    800: _darken(hsl, 0.4).toColor(),
+    900: _darken(hsl, 0.5).toColor(),
+  });
+}
+
+/// 讓顏色變亮
+HSLColor _lighten(HSLColor hsl, double amount) {
+  return hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+}
+
+/// 讓顏色變暗
+HSLColor _darken(HSLColor hsl, double amount) {
+  return hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+} 

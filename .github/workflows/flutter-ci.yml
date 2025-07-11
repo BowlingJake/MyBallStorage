@@ -1,25 +1,30 @@
+# Enhanced Flutter CI Pipeline
+# Supports: Code quality, testing, build verification, and freezed code generation
 # To enable full protection:
 # 1. Settings → Branches → Protect main → Require status checks (build)
-# 2. Settings → Actions → Secrets → New CODECOV_TOKEN
+# 2. Settings → Actions → Secrets → New CODECOV_TOKEN  
 # 3. PR must be green + approved before merge
 name: Flutter CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.22.x"
+          channel: stable
 
       - name: Cache pub packages
         uses: actions/cache@v4
@@ -28,22 +33,56 @@ jobs:
             ~/.pub-cache
             .dart_tool/pub
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify pubspec dependencies
+        run: flutter pub deps
+
+      - name: Generate code with build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Format check
         run: dart format --set-exit-if-changed .
 
-      - name: Analyze
-        run: dart analyze --fatal-infos
+      - name: Analyze code quality
+        run: flutter analyze --fatal-infos --fatal-warnings
 
-      - name: Run tests
-        run: flutter test --coverage
+      - name: Run unit tests
+        run: flutter test --coverage --test-randomize-ordering-seed=random
+
+      - name: Verify coverage format
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            echo "Coverage file generated successfully"
+            head -5 coverage/lcov.info
+          else
+            echo "Warning: No coverage file generated"
+          fi
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
+        if: success()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Build APK (Debug)
+        run: flutter build apk --debug
+
+      - name: Build Web (Release)
+        run: flutter build web --release
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: flutter-builds-${{ github.sha }}
+          path: |
+            build/app/outputs/flutter-apk/app-debug.apk
+            build/web/
+          retention-days: 7

@@ -1,8 +1,9 @@
-import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:core_theme/core_theme.dart';
 
 /// 通用設定頁範例，可直接放在 lib/views/settings_page.dart
 class SettingsPage extends ConsumerWidget {
@@ -11,7 +12,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final themeState = ref.watch(themeProvider);
+    final themeState = ref.watch(appThemeProvider);
 
     return ProfessionalDarkBackground(
       child: Scaffold(
@@ -39,9 +40,9 @@ class SettingsPage extends ConsumerWidget {
   }
 
   void _showThemeDialog(BuildContext context, WidgetRef ref) {
-    final themeState = ref.read(themeProvider);
+    final themeState = ref.read(appThemeProvider);
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -49,35 +50,35 @@ class SettingsPage extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              RadioListTile<ThemeMode>(
+              RadioListTile<AppThemeMode>(
                 title: const Text('淺色'),
-                value: ThemeMode.light,
-                groupValue: themeState,
+                value: AppThemeMode.light,
+                groupValue: themeState.themeMode,
                 onChanged: (value) {
                   if (value != null) {
-                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    ref.read(appThemeProvider.notifier).setThemeMode(value);
                     Navigator.of(context).pop();
                   }
                 },
               ),
-              RadioListTile<ThemeMode>(
+              RadioListTile<AppThemeMode>(
                 title: const Text('深色'),
-                value: ThemeMode.dark,
-                groupValue: themeState,
+                value: AppThemeMode.dark,
+                groupValue: themeState.themeMode,
                 onChanged: (value) {
                   if (value != null) {
-                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    ref.read(appThemeProvider.notifier).setThemeMode(value);
                     Navigator.of(context).pop();
                   }
                 },
               ),
-              RadioListTile<ThemeMode>(
+              RadioListTile<AppThemeMode>(
                 title: const Text('跟隨系統'),
-                value: ThemeMode.system,
-                groupValue: themeState,
+                value: AppThemeMode.system,
+                groupValue: themeState.themeMode,
                 onChanged: (value) {
                   if (value != null) {
-                    ref.read(themeProvider.notifier).setThemeMode(value);
+                    ref.read(appThemeProvider.notifier).setThemeMode(value);
                     Navigator.of(context).pop();
                   }
                 },
@@ -122,13 +123,13 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  String _getThemeModeDisplayName(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
+  String _getThemeModeDisplayName(ThemeState themeState) {
+    switch (themeState.themeMode) {
+      case AppThemeMode.light:
         return '淺色';
-      case ThemeMode.dark:
+      case AppThemeMode.dark:
         return '深色';
-      case ThemeMode.system:
+      case AppThemeMode.system:
         return '跟隨系統';
     }
   }

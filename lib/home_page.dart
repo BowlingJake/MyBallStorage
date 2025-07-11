@@ -1,7 +1,7 @@
 // lib/home_page.dart
 import 'dart:ui'; // For BackdropFilter
 
-import 'package:bowlingarsenal_app/shared/providers/theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_section.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -36,7 +36,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 在 build 方法頂部
     final location = GoRouterState.of(context).matchedLocation;
-    final themeMode = ref.watch(themeProvider);
+    final themeMode = ref.watch(currentThemeModeProvider);
 
     return ProfessionalDarkBackground(
       child: Scaffold(
@@ -59,7 +59,7 @@ class HomePage extends ConsumerWidget {
               ),
               color: Theme.of(context).colorScheme.onSurface,
               onPressed: () {
-                ref.read(themeProvider.notifier).toggleTheme();
+                ref.read(appThemeProvider.notifier).toggleTheme();
               },
               tooltip: 'Toggle Theme',
             ),

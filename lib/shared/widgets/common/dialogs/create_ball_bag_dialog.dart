@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:bowlingarsenal_app/features/arsenal/models/arsenal_ball.dart';
 import 'package:bowlingarsenal_app/features/arsenal/providers/arsenal_providers.dart';
-import 'package:bowlingarsenal_app/theme/theme.dart';
+import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

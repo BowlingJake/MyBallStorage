@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/theme/brand_colors.dart';
+import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
