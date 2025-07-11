@@ -10,10 +10,10 @@ Future<void> showDeleteConfirmationDialog(
     context: context,
     builder: (BuildContext context) {
       return ConfirmationDialog(
-        title: '確認刪除',
-        content: '確定要刪除${itemCount > 1 ? ' $itemCount 個' : '這個'}訓練記錄嗎？此操作無法撤銷。',
-        confirmText: '刪除',
-        cancelText: '取消',
+        title: 'Confirm Delete',
+        content: 'Are you sure you want to delete ${itemCount > 1 ? ' $itemCount ' : 'this '}training record? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
         onConfirm: onConfirm,
         isDangerous: true,
       );

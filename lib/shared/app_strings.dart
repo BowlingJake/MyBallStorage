@@ -3,28 +3,28 @@
 class AppStrings {
   // 訓練頁面相關
   static const String myTraining = 'My Training';
-  static const String selectedItems = '已選擇 {count} 項';
-  static const String selectAll = '全選';
-  static const String cancelSelection = '取消全選';
+  static const String selectedItems = '{count} items selected';
+  static const String selectAll = 'Select All';
+  static const String cancelSelection = 'Cancel Selection';
   static const String startYourBowlingJourney = 'Start Your Bowling Journey';
   static const String recordYourTrainingSessions =
       'Record your training sessions\nTrack your progress';
   static const String addTrainingRecord = 'Add Training Record';
 
   // 訓練記錄操作
-  static const String trainingRecordCreated = '訓練記錄「{title}」已建立！';
-  static const String trainingRecordUpdated = '訓練記錄已更新！';
-  static const String trainingRecordDeleted = '訓練記錄已刪除';
-  static const String trainingRecordsDeleted = '已刪除 {count} 筆訓練記錄';
+  static const String trainingRecordCreated = 'Training record "{title}" created!';
+  static const String trainingRecordUpdated = 'Training record updated!';
+  static const String trainingRecordDeleted = 'Training record deleted';
+  static const String trainingRecordsDeleted = '{count} training records deleted';
   static const String trainingDayDeleted = 'Training day deleted';
   static const String trainingDaysDeleted =
       '{count} training day{plural} deleted';
 
   // 遊戲操作
-  static const String gameAddedSuccess = '第 {count} 局已新增成功！';
-  static const String gameDeleted = '遊戲已刪除';
-  static const String deleteGame = '刪除遊戲';
-  static const String confirmDeleteGame = '確定要刪除第{gameNumber}局嗎？此操作無法復原。';
+  static const String gameAddedSuccess = 'Game {count} added successfully!';
+  static const String gameDeleted = 'Game deleted';
+  static const String deleteGame = 'Delete Game';
+  static const String confirmDeleteGame = 'Are you sure you want to delete Game {gameNumber}? This action cannot be undone.';
 
   // 刪除確認對話框
   static const String deleteTrainingDay = 'Delete Training Day';
@@ -35,18 +35,18 @@ class AppStrings {
       'Are you sure you want to delete {count} training day{plural} with {games} total games? This action cannot be undone.';
 
   // 通用按鈕
-  static const String cancel = '取消';
-  static const String delete = '刪除';
-  static const String confirm = '確定';
-  static const String save = '儲存';
-  static const String edit = '編輯';
+  static const String cancel = 'Cancel';
+  static const String delete = 'Delete';
+  static const String confirm = 'Confirm';
+  static const String save = 'Save';
+  static const String edit = 'Edit';
 
   // 底部導航
-  static const String home = '首頁';
-  static const String library = '球具庫';
-  static const String add = '新增';
-  static const String training = '訓練';
-  static const String profile = '個人';
+  static const String home = 'Home';
+  static const String library = 'Library';
+  static const String add = 'Add';
+  static const String training = 'Training';
+  static const String profile = 'Profile';
 
   // 工具方法：處理複數形式
   static String formatSelectedItems(int count) {

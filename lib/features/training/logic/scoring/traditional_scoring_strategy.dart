@@ -9,7 +9,7 @@ import 'scoring_strategy.dart';
 /// - 第10格有獎勵球機會
 class TraditionalScoringStrategy implements ScoringStrategy {
   @override
-  String get name => '傳統計分';
+  String get name => 'Traditional';
   
   @override
   String get description => 'Strike和Spare會獲得後續球的分數獎勵，第10格可以投獎勵球';

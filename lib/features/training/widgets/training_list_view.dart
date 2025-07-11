@@ -171,6 +171,11 @@ class TrainingListView extends ConsumerWidget {
 
   void _showAddGameDialog(BuildContext context, String dayId, WidgetRef ref) async {
     final controller = ref.read(trainingControllerProvider);
-    await controller.addGameToDay(dayId);
+    final success = await controller.addGameToDay(dayId);
+    
+    if (success) {
+      // 成功添加新遊戲，但不自動打開計分對話框
+      // 使用者需要點擊遊戲記錄才會打開互動式計分對話框
+    }
   }
 }

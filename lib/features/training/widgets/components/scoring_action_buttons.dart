@@ -53,7 +53,7 @@ class ScoringActionButtons extends StatelessWidget {
             icon: Icons.save,
             onPressed: onSave,
             customColor: effectiveAccentColor,
-            isPrimary: canSave,
+            isPrimary: false, // 修改為 false，使用輪廓樣式而非填充樣式
             enabled: canSave,
           ),
         ),

@@ -423,10 +423,12 @@ class ScoringControllerParams {
   const ScoringControllerParams({
     required this.scoringMethod,
     this.initialRolls,
+    this.gameId, // 添加遊戲ID參數
   });
 
   final String scoringMethod;
   final List<int>? initialRolls;
+  final String? gameId; // 遊戲ID，用於區分不同的遊戲
 
   @override
   bool operator ==(Object other) =>
@@ -434,12 +436,14 @@ class ScoringControllerParams {
       other is ScoringControllerParams &&
           runtimeType == other.runtimeType &&
           scoringMethod == other.scoringMethod &&
-          const ListEquality<int>().equals(initialRolls, other.initialRolls);
+          const ListEquality<int>().equals(initialRolls, other.initialRolls) &&
+          gameId == other.gameId; // 加入gameId的比較
 
   @override
   int get hashCode =>
       scoringMethod.hashCode ^ 
-      (initialRolls != null ? const ListEquality<int>().hash(initialRolls) : 0);
+      (initialRolls != null ? const ListEquality<int>().hash(initialRolls) : 0) ^
+      (gameId != null ? gameId.hashCode : 0); // 加入gameId的哈希值
 }
 
 /// Provider for ScoringController

@@ -32,9 +32,12 @@ class InteractiveScoringDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 從現有遊戲資料中重建投球記錄（如果有的話）
     final initialRolls = _reconstructRollsFromGame(game);
+    
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
       initialRolls: initialRolls,
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
     
     final scoringState = ref.watch(scoringControllerProvider(controllerParams));
@@ -54,7 +57,7 @@ class InteractiveScoringDialog extends ConsumerWidget {
           maxHeight: 700,
         ),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.95),
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: scoringColor.withOpacity(0.3),
@@ -109,9 +112,17 @@ class InteractiveScoringDialog extends ConsumerWidget {
 
   /// 重建投球記錄從現有遊戲資料
   List<int>? _reconstructRollsFromGame(GameRecord game) {
-    // 如果遊戲沒有分數或沒有frameScores，返回null表示新遊戲
+    // 檢查是否為新遊戲（分數為0或沒有frameScores）
     if (game.score == 0 || game.frameScores.isEmpty) {
-      return null;
+      return null; // 返回null表示新遊戲
+    }
+    
+    // 檢查是否為剛創建的遊戲（通過檢查時間戳）
+    if (DateTime.now().difference(game.timestamp).inMinutes < 5) {
+      // 如果是5分鐘內創建的遊戲，且分數為0，視為新遊戲
+      if (game.score == 0) {
+        return null;
+      }
     }
     
     // 對於已有分數的遊戲，暫時返回 null
@@ -122,10 +133,11 @@ class InteractiveScoringDialog extends ConsumerWidget {
 
   /// 處理點擊計分格
   Future<void> _onFrameTapped(BuildContext context, WidgetRef ref, int frameIndex) async {
-    final initialRolls = _reconstructRollsFromGame(game);
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _reconstructRollsFromGame(game),
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
     
     final scoringState = ref.read(scoringControllerProvider(controllerParams));
@@ -169,24 +181,25 @@ class InteractiveScoringDialog extends ConsumerWidget {
 
   /// 處理撤銷操作
   void _onUndo(WidgetRef ref) {
-    final initialRolls = _reconstructRollsFromGame(game);
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _reconstructRollsFromGame(game),
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
+    
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
     scoringController.undoLastRoll();
     HapticFeedback.selectionClick();
   }
 
-
-
   /// 處理儲存操作
   void _onSave(BuildContext context, WidgetRef ref) {
-    final initialRolls = _reconstructRollsFromGame(game);
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _reconstructRollsFromGame(game),
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
     
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
@@ -213,10 +226,11 @@ class InteractiveScoringDialog extends ConsumerWidget {
 
   /// 處理切換編輯模式
   void _onToggleEdit(BuildContext context, WidgetRef ref) {
-    final initialRolls = _reconstructRollsFromGame(game);
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _reconstructRollsFromGame(game),
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
     
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
@@ -227,10 +241,11 @@ class InteractiveScoringDialog extends ConsumerWidget {
 
   /// 編輯指定格的數據
   Future<void> _editFrame(BuildContext context, WidgetRef ref, int frameIndex) async {
-    final initialRolls = _reconstructRollsFromGame(game);
+    // 為了確保每次打開不同遊戲時使用獨立的控制器實例，將遊戲ID加入到參數中
     final controllerParams = ScoringControllerParams(
       scoringMethod: scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _reconstructRollsFromGame(game),
+      gameId: game.id, // 添加遊戲ID作為參數的一部分
     );
     
     final scoringState = ref.read(scoringControllerProvider(controllerParams));

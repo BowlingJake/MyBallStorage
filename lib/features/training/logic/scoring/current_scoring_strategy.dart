@@ -10,7 +10,7 @@ import 'scoring_strategy.dart';
 /// - 所有格計分邏輯一致
 class CurrentScoringStrategy implements ScoringStrategy {
   @override
-  String get name => 'Current計分';
+  String get name => 'Current';
   
   @override
   String get description => 'Strike固定30分，Spare為10+第一球分數，第10格無獎勵球';

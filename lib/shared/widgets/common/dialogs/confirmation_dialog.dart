@@ -25,27 +25,25 @@ class ConfirmationDialog extends StatelessWidget {
     
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 400),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: const Color(0x33000000),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDangerous 
-                    ? Colors.red.withOpacity(0.5)
-                    : theme.colorScheme.primary.withOpacity(0.5),
-                ),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDangerous 
+                  ? Colors.red.withOpacity(0.5)
+                  : theme.colorScheme.primary.withOpacity(0.5),
+                width: 1.5,
               ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,28 +59,40 @@ class ConfirmationDialog extends StatelessWidget {
                   Text(
                     content,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white70,
+                      color: Colors.white.withOpacity(0.9),
                     ),
                   ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
+                      OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text(
-                          cancelText,
-                          style: TextStyle(color: Colors.white70),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(color: Colors.grey.shade400),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         ),
+                        child: Text(cancelText),
                       ),
                       const SizedBox(width: 16),
-                      ElevatedButton(
+                      OutlinedButton(
                         onPressed: () {
                           onConfirm();
                           Navigator.of(context).pop();
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isDangerous ? Colors.red : null,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: isDangerous ? Colors.red : theme.colorScheme.primary,
+                          side: BorderSide(
+                            color: isDangerous ? Colors.red : theme.colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         ),
                         child: Text(confirmText),
                       ),
