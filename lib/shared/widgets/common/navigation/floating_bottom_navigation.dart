@@ -1,7 +1,9 @@
 import 'dart:ui'; // For BackdropFilter and ImageFilter
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // 添加 flutter_svg 包
 import 'package:iconsax/iconsax.dart';
+import 'package:bowlingarsenal_app/shared/icons/my_flutter_app_icons.dart'; // 導入自定義圖標
 
 /// 帶動畫效果的浮動底部導覽列
 class AnimatedFloatingBottomNavigation extends StatefulWidget {
@@ -43,10 +45,10 @@ class _AnimatedFloatingBottomNavigationState
             // **RESTRUCTURED NAV ITEMS**
             children: [
               _buildNavItem(Iconsax.home_2, 0, theme),       // Home
-              _buildNavItem(Iconsax.book, 1, theme),          // Library
-              _buildNavItem(Iconsax.box_1, 2, theme),         // Arsenal
-              _buildNavItem(Iconsax.activity, 3, theme),      // Training
-              _buildNavItem(Iconsax.shield_tick, 4, theme),   // Events
+              _buildNavItem(MyFlutterApp.search, 1, theme),          // Library
+              _buildNavItem(MyFlutterApp.bowling_ball, 2, theme),  // Arsenal
+              _buildNavItem(MyFlutterApp.bowling_pin, 3, theme),      // Training
+              _buildNavItem(MyFlutterApp.trophy, 4, theme),   // Events
             ],
           ),
         ),

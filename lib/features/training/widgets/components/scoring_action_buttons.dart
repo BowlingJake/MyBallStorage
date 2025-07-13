@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:flutter/foundation.dart';
 
 /// 計分對話框操作按鈕組件
 class ScoringActionButtons extends StatelessWidget {
@@ -28,6 +29,7 @@ class ScoringActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[ScoringActionButtons] Building. onToggleEdit is ${onToggleEdit == null ? "null" : "not null"}');
     final theme = Theme.of(context);
     final effectiveAccentColor = accentColor ?? theme.colorScheme.primary;
     

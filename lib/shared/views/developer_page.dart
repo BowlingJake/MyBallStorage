@@ -1,66 +1,44 @@
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:bowlingarsenal_app/shared/widgets/common/section_title.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_widget.dart'; // 導入新的組件
-import 'package:bowlingarsenal_app/features/training/models/training_record.dart'; // For BallInfo
-import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_dialog.dart';
-
-class DeveloperPage extends ConsumerWidget {
+class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<DeveloperPage> createState() => _DeveloperPageState();
+}
+
+class _DeveloperPageState extends State<DeveloperPage> {
+  late final PinSelectionController _pinController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pinController = PinSelectionController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Developer Sandbox'),
+        title: const Text('Developer Options'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SectionTitle(title: 'Component Sandbox'),
-            const SizedBox(height: 16),
-
-            // --- Test Area for BallSelectionDialog ---
-            ElevatedButton(
-              child: const Text('Open Ball Selection Dialog'),
-              onPressed: () async {
-                final selectedBalls = await showDialog<List<BallInfo>>(
-                  context: context,
-                  builder: (context) => const BallSelectionDialog(
-                    initialSelectedBalls: [], // Start with no balls selected
-                  ),
-                );
-                if (selectedBalls != null) {
-                  debugPrint('Selected Balls from Dialog: ${selectedBalls.map((b) => b.name).toList()}');
-                } else {
-                  debugPrint('Dialog cancelled.');
-                }
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return PinSelectionDialog(controller: _pinController);
               },
-            ),
-            const SizedBox(height: 24),
-
-            // --- Test Area for BallSelectionWidget ---
-            const Text(
-              'Test: Ball Selection Widget',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            BallSelectionWidget(
-              onBallsSelected: (selectedBalls) {
-                // In a real scenario, you would update your state here.
-                // For testing, we just print the result.
-                debugPrint('Selected Balls: ${selectedBalls.map((b) => b.name).toList()}');
-              },
-            ),
-
-            const SizedBox(height: 24),
-            // ... other developer components can be added here
-          ],
+            );
+          },
+          child: const Text('Show Pin Selection Dialog'),
         ),
       ),
     );
   }
 }
+

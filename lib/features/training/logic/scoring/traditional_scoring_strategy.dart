@@ -35,8 +35,8 @@ class TraditionalScoringStrategy implements ScoringStrategy {
     }
     
     final frames = <BowlingFrame>[];
+    int? cumulativeScore = 0;
     var rollIndex = 0;
-    var cumulativeScore = 0;
     
     // 計算前9格
     for (var frameNumber = 1; frameNumber <= 9; frameNumber++) {
@@ -48,7 +48,12 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       
       final frameResult = _calculateFrame(rolls, rollIndex, frameNumber);
       final frameScore = frameResult.score;
-      cumulativeScore += frameScore;
+
+      if (cumulativeScore != null && frameScore != null) {
+        cumulativeScore += frameScore;
+      } else {
+        cumulativeScore = null; // As soon as one frame's score is undetermined, the rest are too.
+      }
       
       frames.add(BowlingFrame(
         firstBall: frameResult.firstBall,
@@ -62,7 +67,9 @@ class TraditionalScoringStrategy implements ScoringStrategy {
     // 計算第10格
     if (rollIndex < rolls.length) {
       final frame10Result = _calculateFrame10(rolls, rollIndex);
-      cumulativeScore += frame10Result.score;
+      if (cumulativeScore != null) {
+         cumulativeScore += frame10Result.score;
+      }
       
       frames.add(BowlingFrame(
         firstBall: frame10Result.firstBall,
@@ -87,7 +94,7 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       return _FrameResult(
         firstBall: '',
         secondBall: 'X',
-        score: 10 + bonus,
+        score: bonus != null ? 10 + bonus : null,
         nextRollIndex: rollIndex + 1,
       );
     }
@@ -110,7 +117,7 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       return _FrameResult(
         firstBall: firstRoll.toString(),
         secondBall: '/',
-        score: 10 + bonus,
+        score: bonus != null ? 10 + bonus : null,
         nextRollIndex: rollIndex + 2,
       );
     }
@@ -146,7 +153,7 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       return _Frame10Result(
         firstBall: 'X',
         secondBall: _formatBall(secondRoll),
-        thirdBall: secondRoll == 10 ? 'X' : _formatBall(thirdRoll),
+        thirdBall: secondRoll == 10 ? 'X' : (thirdRoll == 10 ? 'X' : _formatBall(thirdRoll)),
         score: firstRoll + secondRoll + thirdRoll,
       );
     }
@@ -193,20 +200,20 @@ class TraditionalScoringStrategy implements ScoringStrategy {
   }
   
   /// 取得Strike的獎勵分數
-  int _getStrikeBonus(List<int> rolls, int strikeIndex) {
+  int? _getStrikeBonus(List<int> rolls, int strikeIndex) {
     // 需要後兩球的分數
     if (strikeIndex + 2 >= rolls.length) {
-      return 0; // 獎勵球不足
+      return null; // 獎勵球不足
     }
     
     return rolls[strikeIndex + 1] + rolls[strikeIndex + 2];
   }
   
   /// 取得Spare的獎勵分數
-  int _getSpareBonus(List<int> rolls, int spareIndex) {
+  int? _getSpareBonus(List<int> rolls, int spareIndex) {
     // 需要後一球的分數
     if (spareIndex + 2 >= rolls.length) {
-      return 0; // 獎勵球不足
+      return null; // 獎勵球不足
     }
     
     return rolls[spareIndex + 2];
@@ -223,7 +230,7 @@ class TraditionalScoringStrategy implements ScoringStrategy {
 class _FrameResult {
   final String firstBall;
   final String secondBall;
-  final int score;
+  final int? score;
   final int nextRollIndex;
   
   const _FrameResult({

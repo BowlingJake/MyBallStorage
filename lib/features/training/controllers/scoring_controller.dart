@@ -1,8 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart'; // Added for debugPrint
 
 import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_manager.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
+import 'package:bowlingarsenal_app/features/training/models/roll_record.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 
 /// 計分狀態類別
@@ -17,7 +19,7 @@ class ScoringState {
     required this.scoringManager,
   });
 
-  final List<int> rolls;
+  final List<RollRecord> rolls;
   final List<BowlingFrame> frames;
   final int currentFrameIndex;
   final int currentRollInFrame;
@@ -26,7 +28,7 @@ class ScoringState {
   final ScoringManager scoringManager;
 
   ScoringState copyWith({
-    List<int>? rolls,
+    List<RollRecord>? rolls,
     List<BowlingFrame>? frames,
     int? currentFrameIndex,
     int? currentRollInFrame,
@@ -50,7 +52,7 @@ class ScoringState {
 class ScoringController extends StateNotifier<ScoringState> {
   ScoringController({
     required String scoringMethod,
-    List<int>? initialRolls,
+    List<RollRecord>? initialRolls,
   }) : super(
           ScoringState(
             rolls: initialRolls ?? [],
@@ -68,10 +70,11 @@ class ScoringController extends StateNotifier<ScoringState> {
   /// 初始化狀態（包括載入現有資料）
   void _initializeState() {
     if (state.rolls.isNotEmpty) {
+      final pinCounts = state.rolls.map((r) => r.pinsDownCount).toList();
       // 如果有現有的投球記錄，需要重新計算當前位置
-      final advancedState = _advanceToNextInput(state.rolls);
+      final advancedState = _advanceToNextInput(pinCounts);
       final isComplete = _checkGameCompleteStatus(
-        state.rolls, 
+        pinCounts, 
         advancedState.currentFrameIndex, 
         advancedState.currentRollInFrame
       );
@@ -99,17 +102,15 @@ class ScoringController extends StateNotifier<ScoringState> {
 
   /// 更新計分表格顯示
   void _updateScoreDisplay() {
-    final newFrames = state.scoringManager.calculateScores(state.rolls);
+    final pinCounts = state.rolls.map((r) => r.pinsDownCount).toList();
+    final newFrames = state.scoringManager.calculateScores(pinCounts);
     state = state.copyWith(frames: newFrames);
   }
 
   /// 獲取最終分數
   int get finalScore {
-    if (state.frames.isEmpty) {
-      return 0;
-    }
-    // 使用 fold 來找到最大的累計分數，這比 lastWhere 更安全
-    return state.frames.fold(0, (max, frame) => frame.cumulativeScore > max ? frame.cumulativeScore : max);
+    final scores = state.frames.map((f) => f.cumulativeScore).whereType<int>();
+    return scores.isEmpty ? 0 : scores.last;
   }
 
   /// 檢查是否可以在指定格輸入
@@ -122,19 +123,59 @@ class ScoringController extends StateNotifier<ScoringState> {
     return state.isGameComplete || state.currentFrameIndex >= 10;
   }
 
+  /// 檢查是否可以編輯指定格
+  bool canEditFrame(int frameIndex) {
+    if (frameIndex < 0 || frameIndex > 9) {
+      debugPrint('[ScoringController] canEditFrame($frameIndex): Invalid frame index.');
+      return false;
+    }
+
+    final pinCounts = state.rolls.map((r) => r.pinsDownCount).toList();
+    int rollIndex = 0;
+    for (int i = 0; i < frameIndex; i++) {
+      if (i < 9) {
+        if (rollIndex < pinCounts.length && pinCounts[rollIndex] == 10) {
+          rollIndex += 1; // Strike in frames 1-9
+        } else {
+          rollIndex += 2; // Open or Spare
+        }
+      }
+    }
+    
+    final bool canEdit = rollIndex < pinCounts.length;
+    debugPrint('[ScoringController] canEditFrame($frameIndex): ${canEdit ? "Yes" : "No"}. (Rolls count: ${pinCounts.length}, required index: $rollIndex)');
+    return canEdit;
+  }
+
   /// 處理球瓶選擇結果
-  void processPinSelection(int frameIndex, int selectedPinsDown) {
+  void processPinSelection(int frameIndex, List<bool> selectedPins) {
     if (!canInputAtFrame(frameIndex)) return;
 
-    final newRolls = List<int>.from(state.rolls)..add(selectedPinsDown);
-    
+    RollRecord newRoll;
+    if (state.currentRollInFrame == 0) {
+      // It's the first roll of the frame. The selectedPins are the result of this roll.
+      newRoll = RollRecord(pinsDown: selectedPins);
+    } else {
+      // It's the second roll. We need to calculate the pins knocked down by this roll only.
+      final firstBallPinState = state.rolls.last.pinsDown;
+      final secondBallPinState = List.generate(10, (i) {
+        // A pin is considered knocked down by the second ball if it's down now,
+        // but wasn't down after the first ball.
+        return selectedPins[i] && !firstBallPinState[i];
+      });
+      newRoll = RollRecord(pinsDown: secondBallPinState);
+    }
+
+    final newRolls = List<RollRecord>.from(state.rolls)..add(newRoll);
+    final newPinCounts = newRolls.map((r) => r.pinsDownCount).toList();
+
     // 推進到下一個輸入位置
-    final advancedState = _advanceToNextInput(newRolls);
+    final advancedState = _advanceToNextInput(newPinCounts);
     
     // 計算新的分數和完成狀態
-    final newFrames = state.scoringManager.calculateScores(newRolls);
+    final newFrames = state.scoringManager.calculateScores(newPinCounts);
     final isComplete = _checkGameCompleteStatus(
-      newRolls, 
+      newPinCounts, 
       advancedState.currentFrameIndex, 
       advancedState.currentRollInFrame
     );
@@ -224,152 +265,59 @@ class ScoringController extends StateNotifier<ScoringState> {
     
     // 計算到第10格的起始位置
     while (currentFrameIdx < 9 && frame10StartIndex < rolls.length) {
-      if (currentRollIdx == 0) {
-        if (rolls[frame10StartIndex] == 10) {
-          // Strike
-          currentFrameIdx++;
-          currentRollIdx = 0;
-        } else {
-          currentRollIdx = 1;
-        }
-        frame10StartIndex++;
+      final roll = rolls[frame10StartIndex];
+      if (roll == 10) { // Strike
+        frame10StartIndex += 1;
       } else {
-        // 第二球
-        currentFrameIdx++;
-        currentRollIdx = 0;
-        frame10StartIndex++;
+        frame10StartIndex += 2;
       }
+      currentFrameIdx += 1;
+    }
+
+    if (frame10StartIndex >= rolls.length) {
+      return false; // 還沒到第10格
+    }
+
+    final frame10Rolls = rolls.sublist(frame10StartIndex);
+
+    if (frame10Rolls.isEmpty) return false;
+
+    // 第一球是Strike
+    if (frame10Rolls[0] == 10) {
+      return frame10Rolls.length >= 3;
     }
     
-    // 檢查第10格的完成狀態
-    final frame10RollsCount = rolls.length - frame10StartIndex;
-    if (frame10RollsCount < 2) {
-      return false; // 至少需要兩球
+    // 不是Strike
+    if (frame10Rolls.length >= 2) {
+      // Spare
+      if (frame10Rolls[0] + frame10Rolls[1] == 10) {
+        return frame10Rolls.length >= 3;
+      }
+      // Open
+      return frame10Rolls.length >= 2;
     }
     
-    if (frame10RollsCount >= 3) {
-      return true; // 三球已完成
-    }
-    
-    // 只有兩球，檢查是否需要第三球
-    final firstRoll = rolls[frame10StartIndex];
-    final secondRoll = rolls[frame10StartIndex + 1];
-    
-    // 如果第一球或前兩球合計為Strike/Spare，需要第三球
-    if (firstRoll == 10 || firstRoll + secondRoll == 10) {
-      return false; // 需要第三球
-    }
-    
-    return true; // 不需要第三球，遊戲完成
+    return false;
   }
-
-
-
-  /// 撤銷上一球
+  
+  /// 復原上一球
   void undoLastRoll() {
-    if (state.rolls.isNotEmpty) {
-      final newRolls = List<int>.from(state.rolls)..removeLast();
-      final advancedState = _advanceToNextInput(newRolls);
-      final newFrames = state.scoringManager.calculateScores(newRolls);
-      final isComplete = _checkGameCompleteStatus(
-        newRolls, 
-        advancedState.currentFrameIndex, 
-        advancedState.currentRollInFrame
-      );
-
-      state = state.copyWith(
-        rolls: newRolls,
-        frames: newFrames,
-        currentFrameIndex: advancedState.currentFrameIndex,
-        currentRollInFrame: advancedState.currentRollInFrame,
-        isGameComplete: isComplete,
-      );
-    }
-  }
-
-  /// 切換修改模式
-  void toggleEditMode() {
-    state = state.copyWith(isEditMode: !state.isEditMode);
-  }
-
-  /// 檢查指定格是否有數據可以修改
-  bool canEditFrame(int frameIndex) {
-    if (!state.isEditMode) return false;
-    
-    // 計算到該格的投球數
-    int rollsUpToFrame = 0;
-    for (int i = 0; i < frameIndex; i++) {
-      if (i < 9) {
-        // 第1-9格
-        if (rollsUpToFrame < state.rolls.length && state.rolls[rollsUpToFrame] == 10) {
-          rollsUpToFrame += 1; // Strike只有一球
-        } else {
-          rollsUpToFrame += 2; // 兩球
-        }
-      } else {
-        // 第10格邏輯較複雜，暫時簡化
-        break;
-      }
-    }
-    
-    // 檢查該格是否有數據：需要至少有第一球的數據
-    return rollsUpToFrame < state.rolls.length;
-  }
-
-  /// 編輯指定格的數據
-  void editFrame(int frameIndex, int newFirstBall, int? newSecondBall) {
-    // 計算該格在 _rolls 中的起始位置
-    int rollStartIndex = 0;
-    for (int i = 0; i < frameIndex; i++) {
-      if (i < 9) {
-        // 第1-9格
-        if (rollStartIndex < state.rolls.length && state.rolls[rollStartIndex] == 10) {
-          rollStartIndex += 1; // Strike只有一球
-        } else {
-          rollStartIndex += 2; // 兩球
-        }
-      } else {
-        // 第10格（暫時簡化）
-        break;
-      }
-    }
-    
-    // 確保有足夠的數據可編輯
-    if (rollStartIndex >= state.rolls.length) {
+    if (state.rolls.isEmpty) {
       return;
     }
     
-    // 取得當前格的數據
-    final currentFirstBall = state.rolls[rollStartIndex];
-    final hasSecondBall = rollStartIndex + 1 < state.rolls.length && currentFirstBall < 10;
-    
-    // 更新 _rolls 列表
-    final newRolls = List<int>.from(state.rolls);
-    newRolls[rollStartIndex] = newFirstBall;
-    
-    if (newFirstBall == 10) {
-      // Strike：移除第二球（如果存在）
-      if (hasSecondBall) {
-        newRolls.removeAt(rollStartIndex + 1);
-      }
-    } else {
-      // 不是Strike：更新或添加第二球
-      if (hasSecondBall) {
-        newRolls[rollStartIndex + 1] = newSecondBall!;
-      } else {
-        newRolls.insert(rollStartIndex + 1, newSecondBall!);
-      }
-    }
-    
-    // 重新計算分數和狀態
-    final newFrames = state.scoringManager.calculateScores(newRolls);
-    final advancedState = _advanceToNextInput(newRolls);
+    final newRolls = List<RollRecord>.from(state.rolls)..removeLast();
+    final newPinCounts = newRolls.map((r) => r.pinsDownCount).toList();
+
+    // Recalculate everything
+    final advancedState = _advanceToNextInput(newPinCounts);
+    final newFrames = state.scoringManager.calculateScores(newPinCounts);
     final isComplete = _checkGameCompleteStatus(
-      newRolls, 
+      newPinCounts, 
       advancedState.currentFrameIndex, 
       advancedState.currentRollInFrame
     );
-
+    
     state = state.copyWith(
       rolls: newRolls,
       frames: newFrames,
@@ -377,6 +325,63 @@ class ScoringController extends StateNotifier<ScoringState> {
       currentRollInFrame: advancedState.currentRollInFrame,
       isGameComplete: isComplete,
     );
+  }
+
+  /// 切換編輯模式
+  void toggleEditMode() {
+    state = state.copyWith(isEditMode: !state.isEditMode);
+    debugPrint('[ScoringController] Toggled edit mode. isEditMode is now: ${state.isEditMode}');
+  }
+
+  /// 編輯指定格的分數
+  Future<void> editFrame(int frameIndex, List<int> newRollsForFrame) async {
+    if (!state.isEditMode) return;
+    
+    debugPrint('[ScoringController] editFrame($frameIndex) called with rolls: $newRollsForFrame');
+
+    // For simplicity, we are rebuilding the entire roll history.
+    // A more optimized approach might directly manipulate the list.
+    final originalPinCounts = state.rolls.map((r) => r.pinsDownCount).toList();
+
+    List<int> newPinCounts = [];
+    int rollIndex = 0;
+
+    // Copy rolls up to the frame being edited
+    for (int i = 0; i < frameIndex; i++) {
+      if (i < 9) {
+        if (rollIndex < originalPinCounts.length && originalPinCounts[rollIndex] == 10) { // Strike
+          newPinCounts.add(originalPinCounts[rollIndex]);
+          rollIndex++;
+        } else {
+          if (rollIndex < originalPinCounts.length) newPinCounts.add(originalPinCounts[rollIndex]);
+          if (rollIndex + 1 < originalPinCounts.length) newPinCounts.add(originalPinCounts[rollIndex + 1]);
+          rollIndex += 2;
+        }
+      }
+    }
+    
+    // Add the new rolls for the edited frame
+    newPinCounts.addAll(newRollsForFrame);
+
+    // This reconstruction of RollRecord is naive. It assumes pin layout which is what we are trying to fix.
+    // However, editing is complex. For now, we accept this limitation.
+    // A proper solution requires a way to input pin details for edits too.
+    final newRolls = newPinCounts.map((count) => RollRecord(pinsDown: List.generate(10, (i) => i < count))).toList();
+
+    // Recalculate state from the new list of rolls
+    final advancedState = _advanceToNextInput(newPinCounts);
+    final newFrames = state.scoringManager.calculateScores(newPinCounts);
+    final isComplete = _checkGameCompleteStatus(newPinCounts, advancedState.currentFrameIndex, advancedState.currentRollInFrame);
+
+    state = state.copyWith(
+      rolls: newRolls,
+      frames: newFrames,
+      currentFrameIndex: advancedState.currentFrameIndex,
+      currentRollInFrame: advancedState.currentRollInFrame,
+      isGameComplete: isComplete,
+      isEditMode: false, // Exit edit mode after edit
+    );
+    debugPrint('[ScoringController] Exiting edit mode after editFrame.');
   }
 
   /// 計算全倒數
@@ -387,7 +392,7 @@ class ScoringController extends StateNotifier<ScoringState> {
     for (int i = 0; i < 9; i++) {
       if (rollIndex >= state.rolls.length) break;
       
-      if (state.rolls[rollIndex] == 10) {
+      if (state.rolls[rollIndex].pinsDownCount == 10) {
         strikes++;
         rollIndex++;
       } else {
@@ -404,8 +409,8 @@ class ScoringController extends StateNotifier<ScoringState> {
     for (int i = 0; i < 9; i++) { // 只計算前9格
       if (rollIndex + 1 >= state.rolls.length) break;
 
-      if (state.rolls[rollIndex] < 10) {
-        if (state.rolls[rollIndex] + state.rolls[rollIndex + 1] == 10) {
+      if (state.rolls[rollIndex].pinsDownCount < 10) {
+        if (state.rolls[rollIndex].pinsDownCount + state.rolls[rollIndex + 1].pinsDownCount == 10) {
           spares++;
         }
         rollIndex += 2;
@@ -420,15 +425,15 @@ class ScoringController extends StateNotifier<ScoringState> {
 
 /// 計分控制器參數
 class ScoringControllerParams {
-  const ScoringControllerParams({
+  final String scoringMethod;
+  final List<int>? initialRolls; // Kept as int for now, as it's from GameRecord
+  final String gameId;
+  
+  ScoringControllerParams({
     required this.scoringMethod,
     this.initialRolls,
-    this.gameId, // 添加遊戲ID參數
+    required this.gameId,
   });
-
-  final String scoringMethod;
-  final List<int>? initialRolls;
-  final String? gameId; // 遊戲ID，用於區分不同的遊戲
 
   @override
   bool operator ==(Object other) =>
@@ -436,20 +441,26 @@ class ScoringControllerParams {
       other is ScoringControllerParams &&
           runtimeType == other.runtimeType &&
           scoringMethod == other.scoringMethod &&
-          const ListEquality<int>().equals(initialRolls, other.initialRolls) &&
-          gameId == other.gameId; // 加入gameId的比較
+          gameId == other.gameId &&
+          const ListEquality().equals(initialRolls, other.initialRolls);
 
   @override
-  int get hashCode =>
-      scoringMethod.hashCode ^ 
-      (initialRolls != null ? const ListEquality<int>().hash(initialRolls) : 0) ^
-      (gameId != null ? gameId.hashCode : 0); // 加入gameId的哈希值
+  int get hashCode => scoringMethod.hashCode ^ gameId.hashCode ^ const ListEquality().hash(initialRolls);
 }
 
 /// Provider for ScoringController
-final scoringControllerProvider = StateNotifierProvider.family<ScoringController, ScoringState, ScoringControllerParams>(
-  (ref, params) => ScoringController(
-    scoringMethod: params.scoringMethod,
-    initialRolls: params.initialRolls,
-  ),
+final scoringControllerProvider = StateNotifierProvider.autoDispose.family<ScoringController, ScoringState, ScoringControllerParams>(
+  (ref, params) {
+    // The `initialRolls` from GameRecord is List<int>. We need to convert it to List<RollRecord>.
+    // This is a naive conversion, as we don't have the pin data. This is a known limitation
+    // when loading old games. New games will store proper data if we save it.
+    final initialRollRecords = params.initialRolls
+        ?.map((count) => RollRecord(pinsDown: List.generate(10, (i) => i < count)))
+        .toList();
+
+    return ScoringController(
+      scoringMethod: params.scoringMethod,
+      initialRolls: initialRollRecords,
+    );
+  },
 ); 

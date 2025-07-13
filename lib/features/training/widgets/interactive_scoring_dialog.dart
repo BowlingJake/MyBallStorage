@@ -11,7 +11,8 @@ import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_dialog_footer.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_dialog_header.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/components/ball_selection_section.dart';
-import 'package:bowlingarsenal_app/shared/widgets/bowling/simple_pins_down_selector.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_dialog.dart';
 import 'package:core_theme/core_theme.dart';
 
 /// 互動式計分對話框
@@ -35,11 +36,13 @@ class InteractiveScoringDialog extends ConsumerStatefulWidget {
 
 class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDialog> {
   late List<BallInfo> _selectedBalls;
+  late final PinSelectionController _pinController; // Add controller
 
   @override
   void initState() {
     super.initState();
     _selectedBalls = widget.game.ballsUsed ?? (widget.game.ballUsed != null ? [widget.game.ballUsed!] : []);
+    _pinController = PinSelectionController(); // Initialize controller
   }
   
   @override
@@ -151,13 +154,20 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
       gameId: widget.game.id,
     );
     
-    final scoringState = ref.read(scoringControllerProvider(controllerParams));
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
+    final scoringState = ref.read(scoringControllerProvider(controllerParams));
 
-    if (scoringState.isGameComplete && !scoringState.isEditMode) return;
+    debugPrint('[ScoringDialog] _onFrameTapped: Frame $frameIndex tapped. isEditMode is ${scoringState.isEditMode}');
+    
+    if (scoringState.isGameComplete && !scoringState.isEditMode) {
+       debugPrint('[ScoringDialog] Game is complete and not in edit mode. Returning.');
+      return;
+    }
     
     if (scoringState.isEditMode) {
-      if (!scoringController.canEditFrame(frameIndex)) {
+      final canEdit = scoringController.canEditFrame(frameIndex);
+      debugPrint('[ScoringDialog] In edit mode. canEditFrame($frameIndex) returned $canEdit.');
+      if (!canEdit) {
         return;
       }
       await _editFrame(context, ref, frameIndex);
@@ -165,20 +175,37 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
     }
     
     if (!scoringController.canInputAtFrame(frameIndex)) {
+      debugPrint('[ScoringDialog] Not in edit mode, and cannot input at frame $frameIndex. Returning.');
       return;
     }
 
-    final selectedPinsDown = await showDialog<int>(
+    // --- REFACTORED LOGIC FOR NORMAL SCORING ---
+    final isFirstRoll = scoringState.currentRollInFrame == 0;
+    List<bool>? initialPinStateForSecondRoll;
+
+    if (!isFirstRoll) {
+      // It's the second roll. We need to find the pin state from the first roll of this frame.
+      final rolls = scoringState.rolls;
+      if (rolls.isNotEmpty) {
+        // The last roll in the state is the first roll of the current frame.
+        final firstRollOfFrame = rolls.last;
+        initialPinStateForSecondRoll = firstRollOfFrame.pinsDown;
+      }
+    }
+    
+    final List<bool>? pinState = await showDialog<List<bool>>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => SimplePinsDownSelector(
-        maxPins: 10,
-        initialPinsDown: 0,
+      builder: (dialogContext) => PinSelectionDialog(
+        controller: _pinController,
+        isFirstRoll: isFirstRoll,
+        initialPinState: initialPinStateForSecondRoll,
       ),
     );
 
-    if (selectedPinsDown != null) {
-      scoringController.processPinSelection(frameIndex, selectedPinsDown);
+    if (pinState != null) {
+      // The controller now handles the full pin state directly.
+      scoringController.processPinSelection(frameIndex, pinState);
       HapticFeedback.lightImpact();
     }
   }
@@ -209,7 +236,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
       id: widget.game.id,
       gameNumber: widget.game.gameNumber,
       score: scoringController.finalScore,
-      frameScores: scoringState.frames.map((f) => f.cumulativeScore).toList(),
+      frameScores: scoringState.frames.map((f) => f.cumulativeScore ?? 0).toList(),
       strikes: scoringController.countStrikes(),
       spares: scoringController.countSpares(),
       notes: widget.game.notes,
@@ -239,55 +266,43 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
       gameId: widget.game.id,
     );
     
-    final scoringState = ref.read(scoringControllerProvider(controllerParams));
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
 
-    int rollStartIndex = 0;
-    for (int i = 0; i < frameIndex; i++) {
-      if (i < 9) {
-        if (rollStartIndex < scoringState.rolls.length && scoringState.rolls[rollStartIndex] == 10) {
-          rollStartIndex += 1;
-        } else {
-          rollStartIndex += 2;
-        }
-      } else {
-        break;
-      }
-    }
-    
-    if (rollStartIndex >= scoringState.rolls.length) {
-      return;
-    }
-    
-    final currentFirstBall = scoringState.rolls[rollStartIndex];
-    final hasSecondBall = rollStartIndex + 1 < scoringState.rolls.length && currentFirstBall < 10;
-    final currentSecondBall = hasSecondBall ? scoringState.rolls[rollStartIndex + 1] : 0;
-    
-    final newFirstBall = await showDialog<int>(
+    // Editing logic now simplified to just collect pin counts,
+    // as the controller's editFrame expects List<int> for now.
+
+    final List<bool>? firstBallState = await showDialog<List<bool>>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => SimplePinsDownSelector(
-        maxPins: 10,
-        initialPinsDown: currentFirstBall,
+      builder: (dialogContext) => PinSelectionDialog(
+        controller: _pinController,
+        isFirstRoll: true,
       ),
     );
 
-    if (newFirstBall == null) return;
+    if (firstBallState == null) return;
+    final int firstBallPins = firstBallState.where((p) => p).length;
 
-    int? newSecondBall;
-    if (newFirstBall < 10) {
-      newSecondBall = await showDialog<int>(
+    final List<int> newRollsForFrame = [firstBallPins];
+
+    if (firstBallPins < 10) {
+      final List<bool>? secondBallState = await showDialog<List<bool>>(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) => SimplePinsDownSelector(
-          maxPins: 10 - newFirstBall,
-          initialPinsDown: hasSecondBall ? currentSecondBall : 0,
+        builder: (dialogContext) => PinSelectionDialog(
+          controller: _pinController,
+          initialPinState: firstBallState,
+          isFirstRoll: false,
         ),
       );
       
-      if (newSecondBall == null) return;
+      if (secondBallState == null) return;
+      
+      final int totalPinsDown = secondBallState.where((p) => p).length;
+      final int secondBallPins = totalPinsDown - firstBallPins;
+      newRollsForFrame.add(secondBallPins);
     }
 
-    scoringController.editFrame(frameIndex, newFirstBall, newSecondBall);
+    await scoringController.editFrame(frameIndex, newRollsForFrame);
   }
 } 

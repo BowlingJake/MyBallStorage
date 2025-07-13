@@ -109,4 +109,7 @@ flutter:
     - family: Noto Sans TC
       fonts:
         - asset: assets/fonts/NotoSansTC-VariableFont_wght.ttf
+    - family: MyFlutterApp
+      fonts:
+        - asset: assets/fonts/standard_icon.ttf
 

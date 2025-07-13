@@ -5,13 +5,13 @@ class BowlingFrame {
   final String firstBall;
   final String secondBall;
   final String thirdBall; // 僅第10格使用
-  final int cumulativeScore;
+  final int? cumulativeScore;
   
   const BowlingFrame({
     this.firstBall = '',
     this.secondBall = '',
     this.thirdBall = '',
-    this.cumulativeScore = 0,
+    this.cumulativeScore,
   });
 }
 
@@ -174,7 +174,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
           flex: 3,
           child: Center(
             child: Text(
-              frameData.cumulativeScore > 0 ? frameData.cumulativeScore.toString() : '',
+              frameData.cumulativeScore?.toString() ?? '',
               style: glowingTextStyle.copyWith(fontSize: 22),
             ),
           ),
