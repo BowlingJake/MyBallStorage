@@ -27,10 +27,24 @@ class GameRecord {
     required this.spares,
     required this.timestamp,
     this.notes,
-    this.ballUsed, // 新增球具參數
+    this.ballUsed,     // 保留舊屬性以向後相容
+    this.ballsUsed,    // 新增: 支持多個球具
   });
 
   factory GameRecord.fromJson(Map<String, dynamic> json) {
+    // 處理多球資訊
+    List<BallInfo>? ballsUsedList;
+    if (json['ballsUsed'] != null) {
+      ballsUsedList = (json['ballsUsed'] as List)
+          .map((ballData) => BallInfo(
+                id: ballData['id'] ?? '',
+                name: ballData['name'] ?? '',
+                brand: ballData['brand'] ?? '',
+                brandColor: ballData['brandColor'] ?? '#000000',
+              ))
+          .toList();
+    }
+
     return GameRecord(
       id: json['id'] ?? '',
       gameNumber: json['gameNumber'] ?? 1,
@@ -49,8 +63,61 @@ class GameRecord {
                 brandColor: json['ballUsed']['brandColor'] ?? '#000000',
               )
               : null,
+      ballsUsed: ballsUsedList,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {
+      'id': id,
+      'gameNumber': gameNumber,
+      'score': score,
+      'frameScores': frameScores,
+      'strikes': strikes,
+      'spares': spares,
+      'timestamp': timestamp.toIso8601String(),
+    };
+    
+    if (notes != null) {
+      data['notes'] = notes;
+    }
+    
+    // 為了向後兼容，同時寫入 ballUsed 和 ballsUsed
+    if (ballsUsed != null && ballsUsed!.isNotEmpty) {
+      // 將第一個球具寫入舊的 `ballUsed` 欄位
+      data['ballUsed'] = {
+        'id': ballsUsed!.first.id,
+        'name': ballsUsed!.first.name,
+        'brand': ballsUsed!.first.brand,
+        'brandColor': ballsUsed!.first.brandColor,
+      };
+      
+      // 將所有球具寫入新的 `ballsUsed` 欄位
+      data['ballsUsed'] = ballsUsed!.map((ball) => {
+        'id': ball.id,
+        'name': ball.name,
+        'brand': ball.brand,
+        'brandColor': ball.brandColor,
+      }).toList();
+    } else if (ballUsed != null) {
+      // 如果只有舊的單一球具數據，也寫入兩個欄位
+       data['ballUsed'] = {
+        'id': ballUsed!.id,
+        'name': ballUsed!.name,
+        'brand': ballUsed!.brand,
+        'brandColor': ballUsed!.brandColor,
+      };
+      data['ballsUsed'] = [{
+        'id': ballUsed!.id,
+        'name': ballUsed!.name,
+        'brand': ballUsed!.brand,
+        'brandColor': ballUsed!.brandColor,
+      }];
+    }
+    
+    return data;
+  }
+  
   final String id;
   final int gameNumber; // 第幾局
   final int score;
@@ -59,29 +126,11 @@ class GameRecord {
   final int spares;
   final String? notes; // 備註
   final DateTime timestamp;
-  final BallInfo? ballUsed;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'gameNumber': gameNumber,
-      'score': score,
-      'frameScores': frameScores,
-      'strikes': strikes,
-      'spares': spares,
-      'notes': notes,
-      'timestamp': timestamp.toIso8601String(),
-      'ballUsed':
-          ballUsed != null
-              ? {
-                'id': ballUsed!.id,
-                'name': ballUsed!.name,
-                'brand': ballUsed!.brand,
-                'brandColor': ballUsed!.brandColor,
-              }
-              : null,
-    };
-  }
+  final BallInfo? ballUsed;    // 舊屬性，單一球具
+  final List<BallInfo>? ballsUsed; // 新屬性，支持多個球具
+  
+  // 向後相容：返回主要使用的球具
+  BallInfo? get primaryBallUsed => ballsUsed?.isNotEmpty == true ? ballsUsed!.first : ballUsed;
 }
 
 // 訓練日摘要模型
