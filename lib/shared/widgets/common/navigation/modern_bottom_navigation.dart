@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class ModernBottomNavigation extends StatelessWidget {
   const ModernBottomNavigation({
     required this.currentIndex,
-    required this.onTap,
+    required this.onTap, // This is still needed to update the index in HomePage
     super.key,
   });
   final int currentIndex;
@@ -14,6 +14,7 @@ class ModernBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // We now directly use the animated version
     return AnimatedFloatingBottomNavigation(
       currentIndex: currentIndex,
       onTap: onTap,

@@ -20,14 +20,17 @@ class BallLibraryPage extends ConsumerWidget {
   const BallLibraryPage({super.key});
 
   int _calculateCurrentIndex(String location) {
-    if (location.startsWith('/library') || location.startsWith('/my-arsenal')) {
+    if (location.startsWith('/library')) {
       return 1;
+    }
+    if (location.startsWith('/my-arsenal')) {
+      return 2; // 修正: Arsenal 頁面對應索引 2
     }
     if (location.startsWith('/training')) {
       return 3;
     }
-    if (location.startsWith('/settings')) {
-      return 4;
+    if (location.startsWith('/events')) {
+      return 4; // 修正: Events 頁面對應索引 4
     }
     return 0;
   }
@@ -109,11 +112,14 @@ class BallLibraryPage extends ConsumerWidget {
                 case 1:
                   context.go('/library');
                   break;
+                case 2:
+                  context.go('/my-arsenal');
+                  break;
                 case 3:
                   context.go('/training');
                   break;
                 case 4:
-                  context.go('/settings');
+                  context.go('/events');
                   break;
               }
             },

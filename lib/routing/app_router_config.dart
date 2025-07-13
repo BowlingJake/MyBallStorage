@@ -14,6 +14,7 @@ import 'package:bowlingarsenal_app/features/training/views/my_training_page.dart
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
+import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 
 // 1. 建立 GoRouterRefreshStream
@@ -70,6 +71,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-arsenal',
         name: 'my-arsenal',
         builder: (context, state) => const MyArsenalPage(),
+      ),
+      GoRoute(
+        path: '/events',
+        name: 'events',
+        builder: (context, state) => const EventsPage(),
       ),
       GoRoute(
         path: '/settings',

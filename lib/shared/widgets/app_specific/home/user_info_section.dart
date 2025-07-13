@@ -84,18 +84,10 @@ class UserInfoSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 10,
-            offset: const Offset(4, 4),
-          ),
-          BoxShadow(
-            color: accentColor.withOpacity(0.3),
-            blurRadius: 15,
-            spreadRadius: 2,
-          ),
-        ],
+        // **PERFORMANCE OPTIMIZATION:**
+        // Replaced expensive, large-radius shadows with a simple, clean border
+        // to improve rendering performance.
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
       ),
       child:
           userPhotoUrl != null
