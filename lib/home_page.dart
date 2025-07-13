@@ -149,10 +149,13 @@ class HomePage extends ConsumerWidget {
         topRight: Radius.circular(25),
         bottomRight: Radius.circular(25),
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+      // **PERFORMANCE OPTIMIZATION:**
+      // Replaced expensive `BackdropFilter` with a simple translucent `Container`.
+      // The `ImageFilter.blur` operation was causing significant UI jank on page load.
+      child: Container(
+        color: Colors.black.withOpacity(0.25), // 使用半透明黑色背景來模擬毛玻璃效果
         child: Drawer(
-          backgroundColor: const Color(0x33000000), // 20% 不透明度的純黑色
+          backgroundColor: Colors.transparent, // Drawer 本身設為透明
           elevation: 0,
           child: ListView(
             padding: EdgeInsets.zero,

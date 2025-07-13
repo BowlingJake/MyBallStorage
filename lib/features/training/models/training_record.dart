@@ -7,11 +7,13 @@ class BallInfo {
     required this.name,
     required this.brand,
     required this.brandColor,
+    this.imagePath,
   });
   final String id;
   final String name;
   final String brand;
   final String brandColor;
+  final String? imagePath;
 }
 
 // 單局記錄模型
@@ -41,6 +43,7 @@ class GameRecord {
                 name: ballData['name'] ?? '',
                 brand: ballData['brand'] ?? '',
                 brandColor: ballData['brandColor'] ?? '#000000',
+                imagePath: ballData['imagePath'],
               ))
           .toList();
     }
@@ -61,6 +64,7 @@ class GameRecord {
                 name: json['ballUsed']['name'] ?? '',
                 brand: json['ballUsed']['brand'] ?? '',
                 brandColor: json['ballUsed']['brandColor'] ?? '#000000',
+                imagePath: json['ballUsed']['imagePath'],
               )
               : null,
       ballsUsed: ballsUsedList,
@@ -90,6 +94,7 @@ class GameRecord {
         'name': ballsUsed!.first.name,
         'brand': ballsUsed!.first.brand,
         'brandColor': ballsUsed!.first.brandColor,
+        'imagePath': ballsUsed!.first.imagePath,
       };
       
       // 將所有球具寫入新的 `ballsUsed` 欄位
@@ -98,6 +103,7 @@ class GameRecord {
         'name': ball.name,
         'brand': ball.brand,
         'brandColor': ball.brandColor,
+        'imagePath': ball.imagePath,
       }).toList();
     } else if (ballUsed != null) {
       // 如果只有舊的單一球具數據，也寫入兩個欄位
@@ -106,12 +112,14 @@ class GameRecord {
         'name': ballUsed!.name,
         'brand': ballUsed!.brand,
         'brandColor': ballUsed!.brandColor,
+        'imagePath': ballUsed!.imagePath,
       };
       data['ballsUsed'] = [{
         'id': ballUsed!.id,
         'name': ballUsed!.name,
         'brand': ballUsed!.brand,
         'brandColor': ballUsed!.brandColor,
+        'imagePath': ballUsed!.imagePath,
       }];
     }
     

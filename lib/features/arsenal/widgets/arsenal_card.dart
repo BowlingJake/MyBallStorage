@@ -31,7 +31,7 @@ class ArsenalCard extends StatelessWidget {
                 child:
                     ball.imagePath.isNotEmpty
                         ? Image.asset(
-                          'assets/images/${ball.imagePath}', // 假設路徑相對於 assets/images
+                          ball.imagePath, // 直接使用 imagePath，因為它已包含完整路徑
                           fit: BoxFit.contain,
                           // 圖片載入失敗時的錯誤圖示
                           errorBuilder: (context, error, stackTrace) {

@@ -6,7 +6,8 @@ class ProfessionalDarkBackground extends StatelessWidget {
   const ProfessionalDarkBackground({
     required this.child,
     super.key,
-    this.backgroundImage = 'images/Sport_Tech_Background.png',
+    // 路徑現在應該是完整的，例如 'assets/images/Sport_Tech_Background.webp'
+    this.backgroundImage = 'assets/images/Sport_Tech_Background.webp',
     this.overlayColor = Colors.black,
     this.overlayOpacity = 0.6,
     this.cutoutRects,

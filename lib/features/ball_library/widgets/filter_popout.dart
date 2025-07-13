@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FilterPopout extends ConsumerStatefulWidget {
   const FilterPopout({
-    required this.filters,
+    required this.initialFilters,
+    required this.onApplyFilters,
     super.key,
   });
-  final BallFilters filters;
+  final BallFilters initialFilters;
+  final ValueChanged<BallFilters> onApplyFilters;
 
   @override
   ConsumerState<FilterPopout> createState() => _FilterPopoutState();
@@ -51,7 +53,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
   @override
   void initState() {
     super.initState();
-    _localFilters = widget.filters;
+    _localFilters = widget.initialFilters;
   }
 
   @override
@@ -167,8 +169,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // 直接使用本地狀態更新 Provider
-                                  ref.read(ballFiltersProvider.notifier).state = _localFilters;
+                                  widget.onApplyFilters(_localFilters);
                                   Navigator.of(context).pop();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -319,9 +320,10 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
 
 // 顯示篩選彈窗的函數
 void showFilterPopout(
-  BuildContext context,
-  BallFilters filters,
-) {
+  BuildContext context, {
+  required BallFilters initialFilters,
+  required ValueChanged<BallFilters> onApplyFilters,
+}) {
   showDialog(
     context: context,
     barrierColor: Colors.black.withOpacity(0.3),
@@ -329,7 +331,8 @@ void showFilterPopout(
       return Material(
         type: MaterialType.transparency,
         child: FilterPopout(
-          filters: filters,
+          initialFilters: initialFilters,
+          onApplyFilters: onApplyFilters,
         ),
       );
     },

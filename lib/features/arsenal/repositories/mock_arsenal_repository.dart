@@ -7,8 +7,10 @@ import 'package:bowlingarsenal_app/features/arsenal/repositories/arsenal_reposit
 class MockArsenalRepository implements ArsenalRepository {
   @override
   Future<List<ArsenalBall>> getUserArsenal() async {
-    // 模擬 1 秒的網路延遲
-    await Future.delayed(const Duration(seconds: 1));
+    // **PERFORMANCE OPTIMIZATION:**
+    // Removed the artificial 1-second delay. This was simulating network latency 
+    // but caused a noticeable pause in the UI during development.
+    // await Future.delayed(const Duration(seconds: 1));
     
     // 返回模擬的保齡球數據
     return [

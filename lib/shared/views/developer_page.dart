@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/section_title.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_widget.dart'; // 導入新的組件
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart'; // For BallInfo
+import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_dialog.dart';
 
 class DeveloperPage extends ConsumerWidget {
   const DeveloperPage({super.key});
@@ -21,6 +22,25 @@ class DeveloperPage extends ConsumerWidget {
           children: [
             const SectionTitle(title: 'Component Sandbox'),
             const SizedBox(height: 16),
+
+            // --- Test Area for BallSelectionDialog ---
+            ElevatedButton(
+              child: const Text('Open Ball Selection Dialog'),
+              onPressed: () async {
+                final selectedBalls = await showDialog<List<BallInfo>>(
+                  context: context,
+                  builder: (context) => const BallSelectionDialog(
+                    initialSelectedBalls: [], // Start with no balls selected
+                  ),
+                );
+                if (selectedBalls != null) {
+                  debugPrint('Selected Balls from Dialog: ${selectedBalls.map((b) => b.name).toList()}');
+                } else {
+                  debugPrint('Dialog cancelled.');
+                }
+              },
+            ),
+            const SizedBox(height: 24),
 
             // --- Test Area for BallSelectionWidget ---
             const Text(

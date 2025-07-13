@@ -10,8 +10,8 @@ import 'package:bowlingarsenal_app/features/training/models/training_record.dart
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_dialog_content.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_dialog_footer.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/components/scoring_dialog_header.dart';
+import 'package:bowlingarsenal_app/features/training/widgets/components/ball_selection_section.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/simple_pins_down_selector.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_widget.dart';
 import 'package:core_theme/core_theme.dart';
 
 /// 互動式計分對話框
@@ -105,17 +105,14 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
                           isEditMode: scoringState.isEditMode,
                           onToggleEdit: () => _onToggleEdit(context, ref),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          child: BallSelectionWidget(
-                            initialBalls: _selectedBalls,
-                            onBallsSelected: (balls) {
-                              setState(() {
-                                _selectedBalls = balls;
-                              });
-                            },
-                            accentColor: scoringColor,
-                          ),
+                        BallSelectionSection(
+                          selectedBalls: _selectedBalls,
+                          accentColor: scoringColor,
+                          onSelectionChanged: (updatedBalls) {
+                            setState(() {
+                              _selectedBalls = updatedBalls;
+                            });
+                          },
                         ),
                       ],
                     ),

@@ -989,7 +989,7 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
                       ? (_currentStep == 2 ? _saveRecord : _nextStep)
                       : () {},
               enabled: _currentStep == 0 ? _step1Valid : true,
-              isPrimary: true,
+              isPrimary: false,
               height: 40,
             ),
           ),

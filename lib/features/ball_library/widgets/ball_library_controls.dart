@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:bowlingarsenal_app/shared/widgets/search/search_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/sort_button.dart';
 import 'filter_popout.dart';
 
 class BallLibraryControls extends ConsumerWidget {
@@ -42,48 +43,23 @@ class BallLibraryControls extends ConsumerWidget {
                   icon: const Icon(Icons.filter_list),
                   label: Text(filterButtonText),
                   onPressed: () async {
-                    await showDialog<void>(
-                      context: context,
-                      builder: (context) => FilterPopout(
-                        filters: filters,
-                      ),
+                    showFilterPopout(
+                      context,
+                      initialFilters: filters,
+                      onApplyFilters: (newFilters) {
+                        ref.read(ballFiltersProvider.notifier).state = newFilters;
+                      },
                     );
                   },
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: PopupMenuButton<SortCriterion>(
-                  onSelected: (criterion) {
+                child: SortButton(
+                  sortCriterion: sortCriteria,
+                  onSortChanged: (criterion) {
                     ref.read(ballSortProvider.notifier).state = criterion;
                   },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<SortCriterion>>[
-                    const PopupMenuItem<SortCriterion>(
-                      value:
-                          SortCriterion(field: SortField.name, ascending: true),
-                      child: Text('Name (A-Z)'),
-                    ),
-                    const PopupMenuItem<SortCriterion>(
-                      value: SortCriterion(
-                          field: SortField.name, ascending: false),
-                      child: Text('Name (Z-A)'),
-                    ),
-                    const PopupMenuItem<SortCriterion>(
-                      value: SortCriterion(field: SortField.rg, ascending: true),
-                      child: Text('RG (Low-High)'),
-                    ),
-                    const PopupMenuItem<SortCriterion>(
-                      value:
-                          SortCriterion(field: SortField.rg, ascending: false),
-                      child: Text('RG (High-Low)'),
-                    ),
-                  ],
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.sort),
-                    label: Text('Sort: ${sortCriteria.displayName}'),
-                    onPressed: null, // PopupMenuButton handles tap
-                  ),
                 ),
               ),
             ],
