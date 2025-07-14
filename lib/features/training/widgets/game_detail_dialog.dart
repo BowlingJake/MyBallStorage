@@ -186,46 +186,120 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.95,
-            padding: const EdgeInsets.all(24),
+    return Material(
+      type: MaterialType.transparency,
+      child: Center(
+        child: Container(
+          width: size.width * 0.92,
+          constraints: BoxConstraints(
+            maxWidth: 500,
+            maxHeight: size.height * 0.8,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0x33000000), // 20% 不透明度的純黑色
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withOpacity(0.5),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withOpacity(0.2),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(theme),
+                    Expanded(child: _buildContent(theme)),
+                    _buildFooter(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      child: Row(
+        children: [
+          // 遊戲圖標
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.primary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: theme.colorScheme.primary.withOpacity(0.3),
               ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 標題
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Game ${widget.game.gameNumber} Details',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white),
-                    ),
-                  ],
-                ),
+            child: Icon(
+              Icons.sports_bowling,
+              color: theme.colorScheme.primary,
+              size: 20,
+            ),
+          ),
 
-                const SizedBox(height: 20),
+          const SizedBox(width: 12),
+
+          // 標題
+          Expanded(
+            child: Text(
+              'Game ${widget.game.gameNumber} Details',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          // 關閉按鈕
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Icon(
+              Icons.close,
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              size: 20,
+            ),
+            style: IconButton.styleFrom(
+              backgroundColor: theme.colorScheme.surface.withOpacity(0.1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(ThemeData theme) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
                 // 分數總覽
                 Container(
@@ -233,6 +307,9 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withOpacity(0.3),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -468,6 +545,47 @@ class _GameDetailDialogState extends State<GameDetailDialog> {
           style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
         ),
       ],
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      child: _isEditingNotes 
+        ? Row(
+            children: [
+              Expanded(
+                child: AppStandardButton(
+                  text: 'Cancel',
+                  icon: Icons.cancel,
+                  onPressed: () {
+                    setState(() {
+                      _isEditingNotes = false;
+                      _notesController.text = widget.game.notes ?? '';
+                    });
+                  },
+                  height: 40,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppStandardButton(
+                  text: 'Save Notes',
+                  icon: Icons.save,
+                  onPressed: _saveNotes,
+                  isPrimary: false,
+                  height: 40,
+                ),
+              ),
+            ],
+          )
+        : AppStandardButton(
+            text: 'Close',
+            icon: Icons.close,
+            onPressed: () => Navigator.of(context).pop(),
+            width: double.infinity,
+            height: 40,
+          ),
     );
   }
 }

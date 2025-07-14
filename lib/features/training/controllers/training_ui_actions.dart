@@ -40,10 +40,10 @@ class TrainingUIActions {
     final record = state.getTrainingDay(dayId);
     if (record == null) return;
 
-    showCreateTrainingRecordDialog(
+    showEditTrainingRecordDialog(
       context,
-      initialData: record,
-      onRecordCreated: (formState) async {
+      summary: record,
+      onRecordUpdated: (formState) async {
         final controller = ref.read(trainingControllerProvider.notifier);
         await controller.updateTrainingRecord(
           dayId,
