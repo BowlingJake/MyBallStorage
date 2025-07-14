@@ -1,24 +1,24 @@
+import 'package:bowlingarsenal_app/features/training/controllers/training_form_controller.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_form_state.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/shared/input_method_card.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/shared/option_toggle_button.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/shared/step_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Step3ScoringSetup extends StatelessWidget {
+class Step3ScoringSetup extends ConsumerWidget {
   const Step3ScoringSetup({
     super.key,
-    required this.selectedInputMethod,
-    required this.selectedScoringMethod,
-    required this.onInputMethodChanged,
-    required this.onScoringMethodChanged,
+    this.initialData,
   });
 
-  final String selectedInputMethod;
-  final String selectedScoringMethod;
-  final ValueChanged<String> onInputMethodChanged;
-  final ValueChanged<String> onScoringMethodChanged;
+  final TrainingDaySummary? initialData;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formState = ref.watch(trainingFormProvider(initialData));
+    final formNotifier = ref.read(trainingFormProvider(initialData).notifier);
     final theme = Theme.of(context);
 
     return Column(
@@ -31,9 +31,9 @@ class Step3ScoringSetup extends StatelessWidget {
           subtitle: 'Choose your input method and scoring system',
         ),
         const SizedBox(height: 16),
-        _buildInputMethodSelector(),
+        _buildInputMethodSelector(formState, formNotifier),
         const SizedBox(height: 16),
-        _buildScoringSystemSelector(),
+        _buildScoringSystemSelector(formState, formNotifier),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(10),
@@ -49,15 +49,14 @@ class Step3ScoringSetup extends StatelessWidget {
               Icon(
                 Icons.lightbulb_outline,
                 color: theme.colorScheme.primary,
-                size: 14,
+                size: 16,
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Advanced scoring provides more detailed statistics',
+                  'You can change these settings later in the app',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontSize: 11,
+                    color: theme.colorScheme.onSurface.withOpacity(0.8),
                   ),
                 ),
               ),
@@ -69,7 +68,9 @@ class Step3ScoringSetup extends StatelessWidget {
     );
   }
 
-  Widget _buildInputMethodSelector() {
+  Widget _buildInputMethodSelector(
+      TrainingFormState formState, 
+      dynamic formNotifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -77,23 +78,23 @@ class Step3ScoringSetup extends StatelessWidget {
           children: [
             Expanded(
               child: InputMethodCard(
-                title: 'Simple',
-                subtitle: 'Only input total score',
-                description: 'Quick basic recording',
+                title: 'Quick Entry',
+                subtitle: 'Just total pins',
+                description: 'Fast entry for total pins only',
                 icon: Icons.speed,
-                isSelected: selectedInputMethod == 'simple',
-                onTap: () => onInputMethodChanged('simple'),
+                isSelected: formState.selectedInputMethod == 'quick',
+                onTap: () => formNotifier.updateInputMethod('quick'),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Expanded(
               child: InputMethodCard(
-                title: 'Advanced',
-                subtitle: 'Frame-by-frame input',
-                description: 'Complete statistics',
-                icon: Icons.grid_on,
-                isSelected: selectedInputMethod == 'advanced',
-                onTap: () => onInputMethodChanged('advanced'),
+                title: 'Pin by Pin',
+                subtitle: 'Detailed tracking',
+                description: 'Track each pin for detailed analysis',
+                icon: Icons.sports,
+                isSelected: formState.selectedInputMethod == 'detailed',
+                onTap: () => formNotifier.updateInputMethod('detailed'),
               ),
             ),
           ],
@@ -102,7 +103,9 @@ class Step3ScoringSetup extends StatelessWidget {
     );
   }
 
-  Widget _buildScoringSystemSelector() {
+  Widget _buildScoringSystemSelector(
+      TrainingFormState formState, 
+      dynamic formNotifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -111,16 +114,16 @@ class Step3ScoringSetup extends StatelessWidget {
             Expanded(
               child: OptionToggleButton(
                 text: 'Traditional',
-                isSelected: selectedScoringMethod == 'traditional',
-                onTap: () => onScoringMethodChanged('traditional'),
+                isSelected: formState.selectedScoringMethod == 'traditional',
+                onTap: () => formNotifier.updateScoringMethod('traditional'),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Expanded(
               child: OptionToggleButton(
                 text: 'Current',
-                isSelected: selectedScoringMethod == 'current',
-                onTap: () => onScoringMethodChanged('current'),
+                isSelected: formState.selectedScoringMethod == 'current',
+                onTap: () => formNotifier.updateScoringMethod('current'),
               ),
             ),
           ],

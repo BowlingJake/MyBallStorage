@@ -1,25 +1,26 @@
+import 'package:bowlingarsenal_app/features/training/controllers/training_form_controller.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_form_state.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/shared/compact_text_field.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/shared/step_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Step1SessionDetails extends StatelessWidget {
+class Step1SessionDetails extends ConsumerWidget {
   const Step1SessionDetails({
     super.key,
-    required this.titleController,
-    required this.centerNameController,
-    required this.selectedDate,
     required this.onDateSelected,
-    required this.onValidate,
+    this.initialData,
   });
 
-  final TextEditingController titleController;
-  final TextEditingController centerNameController;
-  final DateTime selectedDate;
   final VoidCallback onDateSelected;
-  final Function(String) onValidate;
+  final TrainingDaySummary? initialData;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formState = ref.watch(trainingFormProvider(initialData));
+    final formNotifier = ref.read(trainingFormProvider(initialData).notifier);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,20 +39,22 @@ class Step1SessionDetails extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: CompactTextField(
-                controller: titleController,
+              child: _CompactTextField(
+                key: ValueKey(formState.title),
+                initialValue: formState.title,
                 label: 'Session Title',
                 icon: Icons.title,
-                onChanged: onValidate,
+                onChanged: (value) => formNotifier.updateTitle(value),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: CompactTextField(
-                controller: centerNameController,
+              child: _CompactTextField(
+                key: ValueKey(formState.centerName),
+                initialValue: formState.centerName,
                 label: 'Bowling Center',
                 icon: Icons.location_on,
-                onChanged: onValidate,
+                onChanged: (value) => formNotifier.updateCenterName(value),
               ),
             ),
           ],
@@ -59,22 +62,21 @@ class Step1SessionDetails extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // 日期選擇
-        _buildDateSelector(context),
+        // 日期選擇器
+        _buildDateSelector(context, formState),
 
         const Spacer(),
       ],
     );
   }
 
-  Widget _buildDateSelector(BuildContext context) {
+  Widget _buildDateSelector(BuildContext context, TrainingFormState formState) {
     final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: onDateSelected,
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8),
+        height: 50,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
@@ -82,36 +84,75 @@ class Step1SessionDetails extends StatelessWidget {
         ),
         child: Row(
           children: [
+            const SizedBox(width: 12),
             Icon(
               Icons.calendar_today,
               color: theme.colorScheme.primary.withOpacity(0.7),
               size: 18,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Training Date',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.primary.withOpacity(0.8),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${selectedDate.year}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.day.toString().padLeft(2, '0')}',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
+            const SizedBox(width: 8),
+            Text(
+              'Date: ${_formatDate(formState.date ?? DateTime.now())}',
+              style: theme.textTheme.bodyMedium,
             ),
+            const Spacer(),
             Icon(
               Icons.arrow_drop_down,
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-              size: 20,
+              color: theme.colorScheme.primary.withOpacity(0.7),
             ),
+            const SizedBox(width: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+}
+
+// 自訂 CompactTextField 組件，支援 initialValue 而不是 controller
+class _CompactTextField extends StatelessWidget {
+  const _CompactTextField({
+    super.key,
+    required this.initialValue,
+    required this.label,
+    required this.icon,
+    this.onChanged,
+  });
+
+  final String initialValue;
+  final String label;
+  final IconData icon;
+  final void Function(String)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+        color: theme.colorScheme.surface.withOpacity(0.1),
+      ),
+      child: TextFormField(
+        initialValue: initialValue,
+        style: theme.textTheme.bodyMedium,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(
+            icon,
+            color: theme.colorScheme.primary.withOpacity(0.7),
+            size: 18,
+          ),
+          labelStyle: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.primary.withOpacity(0.8),
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         ),
       ),
     );

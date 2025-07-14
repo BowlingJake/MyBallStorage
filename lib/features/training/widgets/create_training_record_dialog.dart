@@ -1,61 +1,66 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:bowlingarsenal_app/features/training/controllers/training_form_controller.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_form_state.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/step_1_session_details.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/step_2_oil_pattern.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_session/step_3_scoring_setup.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
-import 'package:flutter/material.dart';
+
+typedef OnRecordCreatedCallback = void Function(TrainingFormState record);
+
+void showCreateTrainingRecordDialog(
+  BuildContext context, {
+  TrainingDaySummary? initialData,
+  required OnRecordCreatedCallback onRecordCreated,
+}) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.05), // 極淺的背景遮罩
+    builder: (BuildContext context) {
+      return CreateTrainingRecordDialog(
+        initialData: initialData,
+        onRecordCreated: onRecordCreated,
+      );
+    },
+  );
+}
 
 // 重構的新增訓練記錄彈窗 - 遵循APP標準視覺風格
-class CreateTrainingRecordDialog extends StatefulWidget {
-  const CreateTrainingRecordDialog({super.key, this.onRecordCreated});
-  final Function(
-    String title,
-    DateTime date,
-    String center,
-    String? oilPatternName,
-    String? oilPatternLength,
-    bool isHousePattern,
-    String scoringMethod,
-    String inputMethod,
-  )?
-  onRecordCreated;
+class CreateTrainingRecordDialog extends ConsumerStatefulWidget {
+  const CreateTrainingRecordDialog({
+    super.key, 
+    this.initialData,
+    required this.onRecordCreated,
+  });
+  
+  final TrainingDaySummary? initialData;
+  final OnRecordCreatedCallback onRecordCreated;
 
   @override
-  State<CreateTrainingRecordDialog> createState() =>
+  ConsumerState<CreateTrainingRecordDialog> createState() =>
       _CreateTrainingRecordDialogState();
 }
 
-class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
+class _CreateTrainingRecordDialogState extends ConsumerState<CreateTrainingRecordDialog>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
-  // 表單控制器
-  final _titleController = TextEditingController();
-  final _centerNameController = TextEditingController();
-  final _oilPatternNameController = TextEditingController();
-  final _oilPatternLengthController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
-  bool _isHousePattern = true;
-  String _selectedScoringMethod = 'traditional';
-  String _selectedInputMethod = 'simple'; // 新增：輸入方式
-
   // 3步表單流程狀態
-  int _currentStep = 0;
   final PageController _pageController = PageController();
 
   // 動畫控制器
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
-  // 表單驗證狀態
-  bool _step1Valid = false;
-
   @override
   void initState() {
     super.initState();
     _initAnimations();
-    _validateStep1();
   }
 
   void _initAnimations() {
@@ -73,28 +78,19 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _centerNameController.dispose();
-    _oilPatternNameController.dispose();
-    _oilPatternLengthController.dispose();
     _pageController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
 
-  void _validateStep1() {
-    setState(() {
-      _step1Valid =
-          _titleController.text.isNotEmpty &&
-          _centerNameController.text.isNotEmpty;
-    });
-  }
-
   Future<void> _selectDate(BuildContext context) async {
+    final state = ref.read(trainingFormProvider(widget.initialData));
+    final notifier = ref.read(trainingFormProvider(widget.initialData).notifier);
     final theme = Theme.of(context);
+    
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: state.date ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -109,39 +105,8 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         );
       },
     );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  void _nextStep() {
-    if (_currentStep == 0 && !_step1Valid) {
-      _showValidationMessage('Please enter session title and bowling center');
-      return;
-    }
-
-    if (_currentStep < 2) {
-      setState(() {
-        _currentStep++;
-      });
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void _previousStep() {
-    if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+    if (picked != null) {
+      notifier.updateDate(picked);
     }
   }
 
@@ -154,44 +119,6 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
-  }
-
-  void _saveRecord() {
-    if (_formKey.currentState!.validate()) {
-      widget.onRecordCreated?.call(
-        _titleController.text,
-        _selectedDate,
-        _centerNameController.text,
-        _oilPatternNameController.text.isEmpty
-            ? null
-            : _oilPatternNameController.text,
-        _oilPatternLengthController.text.isEmpty
-            ? null
-            : _oilPatternLengthController.text,
-        _isHousePattern,
-        _selectedScoringMethod,
-        _selectedInputMethod, // 新增參數
-      );
-
-      Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Text('Training session created successfully!'),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-      );
-    }
   }
 
   @override
@@ -290,19 +217,24 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'New Training Session', // 恢復原始標題
+                  widget.initialData != null ? 'Edit Training Session' : 'New Training Session', // 恢復原始標題
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     // 顏色由主題自動決定
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  _getStepTitle(),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final state = ref.watch(trainingFormProvider(widget.initialData));
+                    return Text(
+                      _getStepTitle(state.currentStep),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -330,8 +262,8 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
     );
   }
 
-  String _getStepTitle() {
-    switch (_currentStep) {
+  String _getStepTitle(int currentStep) {
+    switch (currentStep) {
       case 0:
         return 'Session & Location Details';
       case 1:
@@ -348,24 +280,29 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        children: [
-          for (int i = 0; i < 3; i++) ...[
-            Expanded(
-              child: Container(
-                height: 3,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2),
-                  color:
-                      i <= _currentStep
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface.withOpacity(0.2),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(trainingFormProvider(widget.initialData));
+          return Row(
+            children: [
+              for (int i = 0; i < 3; i++) ...[
+                Expanded(
+                  child: Container(
+                    height: 3,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      color:
+                          i <= state.currentStep
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface.withOpacity(0.2),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            if (i < 2) const SizedBox(width: 8),
-          ],
-        ],
+                if (i < 2) const SizedBox(width: 8),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -380,35 +317,14 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
           physics: const NeverScrollableScrollPhysics(),
           children: [
             Step1SessionDetails(
-              titleController: _titleController,
-              centerNameController: _centerNameController,
-              selectedDate: _selectedDate,
               onDateSelected: () => _selectDate(context),
-              onValidate: (_) => _validateStep1(),
+              initialData: widget.initialData,
             ),
             Step2OilPattern(
-              isHousePattern: _isHousePattern,
-              onPatternTypeChanged: (isHouse) {
-                setState(() {
-                  _isHousePattern = isHouse;
-                });
-              },
-              oilPatternNameController: _oilPatternNameController,
-              oilPatternLengthController: _oilPatternLengthController,
+              initialData: widget.initialData,
             ),
             Step3ScoringSetup(
-              selectedInputMethod: _selectedInputMethod,
-              onInputMethodChanged: (method) {
-                setState(() {
-                  _selectedInputMethod = method;
-                });
-              },
-              selectedScoringMethod: _selectedScoringMethod,
-              onScoringMethodChanged: (method) {
-                setState(() {
-                  _selectedScoringMethod = method;
-                });
-              },
+              initialData: widget.initialData,
             ),
           ],
         ),
@@ -419,61 +335,99 @@ class _CreateTrainingRecordDialogState extends State<CreateTrainingRecordDialog>
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-      child: Row(
-        children: [
-          // 上一步按鈕
-          if (_currentStep > 0) ...[
-            Expanded(
-              child: AppStandardButton(
-                text: 'Previous',
-                icon: Icons.arrow_back,
-                onPressed: _previousStep,
-                height: 40,
-              ),
-            ),
-            const SizedBox(width: 12),
-          ],
+      child: Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(trainingFormProvider(widget.initialData));
+          final notifier = ref.read(trainingFormProvider(widget.initialData).notifier);
+          return Row(
+            children: [
+              // 上一步按鈕
+              if (state.currentStep > 0) ...[
+                Expanded(
+                  child: AppStandardButton(
+                    text: 'Previous',
+                    icon: Icons.arrow_back,
+                    onPressed: () {
+                      if (state.currentStep > 0) {
+                        notifier.previousStep();
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    },
+                    height: 40,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
 
-          // 下一步/完成按鈕
-          Expanded(
-            child: AppStandardButton(
-              text: _currentStep == 2 ? 'Create Session' : 'Next',
-              icon: _currentStep == 2 ? Icons.check : Icons.arrow_forward,
-              onPressed:
-                  (_currentStep == 0 ? _step1Valid : true)
-                      ? (_currentStep == 2 ? _saveRecord : _nextStep)
-                      : () {},
-              enabled: _currentStep == 0 ? _step1Valid : true,
-              isPrimary: false,
-              height: 40,
-            ),
-          ),
-        ],
+              // 下一步/完成按鈕
+              Expanded(
+                child: AppStandardButton(
+                  text: state.currentStep == 2 ? 'Create Session' : 'Next',
+                  icon: state.currentStep == 2 ? Icons.check : Icons.arrow_forward,
+                  onPressed:
+                      (state.currentStep == 0 ? state.isStep1Valid : true)
+                          ? (state.currentStep == 2 
+                              ? () {
+                                  if (_formKey.currentState!.validate()) {
+                                    final result = notifier.submit();
+                                    if (result != null) {
+                                      widget.onRecordCreated(result);
+                                      Navigator.of(context).pop();
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Row(
+                                            children: [
+                                              Icon(Icons.check_circle, color: Colors.white),
+                                              SizedBox(width: 12),
+                                              Text('Training session created successfully!'),
+                                            ],
+                                          ),
+                                          backgroundColor: Theme.of(context).colorScheme.primary,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                }
+                              : () {
+                                  if (state.currentStep == 0 && !state.isStep1Valid) {
+                                    _showValidationMessage('Please enter session title and bowling center');
+                                    return;
+                                  }
+
+                                  if (state.currentStep < 2) {
+                                    notifier.nextStep();
+                                    _pageController.nextPage(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  }
+                                })
+                          : () {},
+                  enabled: state.currentStep == 0 ? state.isStep1Valid : true,
+                  isPrimary: false,
+                  height: 40,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-// 顯示新增訓練記錄彈窗的輔助函數
-void showCreateTrainingRecordDialog(
-  BuildContext context,
-  Function(
-    String title,
-    DateTime date,
-    String center,
-    String? oilPatternName,
-    String? oilPatternLength,
-    bool isHousePattern,
-    String scoringMethod,
-    String inputMethod,
-  )?
-  onRecordCreated,
-) {
-  showDialog(
-    context: context,
-    barrierColor: Colors.black.withOpacity(0.05), // 極淺的背景遮罩
-    builder: (BuildContext context) {
-      return CreateTrainingRecordDialog(onRecordCreated: onRecordCreated);
-    },
-  );
-}
+
+
+
+
+
+
+

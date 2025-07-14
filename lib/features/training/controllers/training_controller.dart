@@ -1,31 +1,97 @@
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/services/training_data_service.dart';
 import 'package:bowlingarsenal_app/utils/game_generator.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final trainingControllerProvider = ChangeNotifierProvider(
-  (ref) => TrainingController(),
+/// 訓練狀態類 - 使用不可變模式
+class TrainingState {
+  final List<TrainingDaySummary> trainingDays;
+  final bool isSelectionMode;
+  final Set<String> selectedDayIds;
+
+  const TrainingState({
+    required this.trainingDays,
+    this.isSelectionMode = false,
+    Set<String>? selectedDayIds,
+  }) : selectedDayIds = selectedDayIds ?? const {};
+
+  // 建立不可變狀態複本
+  TrainingState copyWith({
+    List<TrainingDaySummary>? trainingDays,
+    bool? isSelectionMode,
+    Set<String>? selectedDayIds,
+  }) {
+    return TrainingState(
+      trainingDays: trainingDays ?? this.trainingDays,
+      isSelectionMode: isSelectionMode ?? this.isSelectionMode,
+      selectedDayIds: selectedDayIds ?? Set.of(this.selectedDayIds),
+    );
+  }
+
+  // 計算屬性
+  bool get hasTrainingData => trainingDays.isNotEmpty;
+  int get selectedCount => selectedDayIds.length;
+  int get totalSelectedGames => _calculateTotalSelectedGames();
+
+  int _calculateTotalSelectedGames() {
+    int totalGames = 0;
+    for (final day in trainingDays) {
+      if (selectedDayIds.contains(day.id)) {
+        totalGames += day.totalGames;
+      }
+    }
+    return totalGames;
+  }
+
+  // 檢查是否選中某個訓練日
+  bool isDaySelected(String dayId) => selectedDayIds.contains(dayId);
+
+  // 獲取選中訓練日的統計資訊
+  Map<String, int> getSelectionStats() {
+    return {
+      'days': selectedDayIds.length,
+      'games': totalSelectedGames,
+    };
+  }
+
+  // 獲取指定訓練日
+  TrainingDaySummary? getTrainingDay(String dayId) {
+    return trainingDays.cast<TrainingDaySummary?>().firstWhere(
+          (day) => day?.id == dayId,
+          orElse: () => null,
+        );
+  }
+
+  // 獲取指定訓練日的遊戲數量
+  int getGameCount(String dayId) {
+    final day = getTrainingDay(dayId);
+    return day?.totalGames ?? 0;
+  }
+}
+
+/// 提供 TrainingDataService 的 Provider
+final trainingDataServiceProvider = Provider<TrainingDataService>((ref) {
+  return TrainingDataService();
+});
+
+/// 提供 TrainingController 的 Provider
+final trainingControllerProvider = NotifierProvider<TrainingController, TrainingState>(
+  () => TrainingController(),
 );
 
 /// 訓練頁面控制器
 /// 專注於訓練數據相關的業務邏輯和狀態管理
-class TrainingController extends ChangeNotifier {
-  final TrainingDataService _dataService = TrainingDataService();
+class TrainingController extends Notifier<TrainingState> {
+  late final TrainingDataService _dataService;
 
-  // 選擇模式狀態
-  bool _isSelectionMode = false;
-  final Set<String> _selectedDayIds = {};
-
-  // Getters
-  List<TrainingDaySummary> get trainingDays => _dataService.trainingDays;
-  bool get hasTrainingData => _dataService.hasTrainingData;
-  bool get isSelectionMode => _isSelectionMode;
-  Set<String> get selectedDayIds => Set.unmodifiable(_selectedDayIds);
-  int get selectedCount => _selectedDayIds.length;
-  int get totalSelectedGames => _selectedDayIds
-      .map((id) => _dataService.getTrainingDay(id)?.totalGames ?? 0)
-      .fold(0, (a, b) => a + b);
+  @override
+  TrainingState build() {
+    _dataService = ref.watch(trainingDataServiceProvider);
+    return TrainingState(
+      trainingDays: _dataService.trainingDays,
+      isSelectionMode: false,
+    );
+  }
 
   /// 創建新的訓練記錄
   Future<String> createTrainingRecord({
@@ -51,7 +117,9 @@ class TrainingController extends ChangeNotifier {
       scoringMethod: scoringMethod,
       inputMethod: inputMethod,
     );
-    notifyListeners();
+    
+    // 更新狀態
+    state = state.copyWith(trainingDays: _dataService.trainingDays);
     return id;
   }
 
@@ -81,7 +149,10 @@ class TrainingController extends ChangeNotifier {
       scoringMethod: scoringMethod,
       inputMethod: inputMethod,
     );
-    if (success) notifyListeners();
+    
+    if (success) {
+      state = state.copyWith(trainingDays: _dataService.trainingDays);
+    }
     return success;
   }
 
@@ -92,59 +163,74 @@ class TrainingController extends ChangeNotifier {
 
     final success = _dataService.deleteTrainingDay(dayId);
     if (success) {
-      _selectedDayIds.remove(dayId);
-      notifyListeners();
+      final newSelectedDayIds = Set<String>.from(state.selectedDayIds);
+      newSelectedDayIds.remove(dayId);
+      
+      state = state.copyWith(
+        trainingDays: _dataService.trainingDays,
+        selectedDayIds: newSelectedDayIds,
+      );
     }
     return success;
   }
 
   /// 切換選擇模式
   void toggleSelectionMode() {
-    _isSelectionMode = !_isSelectionMode;
-    if (!_isSelectionMode) {
-      _selectedDayIds.clear();
+    final newIsSelectionMode = !state.isSelectionMode;
+    
+    if (!newIsSelectionMode) {
+      state = state.copyWith(
+        isSelectionMode: false,
+        selectedDayIds: {},
+      );
+    } else {
+      state = state.copyWith(isSelectionMode: true);
     }
-    notifyListeners();
   }
 
   /// 切換日選擇狀態
   void toggleDaySelection(String dayId) {
-    if (!_isSelectionMode) return;
+    if (!state.isSelectionMode) return;
 
-    if (_selectedDayIds.contains(dayId)) {
-      _selectedDayIds.remove(dayId);
+    final newSelectedDayIds = Set<String>.from(state.selectedDayIds);
+    
+    if (newSelectedDayIds.contains(dayId)) {
+      newSelectedDayIds.remove(dayId);
     } else {
-      _selectedDayIds.add(dayId);
+      newSelectedDayIds.add(dayId);
     }
-    notifyListeners();
+    
+    state = state.copyWith(selectedDayIds: newSelectedDayIds);
   }
 
   /// 全選所有訓練日
   void selectAllDays() {
-    if (!_isSelectionMode) return;
+    if (!state.isSelectionMode) return;
 
-    _selectedDayIds.clear();
-    _selectedDayIds.addAll(trainingDays.map((day) => day.id));
-    notifyListeners();
+    final allDayIds = state.trainingDays.map((day) => day.id).toSet();
+    state = state.copyWith(selectedDayIds: allDayIds);
   }
 
   /// 清除所有選擇
   void clearAllSelections() {
-    _selectedDayIds.clear();
-    notifyListeners();
+    state = state.copyWith(selectedDayIds: {});
   }
 
   /// 刪除選中的訓練日
   Future<int> deleteSelectedDays() async {
-    if (!_isSelectionMode || _selectedDayIds.isEmpty) return 0;
+    if (!state.isSelectionMode || state.selectedDayIds.isEmpty) return 0;
 
     // 模擬網路延遲
     await Future.delayed(Duration.zero);
 
-    final deletedCount = _dataService.deleteTrainingDays(_selectedDayIds);
-    _selectedDayIds.clear();
-    _isSelectionMode = false;
-    notifyListeners();
+    final deletedCount = _dataService.deleteTrainingDays(state.selectedDayIds);
+    
+    state = state.copyWith(
+      trainingDays: _dataService.trainingDays,
+      isSelectionMode: false,
+      selectedDayIds: {},
+    );
+    
     return deletedCount;
   }
 
@@ -157,7 +243,10 @@ class TrainingController extends ChangeNotifier {
     final newGame = GameGenerator.createDefaultGame(dayId, nextGameNumber);
 
     final success = _dataService.addGameToDay(dayId, newGame);
-    if (success) notifyListeners();
+    
+    if (success) {
+      state = state.copyWith(trainingDays: _dataService.trainingDays);
+    }
     return success;
   }
 
@@ -167,7 +256,10 @@ class TrainingController extends ChangeNotifier {
     await Future.delayed(Duration.zero);
 
     final success = _dataService.addGameToDay(dayId, game);
-    if (success) notifyListeners();
+    
+    if (success) {
+      state = state.copyWith(trainingDays: _dataService.trainingDays);
+    }
     return success;
   }
 
@@ -177,7 +269,10 @@ class TrainingController extends ChangeNotifier {
     await Future.delayed(Duration.zero);
 
     final success = _dataService.updateGameInDay(dayId, updatedGame);
-    if (success) notifyListeners();
+    
+    if (success) {
+      state = state.copyWith(trainingDays: _dataService.trainingDays);
+    }
     return success;
   }
 
@@ -187,38 +282,10 @@ class TrainingController extends ChangeNotifier {
     await Future.delayed(Duration.zero);
 
     final success = _dataService.removeGameFromDay(gameToRemove);
-    if (success) notifyListeners();
-    return success;
-  }
-
-  /// 獲取指定訓練日
-  TrainingDaySummary? getTrainingDay(String dayId) {
-    return _dataService.getTrainingDay(dayId);
-  }
-
-  /// 獲取指定訓練日的遊戲數量
-  int getGameCount(String dayId) {
-    final day = _dataService.getTrainingDay(dayId);
-    return day?.totalGames ?? 0;
-  }
-
-  /// 檢查是否選中某個訓練日
-  bool isDaySelected(String dayId) {
-    return _selectedDayIds.contains(dayId);
-  }
-
-  /// 獲取選中訓練日的統計資訊
-  Map<String, int> getSelectionStats() {
-    final totalDays = _selectedDayIds.length;
-    var totalGames = 0;
-
-    for (final dayId in _selectedDayIds) {
-      final day = _dataService.getTrainingDay(dayId);
-      if (day != null) {
-        totalGames += day.totalGames;
-      }
+    
+    if (success) {
+      state = state.copyWith(trainingDays: _dataService.trainingDays);
     }
-
-    return {'days': totalDays, 'games': totalGames};
+    return success;
   }
 }
