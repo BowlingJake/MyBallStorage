@@ -2,7 +2,7 @@ import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.d
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
-class PinSelectionDialog extends StatelessWidget {
+class PinSelectionDialog extends StatefulWidget {
   final PinSelectionController controller;
   final List<bool>? initialPinState; // Add initial state parameter
   final bool isFirstRoll; // Add this parameter
@@ -13,6 +13,20 @@ class PinSelectionDialog extends StatelessWidget {
     this.initialPinState,
     this.isFirstRoll = true, // Default to true
   });
+
+  @override
+  State<PinSelectionDialog> createState() => _PinSelectionDialogState();
+}
+
+class _PinSelectionDialogState extends State<PinSelectionDialog> {
+  late final List<bool>? _originalInitialState;
+
+  @override
+  void initState() {
+    super.initState();
+    // 儲存原始的初始狀態
+    _originalInitialState = widget.initialPinState?.toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +52,11 @@ class PinSelectionDialog extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
+
                 const SizedBox(height: 24),
                 PinSelectionWidget(
-                  controller: controller,
-                  initialPinState: initialPinState, // Pass it down
+                  controller: widget.controller,
+                  initialPinState: widget.initialPinState, // Pass it down
                 ),
                 const SizedBox(height: 24),
                 // 2x2 Button Grid
@@ -50,15 +65,15 @@ class PinSelectionDialog extends StatelessWidget {
                   children: [
                     AppStandardButton(
                       text: 'Left 10',
-                      onPressed: () => controller.leave(10),
+                      onPressed: () => widget.controller.leave(10),
                       width: 120,
-                      enabled: isFirstRoll, // Control enabled state
+                      enabled: widget.isFirstRoll, // Control enabled state
                     ),
                     AppStandardButton(
                       text: 'Left 7',
-                      onPressed: () => controller.leave(7),
+                      onPressed: () => widget.controller.leave(7),
                       width: 120,
-                      enabled: isFirstRoll, // Control enabled state
+                      enabled: widget.isFirstRoll, // Control enabled state
                     ),
                   ],
                 ),
@@ -68,40 +83,53 @@ class PinSelectionDialog extends StatelessWidget {
                   children: [
                     AppStandardButton(
                       text: 'Strike',
-                      onPressed: () => controller.strike(),
+                      onPressed: () => widget.controller.strike(),
                       width: 120,
-                      enabled: isFirstRoll, // Control enabled state
+                      enabled: widget.isFirstRoll, // Control enabled state
                     ),
                     AppStandardButton(
                       text: 'Spare',
-                      onPressed: () => controller.spare(),
+                      onPressed: () => widget.controller.spare(),
                       width: 120,
-                      enabled: !isFirstRoll, // Control enabled state
+                      enabled: !widget.isFirstRoll, // Control enabled state
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Reset',
-                        onPressed: () => controller.clear(),
+                                  Row(
+                    children: [
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Reset',
+                          onPressed: () => widget.controller.clear(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Save',
-                        isPrimary: true,
-                        onPressed: () {
-                          // Return the state when popping
-                          Navigator.of(context).pop(controller.pinState);
-                        },
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Save',
+                          isPrimary: true,
+                          onPressed: () {
+                            // 對於第二球，只返回本球新擊倒的瓶
+                            List<bool> resultPinState;
+                            if (widget.isFirstRoll || _originalInitialState == null) {
+                              // 第一球：返回完整狀態
+                              resultPinState = widget.controller.pinState;
+                            } else {
+                              // 第二球：只返回本球新擊倒的瓶
+                              final currentState = widget.controller.pinState;
+                              final originalInitialState = _originalInitialState!;
+                              resultPinState = List.generate(10, (i) {
+                                // 如果這個瓶現在倒了，但初始狀態時沒倒，表示是本球擊倒的
+                                return currentState[i] && !originalInitialState[i];
+                              });
+                            }
+                            Navigator.of(context).pop(resultPinState);
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
           ),

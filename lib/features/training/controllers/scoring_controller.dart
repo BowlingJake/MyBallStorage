@@ -151,20 +151,9 @@ class ScoringController extends StateNotifier<ScoringState> {
   void processPinSelection(int frameIndex, List<bool> selectedPins) {
     if (!canInputAtFrame(frameIndex)) return;
 
-    RollRecord newRoll;
-    if (state.currentRollInFrame == 0) {
-      // It's the first roll of the frame. The selectedPins are the result of this roll.
-      newRoll = RollRecord(pinsDown: selectedPins);
-    } else {
-      // It's the second roll. We need to calculate the pins knocked down by this roll only.
-      final firstBallPinState = state.rolls.last.pinsDown;
-      final secondBallPinState = List.generate(10, (i) {
-        // A pin is considered knocked down by the second ball if it's down now,
-        // but wasn't down after the first ball.
-        return selectedPins[i] && !firstBallPinState[i];
-      });
-      newRoll = RollRecord(pinsDown: secondBallPinState);
-    }
+    // selectedPins 代表本球擊倒的瓶數（不是累積）
+    // 創建深度複製以避免引用問題
+    final newRoll = RollRecord(pinsDown: List<bool>.from(selectedPins));
 
     final newRolls = List<RollRecord>.from(state.rolls)..add(newRoll);
     final newPinCounts = newRolls.map((r) => r.pinsDownCount).toList();
@@ -309,10 +298,17 @@ class ScoringController extends StateNotifier<ScoringState> {
     final newRolls = List<RollRecord>.from(state.rolls)..removeLast();
     final newPinCounts = newRolls.map((r) => r.pinsDownCount).toList();
 
+    // 如果沒有剩餘投球記錄，遊戲未完成
+    final isComplete = newRolls.isEmpty ? false : _checkGameCompleteStatus(
+      newPinCounts, 
+      0, // 會在 _advanceToNextInput 中重新計算
+      0
+    );
+
     // Recalculate everything
     final advancedState = _advanceToNextInput(newPinCounts);
     final newFrames = state.scoringManager.calculateScores(newPinCounts);
-    final isComplete = _checkGameCompleteStatus(
+    final finalIsComplete = newRolls.isEmpty ? false : _checkGameCompleteStatus(
       newPinCounts, 
       advancedState.currentFrameIndex, 
       advancedState.currentRollInFrame
@@ -323,7 +319,7 @@ class ScoringController extends StateNotifier<ScoringState> {
       frames: newFrames,
       currentFrameIndex: advancedState.currentFrameIndex,
       currentRollInFrame: advancedState.currentRollInFrame,
-      isGameComplete: isComplete,
+      isGameComplete: finalIsComplete,
     );
   }
 

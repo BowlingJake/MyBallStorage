@@ -189,7 +189,8 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
       if (rolls.isNotEmpty) {
         // The last roll in the state is the first roll of the current frame.
         final firstRollOfFrame = rolls.last;
-        initialPinStateForSecondRoll = firstRollOfFrame.pinsDown;
+        // 創建深度複製以避免引用問題
+        initialPinStateForSecondRoll = List<bool>.from(firstRollOfFrame.pinsDown);
       }
     }
     
