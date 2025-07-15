@@ -6,10 +6,17 @@ import 'package:bowlingarsenal_app/routing/app_router_config.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
-  AppErrorHandler.runGuarded(() {
+  AppErrorHandler.runGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load();
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    );
     runApp(const AppWithPreload()); // Use a preloading wrapper
   });
 }

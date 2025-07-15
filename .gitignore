@@ -52,3 +52,6 @@ venv/
 .env/
 .ipynb_checkpoints/
 venv/
+
+# .env for flutter_dotenv
+.env

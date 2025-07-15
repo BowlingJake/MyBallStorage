@@ -7,7 +7,7 @@ import 'package:bowlingarsenal_app/features/training/widgets/create_session/shar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Step2OilPattern extends ConsumerWidget {
+class Step2OilPattern extends ConsumerStatefulWidget {
   const Step2OilPattern({
     super.key,
     this.initialData,
@@ -16,9 +16,42 @@ class Step2OilPattern extends ConsumerWidget {
   final TrainingDaySummary? initialData;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formState = ref.watch(trainingFormProvider(initialData));
-    final formNotifier = ref.read(trainingFormProvider(initialData).notifier);
+  ConsumerState<Step2OilPattern> createState() => _Step2OilPatternState();
+}
+
+class _Step2OilPatternState extends ConsumerState<Step2OilPattern> {
+  late final TextEditingController _patternNameController;
+  late final TextEditingController _patternLengthController;
+
+  @override
+  void initState() {
+    super.initState();
+    final formState = ref.read(trainingFormProvider(widget.initialData));
+    _patternNameController = TextEditingController(text: formState.oilPatternName);
+    _patternLengthController = TextEditingController(text: formState.oilPatternLength);
+  }
+
+  @override
+  void dispose() {
+    _patternNameController.dispose();
+    _patternLengthController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formState = ref.watch(trainingFormProvider(widget.initialData));
+    final formNotifier = ref.read(trainingFormProvider(widget.initialData).notifier);
+
+    // 同步 controller 內容
+    if (_patternNameController.text != formState.oilPatternName) {
+      _patternNameController.text = formState.oilPatternName;
+      _patternNameController.selection = TextSelection.fromPosition(TextPosition(offset: _patternNameController.text.length));
+    }
+    if (_patternLengthController.text != formState.oilPatternLength) {
+      _patternLengthController.text = formState.oilPatternLength;
+      _patternLengthController.selection = TextSelection.fromPosition(TextPosition(offset: _patternLengthController.text.length));
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,8 +70,8 @@ class Step2OilPattern extends ConsumerWidget {
   }
 
   Widget _buildOilPatternSelector(
-      BuildContext context, 
-      TrainingFormState formState, 
+      BuildContext context,
+      TrainingFormState formState,
       dynamic formNotifier) {
     final theme = Theme.of(context);
 
@@ -58,8 +91,6 @@ class Step2OilPattern extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 12),
-        
-        // 模式選擇按鈕
         Row(
           children: [
             Expanded(
@@ -79,18 +110,14 @@ class Step2OilPattern extends ConsumerWidget {
             ),
           ],
         ),
-
         const SizedBox(height: 16),
-
-        // 模式名稱和長度輸入
         if (!formState.isHousePattern) ...[
           Row(
             children: [
               Expanded(
                 flex: 2,
-                child: _CompactTextField(
-                  key: ValueKey(formState.oilPatternName),
-                  initialValue: formState.oilPatternName,
+                child: CompactTextField(
+                  controller: _patternNameController,
                   label: 'Pattern Name',
                   icon: Icons.label,
                   onChanged: (value) => formNotifier.updateOilPatternName(value),
@@ -98,9 +125,8 @@ class Step2OilPattern extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _CompactTextField(
-                  key: ValueKey(formState.oilPatternLength),
-                  initialValue: formState.oilPatternLength,
+                child: CompactTextField(
+                  controller: _patternLengthController,
                   label: 'Length',
                   icon: Icons.straighten,
                   onChanged: (value) => formNotifier.updateOilPatternLength(value),
@@ -110,53 +136,6 @@ class Step2OilPattern extends ConsumerWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-// 自訂 CompactTextField 組件，支援 initialValue 而不是 controller
-class _CompactTextField extends StatelessWidget {
-  const _CompactTextField({
-    super.key,
-    required this.initialValue,
-    required this.label,
-    required this.icon,
-    this.onChanged,
-  });
-
-  final String initialValue;
-  final String label;
-  final IconData icon;
-  final void Function(String)? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
-        color: theme.colorScheme.surface.withOpacity(0.1),
-      ),
-      child: TextFormField(
-        initialValue: initialValue,
-        style: theme.textTheme.bodyMedium,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(
-            icon,
-            color: theme.colorScheme.primary.withOpacity(0.7),
-            size: 18,
-          ),
-          labelStyle: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.primary.withOpacity(0.8),
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        ),
-      ),
     );
   }
 } 

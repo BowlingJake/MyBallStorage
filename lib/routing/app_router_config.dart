@@ -6,16 +6,16 @@ import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/home_page.dart';
 import 'package:bowlingarsenal_app/shared/views/login_page.dart';
 import 'package:bowlingarsenal_app/features/onboarding/views/onboarding_page.dart';
-import 'package:bowlingarsenal_app/shared/providers/auth_provider.dart';
 import 'package:bowlingarsenal_app/routing/auth_guard.dart';
-
 import 'package:bowlingarsenal_app/features/ball_library/views/ball_library_page.dart';
 import 'package:bowlingarsenal_app/features/training/views/my_training_page.dart';
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/views/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
-import 'package:bowlingarsenal_app/shared/providers/providers.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
+import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -36,6 +36,12 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 // 2. 建立主要的 routerProvider
 final routerProvider = Provider<GoRouter>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final onboardingCompleted = ref.watch(onboardingProvider);
+  // 用 Supabase 狀態判斷
+  final isAuthenticated = authRepository.currentUser != null;
+  final shouldShowOnboarding = isAuthenticated && !onboardingCompleted;
+
   return GoRouter(
     // 3. 設定初始路由
     initialLocation: '/login',
@@ -93,23 +99,29 @@ final routerProvider = Provider<GoRouter>((ref) {
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('頁面不存在')),
       body: Center(
-        child: Text('錯誤: ${state.error?.message}'),
+        child: Text('錯誤:  ${state.error?.message}'),
       ),
     ),
 
     // 6. 設定重導向邏輯 (核心) - 使用純函式auth guard
-    redirect: (BuildContext context, GoRouterState state) {
-      // 讀取最新的認證和引導頁狀態
-      final authState = AuthGuardState(
-        isAuthenticated: ref.read(authProvider).isAuthenticated,
-        shouldShowOnboarding: !ref.read(onboardingProvider),
-      );
-      
-      // 使用純函式進行重導向決策
-      return authGuard(authState, state.matchedLocation);
+    redirect: (context, state) {
+      // 只用 Supabase 狀態
+      if (!isAuthenticated && state.matchedLocation != '/login') {
+        return '/login';
+      }
+      if (isAuthenticated && !shouldShowOnboarding && state.matchedLocation == '/login') {
+        return '/';
+      }
+      if (isAuthenticated && shouldShowOnboarding && state.matchedLocation != '/onboarding') {
+        return '/onboarding';
+      }
+      if (isAuthenticated && !shouldShowOnboarding && state.matchedLocation == '/onboarding') {
+        return '/';
+      }
+      return null;
     },
 
     // 7. 設定狀態監聽，讓路由響應變化
-    refreshListenable: GoRouterRefreshStream(ref.watch(authProvider.notifier).stream),
+    refreshListenable: GoRouterRefreshStream(ref.watch(authStateChangesProvider.stream)),
   );
 }); 

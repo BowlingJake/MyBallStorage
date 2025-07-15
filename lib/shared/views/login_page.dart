@@ -56,14 +56,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  Future<void> _doGuestLogin() async {
-    await _handleLoginAction(ref.read(authProvider.notifier).loginAsGuest);
-  }
-
-  Future<void> _doDeveloperLogin() async {
-    await _handleLoginAction(ref.read(authProvider.notifier).loginAsDeveloper);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -207,31 +199,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          GestureDetector(
-                            onTap: _isLoading ? null : _doGuestLogin,
-                            child: Text(
-                              '以訪客身份繼續',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white.withOpacity(0.9),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          // 開發者快速通道按鈕
-                          GestureDetector(
-                            onTap: _isLoading ? null : _doDeveloperLogin,
-                            child: Text(
-                              '開發者快速通道',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
-                                fontSize: 12,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white.withOpacity(0.6),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
