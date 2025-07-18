@@ -1,5 +1,9 @@
-import 'package:bowlingarsenal_app/shared/widgets/common/cards/standard_app_card.dart'; // 導入新的標準卡片
+// 檔案路徑： user_info_section.dart
+
+import 'package:bowlingarsenal_app/shared/widgets/common/cards/standard_app_card.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart'; // 1. 導入 Dialog
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // 2. 導入 GoRouter
 import 'package:iconsax/iconsax.dart';
 
 class UserInfoSection extends StatelessWidget {
@@ -15,65 +19,74 @@ class UserInfoSection extends StatelessWidget {
   final String? userPhotoUrl;
   final BoxConstraints? constraints;
 
+  // 觸發 Dialog 的方法
+  void _showProfileActions(BuildContext context) {
+    // 呼叫我們升級後的 Dialog 函式
+    showAppConfirmationDialog(
+      context: context,
+      title: 'Profile',
+      content: const Text('Do you want to view or edit your profile?', textAlign: TextAlign.center),
+      confirmText: 'Edit',
+      onConfirm: () {
+        context.go('/edit_profile');
+      },
+      cancelText: 'View',
+      onCancel: () {
+        // 現在 onCancel 是有效的了！
+        Navigator.of(context).pop(); // 先關閉 Dialog
+        // TODO: 實作進入 "View Profile" 頁面的邏輯
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
 
-    // 使用新的標準卡片作為基底
-    return StandardAppCard(
-      constraints: constraints,
-      enableGlow: false, // 關閉光暈效果，讓卡片完全透明
-      // 移除卡片預設的垂直邊距，因為外部容器會處理
-      margin: EdgeInsets.zero,
-      // 增加內部 padding 以提供足夠的呼吸空間
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 左側資訊
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                userName,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: () => _showProfileActions(context),
+      borderRadius: BorderRadius.circular(16),
+      child: StandardAppCard(
+        constraints: constraints,
+        enableGlow: false,
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(
-                    Iconsax.location,
-                    size: 16,
-                    color: Colors.white.withOpacity(0.7),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    location,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.7),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
+                    const SizedBox(width: 6),
+                    Text(
+                      location,
+                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacity(0.7)),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // 右側頭像
-          _buildUserAvatar(theme, accentColor),
-        ],
+                  ],
+                ),
+              ],
+            ),
+            _buildUserAvatar(theme, accentColor),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildUserAvatar(ThemeData theme, Color accentColor) {
-    // 保持頭像原有的精緻設計，它與新卡片風格是協調的
+    // ... (此處程式碼保持不變)
     return Container(
       width: 52,
       height: 52,
@@ -84,28 +97,11 @@ class UserInfoSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        // **PERFORMANCE OPTIMIZATION:**
-        // Replaced expensive, large-radius shadows with a simple, clean border
-        // to improve rendering performance.
         border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
       ),
-      child:
-          userPhotoUrl != null
-              ? ClipOval(
-                child: Image.network(
-                  userPhotoUrl!,
-                  fit: BoxFit.cover,
-                  width: 52,
-                  height: 52,
-                ),
-              )
-              : Center(
-                child: Icon(
-                  Iconsax.user,
-                  color: Colors.white.withOpacity(0.9),
-                  size: 28,
-                ),
-              ),
+      child: userPhotoUrl != null
+          ? ClipOval(child: Image.network(userPhotoUrl!, fit: BoxFit.cover, width: 52, height: 52))
+          : Center(child: Icon(Iconsax.user, color: Colors.white.withOpacity(0.9), size: 28)),
     );
   }
 }

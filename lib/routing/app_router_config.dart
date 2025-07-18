@@ -16,6 +16,7 @@ import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
 import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
+import 'package:bowlingarsenal_app/features/user/presentation/pages/edit_profile_page.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -88,6 +89,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
       ),
+       GoRoute(
+        path: '/edit_profile',
+        name: 'edit_profile', // 給它一個名字是好習慣
+        builder: (context, state) => const EditProfilePage(),
+      ),
       GoRoute(
         path: '/developer',
         name: 'developer',
@@ -106,6 +112,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     // 6. 設定重導向邏輯 (核心) - 使用純函式auth guard
     redirect: (context, state) {
       // 只用 Supabase 狀態
+      /*
       if (!isAuthenticated && state.matchedLocation != '/login') {
         return '/login';
       }
@@ -119,6 +126,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/';
       }
       return null;
+      */
     },
 
     // 7. 設定狀態監聽，讓路由響應變化

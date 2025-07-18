@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bowlingarsenal_app/routing/app_router_config.dart'; // <<< 確保這行存在，並且路徑正確
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -14,6 +16,10 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   bool _isLoading = false;
+  int _tapCount = 0;
+  DateTime? _lastTapTime;
+  static const int _requiredTaps = 7;
+  static const Duration _tapInterval = Duration(seconds: 2);
 
   // Placeholder for Google Sign-In logic
   Future<void> _signInWithGoogle() async {
@@ -56,6 +62,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  void _handleDeveloperTap() {
+    final now = DateTime.now();
+    if (_lastTapTime != null && now.difference(_lastTapTime!) > _tapInterval) {
+      _tapCount = 0;
+    }
+    _tapCount++;
+    _lastTapTime = now;
+
+    if (_tapCount >= _requiredTaps) {
+      _tapCount = 0;
+      _lastTapTime = null;
+      ref.read(routerProvider).go('/');
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('進入開發者通道')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -94,19 +117,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         height: 120,
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        'StrikeTrack',
-                        style: theme.textTheme.displaySmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                          shadows: [
-                            const Shadow(
-                              color: Colors.black54,
-                              blurRadius: 15,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
+                      GestureDetector(
+                        onTap: _handleDeveloperTap,
+                        child: Text(
+                          'StrikeTrack',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                            shadows: [
+                              const Shadow(
+                                color: Colors.black54,
+                                blurRadius: 15,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
