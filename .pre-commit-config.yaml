@@ -1,4 +1,4 @@
-# Pre-commit hooks for Flutter/Dart projects
+  # Pre-commit hooks for Flutter/Dart projects
 # Install with: pip install pre-commit && pre-commit install
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

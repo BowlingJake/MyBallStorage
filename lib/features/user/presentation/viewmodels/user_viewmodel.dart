@@ -26,7 +26,7 @@ class UserViewModel extends ChangeNotifier {
       _currentUser = await _userRepository.getCurrentUser();
       notifyListeners();
     } catch (e) {
-      _setError('載入用戶資料失敗: ${e.toString()}');
+      _setError('Failed to load user data: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -41,7 +41,7 @@ class UserViewModel extends ChangeNotifier {
       _currentUser = await _userRepository.updateUser(user);
       notifyListeners();
     } catch (e) {
-      _setError('更新用戶資料失敗: ${e.toString()}');
+      _setError('Failed to update user data: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -56,7 +56,7 @@ class UserViewModel extends ChangeNotifier {
       _currentUser = await _userRepository.createUser(user);
       notifyListeners();
     } catch (e) {
-      _setError('建立用戶失敗: ${e.toString()}');
+      _setError('Failed to create user: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -74,7 +74,7 @@ class UserViewModel extends ChangeNotifier {
       _currentUser = null;
       notifyListeners();
     } catch (e) {
-      _setError('刪除用戶失敗: ${e.toString()}');
+      _setError('Failed to delete user: ${e.toString()}');
     } finally {
       _setLoading(false);
     }

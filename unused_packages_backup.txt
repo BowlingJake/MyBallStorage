@@ -1,0 +1,14 @@
+These packages may be unused, or you may be using assets from these packages:
+  * cached_network_image 3.4.1 #done
+  * card_swiper 3.0.1 #done
+  * clay_containers 0.3.4 #done
+  * cupertino_icons 1.0.8 #done
+  * firebase_auth 5.6.0 #done
+  * firebase_core 3.14.0 #done
+  * flutter_lints 5.0.0 #done
+  * flutter_staggered_animations #done
+  * glass_kit #done
+  * json_annotation #done
+  * lottie #done
+  * palette_generator #done
+  * shimmer #done
