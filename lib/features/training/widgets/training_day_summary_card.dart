@@ -14,6 +14,7 @@ class TrainingDaySummaryCard extends StatefulWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.onViewRecap,
     this.onAddGame,
     this.onGameTap,
     this.onGameDelete,
@@ -40,6 +41,9 @@ class TrainingDaySummaryCard extends StatefulWidget {
 
   /// 刪除按鈕點擊回調
   final VoidCallback? onDelete;
+
+  /// 查看今日回顧按鈕點擊回調
+  final VoidCallback? onViewRecap;
 
   /// 新增遊戲按鈕點擊回調
   final VoidCallback? onAddGame;
@@ -224,9 +228,9 @@ class _TrainingDaySummaryCardState extends State<TrainingDaySummaryCard>
                               children: [
                                 Expanded(
                                   child: AppStandardButton(
-                                    text: 'Edit Training Day',
-                                    icon: Icons.edit,
-                                    onPressed: widget.onEdit ?? () {},
+                                    text: 'View today\'s recap',
+                                    icon: Icons.analytics_outlined,
+                                    onPressed: widget.onViewRecap ?? () {},
                                     height: 32,
                                   ),
                                 ),

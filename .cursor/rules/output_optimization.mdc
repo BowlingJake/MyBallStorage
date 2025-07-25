@@ -7,6 +7,7 @@ alwaysApply: true
 ## Rule Type: Always
 
 ### 核心原則
+- 在開始思考或生成任何回答之前，務必先閱讀並理解根目錄下的 `AI_CONTEXT.md` 以及 `doc/` 資料夾中的 `TECHNICAL_SPEC.md`。
 - 回答請務必簡潔明瞭，只提供必要的程式碼或解釋。
 - 避免重複的資訊或冗長的前言、結尾。
 - 如果需要提供解釋，請盡量簡短。

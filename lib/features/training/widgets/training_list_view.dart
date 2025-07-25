@@ -37,8 +37,8 @@ class TrainingListView extends ConsumerWidget {
               isSelected: state.isDaySelected(day.id),
               onSelectionChanged: (selected) =>
                   controller.toggleDaySelection(day.id),
+              onViewRecap: () => uiActions.showRecapPage(context, day.id),
               onAddGame: () => uiActions.showAddGameDialog(context, day.id),
-              onEdit: () => uiActions.showEditRecordDialog(context, day.id),
               onDelete: () => uiActions.showDeleteDayDialog(context, day.id),
               onGameTap: (game) => uiActions.showInteractiveScoringDialog(context, game),
               onGameDelete: (game) => controller.deleteGame(game),

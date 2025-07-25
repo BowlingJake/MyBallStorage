@@ -3,19 +3,18 @@
 import 'package:bowlingarsenal_app/shared/widgets/common/cards/standard_app_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart'; // 1. 導入 Dialog
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart'; // 2. 導入 GoRouter
 import 'package:iconsax/iconsax.dart';
+import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
 
-class UserInfoSection extends StatelessWidget {
+class UserInfoSection extends ConsumerWidget {
   const UserInfoSection({
     super.key,
-    this.userName = 'Jake Cheng',
-    this.location = 'Taipei, Taiwan',
     this.userPhotoUrl,
     this.constraints,
   });
-  final String userName;
-  final String location;
+  
   final String? userPhotoUrl;
   final BoxConstraints? constraints;
 
@@ -32,17 +31,42 @@ class UserInfoSection extends StatelessWidget {
       },
       cancelText: 'View',
       onCancel: () {
-        // 現在 onCancel 是有效的了！
         Navigator.of(context).pop(); // 先關閉 Dialog
-        // TODO: 實作進入 "View Profile" 頁面的邏輯
+        context.go('/view_profile'); // 導向 View Profile 頁面
       },
     );
   }
 
+  String _formatUserInfo(userProfile) {
+    final bowlingStyle = userProfile.bowlingStyle;
+    final hand = userProfile.hand;
+    
+    if (bowlingStyle.isNotEmpty && hand.isNotEmpty) {
+      // 提取手的類型 (Left 或 Right)
+      final handType = hand.contains('Left') ? 'Left' : 'Right';
+      return '$bowlingStyle($handType)';
+    } else if (bowlingStyle.isNotEmpty) {
+      return bowlingStyle;
+    } else if (hand.isNotEmpty) {
+      return hand;
+    }
+    
+    return '';
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
+    final userProfile = ref.watch(userProfileProvider);
+
+    // 從 userProfile 取得資料，如果沒有則使用預設值
+    final userName = userProfile?.nickname.isNotEmpty == true 
+        ? userProfile!.nickname 
+        : 'Tap to set profile';
+    final location = userProfile?.location.isNotEmpty == true 
+        ? userProfile!.location 
+        : 'Set your location';
 
     return InkWell(
       onTap: () => _showProfileActions(context),
@@ -55,28 +79,53 @@ class UserInfoSection extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  userName,
-                  style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
-                    const SizedBox(width: 6),
-                    Text(
-                      location,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacity(0.7)),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userName,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white, 
+                      fontWeight: FontWeight.bold
                     ),
-                  ],
-                ),
-              ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Iconsax.location, size: 16, color: Colors.white.withOpacity(0.7)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.7)
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // 第三行顯示打球資訊（移除外層括號）
+                  if (userProfile != null && (userProfile.hand.isNotEmpty || userProfile.bowlingStyle.isNotEmpty))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        _formatUserInfo(userProfile),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
+              ),
             ),
             _buildUserAvatar(theme, accentColor),
           ],

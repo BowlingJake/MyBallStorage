@@ -20,6 +20,11 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
           hand: profileData['hand'] ?? '',
           ballPath: profileData['ballPath'] ?? '',
           pap: profileData['pap'] ?? '',
+          country: profileData['country'] ?? '',
+          city: profileData['city'] ?? '',
+          bowlingStyle: profileData['bowlingStyle'] ?? '',
+          favoriteCenters: profileData['favoriteCenters'] ?? [],
+          favoriteOilPatterns: profileData['favoriteOilPatterns'] ?? [],
         );
       } else {
         state = null;
@@ -35,12 +40,22 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
     String? hand,
     String? ballPath,
     String? pap,
+    String? country,
+    String? city,
+    String? bowlingStyle,
+    List<String>? favoriteCenters,
+    List<OilPattern>? favoriteOilPatterns,
   }) async {
     final newProfile = UserProfile(
       nickname: nickname ?? state?.nickname ?? '',
       hand: hand ?? state?.hand ?? '',
       ballPath: ballPath ?? state?.ballPath ?? '',
       pap: pap ?? state?.pap ?? '',
+      country: country ?? state?.country ?? '',
+      city: city ?? state?.city ?? '',
+      bowlingStyle: bowlingStyle ?? state?.bowlingStyle ?? '',
+      favoriteCenters: favoriteCenters ?? state?.favoriteCenters ?? [],
+      favoriteOilPatterns: favoriteOilPatterns ?? state?.favoriteOilPatterns ?? [],
     );
 
     await _userService.saveProfile(
@@ -48,6 +63,11 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
       hand: newProfile.hand,
       ballPath: newProfile.ballPath,
       pap: newProfile.pap,
+      country: newProfile.country,
+      city: newProfile.city,
+      bowlingStyle: newProfile.bowlingStyle,
+      favoriteCenters: newProfile.favoriteCenters,
+      favoriteOilPatterns: newProfile.favoriteOilPatterns,
     );
 
     state = newProfile;

@@ -1,11 +1,15 @@
 import 'package:bowlingarsenal_app/features/training/controllers/training_controller.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_recap.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/training_recap_page.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/create_training_record_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/delete_confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/edit_training_record_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/widgets/interactive_scoring_dialog.dart';
+import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// 訓練頁面 UI 互動處理器
 /// 此類處理所有與 UI（例如顯示對話框）相關的操作
@@ -110,6 +114,36 @@ class TrainingUIActions {
     final controller = ref.read(trainingControllerProvider.notifier);
     await controller.addGameToDay(dayId);
     // 如果需要額外的 UI 邏輯，可以在此添加
+  }
+
+  /// 顯示今日回顧頁面（使用 Page 而不是 Dialog）
+  void showRecapPage(BuildContext context, String dayId) {
+    final state = ref.read(trainingControllerProvider);
+    final trainingDay = state.getTrainingDay(dayId);
+    
+    if (trainingDay == null) {
+      // 顯示錯誤訊息
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('找不到訓練記錄')),
+      );
+      return;
+    }
+
+    // 獲取使用者資料
+    final userProfile = ref.read(userProfileProvider);
+    final bowlerName = userProfile?.nickname.isNotEmpty == true 
+        ? userProfile!.nickname 
+        : 'Unknown Player';
+
+    // 建立回顧資料
+    final recap = TrainingRecap.fromTrainingDay(trainingDay, bowlerName);
+
+    // 使用 GoRouter 導航到回顧頁面（符合 TECHNICAL_SPEC.md）
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TrainingRecapPage(recap: recap),
+      ),
+    );
   }
 }
 

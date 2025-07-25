@@ -178,6 +178,15 @@ class _HomePageDrawer extends StatelessWidget {
             ),
             _buildDrawerItem(
               context,
+              icon: Iconsax.location,
+              title: 'Favorite Centers & Oil Patterns',
+              onTap: () {
+                Navigator.pop(context);
+                context.go('/favorite_centers_oil_patterns');
+              },
+            ),
+            _buildDrawerItem(
+              context,
               icon: Iconsax.notification,
               title: 'Notifications',
               onTap: () {

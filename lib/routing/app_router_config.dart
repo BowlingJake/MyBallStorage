@@ -17,6 +17,8 @@ import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
 import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/edit_profile_page.dart';
+import 'package:bowlingarsenal_app/features/user/presentation/pages/favorite_centers_oil_patterns_page.dart';
+import 'package:bowlingarsenal_app/features/user/presentation/pages/view_profile_page.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -93,6 +95,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/edit_profile',
         name: 'edit_profile', // 給它一個名字是好習慣
         builder: (context, state) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: '/favorite_centers_oil_patterns',
+        name: 'favorite_centers_oil_patterns',
+        builder: (context, state) => const FavoriteCentersOilPatternsPage(),
+      ),
+      GoRoute(
+        path: '/view_profile',
+        name: 'view_profile',
+        builder: (context, state) => const ViewProfilePage(),
       ),
       GoRoute(
         path: '/developer',
