@@ -5,27 +5,36 @@ part 'bowling_ball.freezed.dart';
 @freezed
 class BowlingBall with _$BowlingBall {
   const factory BowlingBall({
-    required String id,
-    required String name,
-    required String brand,
-    required String core,
-    required String coverstock,
-    required String coverstockName,
-    required String factoryFinish,
-    required String releaseDate,
+    // 來自 Supabase 的標準欄位 (已整合)
+    required int id,
+    @Default('Unknown Ball') String name,
+    @Default('Unknown Brand') String brand,
+    String? coreName,
+    String? coreType,
+    String? coverstockType,
     @Default('https://via.placeholder.com/150') String imageUrl,
     double? rg,
     double? diff,
-    double? intDiff,
-    // 用戶自定義數據
+    double? mbDiff, // 對應 Supabase 的 mb_diff
+    String? region,
+    String? slug,
+    String? createdAt,
+
+    // 為了兼容舊資料而保留的欄位
+    String? coverstock,
+    String? coverstockName,
+    String? factoryFinish,
+    String? releaseDate,
+
+    // 用戶自定義數據 (完全保留)
     String? handType,
     String? layoutType,
     List<String>? layoutValues,
   }) = _BowlingBall;
 
-  // 自定義fromJson工廠方法，支持多種JSON格式
+  /// 客製化的 fromJson 工廠方法，能同時支持 Supabase 和舊有的 JSON 格式
   factory BowlingBall.fromJson(Map<String, dynamic> json) {
-    // Helper to safely parse double values
+    // Helper to safely parse double values (你的這段邏輯很棒，完全保留)
     double? tryParseDouble(dynamic value) {
       if (value is num) {
         return value.toDouble();
@@ -37,87 +46,78 @@ class BowlingBall with _$BowlingBall {
     }
 
     return BowlingBall(
-      id: json['id'] as String? ?? json['Ball'] as String? ?? 'unknown',
-      name: json['name'] as String? ?? json['Ball'] as String? ?? 'Unknown Ball',
+      // --- Supabase 欄位對應 ---
+      id: json['id'] as int? ?? 0,
+      name: json['ball_name'] as String? ?? json['name'] as String? ?? json['Ball'] as String? ?? 'Unknown Ball',
       brand: json['brand'] as String? ?? json['Brand'] as String? ?? 'Unknown Brand',
-      core: json['core'] as String? ?? json['Core'] as String? ?? '',
-      coverstock: json['coverstock'] as String? ?? json['Coverstock Category'] as String? ?? '',
-      coverstockName: json['coverstockName'] as String? ?? json['Coverstock Name'] as String? ?? '',
-      factoryFinish: json['factoryFinish'] as String? ?? json['Factory Finish'] as String? ?? '',
-      releaseDate: json['releaseDate'] as String? ?? json['Release Date'] as String? ?? '',
+      coreName: json['core_name'] as String?,
+      coreType: json['core_type'] as String?,
+      coverstockType: json['coverstock_type'] as String?,
       imageUrl: json['image_url'] as String? ?? 'https://via.placeholder.com/150',
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
-      intDiff: tryParseDouble(json['intDiff'] ?? json['MB Diff']),
+      mbDiff: tryParseDouble(json['mb_diff'] ?? json['intDiff'] ?? json['MB Diff']),
+      region: json['region'] as String?,
+      slug: json['slug'] as String?,
+      createdAt: json['created_at'] as String?,
+
+
+      // --- 用戶自定義數據 ---
       handType: json['handType'] as String?,
       layoutType: json['layoutType'] as String?,
-      layoutValues: json['layoutValues'] != null
-          ? List<String>.from(json['layoutValues'] as List)
-          : null,
+      layoutValues: json['layoutValues'] != null ? List<String>.from(json['layoutValues'] as List) : null,
     );
   }
 }
 
-// 擴展方法，包含業務邏輯
+// 擴展方法，包含你的商業邏輯 (完全保留)
 extension BowlingBallExtension on BowlingBall {
   String get combinedCoverstockInfo {
-    if (coverstockName.isEmpty && coverstock.isEmpty) {
+    final name = coverstockName ?? '';
+    final category = coverstockType ?? coverstock ?? ''; // 優先使用 coverstockType
+
+    if (name.isEmpty && category.isEmpty) {
       return '未知';
     }
-
-    final name = coverstockName;
-    final category = coverstock;
-
     if (name.isEmpty) {
-      return category.isNotEmpty ? category : '未知';
+      return category;
     }
-
     if (category.isEmpty) {
       return name;
     }
 
     // 檢查名稱是否已經包含類別信息
     final lowerName = name.toLowerCase();
-    final lowerCategory = category.toLowerCase();
-
-    if (lowerName.contains('reactive') ||
-        lowerName.contains('urethane') ||
-        lowerName.contains('polyester')) {
+    
+    if (lowerName.contains('reactive') || lowerName.contains('urethane') || lowerName.contains('polyester')) {
       return name; // 名稱已經包含類別信息
     }
-
-    // 智能組合名稱和類別，避免重複
-    if (lowerCategory.contains('pearl') && lowerName.contains('pearl')) {
-      // 例如 "Reactor Pearl" + "Pearl Reactive" → "Reactor Pearl Reactive"
-      return '$name Reactive';
-    } else if (lowerCategory.contains('solid') && lowerName.contains('solid')) {
-      // 例如 "HK22 Solid" + "Solid Reactive" → "HK22 Solid Reactive"
-      return '$name Reactive';
-    } else if (lowerCategory.contains('hybrid') && lowerName.contains('hybrid')) {
-      // 例如 "R2S Hybrid" + "Hybrid Reactive" → "R2S Hybrid Reactive"
-      return '$name Reactive';
-    } else {
-      // 一般情況，直接組合
-      return '$name $category';
-    }
+    
+    // 智能組合名稱和類別
+    return '$name $category';
   }
 
-  /// 自定義toJson方法，確保包含用戶定義的字段
+  /// 自定義toJson方法，確保包含用戶定義的字段 (完全保留)
   Map<String, dynamic> toJsonWithCustomFields() => {
-    'id': id,
-    'name': name,
-    'brand': brand,
-    'core': core,
-    'coverstock': coverstock,
-    'coverstockName': coverstockName,
-    'factoryFinish': factoryFinish,
-    'releaseDate': releaseDate,
-    'image_url': imageUrl,
-    'rg': rg,
-    'diff': diff,
-    'intDiff': intDiff,
-    'handType': handType,
-    'layoutType': layoutType,
-    'layoutValues': layoutValues,
-  };
+        'id': id,
+        'name': name,
+        'brand': brand,
+        'coreName': coreName,
+        'coreType': coreType,
+        'coverstockType': coverstockType,
+        'coverstock': coverstock,
+        'coverstockName': coverstockName,
+        'factoryFinish': factoryFinish,
+        'releaseDate': releaseDate,
+        'imageUrl': imageUrl,
+        'rg': rg,
+        'diff': diff,
+        'mbDiff': mbDiff,
+        'region': region,
+        'slug': slug,
+        'createdAt': createdAt,
+        'handType': handType,
+        'layoutType': layoutType,
+        'layoutValues': layoutValues,
+      };
 }

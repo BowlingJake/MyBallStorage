@@ -16,18 +16,26 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$BowlingBall {
-  String get id => throw _privateConstructorUsedError;
+// 來自 Supabase 的標準欄位 (已整合)
+  int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get brand => throw _privateConstructorUsedError;
-  String get core => throw _privateConstructorUsedError;
-  String get coverstock => throw _privateConstructorUsedError;
-  String get coverstockName => throw _privateConstructorUsedError;
-  String get factoryFinish => throw _privateConstructorUsedError;
-  String get releaseDate => throw _privateConstructorUsedError;
+  String? get coreName => throw _privateConstructorUsedError;
+  String? get coreType => throw _privateConstructorUsedError;
+  String? get coverstockType => throw _privateConstructorUsedError;
   String get imageUrl => throw _privateConstructorUsedError;
   double? get rg => throw _privateConstructorUsedError;
   double? get diff => throw _privateConstructorUsedError;
-  double? get intDiff => throw _privateConstructorUsedError; // 用戶自定義數據
+  double? get mbDiff =>
+      throw _privateConstructorUsedError; // 對應 Supabase 的 mb_diff
+  String? get region => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
+  String? get createdAt => throw _privateConstructorUsedError; // 為了兼容舊資料而保留的欄位
+  String? get coverstock => throw _privateConstructorUsedError;
+  String? get coverstockName => throw _privateConstructorUsedError;
+  String? get factoryFinish => throw _privateConstructorUsedError;
+  String? get releaseDate =>
+      throw _privateConstructorUsedError; // 用戶自定義數據 (完全保留)
   String? get handType => throw _privateConstructorUsedError;
   String? get layoutType => throw _privateConstructorUsedError;
   List<String>? get layoutValues => throw _privateConstructorUsedError;
@@ -46,18 +54,23 @@ abstract class $BowlingBallCopyWith<$Res> {
       _$BowlingBallCopyWithImpl<$Res, BowlingBall>;
   @useResult
   $Res call(
-      {String id,
+      {int id,
       String name,
       String brand,
-      String core,
-      String coverstock,
-      String coverstockName,
-      String factoryFinish,
-      String releaseDate,
+      String? coreName,
+      String? coreType,
+      String? coverstockType,
       String imageUrl,
       double? rg,
       double? diff,
-      double? intDiff,
+      double? mbDiff,
+      String? region,
+      String? slug,
+      String? createdAt,
+      String? coverstock,
+      String? coverstockName,
+      String? factoryFinish,
+      String? releaseDate,
       String? handType,
       String? layoutType,
       List<String>? layoutValues});
@@ -81,15 +94,20 @@ class _$BowlingBallCopyWithImpl<$Res, $Val extends BowlingBall>
     Object? id = null,
     Object? name = null,
     Object? brand = null,
-    Object? core = null,
-    Object? coverstock = null,
-    Object? coverstockName = null,
-    Object? factoryFinish = null,
-    Object? releaseDate = null,
+    Object? coreName = freezed,
+    Object? coreType = freezed,
+    Object? coverstockType = freezed,
     Object? imageUrl = null,
     Object? rg = freezed,
     Object? diff = freezed,
-    Object? intDiff = freezed,
+    Object? mbDiff = freezed,
+    Object? region = freezed,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? coverstock = freezed,
+    Object? coverstockName = freezed,
+    Object? factoryFinish = freezed,
+    Object? releaseDate = freezed,
     Object? handType = freezed,
     Object? layoutType = freezed,
     Object? layoutValues = freezed,
@@ -98,7 +116,7 @@ class _$BowlingBallCopyWithImpl<$Res, $Val extends BowlingBall>
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -107,26 +125,18 @@ class _$BowlingBallCopyWithImpl<$Res, $Val extends BowlingBall>
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
               as String,
-      core: null == core
-          ? _value.core
-          : core // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverstock: null == coverstock
-          ? _value.coverstock
-          : coverstock // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverstockName: null == coverstockName
-          ? _value.coverstockName
-          : coverstockName // ignore: cast_nullable_to_non_nullable
-              as String,
-      factoryFinish: null == factoryFinish
-          ? _value.factoryFinish
-          : factoryFinish // ignore: cast_nullable_to_non_nullable
-              as String,
-      releaseDate: null == releaseDate
-          ? _value.releaseDate
-          : releaseDate // ignore: cast_nullable_to_non_nullable
-              as String,
+      coreName: freezed == coreName
+          ? _value.coreName
+          : coreName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coreType: freezed == coreType
+          ? _value.coreType
+          : coreType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstockType: freezed == coverstockType
+          ? _value.coverstockType
+          : coverstockType // ignore: cast_nullable_to_non_nullable
+              as String?,
       imageUrl: null == imageUrl
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
@@ -139,10 +149,38 @@ class _$BowlingBallCopyWithImpl<$Res, $Val extends BowlingBall>
           ? _value.diff
           : diff // ignore: cast_nullable_to_non_nullable
               as double?,
-      intDiff: freezed == intDiff
-          ? _value.intDiff
-          : intDiff // ignore: cast_nullable_to_non_nullable
+      mbDiff: freezed == mbDiff
+          ? _value.mbDiff
+          : mbDiff // ignore: cast_nullable_to_non_nullable
               as double?,
+      region: freezed == region
+          ? _value.region
+          : region // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstock: freezed == coverstock
+          ? _value.coverstock
+          : coverstock // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstockName: freezed == coverstockName
+          ? _value.coverstockName
+          : coverstockName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      factoryFinish: freezed == factoryFinish
+          ? _value.factoryFinish
+          : factoryFinish // ignore: cast_nullable_to_non_nullable
+              as String?,
+      releaseDate: freezed == releaseDate
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
       handType: freezed == handType
           ? _value.handType
           : handType // ignore: cast_nullable_to_non_nullable
@@ -168,18 +206,23 @@ abstract class _$$BowlingBallImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
+      {int id,
       String name,
       String brand,
-      String core,
-      String coverstock,
-      String coverstockName,
-      String factoryFinish,
-      String releaseDate,
+      String? coreName,
+      String? coreType,
+      String? coverstockType,
       String imageUrl,
       double? rg,
       double? diff,
-      double? intDiff,
+      double? mbDiff,
+      String? region,
+      String? slug,
+      String? createdAt,
+      String? coverstock,
+      String? coverstockName,
+      String? factoryFinish,
+      String? releaseDate,
       String? handType,
       String? layoutType,
       List<String>? layoutValues});
@@ -201,15 +244,20 @@ class __$$BowlingBallImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? brand = null,
-    Object? core = null,
-    Object? coverstock = null,
-    Object? coverstockName = null,
-    Object? factoryFinish = null,
-    Object? releaseDate = null,
+    Object? coreName = freezed,
+    Object? coreType = freezed,
+    Object? coverstockType = freezed,
     Object? imageUrl = null,
     Object? rg = freezed,
     Object? diff = freezed,
-    Object? intDiff = freezed,
+    Object? mbDiff = freezed,
+    Object? region = freezed,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? coverstock = freezed,
+    Object? coverstockName = freezed,
+    Object? factoryFinish = freezed,
+    Object? releaseDate = freezed,
     Object? handType = freezed,
     Object? layoutType = freezed,
     Object? layoutValues = freezed,
@@ -218,7 +266,7 @@ class __$$BowlingBallImplCopyWithImpl<$Res>
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -227,26 +275,18 @@ class __$$BowlingBallImplCopyWithImpl<$Res>
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
               as String,
-      core: null == core
-          ? _value.core
-          : core // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverstock: null == coverstock
-          ? _value.coverstock
-          : coverstock // ignore: cast_nullable_to_non_nullable
-              as String,
-      coverstockName: null == coverstockName
-          ? _value.coverstockName
-          : coverstockName // ignore: cast_nullable_to_non_nullable
-              as String,
-      factoryFinish: null == factoryFinish
-          ? _value.factoryFinish
-          : factoryFinish // ignore: cast_nullable_to_non_nullable
-              as String,
-      releaseDate: null == releaseDate
-          ? _value.releaseDate
-          : releaseDate // ignore: cast_nullable_to_non_nullable
-              as String,
+      coreName: freezed == coreName
+          ? _value.coreName
+          : coreName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coreType: freezed == coreType
+          ? _value.coreType
+          : coreType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstockType: freezed == coverstockType
+          ? _value.coverstockType
+          : coverstockType // ignore: cast_nullable_to_non_nullable
+              as String?,
       imageUrl: null == imageUrl
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
@@ -259,10 +299,38 @@ class __$$BowlingBallImplCopyWithImpl<$Res>
           ? _value.diff
           : diff // ignore: cast_nullable_to_non_nullable
               as double?,
-      intDiff: freezed == intDiff
-          ? _value.intDiff
-          : intDiff // ignore: cast_nullable_to_non_nullable
+      mbDiff: freezed == mbDiff
+          ? _value.mbDiff
+          : mbDiff // ignore: cast_nullable_to_non_nullable
               as double?,
+      region: freezed == region
+          ? _value.region
+          : region // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstock: freezed == coverstock
+          ? _value.coverstock
+          : coverstock // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverstockName: freezed == coverstockName
+          ? _value.coverstockName
+          : coverstockName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      factoryFinish: freezed == factoryFinish
+          ? _value.factoryFinish
+          : factoryFinish // ignore: cast_nullable_to_non_nullable
+              as String?,
+      releaseDate: freezed == releaseDate
+          ? _value.releaseDate
+          : releaseDate // ignore: cast_nullable_to_non_nullable
+              as String?,
       handType: freezed == handType
           ? _value.handType
           : handType // ignore: cast_nullable_to_non_nullable
@@ -284,38 +352,42 @@ class __$$BowlingBallImplCopyWithImpl<$Res>
 class _$BowlingBallImpl implements _BowlingBall {
   const _$BowlingBallImpl(
       {required this.id,
-      required this.name,
-      required this.brand,
-      required this.core,
-      required this.coverstock,
-      required this.coverstockName,
-      required this.factoryFinish,
-      required this.releaseDate,
+      this.name = 'Unknown Ball',
+      this.brand = 'Unknown Brand',
+      this.coreName,
+      this.coreType,
+      this.coverstockType,
       this.imageUrl = 'https://via.placeholder.com/150',
       this.rg,
       this.diff,
-      this.intDiff,
+      this.mbDiff,
+      this.region,
+      this.slug,
+      this.createdAt,
+      this.coverstock,
+      this.coverstockName,
+      this.factoryFinish,
+      this.releaseDate,
       this.handType,
       this.layoutType,
       final List<String>? layoutValues})
       : _layoutValues = layoutValues;
 
+// 來自 Supabase 的標準欄位 (已整合)
   @override
-  final String id;
+  final int id;
   @override
+  @JsonKey()
   final String name;
   @override
+  @JsonKey()
   final String brand;
   @override
-  final String core;
+  final String? coreName;
   @override
-  final String coverstock;
+  final String? coreType;
   @override
-  final String coverstockName;
-  @override
-  final String factoryFinish;
-  @override
-  final String releaseDate;
+  final String? coverstockType;
   @override
   @JsonKey()
   final String imageUrl;
@@ -324,8 +396,24 @@ class _$BowlingBallImpl implements _BowlingBall {
   @override
   final double? diff;
   @override
-  final double? intDiff;
-// 用戶自定義數據
+  final double? mbDiff;
+// 對應 Supabase 的 mb_diff
+  @override
+  final String? region;
+  @override
+  final String? slug;
+  @override
+  final String? createdAt;
+// 為了兼容舊資料而保留的欄位
+  @override
+  final String? coverstock;
+  @override
+  final String? coverstockName;
+  @override
+  final String? factoryFinish;
+  @override
+  final String? releaseDate;
+// 用戶自定義數據 (完全保留)
   @override
   final String? handType;
   @override
@@ -342,7 +430,7 @@ class _$BowlingBallImpl implements _BowlingBall {
 
   @override
   String toString() {
-    return 'BowlingBall(id: $id, name: $name, brand: $brand, core: $core, coverstock: $coverstock, coverstockName: $coverstockName, factoryFinish: $factoryFinish, releaseDate: $releaseDate, imageUrl: $imageUrl, rg: $rg, diff: $diff, intDiff: $intDiff, handType: $handType, layoutType: $layoutType, layoutValues: $layoutValues)';
+    return 'BowlingBall(id: $id, name: $name, brand: $brand, coreName: $coreName, coreType: $coreType, coverstockType: $coverstockType, imageUrl: $imageUrl, rg: $rg, diff: $diff, mbDiff: $mbDiff, region: $region, slug: $slug, createdAt: $createdAt, coverstock: $coverstock, coverstockName: $coverstockName, factoryFinish: $factoryFinish, releaseDate: $releaseDate, handType: $handType, layoutType: $layoutType, layoutValues: $layoutValues)';
   }
 
   @override
@@ -353,7 +441,21 @@ class _$BowlingBallImpl implements _BowlingBall {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.brand, brand) || other.brand == brand) &&
-            (identical(other.core, core) || other.core == core) &&
+            (identical(other.coreName, coreName) ||
+                other.coreName == coreName) &&
+            (identical(other.coreType, coreType) ||
+                other.coreType == coreType) &&
+            (identical(other.coverstockType, coverstockType) ||
+                other.coverstockType == coverstockType) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
+            (identical(other.rg, rg) || other.rg == rg) &&
+            (identical(other.diff, diff) || other.diff == diff) &&
+            (identical(other.mbDiff, mbDiff) || other.mbDiff == mbDiff) &&
+            (identical(other.region, region) || other.region == region) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
             (identical(other.coverstock, coverstock) ||
                 other.coverstock == coverstock) &&
             (identical(other.coverstockName, coverstockName) ||
@@ -362,11 +464,6 @@ class _$BowlingBallImpl implements _BowlingBall {
                 other.factoryFinish == factoryFinish) &&
             (identical(other.releaseDate, releaseDate) ||
                 other.releaseDate == releaseDate) &&
-            (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl) &&
-            (identical(other.rg, rg) || other.rg == rg) &&
-            (identical(other.diff, diff) || other.diff == diff) &&
-            (identical(other.intDiff, intDiff) || other.intDiff == intDiff) &&
             (identical(other.handType, handType) ||
                 other.handType == handType) &&
             (identical(other.layoutType, layoutType) ||
@@ -376,23 +473,29 @@ class _$BowlingBallImpl implements _BowlingBall {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      brand,
-      core,
-      coverstock,
-      coverstockName,
-      factoryFinish,
-      releaseDate,
-      imageUrl,
-      rg,
-      diff,
-      intDiff,
-      handType,
-      layoutType,
-      const DeepCollectionEquality().hash(_layoutValues));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        name,
+        brand,
+        coreName,
+        coreType,
+        coverstockType,
+        imageUrl,
+        rg,
+        diff,
+        mbDiff,
+        region,
+        slug,
+        createdAt,
+        coverstock,
+        coverstockName,
+        factoryFinish,
+        releaseDate,
+        handType,
+        layoutType,
+        const DeepCollectionEquality().hash(_layoutValues)
+      ]);
 
   /// Create a copy of BowlingBall
   /// with the given fields replaced by the non-null parameter values.
@@ -405,38 +508,40 @@ class _$BowlingBallImpl implements _BowlingBall {
 
 abstract class _BowlingBall implements BowlingBall {
   const factory _BowlingBall(
-      {required final String id,
-      required final String name,
-      required final String brand,
-      required final String core,
-      required final String coverstock,
-      required final String coverstockName,
-      required final String factoryFinish,
-      required final String releaseDate,
+      {required final int id,
+      final String name,
+      final String brand,
+      final String? coreName,
+      final String? coreType,
+      final String? coverstockType,
       final String imageUrl,
       final double? rg,
       final double? diff,
-      final double? intDiff,
+      final double? mbDiff,
+      final String? region,
+      final String? slug,
+      final String? createdAt,
+      final String? coverstock,
+      final String? coverstockName,
+      final String? factoryFinish,
+      final String? releaseDate,
       final String? handType,
       final String? layoutType,
       final List<String>? layoutValues}) = _$BowlingBallImpl;
 
+// 來自 Supabase 的標準欄位 (已整合)
   @override
-  String get id;
+  int get id;
   @override
   String get name;
   @override
   String get brand;
   @override
-  String get core;
+  String? get coreName;
   @override
-  String get coverstock;
+  String? get coreType;
   @override
-  String get coverstockName;
-  @override
-  String get factoryFinish;
-  @override
-  String get releaseDate;
+  String? get coverstockType;
   @override
   String get imageUrl;
   @override
@@ -444,7 +549,21 @@ abstract class _BowlingBall implements BowlingBall {
   @override
   double? get diff;
   @override
-  double? get intDiff; // 用戶自定義數據
+  double? get mbDiff; // 對應 Supabase 的 mb_diff
+  @override
+  String? get region;
+  @override
+  String? get slug;
+  @override
+  String? get createdAt; // 為了兼容舊資料而保留的欄位
+  @override
+  String? get coverstock;
+  @override
+  String? get coverstockName;
+  @override
+  String? get factoryFinish;
+  @override
+  String? get releaseDate; // 用戶自定義數據 (完全保留)
   @override
   String? get handType;
   @override
