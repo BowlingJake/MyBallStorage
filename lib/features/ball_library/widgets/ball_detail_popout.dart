@@ -316,7 +316,7 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                                   icon: Icons.balance,
                                   label: 'MB',
                                   value:
-                                      widget.ball.intDiff?.toStringAsFixed(3) ??
+                                      widget.ball.mbDiff?.toStringAsFixed(3) ??
                                       'N/A',
                                 ),
                               ),

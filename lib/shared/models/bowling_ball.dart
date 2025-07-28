@@ -72,6 +72,25 @@ class BowlingBall with _$BowlingBall {
 
 // 擴展方法，包含你的商業邏輯 (完全保留)
 extension BowlingBallExtension on BowlingBall {
+  /// 提供 core 屬性以兼容現有代碼
+  String get core {
+    if (coreName != null && coreName!.isNotEmpty) {
+      if (coreType != null && coreType!.isNotEmpty) {
+        return '$coreName $coreType';
+      }
+      return coreName!;
+    }
+    if (coreType != null && coreType!.isNotEmpty) {
+      return coreType!;
+    }
+    return 'Unknown Core';
+  }
+
+  /// 提供 cover 屬性以兼容現有代碼
+  String get cover {
+    return combinedCoverstockInfo;
+  }
+
   String get combinedCoverstockInfo {
     final name = coverstockName ?? '';
     final category = coverstockType ?? coverstock ?? ''; // 優先使用 coverstockType

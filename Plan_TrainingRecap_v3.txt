@@ -1,0 +1,241 @@
+# Training Recap Page - Tech Borderless Design v3.0
+**Project**: StrikeTrack - Training Recap Tech Redesign  
+**Date**: 2025-07-28  
+**Goal**: 基於資訊強度的深色科技風邊框式設計
+
+## 📊 設計需求分析
+
+### 資訊強度分級系統
+
+#### 🔥 強 (主要資訊 - 醒目展示)
+1. **使用者名稱** - 大字體, 主色調
+2. **訓練標題** - 醒目位置, 清晰可讀  
+3. **各局分數 & 詳細拋球結果** - 最大空間配置
+4. **平均分、全倒率、Spare率** - 統計數據區域
+
+#### 🔶 中 (重要次要 - 依附主資訊)
+1. **擲球風格 & 慣用手** - 依附使用者名稱
+2. **地點、時間、油圖** - 依附訓練標題
+
+#### 🔸 弱 (輔助資訊 - 空白處補充)
+1. **視覺導瓶圖片** - 可選顯示, 極小化處理
+
+### 🎨 深色科技風設計語言
+
+#### 邊框式元件哲學
+- **無背景填充**: 完全透明背景，僅用邊框定義區域 
+- **發光邊框**: 使用品牌藍綠色 (#4A9EAF) 創造科技感
+- **分層邊框**: 主要/次要區域使用不同邊框樣式
+- **極簡線條**: 直線為主，圓角適度使用
+
+## 🏗️ Tech Borderless Layout 設計
+
+### Header 區域 (50px)
+```
+┌─ 使用者資訊區 ─ 藍綠色發光邊框 ─ 統計速覽 ─┐
+│ 王大明 [Two-Handed, Right]    185 avg     │ 
+│ 週五晚間練習 • 中正堂 • House Pattern     │
+└─────────────────────────────────────────────┘
+強: 使用者名稱 (18px Bold)      強: 平均分 (16px Bold)
+中: 風格標籤 (11px)             強: 訓練標題 (14px)  
+中: 地點資訊 (10px, 70%透明度)
+```
+
+### 統計區域 (35px)
+```
+┌─ 核心統計 ─ 虛線邊框 ────────────────────────┐
+│    185        76%       45%                 │ 20px Bold
+│   AVERAGE    STRIKE%   SPARE%               │ 10px Light  
+└─────────────────────────────────────────────┘
+數字使用金色強調 (#F39C12)
+標籤使用白色70%透明度
+```
+
+### Game Cards 區域 (228px = 6×38px)  
+```
+每局卡片 (38px高度, 僅邊框無背景):
+┌─ Game 1 ────────────────────────────────────┐
+│ 1  X  4/ X  7/ 81 X  9/ X  XX XXX    167   │ 16px
+│    ●  ○● ●  ○● ○○ ●  ○● ●  ●  ●●●          │ 8px (可選)
+└─────────────────────────────────────────────┘
+強: 局號 (16px Bold)
+強: 分數序列 (14px) - X金色, /藍綠, 數字白色
+強: 總分 (18px Bold, 右對齊)
+弱: 導瓶圖示 (6px點陣, 可設定隱藏)
+```
+
+### Bottom Actions (50px)
+```
+┌─ 操作區域 ─ 淡色邊框 ─────────────────────────┐
+│  [Save to JB]              [Exit]           │
+└─────────────────────────────────────────────┘
+按鈕採用無背景邊框式設計
+```
+
+## 📱 響應式空間分配
+
+### 總高度計算
+```
+Header:        50px  (13.3%)
+統計:         35px  (9.3%)  
+6局遊戲:      228px (60.4%)
+間距:         14px  (3.7%)
+底部操作:      50px  (13.3%)
+─────────────────────────
+總計:        377px  ✅
+```
+
+### 適配策略
+- **小螢幕**: 隱藏導瓶圖示，高度降至320px
+- **大螢幕**: 增加卡片間距，提升視覺舒適度
+- **橫向**: 2×3網格佈局Game cards
+
+## 🎯 技術實作規範
+
+### Color Tokens
+```dart
+class TechBorderColors {
+  // 邊框顏色
+  static const primary = Color(0xFF4A9EAF);      // 主邊框(發光)
+  static const secondary = Color(0x334A9EAF);    // 次邊框  
+  static const tertiary = Color(0x22FFFFFF);     // 輔助邊框
+  
+  // 內容顏色
+  static const strongText = Color(0xFFFFFFFF);   // 強資訊文字
+  static const mediumText = Color(0xB3FFFFFF);   // 中資訊文字  
+  static const weakText = Color(0x80FFFFFF);     // 弱資訊文字
+  
+  // 分數顏色
+  static const strike = Color(0xFFF39C12);       // Strike金色
+  static const spare = Color(0xFF4A9EAF);        // Spare藍綠
+  static const open = Color(0xFFBDC3C7);         // Open灰色
+}
+```
+
+### Layout Tokens  
+```dart
+class TechBorderSizes {
+  // 區域高度
+  static const headerHeight = 50.0;
+  static const statsHeight = 35.0; 
+  static const gameCardHeight = 38.0;
+  static const actionsHeight = 50.0;
+  
+  // 邊框樣式
+  static const primaryBorderWidth = 2.0;
+  static const secondaryBorderWidth = 1.0;
+  static const borderRadius = 8.0;
+  
+  // 間距系統
+  static const spacingXS = 2.0;
+  static const spacingS = 4.0;
+  static const spacingM = 8.0;
+  static const spacingL = 12.0;
+}
+```
+
+### 元件架構
+```
+lib/features/training/presentation/widgets/recap/tech_style/
+├── tech_border_container.dart       # 邊框容器基礎元件
+├── tech_header_section.dart         # Header區域
+├── tech_stats_section.dart          # 統計區域  
+├── tech_game_card.dart              # 單局Game卡片
+├── tech_score_display.dart          # 分數顯示元件
+└── tech_pin_indicator.dart          # 可選導瓶指示器
+```
+
+## 🎨 視覺設計細節
+
+### 邊框效果層級
+```dart
+// Level 1: 主要容器 (發光邊框)
+BoxDecoration(
+  border: Border.all(
+    color: TechBorderColors.primary,
+    width: 2.0,
+  ),
+  borderRadius: BorderRadius.circular(8),
+  boxShadow: [
+    BoxShadow(
+      color: TechBorderColors.primary.withOpacity(0.3),
+      blurRadius: 8,
+      spreadRadius: 1,
+    ),
+  ],
+)
+
+// Level 2: 次要區域 (標準邊框)  
+BoxDecoration(
+  border: Border.all(
+    color: TechBorderColors.secondary,
+    width: 1.0,
+  ),
+  borderRadius: BorderRadius.circular(6),
+)
+
+// Level 3: 輔助區域 (淡色邊框)
+BoxDecoration(
+  border: Border.all(
+    color: TechBorderColors.tertiary,
+    width: 1.0,
+  ),
+)
+```
+
+### Typography 層級
+```dart
+class TechBorderTextStyles {
+  // 強資訊文字
+  static const strongLarge = TextStyle(
+    fontSize: 18, fontWeight: FontWeight.bold,
+    color: TechBorderColors.strongText,
+  );
+  
+  static const strongMedium = TextStyle(
+    fontSize: 16, fontWeight: FontWeight.bold, 
+    color: TechBorderColors.strongText,
+  );
+  
+  // 中資訊文字
+  static const mediumNormal = TextStyle(
+    fontSize: 14, fontWeight: FontWeight.w500,
+    color: TechBorderColors.mediumText,  
+  );
+  
+  // 弱資訊文字
+  static const weakSmall = TextStyle(
+    fontSize: 10, fontWeight: FontWeight.normal,
+    color: TechBorderColors.weakText,
+  );
+}
+```
+
+## 📋 實作計畫
+
+### Phase 1: 核心元件建立 (2天)
+- [ ] TechBorderContainer 基礎容器
+- [ ] TechHeaderSection 使用者資訊區
+- [ ] TechStatsSection 統計展示區
+- [ ] TechGameCard 單局卡片
+
+### Phase 2: 互動與狀態 (1天)  
+- [ ] 導瓶圖示開關功能
+- [ ] 響應式佈局適配
+- [ ] 載入狀態處理
+
+### Phase 3: 細節優化 (1天)
+- [ ] 邊框動畫效果
+- [ ] 文字排版微調  
+- [ ] 效能優化測試
+
+## ✅ 設計優勢
+
+1. **資訊層級清晰**: 強中弱資訊明確區分，視覺焦點明確
+2. **科技感十足**: 邊框式設計符合深色科技風格  
+3. **空間利用高效**: 377px完美適配手機螢幕
+4. **可定製性強**: 導瓶圖示可選，響應式適配
+5. **品牌一致性**: 完全融入APP整體視覺語言
+
+---
+**結論**: Tech Borderless Design 完美平衡了資訊密度與視覺美感，既滿足了功能需求，又提升了APP的專業科技形象。建議立即開始實作核心元件。

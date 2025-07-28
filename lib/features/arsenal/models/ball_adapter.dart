@@ -6,12 +6,12 @@ import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 /// 用於在 popout detail 中顯示 Arsenal 中的球
 BowlingBall arsenalBallToBowlingBall(ArsenalBall arsenalBall) {
   return BowlingBall(
-    id: arsenalBall.name, // 使用名稱作為 ID
+    id: 0, // 使用預設 ID，因為 BowlingBall.id 是 int 類型
     name: arsenalBall.name,
     brand: arsenalBall.brand,
     coverstock: arsenalBall.cover, // cover 映射到 coverstock
     coverstockName: arsenalBall.cover, // 完整名稱也使用 cover
-    core: arsenalBall.core,
+    coreName: arsenalBall.core, // core 映射到 coreName
     imageUrl: arsenalBall.imagePath, // imagePath 映射到 imageUrl
   );
 }

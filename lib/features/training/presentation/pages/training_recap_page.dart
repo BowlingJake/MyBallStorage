@@ -1,21 +1,25 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 
 import 'package:bowlingarsenal_app/features/training/models/training_recap.dart';
-import 'package:bowlingarsenal_app/features/training/models/score_data.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/widgets/recap/frame_recap_widget.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/recap/training_recap_border_container.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/recap/training_recap_game_card.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/recap/training_recap_header_section.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/recap/training_recap_stats_section.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 
+/// Training Recap頁面 - 顯示訓練回顧資訊
 class TrainingRecapPage extends ConsumerStatefulWidget {
-  final TrainingRecap recap;
-
+  /// 建構函數
   const TrainingRecapPage({
-    super.key,
     required this.recap,
+    super.key,
   });
+
+  /// 訓練回顧數據
+  final TrainingRecap recap;
 
   @override
   ConsumerState<TrainingRecapPage> createState() => _TrainingRecapPageState();
@@ -29,33 +33,58 @@ class _TrainingRecapPageState extends ConsumerState<TrainingRecapPage> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _buildAppBar(context, theme),
-      body: Column(
-        children: [
-          // 固定的 Header 區域（不會捲動）
-          Container(
-            padding: const EdgeInsets.all(12.0),
-            child: _buildRecapHeader(context),
-          ),
-          
-          // 可捲動的遊戲列表區域
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 20),
-              itemCount: widget.recap.games.length + 1, // +1 for bottom actions
-              itemBuilder: (context, index) {
-                if (index == widget.recap.games.length) {
-                  // 最後一項是底部按鈕
-                  return _buildBottomActions(context);
-                }
-                return _buildGameCard(
-                  context, 
-                  widget.recap.games[index], 
-                  index + 1,
-                );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header區域 - 使用者資訊與訓練標題
+            Container(
+              padding: const EdgeInsets.all(TrainingRecapSizes.spacingM),
+              child: TrainingRecapHeaderSection(
+                recap: widget.recap,
+                bowlerHandStyle: 'Two-Handed', // TODO(dev): 從真實數據獲取
+                bowlerHandedness: 'Right', // TODO(dev): 從真實數據獲取
+              ),
             ),
-          ),
-        ],
+            
+            // 統計區域 - 平均分、Strike%、Spare%
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: TrainingRecapSizes.spacingM,),
+              child: TrainingRecapStatsSection(
+                statistics: widget.recap.statistics,
+              ),
+            ),
+            
+            const SizedBox(height: TrainingRecapSizes.spacingS),
+            
+            // 遊戲列表區域 - 動態高度
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: TrainingRecapSizes.spacingM,
+                  vertical: TrainingRecapSizes.spacingS,
+                ),
+                itemCount: widget.recap.games.length,
+                separatorBuilder: (context, index) => const SizedBox(
+                  height: TrainingRecapSizes.spacingXS,
+                ),
+                itemBuilder: (context, index) {
+                  return TrainingRecapGameCard(
+                    game: widget.recap.games[index],
+                    gameNumber: index + 1,
+                    ballName: 'Storm Phaze II', // TODO(dev): 從真實數據獲取球名
+                  );
+                },
+              ),
+            ),
+            
+            // 底部按鈕區域 - 固定在底部
+            Padding(
+              padding: const EdgeInsets.all(TrainingRecapSizes.spacingM),
+              child: _buildBottomActions(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -79,216 +108,15 @@ class _TrainingRecapPageState extends ConsumerState<TrainingRecapPage> {
     );
   }
 
-  Widget _buildRecapHeader(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Row(
-      children: [
-        // 左側：基本資訊
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.recap.bowlerName,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                widget.recap.bowlingCenter,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                widget.recap.oilPattern,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-        ),
-        
-        const SizedBox(width: 12),
-        
-        // 右側：統計資訊（重新設計以避免 overflow）
-        Expanded(
-          flex: 2, // 加長窗格
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.5),
-              ),
-            ),
-            child: Column(
-              children: [
-                // AVG 在上方
-                Text(
-                  '${widget.recap.statistics.average.toStringAsFixed(1)}',
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 28, // 稍微小一點
-                  ),
-                ),
-                Text(
-                  'AVG',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                
-                // STR% 和 SPR% 在下方（水平排列）
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          '${widget.recap.statistics.strikePercentage.toStringAsFixed(0)}%',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'STRIKE%',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          '${widget.recap.statistics.sparePercentage.toStringAsFixed(0)}%',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'SPARE%',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildGameCard(BuildContext context, BowlingScoreData game, int gameNumber) {
-    final theme = Theme.of(context);
-    final totalScore = game.frames.lastWhere(
-      (frame) => frame.totalScore != null,
-      orElse: () => Frame.empty(10),
-    ).totalScore ?? 0;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), // 進一步縮小垂直間距
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          // 遊戲標題和總分（進一步縮小）
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 進一步縮小
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Game $gameNumber Ball Used: xxxx',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 12, // 進一步縮小字體
-                  ),
-                ),
-                Text(
-                  totalScore.toString(),
-                  style: theme.textTheme.headlineSmall?.copyWith( // 縮小總分字體
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // 10格橫向排列（進一步優化空間）
-          Container(
-            height: 85, // 進一步縮小高度
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8), // 進一步縮小
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final availableWidth = constraints.maxWidth;
-                final spacing = 3.0; // 進一步縮小間距
-                final totalSpacing = spacing * 9;
-                final frameWidth = (availableWidth - totalSpacing) / 10;
-                final adjustedFrameWidth = frameWidth.clamp(32.0, 70.0); // 進一步調整寬度範圍
-                
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    final frame = index < game.frames.length 
-                        ? game.frames[index] 
-                        : Frame.empty(index + 1);
-                    
-                    return Container(
-                      width: index == 9 ? adjustedFrameWidth * 1.2 : adjustedFrameWidth,
-                      margin: EdgeInsets.only(right: index < 9 ? spacing : 0),
-                      child: FrameRecapWidget(
-                        frame: frame,
-                        frameNumber: index + 1,
-                        isLastFrame: index == 9,
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBottomActions(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
+    return TrainingRecapBorderContainer(
+      borderType: BorderType.tertiary,
+      padding: const EdgeInsets.symmetric(
+        horizontal: TrainingRecapSizes.spacingL,
+        vertical: TrainingRecapSizes.spacingM,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -296,18 +124,14 @@ class _TrainingRecapPageState extends ConsumerState<TrainingRecapPage> {
               text: 'Save to JB',
               icon: Iconsax.save_2,
               isPrimary: true,
-              onPressed: () {
-                // TODO: 實作儲存到 JB 功能
-                _handleSaveToJB();
-              },
+              onPressed: _handleSaveToJB,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: TrainingRecapSizes.spacingL),
           Expanded(
             child: AppStandardButton(
               text: 'Exit',
               icon: Iconsax.close_circle,
-              isPrimary: false,
               onPressed: () => context.pop(),
             ),
           ),
@@ -317,11 +141,11 @@ class _TrainingRecapPageState extends ConsumerState<TrainingRecapPage> {
   }
 
   void _handleSaveToJB() {
-    // TODO: 實作儲存功能
+    // TODO(dev): 實作儲存功能
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Save to JB functionality coming soon'),
       ),
     );
   }
-} 
+}

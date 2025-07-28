@@ -145,7 +145,7 @@ final filteredBallListProvider = Provider<List<BowlingBall>>((ref) {
     items = items.where((ball) => _matchesCoreFilter(ball.core, selectedFilters.core));
   }
   if (selectedFilters.coverstock != null) {
-    items = items.where((ball) => _matchesCoverstockFilter(ball.coverstock, selectedFilters.coverstock));
+    items = items.where((ball) => _matchesCoverstockFilter(ball.coverstock ?? '', selectedFilters.coverstock));
   }
 
   // 在所有篩選完成後，只呼叫一次 .toList()

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(dart run build_runner:*)",
+      "Bash(dart analyze:*)"
     ],
     "deny": []
   }
