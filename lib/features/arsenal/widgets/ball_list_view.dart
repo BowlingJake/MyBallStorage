@@ -10,7 +10,7 @@ import 'package:gradient_borders/gradient_borders.dart';
 // import 'package:getwidget/getwidget.dart'; // GFListTile is no longer used
 import 'package:bowlingarsenal_app/shared/widgets/painters/grid_painter.dart';
 import 'package:bowlingarsenal_app/shared/widgets/painters/metal_texture_painter.dart';
-import 'package:bowlingarsenal_app/features/ball_library/widgets/ball_card_item.dart';
+import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_card_item.dart';
 
 class BallListView extends StatelessWidget {
   const BallListView({

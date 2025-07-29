@@ -6,25 +6,6 @@ part of 'game_detail_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$trainingRepositoryHash() =>
-    r'83772f709685463c4fc1d05753b9b7a8097fd99d';
-
-/// See also [trainingRepository].
-@ProviderFor(trainingRepository)
-final trainingRepositoryProvider =
-    AutoDisposeProvider<TrainingRepository>.internal(
-  trainingRepository,
-  name: r'trainingRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$trainingRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TrainingRepositoryRef = AutoDisposeProviderRef<TrainingRepository>;
 String _$gameDetailNotifierHash() =>
     r'365745e18641eac2a00451e654879588d35957ac';
 

@@ -1,16 +1,9 @@
-import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
-import 'package:bowlingarsenal_app/features/training/data/training_repository.dart';
+import 'package:bowlingarsenal_app/features/training/logic/training_controller.dart';
 import 'package:bowlingarsenal_app/features/training/models/score_data.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'game_detail_provider.g.dart';
-
-@riverpod
-TrainingRepository trainingRepository(TrainingRepositoryRef ref) {
-  final supabase = ref.watch(supabaseClientProvider);
-  return TrainingRepository(supabase);
-}
 
 @riverpod
 class GameDetailNotifier extends _$GameDetailNotifier {

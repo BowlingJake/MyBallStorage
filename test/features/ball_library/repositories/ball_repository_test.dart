@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:bowlingarsenal_app/features/ball_library/repositories/ball_repository.dart';
-import 'package:bowlingarsenal_app/features/ball_library/repositories/ball_data_repository.dart';
-import 'package:bowlingarsenal_app/features/ball_library/services/ball_data_service.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_repository.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_service.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 
 // Mock classes

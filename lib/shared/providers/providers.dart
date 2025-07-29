@@ -4,16 +4,17 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
-import 'package:bowlingarsenal_app/features/ball_library/providers/ball_library_providers.dart';
+import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 
 export '../../features/onboarding/providers/onboarding_provider.dart';
 export 'user_profile_provider.dart';
-// Ball Library providers are now in features/ball_library/providers/ball_library_providers.dart
+// Ball Library controller and models are now in their new locations
 // They are re-exported here for backwards compatibility
-export 'package:bowlingarsenal_app/features/ball_library/providers/ball_library_providers.dart';
+export 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
+export 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 
 /// 全局底部導覽列索引
 final bottomNavProvider = StateProvider<int>((ref) => 0);
