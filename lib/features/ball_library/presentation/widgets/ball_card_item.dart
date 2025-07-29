@@ -43,18 +43,52 @@ class BallCardItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    // Top Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left: Ball Name
-                        Expanded(
-                          flex: 2,
-                          child: Text(
+                    // Left: Ball Image (Full Height)
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.grey.withOpacity(0.3),
+                          border: Border.all(
+                            color: brandColor.withOpacity(0.4),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.5),
+                          child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
+                              ? Image.network(
+                                  ball.imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.sports_baseball,
+                                      color: Colors.white54,
+                                      size: 35,
+                                    );
+                                  },
+                                )
+                              : const Icon(
+                                  Icons.sports_baseball,
+                                  color: Colors.white54,
+                                  size: 35,
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Right: Information Column
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Top: Ball Name
+                          Text(
                             ball.name,
                             style: const TextStyle(
                               fontSize: 18,
@@ -63,63 +97,9 @@ class BallCardItem extends StatelessWidget {
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Right: Brand and Region Tags
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: brandColor.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: brandColor.withOpacity(0.4),
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Text(
-                                cleanBrandName(ball.brand),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: brandColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Colors.grey.withOpacity(0.4),
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Text(
-                                ball.region ?? 'Unknown',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Bottom Section
-                    Row(
-                      children: [
-                        // Left: Core Type and Cover Type
-                        Expanded(
-                          flex: 2,
-                          child: Column(
+                          const SizedBox(height: 8),
+                          // Middle: Core & Cover Types
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -139,12 +119,9 @@ class BallCardItem extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Middle: RG, Diff, MB Data Blocks
-                        Expanded(
-                          flex: 3,
-                          child: Row(
+                          const SizedBox(height: 12),
+                          // Bottom: RG, Diff, MB Data Blocks
+                          Row(
                             children: [
                               Expanded(
                                 child: Container(
@@ -248,8 +225,8 @@ class BallCardItem extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
