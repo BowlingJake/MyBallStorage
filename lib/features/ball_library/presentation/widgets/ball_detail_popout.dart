@@ -1,12 +1,7 @@
-import 'dart:ui';
-
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:core_theme/core_theme.dart';
-import 'package:bowlingarsenal_app/utils/app_formatters.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/ball_image_widget.dart';
-// 導入原有的 BowlingBall 模型
+import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class BowlingBallDetailWidget extends StatefulWidget {
   const BowlingBallDetailWidget({required this.ball, super.key});
@@ -18,314 +13,175 @@ class BowlingBallDetailWidget extends StatefulWidget {
 }
 
 class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
-  bool isFavorited = false; // 收藏狀態
+  bool isFavorited = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
-    // 取得品牌色調色板，使用降飽和度的柔和色彩
     final brandPalette = getBrandTonalPalette(widget.ball.brand, theme);
-    final gradientColors = <Color>[
-      brandPalette.shade400.withOpacity(0.55),
-      brandPalette.shade500.withOpacity(0.35),
-    ];
-
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
+    final brandColor = brandPalette[400]!;
+    
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.85,
+        constraints: const BoxConstraints(maxWidth: 400),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.grey[600]!,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // 只在彈窗內容區域顯示品牌色漸層背景
+            // 頂部區域：關閉按鈕 + 圓形圖片 + 收藏按鈕
             Container(
-              width: size.width * 2 / 3,
-              constraints: const BoxConstraints(maxWidth: 420, minWidth: 280),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                gradient: LinearGradient(
-                  colors: gradientColors,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.10),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+              height: 180,
+              child: Stack(
+                children: [
+                  // 左上角關閉按鈕
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    ),
+                  ),
+                  // 右上角收藏按鈕
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: IconButton(
+                      icon: Icon(
+                        isFavorited ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorited ? Colors.red : Colors.white,
+                        size: 24,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isFavorited = !isFavorited;
+                        });
+                        // TODO: 實際收藏功能
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    ),
+                  ),
+                  // 中央圓形圖片
+                  Center(
+                    child: Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.withOpacity(0.3),
+                        border: Border.all(
+                          color: brandColor.withOpacity(0.6),
+                          width: 2,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: widget.ball.imageUrl.isNotEmpty && 
+                               widget.ball.imageUrl != 'https://via.placeholder.com/150'
+                            ? Image.network(
+                                widget.ball.imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.sports_baseball,
+                                    color: Colors.white54,
+                                    size: 70,
+                                  );
+                                },
+                              )
+                            : const Icon(
+                                Icons.sports_baseball,
+                                color: Colors.white54,
+                                size: 70,
+                              ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: Stack(
-                clipBehavior: Clip.none, // Stack 也不裁切
+            ),
+            // 中間區域：球資訊
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Column(
                 children: [
-                  Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                      child: Container(color: Colors.white.withOpacity(0.10)),
+                  // Brand
+                  Text(
+                    widget.ball.brand,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
+                    textAlign: TextAlign.left,
                   ),
-                  // 內容
-                  Padding(
-                    padding: const EdgeInsets.symmetric(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 上方 X 與愛心
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                onPressed: () => Navigator.of(context).pop(),
-                                tooltip: '關閉',
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  isFavorited
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color:
-                                      isFavorited ? Colors.red : Colors.white,
-                                  size: 26,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    isFavorited = !isFavorited;
-                                  });
-                                  // TODO: 在這裡添加實際的收藏功能邏輯
-                                },
-                                tooltip: isFavorited ? '取消收藏' : '收藏',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // 球主圖
-                        Center(
-                          child: Transform.translate(
-                            offset: const Offset(0, -10), // 整體往上移動 10px
-                            child: Stack(
-                              alignment: Alignment.center,
-                              clipBehavior: Clip.none, // 球圖片Stack也不裁切
-                              children: [
-                                // Spotlight 背景光源 - 球正後方的柔光效果
-                                Positioned(
-                                  child: Container(
-                                    width: 130, // 球直徑 × 1.3 (100 × 1.3)
-                                    height: 130,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: RadialGradient(
-                                        radius: 0.8,
-                                        colors: [
-                                          Colors.grey.withOpacity(
-                                            0.15,
-                                          ), // 中心淺灰白
-                                          Colors.white.withOpacity(
-                                            0.08,
-                                          ), // 中間層白光
-                                          Colors.transparent, // 邊緣透明
-                                        ],
-                                        stops: const [0.0, 0.5, 1.0],
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.white.withOpacity(0.06),
-                                          blurRadius: 22, // 20-24px 模糊讓光暈更柔和
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                // 陰影：使用 Positioned 放在球下方
-                                Positioned(
-                                  bottom: -18, // 放在球底部下方
-                                  child: Container(
-                                    width: 100 * 0.9,
-                                    height: 100 * 0.28,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.05),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          blurRadius: 25,
-                                          spreadRadius: 1,
-                                          offset: const Offset(0, 2),
-                                          color: Colors.black.withOpacity(0.15),
-                                        ),
-                                      ],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.elliptical(45, 14),
-                                      ), // 橢圓形
-                                    ),
-                                  ),
-                                ),
-                                // 頂層球圖片 - 更明顯的內陰影效果
-                                Container(
-                                  width: 100,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.12),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      // 球圖片
-                                      ClipOval(
-                                        child: BallImageWidget(
-                                          imageUrl: widget.ball.imageUrl,
-                                          width: 100,
-                                          height: 100,
-                                        ),
-                                      ),
-                                      // 接觸陰影 - 球底部內側的窄暗帶（環境遮蔽）
-                                      ClipOval(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: RadialGradient(
-                                              center: const Alignment(
-                                                0,
-                                                0.7,
-                                              ), // 靠近底部中心
-                                              radius: 0.6,
-                                              colors: [
-                                                Colors.transparent,
-                                                Colors.black.withOpacity(
-                                                  0.25,
-                                                ), // 接觸陰影較深
-                                              ],
-                                              stops: const [
-                                                0.7,
-                                                1.0,
-                                              ], // 只在邊緣很窄的範圍
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // 內陰影疊加層
-                                      ClipOval(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: RadialGradient(
-                                              center: const Alignment(
-                                                -0.3,
-                                                -0.3,
-                                              ), // 左上角偏移
-                                              radius: 0.8,
-                                              colors: [
-                                                Colors.black.withOpacity(
-                                                  0.15,
-                                                ), // 更明顯的陰影
-                                                Colors.black.withOpacity(0.05),
-                                                Colors.transparent,
-                                              ],
-                                              stops: const [0.0, 0.4, 0.8],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        // 標題
-                        Text(
-                          widget.ball.name,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.ball.brand,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        // 上排兩格（球心、球皮）
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _StatItem(
-                                  svgAsset: 'assets/images/core_logo.svg',
-                                  label: '球心',
-                                  value:
-                                      widget.ball.core.isNotEmpty
-                                          ? widget.ball.core
-                                          : '未知',
-                                ),
-                              ),
-                              Expanded(
-                                child: _StatItem(
-                                  svgAsset: 'assets/images/cover_logo.svg',
-                                  label: '球皮',
-                                  value: widget.ball.combinedCoverstockInfo,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // 下排三格（RG、RG差、MB diff）
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _StatItem(
-                                  svgAsset: 'assets/images/rg_logo.svg',
-                                  label: 'RG',
-                                  value:
-                                      widget.ball.rg?.toStringAsFixed(3) ??
-                                      'N/A',
-                                ),
-                              ),
-                              Expanded(
-                                child: _StatItem(
-                                  icon: Icons.trending_up,
-                                  label: 'RG差',
-                                  value:
-                                      widget.ball.diff?.toStringAsFixed(3) ??
-                                      'N/A',
-                                ),
-                              ),
-                              Expanded(
-                                child: _StatItem(
-                                  icon: Icons.balance,
-                                  label: 'MB',
-                                  value:
-                                      widget.ball.mbDiff?.toStringAsFixed(3) ??
-                                      'N/A',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                  const SizedBox(height: 4),
+                  // Ball Name
+                  Text(
+                    widget.ball.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
+                    textAlign: TextAlign.left,
+                  ),
+                  const SizedBox(height: 12),
+                  // Core Name
+                  _buildInfoRow('Core Name', widget.ball.coreName ?? 'Unknown'),
+                  const SizedBox(height: 6),
+                  // Core Type
+                  _buildInfoRow('Core Type', widget.ball.coreType ?? 'Unknown'),
+                  const SizedBox(height: 6),
+                  // Cover Name
+                  _buildInfoRow('Cover Name', widget.ball.coverstockName ?? 'Unknown'),
+                  const SizedBox(height: 6),
+                  // Cover Type
+                  _buildInfoRow('Cover Type', widget.ball.coverstockType ?? widget.ball.coverstock ?? 'Unknown'),
+                ],
+              ),
+            ),
+            // 底部區域：進度條
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  // RG 進度條
+                  _buildProgressBar(
+                    'RG',
+                    widget.ball.rg,
+                    2.460,
+                    2.700,
+                    const Color(0xFF4A90E2), // 科技藍
+                  ),
+                  const SizedBox(height: 16),
+                  // RG DIFF 進度條
+                  _buildProgressBar(
+                    'RG DIFF',
+                    widget.ball.diff,
+                    0.0,
+                    0.060,
+                    const Color(0xFF50C878), // 科技綠
+                  ),
+                  const SizedBox(height: 16),
+                  // MB DIFF 進度條
+                  _buildProgressBar(
+                    'MB DIFF',
+                    widget.ball.mbDiff,
+                    0.0,
+                    0.040,
+                    const Color(0xFF8B949E), // 科技灰
                   ),
                 ],
               ),
@@ -335,85 +191,100 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
       ),
     );
   }
-}
 
-class _StatItem extends StatelessWidget {
-  const _StatItem({
-    required this.label,
-    required this.value,
-    this.icon,
-    this.svgAsset,
-  });
-  final IconData? icon;
-  final String? svgAsset;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SizedBox(
-      height: 110, // 增加高度給文字更多空間
-      child: Column(
-        children: [
-          // 圖示區域固定高度
-          SizedBox(
-            height: 56, // 圖示區域固定高度
-            child: Center(
-              child:
-                  svgAsset != null
-                      ? SizedBox(
-                        height: 48,
-                        width: 48,
-                        child: SvgPicture.asset(
-                          svgAsset!,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      )
-                      : (icon != null
-                          ? Icon(icon, color: Colors.white, size: 48)
-                          : const SizedBox.shrink()),
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white70,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 4),
-          // 文字區域
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressBar(String label, double? value, double min, double max, Color color) {
+    final double progress = value != null ? ((value - min) / (max - min)).clamp(0.0, 1.0) : 0.0;
+    final String displayValue = value?.toStringAsFixed(3) ?? 'N/A';
+    
+    return Row(
+      children: [
+        // 標籤
+        SizedBox(
+          width: 70,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // 進度條容器 - Outlined設計
+        Expanded(
+          child: Container(
+            height: 24,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.black.withOpacity(0.8),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
+            ),
+            child: Stack(
+              children: [
+                // 進度條填充
+                FractionallySizedBox(
+                  alignment: Alignment.centerLeft,  
+                  widthFactor: progress,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.5),
+                      color: color.withOpacity(0.8),
+                    ),
+                  ),
+                ),
+                // 數值文字
+                Center(
+                  child: Text(
+                    displayValue,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 // 顯示球詳細資訊的輔助函數
 void showBallDetails(BuildContext context, BowlingBall ball) {
-  showModalBottomSheet(
+  showDialog(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.of(context).size.height * 0.90,
-      minHeight: 200,
-    ),
-    builder: (builderContext) {
-      return BowlingBallDetailWidget(ball: ball);
-    },
+    builder: (context) => BowlingBallDetailWidget(ball: ball),
   );
 }

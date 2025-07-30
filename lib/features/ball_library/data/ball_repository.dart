@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 
 /// 抽象的 Ball Repository 介面
 /// 定義了所有與保齡球庫數據相關的操作合約
@@ -12,6 +13,21 @@ abstract class BallRepository {
     required int limit,
     String? orderBy,
     bool ascending = true,
+  });
+
+  /// 根據搜尋條件、篩選條件和排序條件獲取保齡球列表
+  Future<List<BowlingBall>> getBallsWithFilters({
+    String? searchText,
+    BallFilters? filters,
+    SortCriterion? sortCriterion,
+    int? offset,
+    int? limit,
+  });
+
+  /// 根據搜尋條件、篩選條件獲取總數量
+  Future<int> getTotalCountWithFilters({
+    String? searchText,
+    BallFilters? filters,
   });
 
   /// 根據品牌篩選保齡球

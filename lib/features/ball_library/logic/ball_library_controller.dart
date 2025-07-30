@@ -43,16 +43,15 @@ class BallLibraryController extends _$BallLibraryController {
     try {
       print('🔄 BallLibraryController: Starting build...');
       
-      // 獲取總數量
+      // 獲取總數量（無篩選條件）
       final totalCount = await _repository.getTotalCount();
       print('📊 Total count: $totalCount');
       
-      // 獲取第一頁資料 (50筆)，使用預設排序
-      final balls = await _repository.getBallsPaginated(
+      // 使用新的方法獲取第一頁資料
+      final balls = await _repository.getBallsWithFilters(
+        sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
         offset: 0,
         limit: 50,
-        orderBy: 'create_at',
-        ascending: true,
       );
       print('🎯 First page balls: ${balls.length}');
       print('🎾 Sample ball names: ${balls.take(3).map((b) => b.name).toList()}');
@@ -84,118 +83,182 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     print('🔍 Searching for: "$searchText"');
-    print('🎯 All balls count: ${currentState.allBalls.length}');
     
-    if (searchText.isEmpty) {
-      // 搜尋文字清空時，重置為第一頁資料
-      final newState = currentState.copyWith(
-        searchText: searchText,
-        filteredBalls: currentState.allBalls,
-        hasMoreData: currentState.allBalls.length < currentState.totalCount,
-      );
-      state = AsyncValue.data(newState);
-      return;
-    }
-
-    // 如果有搜尋文字，需要搜尋所有資料
     try {
-      // 先取得所有資料進行搜尋
-      final allBalls = await _repository.getBallsPaginated(
+      // 使用新的Repository方法直接從資料庫搜尋
+      final filteredBalls = await _repository.getBallsWithFilters(
+        searchText: searchText.isEmpty ? null : searchText,
+        filters: currentState.filters,
+        sortCriterion: currentState.sortCriterion,
         offset: 0,
-        limit: currentState.totalCount, // 取得所有資料
-        orderBy: 'create_at',
-        ascending: true,
+        limit: null, // 搜尋時取得所有符合條件的資料
       );
       
-      print('🎾 Got ${allBalls.length} balls for search');
+      // 獲取符合搜尋條件的總數量
+      final filteredCount = await _repository.getTotalCountWithFilters(
+        searchText: searchText.isEmpty ? null : searchText,
+        filters: currentState.filters,
+      );
+      
+      print('✅ Search results: ${filteredBalls.length} balls');
       
       final newState = currentState.copyWith(
         searchText: searchText,
-        allBalls: allBalls,
+        filteredBalls: filteredBalls,
+        hasMoreData: false, // 搜尋時一次載入所有結果
+        currentPage: 0,
       );
       
-      final filteredBalls = _applyFiltersAndSort(allBalls, newState);
-      print('✅ Filtered results: ${filteredBalls.length}');
-      
-      state = AsyncValue.data(newState.copyWith(
-        filteredBalls: filteredBalls,
-        hasMoreData: false, // 搜尋時不需要分頁
-      ));
+      state = AsyncValue.data(newState);
     } catch (e) {
       print('❌ Search error: $e');
-      // 發生錯誤時至少更新搜尋文字
-      final newState = currentState.copyWith(searchText: searchText);
-      final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
-      state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+      final newState = currentState.copyWith(
+        searchText: searchText,
+        error: e.toString(),
+      );
+      state = AsyncValue.data(newState);
     }
   }
 
   /// 更新篩選條件
-  void updateFilters(BallFilters filters) {
+  Future<void> updateFilters(BallFilters filters) async {
     final currentState = state.value;
     if (currentState == null) return;
 
-    final newState = currentState.copyWith(filters: filters);
-    final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
-    
-    state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+    try {
+      print('🔧 Updating filters: ${filters.activeFilterCount} active');
+      
+      // 使用新的Repository方法直接從資料庫篩選
+      final filteredBalls = await _repository.getBallsWithFilters(
+        searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
+        filters: filters,
+        sortCriterion: currentState.sortCriterion,
+      );
+      
+      print('✅ Filter results: ${filteredBalls.length} balls');
+      
+      final newState = currentState.copyWith(
+        filters: filters,
+        filteredBalls: filteredBalls,
+        hasMoreData: false, // 篩選時一次載入所有結果
+        currentPage: 0,
+      );
+      
+      state = AsyncValue.data(newState);
+    } catch (e) {
+      print('❌ Filter error: $e');
+      final newState = currentState.copyWith(
+        filters: filters,
+        error: e.toString(),
+      );
+      state = AsyncValue.data(newState);
+    }
   }
 
   /// 更新品牌篩選
-  void updateBrandFilter(String? brand) {
+  Future<void> updateBrandFilter(String? brand) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final newFilters = currentState.filters.copyWith(brand: brand);
-    updateFilters(newFilters);
+    await updateFilters(newFilters);
   }
 
   /// 更新核心篩選
-  void updateCoreFilter(String? core) {
+  Future<void> updateCoreFilter(String? core) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final newFilters = currentState.filters.copyWith(core: core);
-    updateFilters(newFilters);
+    await updateFilters(newFilters);
   }
 
   /// 更新覆蓋篩選
-  void updateCoverstockFilter(String? coverstock) {
+  Future<void> updateCoverstockFilter(String? coverstock) async {
     final currentState = state.value;
     if (currentState == null) return;
 
     final newFilters = currentState.filters.copyWith(coverstock: coverstock);
-    updateFilters(newFilters);
+    await updateFilters(newFilters);
   }
 
   /// 更新排序條件
-  void updateSortCriterion(SortCriterion sortCriterion) {
+  Future<void> updateSortCriterion(SortCriterion sortCriterion) async {
     final currentState = state.value;
     if (currentState == null) return;
 
-    final newState = currentState.copyWith(sortCriterion: sortCriterion);
-    final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
-    
-    state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+    try {
+      print('📊 Updating sort: ${sortCriterion.field} ${sortCriterion.ascending ? "ASC" : "DESC"}');
+      
+      // 使用新的Repository方法直接從資料庫排序
+      final filteredBalls = await _repository.getBallsWithFilters(
+        searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
+        filters: currentState.filters,
+        sortCriterion: sortCriterion,
+      );
+      
+      print('✅ Sort results: ${filteredBalls.length} balls');
+      
+      final newState = currentState.copyWith(
+        sortCriterion: sortCriterion,
+        filteredBalls: filteredBalls,
+        hasMoreData: false, // 排序時一次載入所有結果
+        currentPage: 0,
+      );
+      
+      state = AsyncValue.data(newState);
+    } catch (e) {
+      print('❌ Sort error: $e');
+      final newState = currentState.copyWith(
+        sortCriterion: sortCriterion,
+        error: e.toString(),
+      );
+      state = AsyncValue.data(newState);
+    }
   }
 
   /// 更新排序條件 (別名方法)
-  void updateSort(SortCriterion sortCriterion) {
-    updateSortCriterion(sortCriterion);
+  Future<void> updateSort(SortCriterion sortCriterion) async {
+    await updateSortCriterion(sortCriterion);
   }
 
   /// 清除所有篩選條件
-  void clearAllFilters() {
+  Future<void> clearAllFilters() async {
     final currentState = state.value;
     if (currentState == null) return;
 
-    final newState = currentState.copyWith(
-      searchText: '',
-      filters: const BallFilters(),
-    );
-    final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
-    
-    state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+    try {
+      print('🧹 Clearing all filters');
+      
+      // 重新載入第一頁資料，無任何篩選條件
+      final balls = await _repository.getBallsWithFilters(
+        sortCriterion: currentState.sortCriterion,
+        offset: 0,
+        limit: 50,
+      );
+      
+      final totalCount = await _repository.getTotalCount();
+      
+      print('✅ Cleared filters: ${balls.length} balls');
+      
+      final newState = currentState.copyWith(
+        searchText: '',
+        filters: const BallFilters(),
+        filteredBalls: balls,
+        hasMoreData: balls.length < totalCount,
+        currentPage: 0,
+      );
+      
+      state = AsyncValue.data(newState);
+    } catch (e) {
+      print('❌ Clear filters error: $e');
+      final newState = currentState.copyWith(
+        searchText: '',
+        filters: const BallFilters(),
+        error: e.toString(),
+      );
+      state = AsyncValue.data(newState);
+    }
   }
 
   /// 載入更多資料
@@ -205,30 +268,38 @@ class BallLibraryController extends _$BallLibraryController {
       return;
     }
 
+    // 如果有搜尋或篩選條件，不支援分頁載入更多
+    if (currentState.searchText.isNotEmpty || currentState.filters.activeFilterCount > 0) {
+      print('⚠️ Load more not supported with active filters/search');
+      return;
+    }
+
     state = AsyncValue.data(currentState.copyWith(isLoadingMore: true));
 
     try {
       final nextPage = currentState.currentPage + 1;
       final offset = nextPage * currentState.pageSize;
       
-      final newBalls = await _repository.getBallsPaginated(
+      print('📄 Loading more: page $nextPage, offset $offset');
+      
+      final newBalls = await _repository.getBallsWithFilters(
+        sortCriterion: currentState.sortCriterion,
         offset: offset,
         limit: currentState.pageSize,
-        orderBy: 'create_at',
-        ascending: true,
       );
 
-      final updatedAllBalls = [...currentState.allBalls, ...newBalls];
       final allBalls = [...currentState.filteredBalls, ...newBalls];
       
+      print('✅ Loaded ${newBalls.length} more balls, total: ${allBalls.length}');
+      
       state = AsyncValue.data(currentState.copyWith(
-        allBalls: updatedAllBalls,
         filteredBalls: allBalls,
         currentPage: nextPage,
         isLoadingMore: false,
         hasMoreData: allBalls.length < currentState.totalCount,
       ));
     } catch (e) {
+      print('❌ Load more error: $e');
       state = AsyncValue.data(currentState.copyWith(
         isLoadingMore: false,
         error: e.toString(),
@@ -241,14 +312,17 @@ class BallLibraryController extends _$BallLibraryController {
     state = const AsyncValue.loading();
     
     try {
+      print('🔄 Refreshing ball library...');
+      
       final totalCount = await _repository.getTotalCount();
       
-      final balls = await _repository.getBallsPaginated(
+      final balls = await _repository.getBallsWithFilters(
+        sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
         offset: 0,
         limit: 50,
-        orderBy: 'create_at',
-        ascending: true,
       );
+      
+      print('✅ Refreshed: ${balls.length} balls');
       
       state = AsyncValue.data(BallLibraryState(
         allBalls: balls,
@@ -260,90 +334,8 @@ class BallLibraryController extends _$BallLibraryController {
         error: null,
       ));
     } catch (e) {
+      print('❌ Refresh error: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
-  }
-
-  /// 根據搜尋、篩選和排序條件處理球列表
-  List<BowlingBall> _applyFiltersAndSort(List<BowlingBall> balls, BallLibraryState state) {
-    Iterable<BowlingBall> items = balls;
-
-    // 搜尋篩選
-    if (state.searchText.isNotEmpty) {
-      items = items.where((ball) =>
-          ball.name.toLowerCase().contains(state.searchText.toLowerCase()) ||
-          ball.brand.toLowerCase().contains(state.searchText.toLowerCase()));
-    }
-
-    // 品牌篩選
-    if (state.filters.brand != null) {
-      items = items.where((ball) => 
-          state.matchesBrandFilter(ball.brand, state.filters.brand));
-    }
-
-    // 核心篩選
-    if (state.filters.core != null) {
-      items = items.where((ball) => 
-          state.matchesCoreFilter(ball.core, state.filters.core));
-    }
-
-    // 覆蓋篩選
-    if (state.filters.coverstock != null) {
-      items = items.where((ball) => 
-          state.matchesCoverstockFilter(ball.coverstock ?? '', state.filters.coverstock));
-    }
-
-    // 轉換為列表以進行排序
-    final filteredList = items.toList();
-
-    // 排序
-    filteredList.sort((a, b) {
-      int comparison;
-      switch (state.sortCriterion.field) {
-        case SortField.id:
-          comparison = a.id.compareTo(b.id);
-          break;
-        case SortField.name:
-          comparison = a.name.compareTo(b.name);
-          break;
-        case SortField.brand:
-          comparison = a.brand.compareTo(b.brand);
-          if (comparison == 0) {
-            comparison = a.name.compareTo(b.name);
-          }
-          break;
-        case SortField.releaseYear:
-          if (a.releaseDate == null && b.releaseDate == null) {
-            comparison = a.name.compareTo(b.name);
-          } else if (a.releaseDate == null) {
-            comparison = 1;
-          } else if (b.releaseDate == null) {
-            comparison = -1;
-          } else {
-            comparison = a.releaseDate!.compareTo(b.releaseDate!);
-            if (comparison == 0) {
-              comparison = a.name.compareTo(b.name);
-            }
-          }
-          break;
-        case SortField.rg:
-          if (a.rg == null && b.rg == null) {
-            comparison = a.name.compareTo(b.name);
-          } else if (a.rg == null) {
-            comparison = 1;
-          } else if (b.rg == null) {
-            comparison = -1;
-          } else {
-            comparison = a.rg!.compareTo(b.rg!);
-            if (comparison == 0) {
-              comparison = a.name.compareTo(b.name);
-            }
-          }
-          break;
-      }
-      return state.sortCriterion.ascending ? comparison : -comparison;
-    });
-
-    return filteredList;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_service.dart';
+import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 
 /// BallRepository的具體實現，基於BallDataService
@@ -96,5 +97,123 @@ class BallDataRepository implements BallRepository {
     // 由於BallDataService使用私有字段快取，我們無法直接清除
     // 在實際實現中，可能需要修改BallDataService或使用其他策略
     // 暫時留空，或者可以重新創建service實例
+  }
+
+  @override
+  Future<List<BowlingBall>> getBallsWithFilters({
+    String? searchText,
+    BallFilters? filters,
+    SortCriterion? sortCriterion,
+    int? offset,
+    int? limit,
+  }) async {
+    final allBalls = await _ballDataService.loadBallData();
+    Iterable<BowlingBall> filteredBalls = allBalls;
+
+    // 搜尋條件
+    if (searchText != null && searchText.isNotEmpty) {
+      final lowercaseQuery = searchText.toLowerCase();
+      filteredBalls = filteredBalls.where((ball) =>
+          ball.name.toLowerCase().contains(lowercaseQuery) ||
+          ball.brand.toLowerCase().contains(lowercaseQuery));
+    }
+
+    // 篩選條件
+    if (filters != null) {
+      if (filters.brand != null) {
+        filteredBalls = filteredBalls.where((ball) =>
+            ball.brand.toLowerCase().contains(filters.brand!.toLowerCase()));
+      }
+      if (filters.core != null) {
+        filteredBalls = filteredBalls.where((ball) {
+          final core = ball.core.toLowerCase();
+          return core.contains(filters.core!.toLowerCase());
+        });
+      }
+      if (filters.coverstock != null) {
+        filteredBalls = filteredBalls.where((ball) {
+          final coverstock = (ball.coverstock ?? '').toLowerCase();
+          final selectedCoverstock = filters.coverstock!.toLowerCase();
+          
+          switch (selectedCoverstock) {
+            case 'urethane':
+              return coverstock.contains('urethane');
+            case 'polyester':
+              return coverstock.contains('polyester') || coverstock.contains('poly');
+            case 'solid reactive':
+              return coverstock.contains('solid') && coverstock.contains('reactive');
+            case 'pearl reactive':
+              return coverstock.contains('pearl') && coverstock.contains('reactive');
+            case 'hybrid reactive':
+              return coverstock.contains('hybrid') && coverstock.contains('reactive');
+            default:
+              return false;
+          }
+        });
+      }
+    }
+
+    // 排序
+    final ballsList = filteredBalls.toList();
+    if (sortCriterion != null) {
+      ballsList.sort((a, b) {
+        int comparison;
+        switch (sortCriterion.field) {
+          case SortField.id:
+            comparison = a.id.compareTo(b.id);
+            break;
+          case SortField.name:
+            comparison = a.name.compareTo(b.name);
+            break;
+          case SortField.brand:
+            comparison = a.brand.compareTo(b.brand);
+            break;
+          case SortField.releaseYear:
+            if (a.releaseDate == null && b.releaseDate == null) {
+              comparison = 0;
+            } else if (a.releaseDate == null) {
+              comparison = 1;
+            } else if (b.releaseDate == null) {
+              comparison = -1;
+            } else {
+              comparison = a.releaseDate!.compareTo(b.releaseDate!);
+            }
+            break;
+          case SortField.rg:
+            if (a.rg == null && b.rg == null) {
+              comparison = 0;
+            } else if (a.rg == null) {
+              comparison = 1;
+            } else if (b.rg == null) {
+              comparison = -1;
+            } else {
+              comparison = a.rg!.compareTo(b.rg!);
+            }
+            break;
+        }
+        return sortCriterion.ascending ? comparison : -comparison;
+      });
+    }
+
+    // 分頁
+    if (offset != null && limit != null) {
+      final start = offset.clamp(0, ballsList.length);
+      final end = (offset + limit).clamp(0, ballsList.length);
+      return ballsList.sublist(start, end);
+    }
+
+    return ballsList;
+  }
+
+  @override
+  Future<int> getTotalCountWithFilters({
+    String? searchText,
+    BallFilters? filters,
+  }) async {
+    final filteredBalls = await getBallsWithFilters(
+      searchText: searchText,
+      filters: filters,
+    );
+    return filteredBalls.length;
   }
 } 

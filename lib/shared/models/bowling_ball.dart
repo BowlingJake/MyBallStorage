@@ -53,6 +53,8 @@ class BowlingBall with _$BowlingBall {
       coreName: json['core_name'] as String?,
       coreType: json['core_type'] as String?,
       coverstockType: json['coverstock_type'] as String?,
+      coverstockName: json['coverstock_name'] as String?,
+      coverstock: json['coverstock'] as String?,
       imageUrl: json['image_url'] as String? ?? 'https://via.placeholder.com/150',
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
@@ -62,6 +64,10 @@ class BowlingBall with _$BowlingBall {
       createdAt: json['created_at'] as String? ?? json['create_at'] as String?,
 
 
+      // --- 舊資料兼容欄位 ---
+      factoryFinish: json['factory_finish'] as String?,
+      releaseDate: json['release_date'] as String?,
+      
       // --- 用戶自定義數據 ---
       handType: json['handType'] as String?,
       layoutType: json['layoutType'] as String?,

@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
+import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -166,5 +167,164 @@ class SupabaseBallRepository implements BallRepository {
   void clearCache() {
     // Supabase不需要清除快取，因為每次都直接從資料庫讀取
     // 如果需要實作快取機制，可以在這裡加入相關邏輯
+  }
+
+  @override
+  Future<List<BowlingBall>> getBallsWithFilters({
+    String? searchText,
+    BallFilters? filters,
+    SortCriterion? sortCriterion,
+    int? offset,
+    int? limit,
+  }) async {
+    try {
+      print('🔍 SupabaseBallRepository: getBallsWithFilters');
+      print('   searchText: $searchText');
+      print('   filters: ${filters?.activeFilterCount ?? 0} active');
+      print('   sortCriterion: ${sortCriterion?.field}');
+      print('   offset: $offset, limit: $limit');
+
+      // 建立基本查詢
+      var query = _supabase.from('ball_data').select('*');
+
+      // 搜尋條件
+      if (searchText != null && searchText.isNotEmpty) {
+        query = query.or('ball_name.ilike.%$searchText%,brand.ilike.%$searchText%');
+      }
+
+      // 篩選條件
+      if (filters != null) {
+        if (filters.brand != null) {
+          query = query.ilike('brand', '%${filters.brand}%');
+        }
+        if (filters.core != null) {
+          query = query.or('core_name.ilike.%${filters.core}%,core_type.ilike.%${filters.core}%');
+        }
+        if (filters.coverstock != null) {
+          // 根據覆蓋類型篩選
+          final coverstock = filters.coverstock!.toLowerCase();
+          if (coverstock == 'urethane') {
+            query = query.or('coverstock_name.ilike.%urethane%,coverstock_type.ilike.%urethane%');
+          } else if (coverstock == 'polyester') {
+            query = query.or('coverstock_name.ilike.%polyester%,coverstock_type.ilike.%polyester%,coverstock_name.ilike.%poly%,coverstock_type.ilike.%poly%');
+          } else if (coverstock == 'solid reactive') {
+            // 使用複合查詢：包含 solid 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)');
+          } else if (coverstock == 'pearl reactive') {
+            // 使用複合查詢：包含 pearl 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)');
+          } else if (coverstock == 'hybrid reactive') {
+            // 使用複合查詢：包含 hybrid 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)');
+          }
+        }
+      }
+
+      // 排序條件
+      String orderByField = 'id';
+      bool ascending = true;
+      
+      if (sortCriterion != null) {
+        ascending = sortCriterion.ascending;
+        switch (sortCriterion.field) {
+          case SortField.id:
+            orderByField = 'id';
+          case SortField.name:
+            orderByField = 'ball_name';
+          case SortField.brand:
+            orderByField = 'brand';
+          case SortField.releaseYear:
+            orderByField = 'release_date';
+          case SortField.rg:
+            orderByField = 'rg';
+        }
+      }
+
+      // 應用排序和分頁，然後執行查詢
+      if (offset != null && limit != null) {
+        final response = await query
+            .order(orderByField, ascending: ascending)
+            .range(offset, offset + limit - 1);
+        
+        print('   Result count: ${(response as List).length}');
+        
+        return (response as List<dynamic>)
+            .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } else {
+        final response = await query.order(orderByField, ascending: ascending);
+        
+        print('   Result count: ${(response as List).length}');
+        
+        return (response as List<dynamic>)
+            .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
+            .toList();
+      }
+
+      // 這部分已經在上面處理了
+    } catch (e, stackTrace) {
+      print('❌ SupabaseBallRepository getBallsWithFilters error: $e');
+      print('Stack trace: $stackTrace');
+      throw Exception('Failed to fetch balls with filters: $e');
+    }
+  }
+
+  @override
+  Future<int> getTotalCountWithFilters({
+    String? searchText,
+    BallFilters? filters,
+  }) async {
+    try {
+      print('🔍 SupabaseBallRepository: getTotalCountWithFilters');
+      print('   searchText: $searchText');
+      print('   filters: ${filters?.activeFilterCount ?? 0} active');
+
+      // 建立查詢來取得符合條件的資料並計算數量
+      var query = _supabase.from('ball_data').select('id');
+
+      // 搜尋條件
+      if (searchText != null && searchText.isNotEmpty) {
+        query = query.or('ball_name.ilike.%$searchText%,brand.ilike.%$searchText%');
+      }
+
+      // 篩選條件
+      if (filters != null) {
+        if (filters.brand != null) {
+          query = query.ilike('brand', '%${filters.brand}%');
+        }
+        if (filters.core != null) {
+          query = query.or('core_name.ilike.%${filters.core}%,core_type.ilike.%${filters.core}%');
+        }
+        if (filters.coverstock != null) {
+          // 根據覆蓋類型篩選
+          final coverstock = filters.coverstock!.toLowerCase();
+          if (coverstock == 'urethane') {
+            query = query.or('coverstock_name.ilike.%urethane%,coverstock_type.ilike.%urethane%');
+          } else if (coverstock == 'polyester') {
+            query = query.or('coverstock_name.ilike.%polyester%,coverstock_type.ilike.%polyester%,coverstock_name.ilike.%poly%,coverstock_type.ilike.%poly%');
+          } else if (coverstock == 'solid reactive') {
+            // 使用複合查詢：包含 solid 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)');
+          } else if (coverstock == 'pearl reactive') {
+            // 使用複合查詢：包含 pearl 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)');
+          } else if (coverstock == 'hybrid reactive') {
+            // 使用複合查詢：包含 hybrid 且包含 reactive
+            query = query.or('and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)');
+          }
+        }
+      }
+
+      // 執行查詢並計算數量
+      final response = await query;
+      final count = (response as List).length;
+      
+      print('   Total count with filters: $count');
+      return count;
+    } catch (e, stackTrace) {
+      print('❌ SupabaseBallRepository getTotalCountWithFilters error: $e');
+      print('Stack trace: $stackTrace');
+      throw Exception('Failed to get total count with filters: $e');
+    }
   }
 }
