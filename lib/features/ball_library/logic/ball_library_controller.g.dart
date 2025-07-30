@@ -8,7 +8,7 @@ part of 'ball_library_controller.dart';
 
 String _$ballDataServiceHash() => r'bf317fe8b12e3a3930463b9a7cd8b8ba4f5392b1';
 
-/// 提供 BallDataService 的 Provider
+/// 提供 BallDataService 的 Provider (本地JSON檔案)
 ///
 /// Copied from [ballDataService].
 @ProviderFor(ballDataService)
@@ -25,9 +25,30 @@ final ballDataServiceProvider = AutoDisposeProvider<BallDataService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BallDataServiceRef = AutoDisposeProviderRef<BallDataService>;
-String _$ballRepositoryHash() => r'7d30ff1b723e82fe453e4dd84ade0f00bbd369a8';
+String _$localBallRepositoryHash() =>
+    r'9bbb2680f84db47a6fe3d908309e3e65ffe82306';
 
-/// 提供 BallRepository 的 Provider
+/// 提供本地JSON檔案的 BallRepository
+///
+/// Copied from [localBallRepository].
+@ProviderFor(localBallRepository)
+final localBallRepositoryProvider =
+    AutoDisposeProvider<BallRepository>.internal(
+  localBallRepository,
+  name: r'localBallRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$localBallRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef LocalBallRepositoryRef = AutoDisposeProviderRef<BallRepository>;
+String _$ballRepositoryHash() => r'5086569ff32c4e3c75af801bf2d93ebe1888906b';
+
+/// 提供 Supabase 的 BallRepository
 ///
 /// Copied from [ballRepository].
 @ProviderFor(ballRepository)
@@ -45,7 +66,7 @@ final ballRepositoryProvider = AutoDisposeProvider<BallRepository>.internal(
 // ignore: unused_element
 typedef BallRepositoryRef = AutoDisposeProviderRef<BallRepository>;
 String _$ballLibraryControllerHash() =>
-    r'dc62ee2843137e5c51653cad6593f7b05d0ea284';
+    r'1b8fe6799bd998167fd120191f22e77e0bba7251';
 
 /// Ball Library 控制器
 /// 專注於球庫相關的業務邏輯和狀態管理

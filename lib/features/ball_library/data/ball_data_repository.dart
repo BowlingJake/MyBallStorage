@@ -11,7 +11,49 @@ class BallDataRepository implements BallRepository {
 
   @override
   Future<List<BowlingBall>> getAllBalls() async {
-    return await _ballDataService.loadBallData();
+    final balls = await _ballDataService.loadBallData();
+    balls.sort((a, b) => a.id.compareTo(b.id));  // 預設按ID排序
+    return balls;
+  }
+
+  @override
+  Future<List<BowlingBall>> getBallsPaginated({
+    required int offset,
+    required int limit,
+    String? orderBy,
+    bool ascending = true,
+  }) async {
+    final allBalls = await _ballDataService.loadBallData();
+    
+    // 排序
+    allBalls.sort((a, b) {
+      int comparison;
+      switch (orderBy) {
+        case 'ball_name':
+          comparison = a.name.compareTo(b.name);
+          break;
+        case 'brand':
+          comparison = a.brand.compareTo(b.brand);
+          break;
+        default: // 預設使用ID
+          comparison = a.id.compareTo(b.id);
+      }
+      return ascending ? comparison : -comparison;
+    });
+    
+    // 分頁
+    final start = offset;
+    final end = (offset + limit).clamp(0, allBalls.length);
+    
+    if (start >= allBalls.length) return [];
+    
+    return allBalls.sublist(start, end);
+  }
+
+  @override
+  Future<int> getTotalCount() async {
+    final balls = await _ballDataService.loadBallData();
+    return balls.length;
   }
 
   @override

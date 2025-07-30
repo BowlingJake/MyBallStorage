@@ -1,4 +1,6 @@
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/database_test_helper.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/rls_diagnostic.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
@@ -50,25 +52,68 @@ class BallLibraryPage extends ConsumerWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
-        ),
-        body: ballLibraryAsync.when(
-          data: (state) => Column(
-            children: [
-              const SizedBox(height: 100),
-              // 新的簡化控制面板將在下一步添加
-              _buildSimplifiedControls(context, ref, state),
-              const SizedBox(height: 16),
-              // 球列表
-              Expanded(
-                child: state.filteredBalls.isEmpty
-                    ? _buildEmptyState(state.hasActiveFilters)
-                    : BallListView(
-                        bowlingBalls: state.filteredBalls,
-                        onBallTapped: (ball) => _showBallDetail(context, ball),
-                      ),
+          actions: [
+            if (kDebugMode) ...[
+              IconButton(
+                icon: const Icon(Icons.bug_report, color: Colors.orange),
+                onPressed: () async {
+                  print('🔧 Testing database connection...');
+                  await DatabaseTestHelper.testConnection();
+                },
+                tooltip: 'Test Database',
+              ),
+              IconButton(
+                icon: const Icon(Icons.security, color: Colors.red),
+                onPressed: () async {
+                  print('🔐 Diagnosing RLS...');
+                  await RLSDiagnostic.diagnoseRLS();
+                  RLSDiagnostic.printRLSFixSQL();
+                },
+                tooltip: 'Diagnose RLS',
               ),
             ],
-          ),
+          ],
+        ),
+        body: ballLibraryAsync.when(
+          data: (state) {
+            print('🎨 UI Rendering: ${state.filteredBalls.length} balls');
+            print('   isLoading: ${state.isLoading}');
+            print('   hasMoreData: ${state.hasMoreData}');
+            print('   error: ${state.error}');
+            
+            return Column(
+              children: [
+                const SizedBox(height: 100),
+                // 新的簡化控制面板將在下一步添加
+                _buildSimplifiedControls(context, ref, state),
+                const SizedBox(height: 16),
+                // 球列表
+                Expanded(
+                  child: state.filteredBalls.isEmpty
+                      ? _buildEmptyState(state.hasActiveFilters)
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: BallListView(
+                                bowlingBalls: state.filteredBalls,
+                                onBallTapped: (ball) => _showBallDetail(context, ball),
+                                onScrollEnd: () {
+                                  // 滾動到底部時載入更多
+                                  if (state.hasMoreData && !state.isLoadingMore) {
+                                    ref.read(ballLibraryControllerProvider.notifier).loadMore();
+                                  }
+                                },
+                              ),
+                            ),
+                            // 載入更多文字提示 - 只在有更多資料時顯示
+                            if (state.hasMoreData || state.isLoadingMore)
+                              _buildLoadMoreFooter(context, ref, state),
+                          ],
+                        ),
+                ),
+              ],
+            );
+          },
           loading: () => const Center(
             child: CircularProgressIndicator(),
           ),
@@ -257,6 +302,69 @@ class BallLibraryPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildLoadMoreFooter(BuildContext context, WidgetRef ref, BallLibraryState state) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      child: state.isLoadingMore
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white54),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '載入中...',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            )
+          : GestureDetector(
+              onTap: () {
+                ref.read(ballLibraryControllerProvider.notifier).loadMore();
+              },
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[600]!),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '點擊載入更多',
+                        style: TextStyle(
+                          color: Colors.grey[300],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '(${state.filteredBalls.length}/${state.totalCount})',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+    );
+  }
+
   void _showBallDetail(BuildContext context, BowlingBall ball) {
     if (kDebugMode) {
       print('Tapped on ball: ${ball.name}');
@@ -303,6 +411,7 @@ class _SortDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+            _buildSortOption('ID', SortField.id),
             _buildSortOption('Name', SortField.name),
             _buildSortOption('Brand', SortField.brand),
             _buildSortOption('Release Year', SortField.releaseYear),

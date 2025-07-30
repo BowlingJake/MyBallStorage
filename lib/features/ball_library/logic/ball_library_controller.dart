@@ -1,24 +1,33 @@
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_service.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/supabase_ball_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'ball_library_controller.g.dart';
 
-/// 提供 BallDataService 的 Provider
+/// 提供 BallDataService 的 Provider (本地JSON檔案)
 @riverpod
 BallDataService ballDataService(BallDataServiceRef ref) {
   return BallDataService();
 }
 
-/// 提供 BallRepository 的 Provider
+/// 提供本地JSON檔案的 BallRepository
 @riverpod
-BallRepository ballRepository(BallRepositoryRef ref) {
+BallRepository localBallRepository(LocalBallRepositoryRef ref) {
   final dataService = ref.watch(ballDataServiceProvider);
   return BallDataRepository(dataService);
+}
+
+/// 提供 Supabase 的 BallRepository
+@riverpod
+BallRepository ballRepository(BallRepositoryRef ref) {
+  final supabaseClient = ref.watch(supabaseClientProvider);
+  return SupabaseBallRepository(supabaseClient);
 }
 
 /// Ball Library 控制器
@@ -32,15 +41,35 @@ class BallLibraryController extends _$BallLibraryController {
     _repository = ref.watch(ballRepositoryProvider);
     
     try {
-      final balls = await _repository.getAllBalls();
-      final filteredBalls = _applyFiltersAndSort(balls, const BallLibraryState());
+      print('🔄 BallLibraryController: Starting build...');
       
-      return BallLibraryState(
-        allBalls: balls,
-        filteredBalls: filteredBalls,
-        isLoading: false,
+      // 獲取總數量
+      final totalCount = await _repository.getTotalCount();
+      print('📊 Total count: $totalCount');
+      
+      // 獲取第一頁資料 (50筆)，使用預設排序
+      final balls = await _repository.getBallsPaginated(
+        offset: 0,
+        limit: 50,
+        orderBy: 'create_at',
+        ascending: true,
       );
-    } catch (e) {
+      print('🎯 First page balls: ${balls.length}');
+      print('🎾 Sample ball names: ${balls.take(3).map((b) => b.name).toList()}');
+      
+      final state = BallLibraryState(
+        filteredBalls: balls,
+        isLoading: false,
+        totalCount: totalCount,
+        hasMoreData: balls.length < totalCount,
+        currentPage: 0,
+      );
+      
+      print('✅ State created: ${state.filteredBalls.length} balls, hasMore: ${state.hasMoreData}');
+      return state;
+    } catch (e, stackTrace) {
+      print('❌ BallLibraryController build error: $e');
+      print('Stack trace: $stackTrace');
       return BallLibraryState(
         isLoading: false,
         error: e.toString(),
@@ -127,19 +156,62 @@ class BallLibraryController extends _$BallLibraryController {
     state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
   }
 
+  /// 載入更多資料
+  Future<void> loadMore() async {
+    final currentState = state.value;
+    if (currentState == null || currentState.isLoadingMore || !currentState.hasMoreData) {
+      return;
+    }
+
+    state = AsyncValue.data(currentState.copyWith(isLoadingMore: true));
+
+    try {
+      final nextPage = currentState.currentPage + 1;
+      final offset = nextPage * currentState.pageSize;
+      
+      final newBalls = await _repository.getBallsPaginated(
+        offset: offset,
+        limit: currentState.pageSize,
+        orderBy: 'create_at',
+        ascending: true,
+      );
+
+      final allBalls = [...currentState.filteredBalls, ...newBalls];
+      
+      state = AsyncValue.data(currentState.copyWith(
+        filteredBalls: allBalls,
+        currentPage: nextPage,
+        isLoadingMore: false,
+        hasMoreData: allBalls.length < currentState.totalCount,
+      ));
+    } catch (e) {
+      state = AsyncValue.data(currentState.copyWith(
+        isLoadingMore: false,
+        error: e.toString(),
+      ));
+    }
+  }
+
   /// 重新載入球庫資料
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     
     try {
-      final balls = await _repository.getAllBalls();
-      final currentState = state.value ?? const BallLibraryState();
-      final filteredBalls = _applyFiltersAndSort(balls, currentState);
+      final totalCount = await _repository.getTotalCount();
       
-      state = AsyncValue.data(currentState.copyWith(
-        allBalls: balls,
-        filteredBalls: filteredBalls,
+      final balls = await _repository.getBallsPaginated(
+        offset: 0,
+        limit: 50,
+        orderBy: 'create_at',
+        ascending: true,
+      );
+      
+      state = AsyncValue.data(BallLibraryState(
+        filteredBalls: balls,
         isLoading: false,
+        totalCount: totalCount,
+        hasMoreData: balls.length < totalCount,
+        currentPage: 0,
         error: null,
       ));
     } catch (e) {
@@ -183,6 +255,9 @@ class BallLibraryController extends _$BallLibraryController {
     filteredList.sort((a, b) {
       int comparison;
       switch (state.sortCriterion.field) {
+        case SortField.id:
+          comparison = a.id.compareTo(b.id);
+          break;
         case SortField.name:
           comparison = a.name.compareTo(b.name);
           break;

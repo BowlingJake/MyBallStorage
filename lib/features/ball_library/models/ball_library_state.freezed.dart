@@ -336,8 +336,14 @@ mixin _$BallLibraryState {
   List<BowlingBall> get filteredBalls => throw _privateConstructorUsedError;
   String get searchText => throw _privateConstructorUsedError;
   BallFilters get filters => throw _privateConstructorUsedError;
-  SortCriterion get sortCriterion => throw _privateConstructorUsedError;
+  SortCriterion get sortCriterion =>
+      throw _privateConstructorUsedError; // 預設ID排序
   bool get isLoading => throw _privateConstructorUsedError;
+  bool get isLoadingMore => throw _privateConstructorUsedError;
+  int get currentPage => throw _privateConstructorUsedError;
+  int get pageSize => throw _privateConstructorUsedError;
+  int get totalCount => throw _privateConstructorUsedError;
+  bool get hasMoreData => throw _privateConstructorUsedError;
   String? get error => throw _privateConstructorUsedError;
 
   /// Create a copy of BallLibraryState
@@ -360,6 +366,11 @@ abstract class $BallLibraryStateCopyWith<$Res> {
       BallFilters filters,
       SortCriterion sortCriterion,
       bool isLoading,
+      bool isLoadingMore,
+      int currentPage,
+      int pageSize,
+      int totalCount,
+      bool hasMoreData,
       String? error});
 
   $BallFiltersCopyWith<$Res> get filters;
@@ -387,6 +398,11 @@ class _$BallLibraryStateCopyWithImpl<$Res, $Val extends BallLibraryState>
     Object? filters = null,
     Object? sortCriterion = null,
     Object? isLoading = null,
+    Object? isLoadingMore = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
+    Object? totalCount = null,
+    Object? hasMoreData = null,
     Object? error = freezed,
   }) {
     return _then(_value.copyWith(
@@ -413,6 +429,26 @@ class _$BallLibraryStateCopyWithImpl<$Res, $Val extends BallLibraryState>
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isLoadingMore: null == isLoadingMore
+          ? _value.isLoadingMore
+          : isLoadingMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMoreData: null == hasMoreData
+          ? _value.hasMoreData
+          : hasMoreData // ignore: cast_nullable_to_non_nullable
               as bool,
       error: freezed == error
           ? _value.error
@@ -457,6 +493,11 @@ abstract class _$$BallLibraryStateImplCopyWith<$Res>
       BallFilters filters,
       SortCriterion sortCriterion,
       bool isLoading,
+      bool isLoadingMore,
+      int currentPage,
+      int pageSize,
+      int totalCount,
+      bool hasMoreData,
       String? error});
 
   @override
@@ -484,6 +525,11 @@ class __$$BallLibraryStateImplCopyWithImpl<$Res>
     Object? filters = null,
     Object? sortCriterion = null,
     Object? isLoading = null,
+    Object? isLoadingMore = null,
+    Object? currentPage = null,
+    Object? pageSize = null,
+    Object? totalCount = null,
+    Object? hasMoreData = null,
     Object? error = freezed,
   }) {
     return _then(_$BallLibraryStateImpl(
@@ -511,6 +557,26 @@ class __$$BallLibraryStateImplCopyWithImpl<$Res>
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
+      isLoadingMore: null == isLoadingMore
+          ? _value.isLoadingMore
+          : isLoadingMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalCount: null == totalCount
+          ? _value.totalCount
+          : totalCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMoreData: null == hasMoreData
+          ? _value.hasMoreData
+          : hasMoreData // ignore: cast_nullable_to_non_nullable
+              as bool,
       error: freezed == error
           ? _value.error
           : error // ignore: cast_nullable_to_non_nullable
@@ -527,8 +593,13 @@ class _$BallLibraryStateImpl extends _BallLibraryState {
       final List<BowlingBall> filteredBalls = const [],
       this.searchText = '',
       this.filters = const BallFilters(),
-      this.sortCriterion = const SortCriterion(),
+      this.sortCriterion = const SortCriterion(field: SortField.id),
       this.isLoading = false,
+      this.isLoadingMore = false,
+      this.currentPage = 0,
+      this.pageSize = 50,
+      this.totalCount = 0,
+      this.hasMoreData = false,
       this.error})
       : _allBalls = allBalls,
         _filteredBalls = filteredBalls,
@@ -561,15 +632,31 @@ class _$BallLibraryStateImpl extends _BallLibraryState {
   @override
   @JsonKey()
   final SortCriterion sortCriterion;
+// 預設ID排序
   @override
   @JsonKey()
   final bool isLoading;
+  @override
+  @JsonKey()
+  final bool isLoadingMore;
+  @override
+  @JsonKey()
+  final int currentPage;
+  @override
+  @JsonKey()
+  final int pageSize;
+  @override
+  @JsonKey()
+  final int totalCount;
+  @override
+  @JsonKey()
+  final bool hasMoreData;
   @override
   final String? error;
 
   @override
   String toString() {
-    return 'BallLibraryState(allBalls: $allBalls, filteredBalls: $filteredBalls, searchText: $searchText, filters: $filters, sortCriterion: $sortCriterion, isLoading: $isLoading, error: $error)';
+    return 'BallLibraryState(allBalls: $allBalls, filteredBalls: $filteredBalls, searchText: $searchText, filters: $filters, sortCriterion: $sortCriterion, isLoading: $isLoading, isLoadingMore: $isLoadingMore, currentPage: $currentPage, pageSize: $pageSize, totalCount: $totalCount, hasMoreData: $hasMoreData, error: $error)';
   }
 
   @override
@@ -587,6 +674,16 @@ class _$BallLibraryStateImpl extends _BallLibraryState {
                 other.sortCriterion == sortCriterion) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
+            (identical(other.isLoadingMore, isLoadingMore) ||
+                other.isLoadingMore == isLoadingMore) &&
+            (identical(other.currentPage, currentPage) ||
+                other.currentPage == currentPage) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize) &&
+            (identical(other.totalCount, totalCount) ||
+                other.totalCount == totalCount) &&
+            (identical(other.hasMoreData, hasMoreData) ||
+                other.hasMoreData == hasMoreData) &&
             (identical(other.error, error) || other.error == error));
   }
 
@@ -599,6 +696,11 @@ class _$BallLibraryStateImpl extends _BallLibraryState {
       filters,
       sortCriterion,
       isLoading,
+      isLoadingMore,
+      currentPage,
+      pageSize,
+      totalCount,
+      hasMoreData,
       error);
 
   /// Create a copy of BallLibraryState
@@ -619,6 +721,11 @@ abstract class _BallLibraryState extends BallLibraryState {
       final BallFilters filters,
       final SortCriterion sortCriterion,
       final bool isLoading,
+      final bool isLoadingMore,
+      final int currentPage,
+      final int pageSize,
+      final int totalCount,
+      final bool hasMoreData,
       final String? error}) = _$BallLibraryStateImpl;
   const _BallLibraryState._() : super._();
 
@@ -631,9 +738,19 @@ abstract class _BallLibraryState extends BallLibraryState {
   @override
   BallFilters get filters;
   @override
-  SortCriterion get sortCriterion;
+  SortCriterion get sortCriterion; // 預設ID排序
   @override
   bool get isLoading;
+  @override
+  bool get isLoadingMore;
+  @override
+  int get currentPage;
+  @override
+  int get pageSize;
+  @override
+  int get totalCount;
+  @override
+  bool get hasMoreData;
   @override
   String? get error;
 

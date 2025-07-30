@@ -59,7 +59,7 @@ class BowlingBall with _$BowlingBall {
       mbDiff: tryParseDouble(json['mb_diff'] ?? json['intDiff'] ?? json['MB Diff']),
       region: json['region'] as String?,
       slug: json['slug'] as String?,
-      createdAt: json['created_at'] as String?,
+      createdAt: json['created_at'] as String? ?? json['create_at'] as String?,
 
 
       // --- 用戶自定義數據 ---

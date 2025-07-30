@@ -8,7 +8,10 @@
       "Bash(mv:*)",
       "Bash(rmdir:*)",
       "Bash(flutter analyze:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(flutter pub run build_runner build:*)",
+      "Bash(flutter run:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

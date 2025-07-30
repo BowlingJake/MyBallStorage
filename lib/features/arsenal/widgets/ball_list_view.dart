@@ -17,12 +17,14 @@ class BallListView extends StatelessWidget {
     required this.bowlingBalls,
     this.onBallTapped,
     this.onBallLongPress,
+    this.onScrollEnd,
     super.key,
   });
 
   final List<BowlingBall> bowlingBalls;
   final Function(BowlingBall)? onBallTapped;
   final Function(BowlingBall)? onBallLongPress;
+  final VoidCallback? onScrollEnd;
 
   @override
   Widget build(BuildContext context) {
@@ -55,24 +57,33 @@ class BallListView extends StatelessWidget {
             ),
           ),
         ),
-        ListView.builder(
-          padding: const EdgeInsets.only(bottom: 32),
-          itemCount: balls.length,
-          itemBuilder: (context, index) {
-            final ball = balls[index];
-            return BallCardItem(
-              ball: ball,
-              theme: Theme.of(context),
-              onTap: () {
-                onBallTapped?.call(ball);
-                // print('Tapped on ${ball.name}');
-              },
-              onLongPress: () {
-                onBallLongPress?.call(ball);
-                // print('Long pressed on ${ball.name}');
-              },
-            );
+        NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            // 當滾動到底部時觸發載入更多
+            if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+              onScrollEnd?.call();
+            }
+            return false;
           },
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 32),
+            itemCount: balls.length,
+            itemBuilder: (context, index) {
+              final ball = balls[index];
+              return BallCardItem(
+                ball: ball,
+                theme: Theme.of(context),
+                onTap: () {
+                  onBallTapped?.call(ball);
+                  // print('Tapped on ${ball.name}');
+                },
+                onLongPress: () {
+                  onBallLongPress?.call(ball);
+                  // print('Long pressed on ${ball.name}');
+                },
+              );
+            },
+          ),
         ),
       ],
     );

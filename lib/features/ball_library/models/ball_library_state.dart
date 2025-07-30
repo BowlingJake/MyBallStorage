@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'ball_library_state.freezed.dart';
 
 /// 排序欄位枚舉
-enum SortField { name, brand, releaseYear, rg }
+enum SortField { id, name, brand, releaseYear, rg }
 
 /// 篩選欄位枚舉
 enum FilterField { brand, core, coverstock }
@@ -56,8 +56,13 @@ class BallLibraryState with _$BallLibraryState {
     @Default([]) List<BowlingBall> filteredBalls,
     @Default('') String searchText,
     @Default(BallFilters()) BallFilters filters,
-    @Default(SortCriterion()) SortCriterion sortCriterion,
+    @Default(SortCriterion(field: SortField.id)) SortCriterion sortCriterion,  // 預設ID排序
     @Default(false) bool isLoading,
+    @Default(false) bool isLoadingMore,
+    @Default(0) int currentPage,
+    @Default(50) int pageSize,
+    @Default(0) int totalCount,
+    @Default(false) bool hasMoreData,
     String? error,
   }) = _BallLibraryState;
 
