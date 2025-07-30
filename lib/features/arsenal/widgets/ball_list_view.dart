@@ -17,14 +17,18 @@ class BallListView extends StatelessWidget {
     required this.bowlingBalls,
     this.onBallTapped,
     this.onBallLongPress,
-    this.onScrollEnd,
+    this.hasMoreData = false,
+    this.isLoadingMore = false,
+    this.onLoadMore,
     super.key,
   });
 
   final List<BowlingBall> bowlingBalls;
   final Function(BowlingBall)? onBallTapped;
   final Function(BowlingBall)? onBallLongPress;
-  final VoidCallback? onScrollEnd;
+  final bool hasMoreData;
+  final bool isLoadingMore;
+  final VoidCallback? onLoadMore;
 
   @override
   Widget build(BuildContext context) {
@@ -57,35 +61,87 @@ class BallListView extends StatelessWidget {
             ),
           ),
         ),
-        NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollInfo) {
-            // 當滾動到底部時觸發載入更多
-            if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-              onScrollEnd?.call();
+        ListView.builder(
+          padding: const EdgeInsets.only(bottom: 32),
+          itemCount: balls.length + (hasMoreData || isLoadingMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            // 如果是最後一個項目且有更多資料，顯示載入更多按鈕
+            if (index == balls.length) {
+              return _buildLoadMoreItem();
             }
-            return false;
+            
+            final ball = balls[index];
+            return BallCardItem(
+              ball: ball,
+              theme: Theme.of(context),
+              onTap: () {
+                onBallTapped?.call(ball);
+              },
+              onLongPress: () {
+                onBallLongPress?.call(ball);
+              },
+            );
           },
-          child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 32),
-            itemCount: balls.length,
-            itemBuilder: (context, index) {
-              final ball = balls[index];
-              return BallCardItem(
-                ball: ball,
-                theme: Theme.of(context),
-                onTap: () {
-                  onBallTapped?.call(ball);
-                  // print('Tapped on ${ball.name}');
-                },
-                onLongPress: () {
-                  onBallLongPress?.call(ball);
-                  // print('Long pressed on ${ball.name}');
-                },
-              );
-            },
-          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoadMoreItem() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      child: isLoadingMore
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white54),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '載入中...',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            )
+          : GestureDetector(
+              onTap: onLoadMore,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[600]!),
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.grey[800]?.withOpacity(0.3),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.expand_more,
+                      color: Colors.grey[300],
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '點擊載入更多',
+                      style: TextStyle(
+                        color: Colors.grey[300],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

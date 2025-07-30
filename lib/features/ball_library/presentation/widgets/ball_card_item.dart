@@ -33,8 +33,8 @@ class BallCardItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               color: Colors.black.withOpacity(0.8),
               border: Border.all(
-                color: theme.colorScheme.outline.withOpacity(0.3),
-                width: 1,
+                color: brandColor.withOpacity(0.6),
+                width: 1.5,
               ),
             ),
             child: InkWell(
@@ -45,21 +45,20 @@ class BallCardItem extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Left: Ball Image (Full Height)
-                    Expanded(
-                      flex: 2,
+                    // Left: Ball Image (Circular)
+                    SizedBox(
+                      width: 120, // Fixed square width
+                      height: 120, // Fixed square height
                       child: Container(
-                        height: 80,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          shape: BoxShape.circle,
                           color: Colors.grey.withOpacity(0.3),
                           border: Border.all(
                             color: brandColor.withOpacity(0.4),
                             width: 1.5,
                           ),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10.5),
+                        child: ClipOval(
                           child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
                               ? Image.network(
                                   ball.imageUrl,
@@ -97,26 +96,62 @@ class BallCardItem extends StatelessWidget {
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: 4),
+                          // Core & Cover Types in one line
+                          Text(
+                            '${getCoreCategory(ball.core)} | ${ball.coverstockType ?? ball.coverstock ?? 'Unknown'}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           const SizedBox(height: 8),
-                          // Middle: Core & Cover Types
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          // Brand & Region Tags
+                          Row(
                             children: [
-                              Text(
-                                'Core Type: ${getCoreCategory(ball.core)}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
+                              // Brand Tag
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: brandColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: brandColor.withOpacity(0.4),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  ball.brand,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: brandColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Cover Type: ${ball.coverstockType ?? ball.coverstock ?? 'Unknown'}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
+                              const SizedBox(width: 6),
+                              // Region Tag (if available)
+                              if (ball.region != null && ball.region!.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.grey.withOpacity(0.4),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    ball.region!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -228,52 +263,6 @@ class BallCardItem extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Bottom-left corner decoration
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(14),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    brandColor.withOpacity(0.8),
-                    brandColor.withOpacity(0.4),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Top-right corner decoration
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(14),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.topRight,
-                  colors: [
-                    brandColor.withOpacity(0.8),
-                    brandColor.withOpacity(0.4),
-                    Colors.transparent,
                   ],
                 ),
               ),

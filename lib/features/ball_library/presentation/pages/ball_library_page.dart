@@ -83,32 +83,25 @@ class BallLibraryPage extends ConsumerWidget {
             
             return Column(
               children: [
-                const SizedBox(height: 100),
-                // 新的簡化控制面板將在下一步添加
+                // 為AppBar留出空間 (AppBar高度 + 狀態列高度)
+                SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 16),
+                // 控制面板
                 _buildSimplifiedControls(context, ref, state),
                 const SizedBox(height: 16),
                 // 球列表
                 Expanded(
                   child: state.filteredBalls.isEmpty
                       ? _buildEmptyState(state.hasActiveFilters)
-                      : Column(
-                          children: [
-                            Expanded(
-                              child: BallListView(
-                                bowlingBalls: state.filteredBalls,
-                                onBallTapped: (ball) => _showBallDetail(context, ball),
-                                onScrollEnd: () {
-                                  // 滾動到底部時載入更多
-                                  if (state.hasMoreData && !state.isLoadingMore) {
-                                    ref.read(ballLibraryControllerProvider.notifier).loadMore();
-                                  }
-                                },
-                              ),
-                            ),
-                            // 載入更多文字提示 - 只在有更多資料時顯示
-                            if (state.hasMoreData || state.isLoadingMore)
-                              _buildLoadMoreFooter(context, ref, state),
-                          ],
+                      : BallListView(
+                          bowlingBalls: state.filteredBalls,
+                          onBallTapped: (ball) => _showBallDetail(context, ball),
+                          hasMoreData: state.hasMoreData,
+                          isLoadingMore: state.isLoadingMore,
+                          onLoadMore: () {
+                            if (state.hasMoreData && !state.isLoadingMore) {
+                              ref.read(ballLibraryControllerProvider.notifier).loadMore();
+                            }
+                          },
                         ),
                 ),
               ],
@@ -169,28 +162,32 @@ class BallLibraryPage extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          // 搜尋框 - 線框未填滿
+          // 搜尋框 - Outlined形式，黑色背景80%透明度
           TextField(
-            onChanged: (text) =>
-                ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text),
+            onChanged: (text) {
+              ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
+            },
             decoration: InputDecoration(
               hintText: 'Search balls...',
               hintStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              filled: true,
+              fillColor: Colors.black.withOpacity(0.8),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.grey),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.grey),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.blue),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
               ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 12),
           // 篩選和排序按鈕
@@ -320,7 +317,7 @@ class BallLibraryPage extends ConsumerWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '載入中...',
+                  'Loading...',
                   style: TextStyle(
                     color: Colors.grey[400],
                     fontSize: 14,
@@ -343,7 +340,7 @@ class BallLibraryPage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '點擊載入更多',
+                        'Press to load more',
                         style: TextStyle(
                           color: Colors.grey[300],
                           fontSize: 14,

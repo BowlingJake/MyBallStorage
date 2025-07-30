@@ -58,6 +58,7 @@ class BallLibraryController extends _$BallLibraryController {
       print('🎾 Sample ball names: ${balls.take(3).map((b) => b.name).toList()}');
       
       final state = BallLibraryState(
+        allBalls: balls,
         filteredBalls: balls,
         isLoading: false,
         totalCount: totalCount,
@@ -78,14 +79,55 @@ class BallLibraryController extends _$BallLibraryController {
   }
 
   /// 更新搜尋文字
-  void updateSearchText(String searchText) {
+  Future<void> updateSearchText(String searchText) async {
     final currentState = state.value;
     if (currentState == null) return;
 
-    final newState = currentState.copyWith(searchText: searchText);
-    final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
+    print('🔍 Searching for: "$searchText"');
+    print('🎯 All balls count: ${currentState.allBalls.length}');
     
-    state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+    if (searchText.isEmpty) {
+      // 搜尋文字清空時，重置為第一頁資料
+      final newState = currentState.copyWith(
+        searchText: searchText,
+        filteredBalls: currentState.allBalls,
+        hasMoreData: currentState.allBalls.length < currentState.totalCount,
+      );
+      state = AsyncValue.data(newState);
+      return;
+    }
+
+    // 如果有搜尋文字，需要搜尋所有資料
+    try {
+      // 先取得所有資料進行搜尋
+      final allBalls = await _repository.getBallsPaginated(
+        offset: 0,
+        limit: currentState.totalCount, // 取得所有資料
+        orderBy: 'create_at',
+        ascending: true,
+      );
+      
+      print('🎾 Got ${allBalls.length} balls for search');
+      
+      final newState = currentState.copyWith(
+        searchText: searchText,
+        allBalls: allBalls,
+      );
+      
+      final filteredBalls = _applyFiltersAndSort(allBalls, newState);
+      print('✅ Filtered results: ${filteredBalls.length}');
+      
+      state = AsyncValue.data(newState.copyWith(
+        filteredBalls: filteredBalls,
+        hasMoreData: false, // 搜尋時不需要分頁
+      ));
+    } catch (e) {
+      print('❌ Search error: $e');
+      // 發生錯誤時至少更新搜尋文字
+      final newState = currentState.copyWith(searchText: searchText);
+      final filteredBalls = _applyFiltersAndSort(currentState.allBalls, newState);
+      state = AsyncValue.data(newState.copyWith(filteredBalls: filteredBalls));
+    }
   }
 
   /// 更新篩選條件
@@ -176,9 +218,11 @@ class BallLibraryController extends _$BallLibraryController {
         ascending: true,
       );
 
+      final updatedAllBalls = [...currentState.allBalls, ...newBalls];
       final allBalls = [...currentState.filteredBalls, ...newBalls];
       
       state = AsyncValue.data(currentState.copyWith(
+        allBalls: updatedAllBalls,
         filteredBalls: allBalls,
         currentPage: nextPage,
         isLoadingMore: false,
@@ -207,6 +251,7 @@ class BallLibraryController extends _$BallLibraryController {
       );
       
       state = AsyncValue.data(BallLibraryState(
+        allBalls: balls,
         filteredBalls: balls,
         isLoading: false,
         totalCount: totalCount,
