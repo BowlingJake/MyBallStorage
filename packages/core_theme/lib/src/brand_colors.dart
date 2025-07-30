@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 品牌核心顏色定義
-/// 
+///
 /// 定義應用的核心色彩系統，包含深色和淺色模式的顏色配置
 class BrandColors {
   BrandColors._();
@@ -14,7 +14,7 @@ class BrandColors {
   /// 強調色，用於所有可互動的元素和圖表，柔和的護眼藍綠色
   static const Color accentColorDark = Color(0xFF4A9EAF);
 
-  /// App 的主要背景色，Professional Dark風格的深色背景
+  /// App 的主要背景色，Professional Dark 風格的深色背景
   static const Color darkBackgroundColor = Color(0xFF0F0F0F);
 
   /// 卡片、對話框等元件的表面顏色，比背景稍亮以創造層次
@@ -52,65 +52,71 @@ class BrandColors {
   // --- 計分模式顏色 ---
   /// 傳統計分模式顏色（青色）
   static const Color traditionalScoringColor = Color(0xFF00B2A9);
-  
-  /// Current計分模式顏色（橘色）
+
+  /// Current 計分模式顏色（橘色）
   static const Color currentScoringColor = Color(0xFFFF6B35);
 
   /// 獲取深色模式的顏色配置
   static ColorScheme get darkColorScheme => const ColorScheme.dark(
-    primary: accentColorDark,
-    onPrimary: textPrimaryDark,
-    secondary: accentColorDark,
-    onSecondary: textPrimaryDark,
-    surface: darkSurfaceColor,
-    onSurface: textPrimaryDark,
-    error: errorColor,
-    onError: textPrimaryDark,
-  );
+        primary: accentColorDark,
+        onPrimary: textPrimaryDark,
+        secondary: accentColorDark,
+        onSecondary: textPrimaryDark,
+        surface: darkSurfaceColor,
+        onSurface: textPrimaryDark,
+        error: errorColor,
+        onError: textPrimaryDark,
+      );
 
   /// 獲取淺色模式的顏色配置
   static ColorScheme get lightColorScheme => const ColorScheme.light(
-    primary: accentColorLight,
-    onPrimary: textPrimaryLight,
-    secondary: accentColorLight,
-    onSecondary: textPrimaryLight,
-    surface: lightSurfaceColor,
-    onSurface: textPrimaryLight,
-    error: errorColor,
-    onError: textPrimaryLight,
-  );
+        primary: accentColorLight,
+        onPrimary: textPrimaryLight,
+        secondary: accentColorLight,
+        onSecondary: textPrimaryLight,
+        surface: lightSurfaceColor,
+        onSurface: textPrimaryLight,
+        error: errorColor,
+        onError: textPrimaryLight,
+      );
 }
 
 /// 根據品牌名稱獲取品牌調色板
-/// 
+///
 /// 為不同的保齡球品牌提供特定的顏色調色板
 MaterialColor getBrandTonalPalette(String brand, ThemeData theme) {
-  // 定義各品牌的主色調
+  // 定義各品牌的主色調（依討論最終版）
   final brandColors = <String, Color>{
-    'Storm': const Color(0xFF8B0000), // 深紅色
-    'Hammer': const Color(0xFF4B0082), // 靛藍色
-    'Ebonite': const Color(0xFF000000), // 黑色
-    'Brunswick': const Color(0xFF006400), // 深綠色
-    'Columbia 300': const Color(0xFF1E90FF), // 道奇藍
-    'Roto Grip': const Color(0xFFFF8C00), // 深橙色
-    'DV8': const Color(0xFF800080), // 紫色
-    'Track': const Color(0xFF228B22), // 森林綠
-    'Motiv': const Color(0xFFDC143C), // 深紅色
-    'Global 900': const Color(0xFF4169E1), // 皇家藍
+    'Storm': Color(0xFF00685E),
+    'Roto Grip': Color(0xFFD7182A),
+    '900 Global': Color(0xFFFFB800),
+    'Global 900': Color(0xFFFFB800), // 同一品牌額外兼容名稱
+    'Brunswick': Color(0xFF003C72),
+    'Hammer': Color(0xFFF37021),
+    'Ebonite': Color(0xFF003366),
+    'Columbia 300': Color(0xFFC8102E),
+    'Motiv': Color(0xFFFF6A00),
+    'Track': Color(0xFF005BAB),
+    'Radical': Color(0xFFFFE100),
+    'DV8': Color(0xFF1C7C6D),
+    'SWAG': Color(0xFFC6FF00),
+    'ABS': Color(0xFFC8102E),
   };
 
-  // 獲取品牌主色調，如果品牌不在清單中則使用預設強調色
-  final brandColor = brandColors[brand] ?? 
-    (theme.brightness == Brightness.dark ? BrandColors.accentColorDark : BrandColors.accentColorLight);
+  // 取出品牌主色；若品牌不在清單中則回退到全局強調色
+  final brandColor = brandColors[brand] ??
+      (theme.brightness == Brightness.dark
+          ? BrandColors.accentColorDark
+          : BrandColors.accentColorLight);
 
-  // 根據主色調創建 MaterialColor
+  // 以主色創建 MaterialColor
   return _createMaterialColor(brandColor);
 }
 
-/// 根據單一顏色創建MaterialColor
+/// 根據單一顏色創建 MaterialColor
 MaterialColor _createMaterialColor(Color color) {
   final hsl = HSLColor.fromColor(color);
-  
+
   return MaterialColor(color.value, {
     50: _lighten(hsl, 0.4).toColor(),
     100: _lighten(hsl, 0.3).toColor(),
@@ -126,11 +132,9 @@ MaterialColor _createMaterialColor(Color color) {
 }
 
 /// 讓顏色變亮
-HSLColor _lighten(HSLColor hsl, double amount) {
-  return hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
-}
+HSLColor _lighten(HSLColor hsl, double amount) =>
+    hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
 
 /// 讓顏色變暗
-HSLColor _darken(HSLColor hsl, double amount) {
-  return hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-} 
+HSLColor _darken(HSLColor hsl, double amount) =>
+    hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
