@@ -167,6 +167,9 @@ abstract class _SortCriterion extends SortCriterion {
 
 /// @nodoc
 mixin _$BallFilters {
+  Set<String> get brands => throw _privateConstructorUsedError;
+  Set<String> get cores => throw _privateConstructorUsedError;
+  Set<String> get coverstocks => throw _privateConstructorUsedError; // 保留舊版本相容性
   String? get brand => throw _privateConstructorUsedError;
   String? get core => throw _privateConstructorUsedError;
   String? get coverstock => throw _privateConstructorUsedError;
@@ -184,7 +187,13 @@ abstract class $BallFiltersCopyWith<$Res> {
           BallFilters value, $Res Function(BallFilters) then) =
       _$BallFiltersCopyWithImpl<$Res, BallFilters>;
   @useResult
-  $Res call({String? brand, String? core, String? coverstock});
+  $Res call(
+      {Set<String> brands,
+      Set<String> cores,
+      Set<String> coverstocks,
+      String? brand,
+      String? core,
+      String? coverstock});
 }
 
 /// @nodoc
@@ -202,11 +211,26 @@ class _$BallFiltersCopyWithImpl<$Res, $Val extends BallFilters>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? brands = null,
+    Object? cores = null,
+    Object? coverstocks = null,
     Object? brand = freezed,
     Object? core = freezed,
     Object? coverstock = freezed,
   }) {
     return _then(_value.copyWith(
+      brands: null == brands
+          ? _value.brands
+          : brands // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      cores: null == cores
+          ? _value.cores
+          : cores // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      coverstocks: null == coverstocks
+          ? _value.coverstocks
+          : coverstocks // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -231,7 +255,13 @@ abstract class _$$BallFiltersImplCopyWith<$Res>
       __$$BallFiltersImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? brand, String? core, String? coverstock});
+  $Res call(
+      {Set<String> brands,
+      Set<String> cores,
+      Set<String> coverstocks,
+      String? brand,
+      String? core,
+      String? coverstock});
 }
 
 /// @nodoc
@@ -247,11 +277,26 @@ class __$$BallFiltersImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? brands = null,
+    Object? cores = null,
+    Object? coverstocks = null,
     Object? brand = freezed,
     Object? core = freezed,
     Object? coverstock = freezed,
   }) {
     return _then(_$BallFiltersImpl(
+      brands: null == brands
+          ? _value._brands
+          : brands // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      cores: null == cores
+          ? _value._cores
+          : cores // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      coverstocks: null == coverstocks
+          ? _value._coverstocks
+          : coverstocks // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -271,8 +316,46 @@ class __$$BallFiltersImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$BallFiltersImpl extends _BallFilters {
-  const _$BallFiltersImpl({this.brand, this.core, this.coverstock}) : super._();
+  const _$BallFiltersImpl(
+      {final Set<String> brands = const <String>{},
+      final Set<String> cores = const <String>{},
+      final Set<String> coverstocks = const <String>{},
+      this.brand,
+      this.core,
+      this.coverstock})
+      : _brands = brands,
+        _cores = cores,
+        _coverstocks = coverstocks,
+        super._();
 
+  final Set<String> _brands;
+  @override
+  @JsonKey()
+  Set<String> get brands {
+    if (_brands is EqualUnmodifiableSetView) return _brands;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_brands);
+  }
+
+  final Set<String> _cores;
+  @override
+  @JsonKey()
+  Set<String> get cores {
+    if (_cores is EqualUnmodifiableSetView) return _cores;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_cores);
+  }
+
+  final Set<String> _coverstocks;
+  @override
+  @JsonKey()
+  Set<String> get coverstocks {
+    if (_coverstocks is EqualUnmodifiableSetView) return _coverstocks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_coverstocks);
+  }
+
+// 保留舊版本相容性
   @override
   final String? brand;
   @override
@@ -282,7 +365,7 @@ class _$BallFiltersImpl extends _BallFilters {
 
   @override
   String toString() {
-    return 'BallFilters(brand: $brand, core: $core, coverstock: $coverstock)';
+    return 'BallFilters(brands: $brands, cores: $cores, coverstocks: $coverstocks, brand: $brand, core: $core, coverstock: $coverstock)';
   }
 
   @override
@@ -290,6 +373,10 @@ class _$BallFiltersImpl extends _BallFilters {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$BallFiltersImpl &&
+            const DeepCollectionEquality().equals(other._brands, _brands) &&
+            const DeepCollectionEquality().equals(other._cores, _cores) &&
+            const DeepCollectionEquality()
+                .equals(other._coverstocks, _coverstocks) &&
             (identical(other.brand, brand) || other.brand == brand) &&
             (identical(other.core, core) || other.core == core) &&
             (identical(other.coverstock, coverstock) ||
@@ -297,7 +384,14 @@ class _$BallFiltersImpl extends _BallFilters {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, brand, core, coverstock);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_brands),
+      const DeepCollectionEquality().hash(_cores),
+      const DeepCollectionEquality().hash(_coverstocks),
+      brand,
+      core,
+      coverstock);
 
   /// Create a copy of BallFilters
   /// with the given fields replaced by the non-null parameter values.
@@ -310,11 +404,20 @@ class _$BallFiltersImpl extends _BallFilters {
 
 abstract class _BallFilters extends BallFilters {
   const factory _BallFilters(
-      {final String? brand,
+      {final Set<String> brands,
+      final Set<String> cores,
+      final Set<String> coverstocks,
+      final String? brand,
       final String? core,
       final String? coverstock}) = _$BallFiltersImpl;
   const _BallFilters._() : super._();
 
+  @override
+  Set<String> get brands;
+  @override
+  Set<String> get cores;
+  @override
+  Set<String> get coverstocks; // 保留舊版本相容性
   @override
   String? get brand;
   @override

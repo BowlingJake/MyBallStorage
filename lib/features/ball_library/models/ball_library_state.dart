@@ -31,6 +31,10 @@ class SortCriterion with _$SortCriterion {
 @freezed
 class BallFilters with _$BallFilters {
   const factory BallFilters({
+    @Default(<String>{}) Set<String> brands,
+    @Default(<String>{}) Set<String> cores, 
+    @Default(<String>{}) Set<String> coverstocks,
+    // 保留舊版本相容性
     String? brand,
     String? core,
     String? coverstock,
@@ -41,9 +45,9 @@ class BallFilters with _$BallFilters {
   /// 計算目前有多少個有效的篩選條件
   int get activeFilterCount {
     int count = 0;
-    if (brand != null) count++;
-    if (core != null) count++;
-    if (coverstock != null) count++;
+    if (brands.isNotEmpty || brand != null) count++;
+    if (cores.isNotEmpty || core != null) count++;
+    if (coverstocks.isNotEmpty || coverstock != null) count++;
     return count;
   }
 }

@@ -194,28 +194,80 @@ class SupabaseBallRepository implements BallRepository {
 
       // 篩選條件
       if (filters != null) {
-        if (filters.brand != null) {
-          query = query.ilike('brand', '%${filters.brand}%');
+        // 處理品牌篩選（支援多選）
+        if (filters.brands.isNotEmpty || filters.brand != null) {
+          final brands = filters.brands.isNotEmpty 
+            ? filters.brands 
+            : {if (filters.brand != null) filters.brand!};
+          
+          if (brands.length == 1) {
+            query = query.ilike('brand', '%${brands.first}%');
+          } else {
+            final brandConditions = brands.map((brand) => 'brand.ilike.%$brand%').join(',');
+            query = query.or(brandConditions);
+          }
         }
-        if (filters.core != null) {
-          query = query.or('core_name.ilike.%${filters.core}%,core_type.ilike.%${filters.core}%');
+        
+        // 處理球心篩選（支援多選）
+        if (filters.cores.isNotEmpty || filters.core != null) {
+          final cores = filters.cores.isNotEmpty 
+            ? filters.cores 
+            : {if (filters.core != null) filters.core!};
+            
+          final coreConditions = <String>[];
+          for (final core in cores) {
+            coreConditions.add('core_name.ilike.%$core%');
+            coreConditions.add('core_type.ilike.%$core%');
+          }
+          query = query.or(coreConditions.join(','));
         }
-        if (filters.coverstock != null) {
-          // 根據覆蓋類型篩選
-          final coverstock = filters.coverstock!.toLowerCase();
-          if (coverstock == 'urethane') {
-            query = query.or('coverstock_name.ilike.%urethane%,coverstock_type.ilike.%urethane%');
-          } else if (coverstock == 'polyester') {
-            query = query.or('coverstock_name.ilike.%polyester%,coverstock_type.ilike.%polyester%,coverstock_name.ilike.%poly%,coverstock_type.ilike.%poly%');
-          } else if (coverstock == 'solid reactive') {
-            // 使用複合查詢：包含 solid 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)');
-          } else if (coverstock == 'pearl reactive') {
-            // 使用複合查詢：包含 pearl 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)');
-          } else if (coverstock == 'hybrid reactive') {
-            // 使用複合查詢：包含 hybrid 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)');
+        
+        // 處理球皮篩選（支援多選）
+        if (filters.coverstocks.isNotEmpty || filters.coverstock != null) {
+          final coverstocks = filters.coverstocks.isNotEmpty 
+            ? filters.coverstocks 
+            : {if (filters.coverstock != null) filters.coverstock!};
+            
+          final coverstockConditions = <String>[];
+          for (final coverstock in coverstocks) {
+            final coverstockLower = coverstock.toLowerCase();
+            if (coverstockLower == 'urethane') {
+              coverstockConditions.addAll([
+                'coverstock_name.ilike.%urethane%',
+                'coverstock_type.ilike.%urethane%'
+              ]);
+            } else if (coverstockLower == 'polyester') {
+              coverstockConditions.addAll([
+                'coverstock_name.ilike.%polyester%',
+                'coverstock_type.ilike.%polyester%',
+                'coverstock_name.ilike.%poly%',
+                'coverstock_type.ilike.%poly%'
+              ]);
+            } else if (coverstockLower == 'solid reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)'
+              ]);
+            } else if (coverstockLower == 'pearl reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)'
+              ]);
+            } else if (coverstockLower == 'hybrid reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)'
+              ]);
+            }
+          }
+          if (coverstockConditions.isNotEmpty) {
+            query = query.or(coverstockConditions.join(','));
           }
         }
       }
@@ -289,28 +341,80 @@ class SupabaseBallRepository implements BallRepository {
 
       // 篩選條件
       if (filters != null) {
-        if (filters.brand != null) {
-          query = query.ilike('brand', '%${filters.brand}%');
+        // 處理品牌篩選（支援多選）
+        if (filters.brands.isNotEmpty || filters.brand != null) {
+          final brands = filters.brands.isNotEmpty 
+            ? filters.brands 
+            : {if (filters.brand != null) filters.brand!};
+          
+          if (brands.length == 1) {
+            query = query.ilike('brand', '%${brands.first}%');
+          } else {
+            final brandConditions = brands.map((brand) => 'brand.ilike.%$brand%').join(',');
+            query = query.or(brandConditions);
+          }
         }
-        if (filters.core != null) {
-          query = query.or('core_name.ilike.%${filters.core}%,core_type.ilike.%${filters.core}%');
+        
+        // 處理球心篩選（支援多選）
+        if (filters.cores.isNotEmpty || filters.core != null) {
+          final cores = filters.cores.isNotEmpty 
+            ? filters.cores 
+            : {if (filters.core != null) filters.core!};
+            
+          final coreConditions = <String>[];
+          for (final core in cores) {
+            coreConditions.add('core_name.ilike.%$core%');
+            coreConditions.add('core_type.ilike.%$core%');
+          }
+          query = query.or(coreConditions.join(','));
         }
-        if (filters.coverstock != null) {
-          // 根據覆蓋類型篩選
-          final coverstock = filters.coverstock!.toLowerCase();
-          if (coverstock == 'urethane') {
-            query = query.or('coverstock_name.ilike.%urethane%,coverstock_type.ilike.%urethane%');
-          } else if (coverstock == 'polyester') {
-            query = query.or('coverstock_name.ilike.%polyester%,coverstock_type.ilike.%polyester%,coverstock_name.ilike.%poly%,coverstock_type.ilike.%poly%');
-          } else if (coverstock == 'solid reactive') {
-            // 使用複合查詢：包含 solid 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)');
-          } else if (coverstock == 'pearl reactive') {
-            // 使用複合查詢：包含 pearl 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)');
-          } else if (coverstock == 'hybrid reactive') {
-            // 使用複合查詢：包含 hybrid 且包含 reactive
-            query = query.or('and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%),and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)');
+        
+        // 處理球皮篩選（支援多選）
+        if (filters.coverstocks.isNotEmpty || filters.coverstock != null) {
+          final coverstocks = filters.coverstocks.isNotEmpty 
+            ? filters.coverstocks 
+            : {if (filters.coverstock != null) filters.coverstock!};
+            
+          final coverstockConditions = <String>[];
+          for (final coverstock in coverstocks) {
+            final coverstockLower = coverstock.toLowerCase();
+            if (coverstockLower == 'urethane') {
+              coverstockConditions.addAll([
+                'coverstock_name.ilike.%urethane%',
+                'coverstock_type.ilike.%urethane%'
+              ]);
+            } else if (coverstockLower == 'polyester') {
+              coverstockConditions.addAll([
+                'coverstock_name.ilike.%polyester%',
+                'coverstock_type.ilike.%polyester%',
+                'coverstock_name.ilike.%poly%',
+                'coverstock_type.ilike.%poly%'
+              ]);
+            } else if (coverstockLower == 'solid reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%solid%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%solid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%solid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%solid%,coverstock_name.ilike.%reactive%)'
+              ]);
+            } else if (coverstockLower == 'pearl reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%pearl%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%pearl%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%pearl%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%pearl%,coverstock_name.ilike.%reactive%)'
+              ]);
+            } else if (coverstockLower == 'hybrid reactive') {
+              coverstockConditions.addAll([
+                'and(coverstock_name.ilike.%hybrid%,coverstock_name.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%hybrid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_name.ilike.%hybrid%,coverstock_type.ilike.%reactive%)',
+                'and(coverstock_type.ilike.%hybrid%,coverstock_name.ilike.%reactive%)'
+              ]);
+            }
+          }
+          if (coverstockConditions.isNotEmpty) {
+            query = query.or(coverstockConditions.join(','));
           }
         }
       }

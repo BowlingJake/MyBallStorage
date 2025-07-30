@@ -120,35 +120,56 @@ class BallDataRepository implements BallRepository {
 
     // 篩選條件
     if (filters != null) {
-      if (filters.brand != null) {
-        filteredBalls = filteredBalls.where((ball) =>
-            ball.brand.toLowerCase().contains(filters.brand!.toLowerCase()));
-      }
-      if (filters.core != null) {
+      // 處理品牌篩選（支援多選）
+      if (filters.brands.isNotEmpty || filters.brand != null) {
+        final brands = filters.brands.isNotEmpty 
+          ? filters.brands 
+          : {if (filters.brand != null) filters.brand!};
+        
         filteredBalls = filteredBalls.where((ball) {
-          final core = ball.core.toLowerCase();
-          return core.contains(filters.core!.toLowerCase());
+          return brands.any((brand) => 
+            ball.brand.toLowerCase().contains(brand.toLowerCase()));
         });
       }
-      if (filters.coverstock != null) {
+      
+      // 處理球心篩選（支援多選）
+      if (filters.cores.isNotEmpty || filters.core != null) {
+        final cores = filters.cores.isNotEmpty 
+          ? filters.cores 
+          : {if (filters.core != null) filters.core!};
+        
+        filteredBalls = filteredBalls.where((ball) {
+          final ballCore = ball.core.toLowerCase();
+          return cores.any((core) => ballCore.contains(core.toLowerCase()));
+        });
+      }
+      
+      // 處理球皮篩選（支援多選）
+      if (filters.coverstocks.isNotEmpty || filters.coverstock != null) {
+        final coverstocks = filters.coverstocks.isNotEmpty 
+          ? filters.coverstocks 
+          : {if (filters.coverstock != null) filters.coverstock!};
+        
         filteredBalls = filteredBalls.where((ball) {
           final coverstock = (ball.coverstock ?? '').toLowerCase();
-          final selectedCoverstock = filters.coverstock!.toLowerCase();
           
-          switch (selectedCoverstock) {
-            case 'urethane':
-              return coverstock.contains('urethane');
-            case 'polyester':
-              return coverstock.contains('polyester') || coverstock.contains('poly');
-            case 'solid reactive':
-              return coverstock.contains('solid') && coverstock.contains('reactive');
-            case 'pearl reactive':
-              return coverstock.contains('pearl') && coverstock.contains('reactive');
-            case 'hybrid reactive':
-              return coverstock.contains('hybrid') && coverstock.contains('reactive');
-            default:
-              return false;
-          }
+          return coverstocks.any((selectedCoverstock) {
+            final selectedCoverstockLower = selectedCoverstock.toLowerCase();
+            switch (selectedCoverstockLower) {
+              case 'urethane':
+                return coverstock.contains('urethane');
+              case 'polyester':
+                return coverstock.contains('polyester') || coverstock.contains('poly');
+              case 'solid reactive':
+                return coverstock.contains('solid') && coverstock.contains('reactive');
+              case 'pearl reactive':
+                return coverstock.contains('pearl') && coverstock.contains('reactive');
+              case 'hybrid reactive':
+                return coverstock.contains('hybrid') && coverstock.contains('reactive');
+              default:
+                return false;
+            }
+          });
         });
       }
     }

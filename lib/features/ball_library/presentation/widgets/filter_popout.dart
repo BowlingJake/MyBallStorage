@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
-import 'package:bowlingarsenal_app/shared/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,35 +19,19 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
   // 本地狀態，用於 UI 互動
   late BallFilters _localFilters;
 
-  // 品牌圖標映射
-  final Map<String, IconData> _brandIcons = {
-    'Storm': Icons.thunderstorm,
-    'Hammer': Icons.build,
-    'Brunswick': Icons.circle,
-    'Roto Grip': Icons.rotate_right,
-    'Motiv': Icons.motion_photos_on,
-    'Columbia 300': Icons.star,
-    'Ebonite': Icons.fiber_manual_record,
-    '900 Global': Icons.public,
-    'Track': Icons.timeline,
-    'Radical': Icons.whatshot,
-    'SWAG': Icons.style,
-  };
+  // 品牌列表
+  final List<String> _brands = [
+    'Storm', 'Roto Grip', '900 Global', 'Brunswick', 'Ebonite', 'Track', 
+    'Columbia 300', 'DV8', 'Radical', 'Motiv', 'Hammer', 'SWAG'
+  ];
 
-  // 球心圖標映射
-  final Map<String, IconData> _coreIcons = {
-    'Symmetric': Icons.circle_outlined,
-    'Asymmetric': Icons.change_history,
-  };
+  // 球心選項
+  final List<String> _cores = ['Symmetric', 'Asymmetric'];
 
-  // 球表圖標映射
-  final Map<String, IconData> _coverstockIcons = {
-    'Solid Reactive': Icons.circle,
-    'Pearl Reactive': Icons.grain,
-    'Hybrid Reactive': Icons.blur_on,
-    'Urethane': Icons.radio_button_checked,
-    'Polyester': Icons.fiber_manual_record,
-  };
+  // 球皮選項
+  final List<String> _coverstocks = [
+    'Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'
+  ];
 
   @override
   void initState() {
@@ -59,262 +41,269 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
-          children: [
-            Container(
-              width: size.width * 0.9,
-              height: size.height * 0.8,
-              constraints: const BoxConstraints(
-                maxWidth: 450,
-                maxHeight: 600,
-                minWidth: 320,
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.8),
+      body: Center(
+        child: Container(
+          width: size.width * 0.9,
+          height: size.height * 0.8,
+          constraints: const BoxConstraints(
+            maxWidth: 450,
+            maxHeight: 700,
+            minWidth: 320,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withOpacity(0.3),
-                    theme.colorScheme.primary.withOpacity(0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            ],
+          ),
+          child: Column(
+            children: [
+              // 標題列
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                      child: Container(color: Colors.white.withOpacity(0.15)),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 1,
                     ),
                   ),
-                  // 內容
-                  Column(
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Filter Options',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.black54,
+                        size: 24,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 篩選內容
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 標題列
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Filter Options',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Brand 篩選
+                      _buildBrandSection(),
+                      const SizedBox(height: 24),
 
-                      // 篩選內容 - 使用Expanded和SingleChildScrollView
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Brand 篩選
-                              _buildBrandFilterSection(),
+                      // Core 篩選
+                      _buildCoreSection(),
+                      const SizedBox(height: 24),
 
-                              const SizedBox(height: 24),
-
-                              // Core 篩選
-                              _buildCoreFilterSection(),
-
-                              const SizedBox(height: 24),
-
-                              // Cover 篩選
-                              _buildCoverFilterSection(),
-
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // 底部按鈕
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  widget.onFiltersChanged(_localFilters);
-                                  Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  side: BorderSide(
-                                    color: Colors.white.withOpacity(0.5),
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Apply Filters',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Coverstock 篩選
+                      _buildCoverstockSection(),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              // 底部按鈕
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          widget.onFiltersChanged(_localFilters);
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          'Apply Filters',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBrandFilterSection() {
-    final brandGroups = <String, List<String>>{
-      'Team SPI': ['Storm', 'Roto Grip', '900 Global'],
-      'Brunswick Group': ['Brunswick', 'Ebonite', 'Track', 'Columbia 300', 'DV8', 'Radical'],
-      'Others': ['Motiv', 'Hammer', 'SWAG'],
-    };
-
-    return _buildFilterSection(
+  Widget _buildBrandSection() {
+    return _buildMultiSelectSection(
       title: 'Brand',
-      groups: brandGroups,
-      selectedItem: _localFilters.brand,
-      onSelected: (brand) {
+      items: _brands,
+      selectedItems: _localFilters.brands,
+      onSelectionChanged: (selectedBrands) {
         setState(() {
-          _localFilters = _localFilters.copyWith(brand: _localFilters.brand == brand ? null : brand);
+          _localFilters = _localFilters.copyWith(brands: selectedBrands);
         });
       },
-      icons: _brandIcons,
     );
   }
 
-  Widget _buildCoreFilterSection() {
-    return _buildFilterSection(
+  Widget _buildCoreSection() {
+    return _buildMultiSelectSection(
       title: 'Core',
-      items: ['Symmetric', 'Asymmetric'],
-      selectedItem: _localFilters.core,
-      onSelected: (core) {
+      items: _cores,
+      selectedItems: _localFilters.cores,
+      onSelectionChanged: (selectedCores) {
         setState(() {
-          _localFilters = _localFilters.copyWith(core: _localFilters.core == core ? null : core);
+          _localFilters = _localFilters.copyWith(cores: selectedCores);
         });
       },
-      icons: _coreIcons,
     );
   }
 
-  Widget _buildCoverFilterSection() {
-    return _buildFilterSection(
+  Widget _buildCoverstockSection() {
+    return _buildMultiSelectSection(
       title: 'Coverstock',
-      items: ['Solid Reactive', 'Pearl Reactive', 'Hybrid Reactive', 'Urethane', 'Polyester'],
-      selectedItem: _localFilters.coverstock,
-      onSelected: (cover) {
+      items: _coverstocks,
+      selectedItems: _localFilters.coverstocks,
+      onSelectionChanged: (selectedCoverstocks) {
         setState(() {
-          _localFilters = _localFilters.copyWith(coverstock: _localFilters.coverstock == cover ? null : cover);
+          _localFilters = _localFilters.copyWith(coverstocks: selectedCoverstocks);
         });
       },
-      icons: _coverstockIcons,
     );
   }
 
-  Widget _buildFilterSection({
+  Widget _buildMultiSelectSection({
     required String title,
-    Map<String, List<String>>? groups,
-    List<String>? items,
-    required String? selectedItem,
-    required ValueChanged<String?> onSelected,
-    required Map<String, IconData> icons,
+    required List<String> items,
+    required Set<String> selectedItems,
+    required ValueChanged<Set<String>> onSelectionChanged,
   }) {
-    final allItems = groups?.values.expand((list) => list).toList() ?? items!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: allItems.map((item) {
-            final isSelected = selectedItem == item;
-            return GestureDetector(
-              onTap: () => onSelected(isSelected ? null : item),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: (MediaQuery.of(context).size.width * 0.9 - 40 - 12) / 3,
-                height: 36,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.white.withOpacity(0.25) : Colors.white.withOpacity(0.08),
-                  border: Border.all(
-                    color: isSelected ? Colors.white.withOpacity(0.9) : Colors.white.withOpacity(0.3),
-                    width: isSelected ? 2 : 1,
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: isSelected ? [
-                    BoxShadow(
-                      color: Colors.white.withOpacity(0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ] : [],
-                ),
-                child: Center(
-                  child: Text(
-                    item!,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(isSelected ? 1.0 : 0.8),
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1,
         ),
-      ],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildTagWrap(items, selectedItems, onSelectionChanged),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTagWrap(
+    List<String> items,
+    Set<String> selectedItems, 
+    ValueChanged<Set<String>> onSelectionChanged,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width * 0.9 - 72; // 扣除container padding和border
+    final itemWidth = (screenWidth - 24) / 3; // 3-4個標籤每行，扣除spacing
+    
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: items.map((item) {
+        final isSelected = selectedItems.contains(item);
+        return GestureDetector(
+          onTap: () {
+            final newSelection = Set<String>.from(selectedItems);
+            if (isSelected) {
+              newSelection.remove(item);
+            } else {
+              newSelection.add(item);
+            }
+            onSelectionChanged(newSelection);
+          },
+          child: Container(
+            width: itemWidth.clamp(80, 120),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected 
+                ? Theme.of(context).primaryColor.withOpacity(0.1)
+                : Colors.grey.shade50,
+              border: Border.all(
+                color: isSelected 
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey.shade300,
+                width: isSelected ? 2 : 1,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              item,
+              style: TextStyle(
+                color: isSelected 
+                  ? Theme.of(context).primaryColor
+                  : Colors.black87,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -327,14 +316,11 @@ void showFilterPopout(
 }) {
   showDialog(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.3),
+    barrierColor: Colors.transparent,
     builder: (BuildContext context) {
-      return Material(
-        type: MaterialType.transparency,
-        child: FilterPopout(
-          currentFilters: initialFilters,
-          onFiltersChanged: onFiltersChanged,
-        ),
+      return FilterPopout(
+        currentFilters: initialFilters,
+        onFiltersChanged: onFiltersChanged,
       );
     },
   );
