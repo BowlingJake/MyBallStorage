@@ -1,8 +1,8 @@
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
+import 'package:bowlingarsenal_app/features/comparison/presentation/widgets/ball_comparison_dialog.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
-import 'package:bowlingarsenal_app/features/favorites/logic/favorites_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -12,8 +12,79 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class BallLibraryPage extends ConsumerWidget {
+class BallLibraryPage extends ConsumerStatefulWidget {
   const BallLibraryPage({super.key});
+
+  @override
+  ConsumerState<BallLibraryPage> createState() => _BallLibraryPageState();
+}
+
+class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
+  bool _isComparisonMode = false;
+  Set<int> _selectedBallIds = {};
+
+  void _toggleComparisonMode() {
+    setState(() {
+      _isComparisonMode = !_isComparisonMode;
+      if (!_isComparisonMode) {
+        _selectedBallIds.clear();
+      }
+    });
+  }
+
+  void _toggleBallSelection(int ballId) {
+    setState(() {
+      if (_selectedBallIds.contains(ballId)) {
+        _selectedBallIds.remove(ballId);
+      } else {
+        // Limit to 2 balls for comparison
+        if (_selectedBallIds.length < 2) {
+          _selectedBallIds.add(ballId);
+        }
+      }
+    });
+  }
+
+  Future<void> _showComparison() async {
+    if (_selectedBallIds.length == 2) {
+      final ballIds = _selectedBallIds.toList();
+      final currentContext = context; // 保存 context 引用
+      
+      try {
+        // 直接從 repository 獲取球資料，避免分頁限制
+        final repository = ref.read(ballRepositoryProvider);
+        final ball1Future = repository.getBallById(ballIds[0].toString());
+        final ball2Future = repository.getBallById(ballIds[1].toString());
+        
+        final results = await Future.wait([ball1Future, ball2Future]);
+        final ball1 = results[0];
+        final ball2 = results[1];
+        
+        if (ball1 != null && ball2 != null && mounted) {
+          await showDialog<void>(
+            context: currentContext,
+            builder: (context) => BallComparisonDialog(
+              ball1: ball1,
+              ball2: ball2,
+            ),
+          );
+          
+          // Exit comparison mode after showing dialog
+          _toggleComparisonMode();
+        }
+      } catch (e) {
+        // 顯示錯誤訊息
+        if (mounted) {
+          ScaffoldMessenger.of(currentContext).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to load balls for comparison'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   int _calculateCurrentIndex(String location) {
     if (location.startsWith('/library')) {
@@ -29,7 +100,7 @@ class BallLibraryPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final currentIndex = _calculateCurrentIndex(location);
     final ballLibraryAsync = ref.watch(ballLibraryControllerProvider);
@@ -56,6 +127,21 @@ class BallLibraryPage extends ConsumerWidget {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           actions: [
+            // Comparison 按鈕
+            if (_isComparisonMode && _selectedBallIds.length == 2)
+              IconButton(
+                icon: const Icon(Icons.check, color: Colors.green),
+                onPressed: _showComparison,
+                tooltip: 'Compare Selected',
+              ),
+            IconButton(
+              icon: Icon(
+                _isComparisonMode ? Icons.close : Icons.compare_arrows,
+                color: _isComparisonMode ? Colors.orange : Colors.white,
+              ),
+              onPressed: _toggleComparisonMode,
+              tooltip: _isComparisonMode ? 'Cancel Comparison' : 'Compare Balls',
+            ),
             // Favorites 按鈕
             IconButton(
               icon: const Icon(Icons.favorite, color: Colors.white),
@@ -87,6 +173,9 @@ class BallLibraryPage extends ConsumerWidget {
                               ref.read(ballLibraryControllerProvider.notifier).loadMore();
                             }
                           },
+                          isSelectionMode: _isComparisonMode,
+                          selectedBallIds: _selectedBallIds,
+                          onBallSelectionToggle: _toggleBallSelection,
                         ),
                 ),
               ],

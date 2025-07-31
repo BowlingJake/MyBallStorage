@@ -20,6 +20,9 @@ class BallListView extends StatelessWidget {
     this.hasMoreData = false,
     this.isLoadingMore = false,
     this.onLoadMore,
+    this.isSelectionMode = false,
+    this.selectedBallIds = const <int>{},
+    this.onBallSelectionToggle,
     super.key,
   });
 
@@ -29,6 +32,9 @@ class BallListView extends StatelessWidget {
   final bool hasMoreData;
   final bool isLoadingMore;
   final VoidCallback? onLoadMore;
+  final bool isSelectionMode;
+  final Set<int> selectedBallIds;
+  final Function(int)? onBallSelectionToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -71,15 +77,23 @@ class BallListView extends StatelessWidget {
             }
             
             final ball = balls[index];
+            final isSelected = selectedBallIds.contains(ball.id);
+            
             return BallCardItem(
               ball: ball,
               theme: Theme.of(context),
               onTap: () {
-                onBallTapped?.call(ball);
+                if (isSelectionMode) {
+                  onBallSelectionToggle?.call(ball.id);
+                } else {
+                  onBallTapped?.call(ball);
+                }
               },
               onLongPress: () {
                 onBallLongPress?.call(ball);
               },
+              isSelectionMode: isSelectionMode,
+              isSelected: isSelected,
             );
           },
         ),

@@ -12,6 +12,8 @@ class BallCardItem extends ConsumerWidget {
     required this.theme,
     this.onTap,
     this.onLongPress,
+    this.isSelectionMode = false,
+    this.isSelected = false,
     super.key,
   });
   
@@ -19,6 +21,8 @@ class BallCardItem extends ConsumerWidget {
   final ThemeData theme;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final bool isSelectionMode;
+  final bool isSelected;
 
 
   @override
@@ -35,13 +39,24 @@ class BallCardItem extends ConsumerWidget {
               borderRadius: BorderRadius.circular(14),
               color: Colors.black.withOpacity(0.8),
               border: Border.all(
-                color: brandColor.withOpacity(0.6),
-                width: 1.5,
+                color: isSelected 
+                    ? theme.primaryColor.withOpacity(0.8)
+                    : brandColor.withOpacity(0.6),
+                width: isSelected ? 3.0 : 1.5,
               ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: theme.primaryColor.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : null,
             ),
             child: InkWell(
-              onTap: null, // 移除短按功能
-              onLongPress: onTap, // 長按才顯示詳細資料
+              onTap: isSelectionMode ? onTap : null, // 在選擇模式下允許點擊
+              onLongPress: isSelectionMode ? null : onTap, // 在選擇模式下禁用長按
               borderRadius: BorderRadius.circular(14),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -266,11 +281,31 @@ class BallCardItem extends ConsumerWidget {
               ),
             ),
           ),
-          // 愛心按鈕 - positioned在右上角
+          // 選擇模式指示器或愛心按鈕
           Positioned(
             top: 8,
             right: 8,
-            child: CompactFavoriteButton(ball: ball),
+            child: isSelectionMode
+                ? (isSelected 
+                    ? Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.8),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      )
+                    : const SizedBox.shrink()) // 未選中時不顯示任何icon
+                : CompactFavoriteButton(ball: ball),
           ),
         ],
       ),
