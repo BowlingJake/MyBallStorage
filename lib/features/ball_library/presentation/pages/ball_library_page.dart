@@ -1,6 +1,4 @@
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
-import 'package:bowlingarsenal_app/features/ball_library/data/database_test_helper.dart';
-import 'package:bowlingarsenal_app/features/ball_library/data/rls_diagnostic.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
@@ -8,9 +6,6 @@ import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_sta
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +40,7 @@ class BallLibraryPage extends ConsumerWidget {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.go('/'),
           ),
           title: const Text(
             'Ball Library',
@@ -60,33 +55,79 @@ class BallLibraryPage extends ConsumerWidget {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           actions: [
-            if (kDebugMode) ...[
-              IconButton(
-                icon: const Icon(Icons.bug_report, color: Colors.orange),
-                onPressed: () async {
-                  print('🔧 Testing database connection...');
-                  await DatabaseTestHelper.testConnection();
-                },
-                tooltip: 'Test Database',
-              ),
-              IconButton(
-                icon: const Icon(Icons.security, color: Colors.red),
-                onPressed: () async {
-                  print('🔐 Diagnosing RLS...');
-                  await RLSDiagnostic.diagnoseRLS();
-                  RLSDiagnostic.printRLSFixSQL();
-                },
-                tooltip: 'Diagnose RLS',
-              ),
-            ],
+            PopupMenuButton<SortCriterion>(
+              icon: const Icon(Icons.sort, color: Colors.white),
+              color: Colors.grey[800],
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.id, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('ID (Low-High)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.id, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('ID (High-Low)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.name, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Name (A-Z)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.name, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Name (Z-A)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.brand, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Brand (A-Z)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.brand, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Brand (Z-A)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (SortCriterion newSort) {
+                ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
+              },
+            ),
           ],
         ),
         body: ballLibraryAsync.when(
           data: (state) {
-            print('🎨 UI Rendering: ${state.filteredBalls.length} balls');
-            print('   isLoading: ${state.isLoading}');
-            print('   hasMoreData: ${state.hasMoreData}');
-            print('   error: ${state.error}');
             
             return Column(
               children: [
@@ -94,7 +135,6 @@ class BallLibraryPage extends ConsumerWidget {
                 SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 8),
                 // 控制面板
                 _buildSimplifiedControls(context, ref, state),
-                const SizedBox(height: 16),
                 // 球列表
                 Expanded(
                   child: state.filteredBalls.isEmpty
@@ -166,150 +206,91 @@ class BallLibraryPage extends ConsumerWidget {
 
   Widget _buildSimplifiedControls(BuildContext context, WidgetRef ref, BallLibraryState state) {
     return Container(
+      // 透明背景，讓球具資料自然滾動穿過
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
+      child: Row(
         children: [
-          // 搜尋框 - 整合篩選和排序功能
-          TextField(
-            onChanged: (text) {
-              ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
-            },
-            decoration: InputDecoration(
-              hintText: 'Search balls...',
-              hintStyle: TextStyle(color: Colors.grey[400]),
-              prefixIcon: const Icon(Icons.search, color: Colors.grey),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 篩選按鈕
-                  Container(
-                    margin: const EdgeInsets.only(right: 4),
-                    child: Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.filter_list, color: Colors.grey, size: 20),
-                          onPressed: () => _showFilterDialog(context, ref, state),
-                          padding: const EdgeInsets.all(4),
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        ),
-                        if (state.filters.activeFilterCount > 0)
-                          Positioned(
-                            right: 4,
-                            top: 4,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${state.filters.activeFilterCount}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // 排序按鈕
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    child: PopupMenuButton<SortCriterion>(
-                      icon: const Icon(Icons.sort, color: Colors.grey, size: 20),
-                      color: Colors.grey[800],
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.id, ascending: true),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('ID (Low-High)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.id, ascending: false),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('ID (High-Low)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.name, ascending: true),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('Name (A-Z)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.name, ascending: false),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('Name (Z-A)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.brand, ascending: true),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('Brand (A-Z)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const SortCriterion(field: SortField.brand, ascending: false),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.sort, size: 16, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text('Brand (Z-A)', style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onSelected: (SortCriterion newSort) {
-                        ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
-                      },
-                    ),
-                  ),
-                ],
+          // 搜尋框 - 佔據大部分空間
+          Expanded(
+            child: TextField(
+              onChanged: (text) {
+                ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
+              },
+              decoration: InputDecoration(
+                hintText: 'Search balls...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                filled: true,
+                fillColor: Colors.black.withOpacity(0.6),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
-              filled: true,
-              fillColor: Colors.black.withOpacity(0.8),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(width: 12),
+          // 篩選按鈕
+          Stack(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.grey[600]!,
+                    width: 1.5,
+                  ),
+                ),
+                child: InkWell(
+                  onTap: () => _showFilterDialog(context, ref, state),
+                  borderRadius: BorderRadius.circular(12),
+                  child: const Icon(
+                    Icons.filter_list,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                ),
+              ),
+              if (state.filters.activeFilterCount > 0)
+                Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${state.filters.activeFilterCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -328,21 +309,6 @@ class BallLibraryPage extends ConsumerWidget {
     );
   }
 
-  void _showSortDialog(BuildContext context, WidgetRef ref, BallLibraryState state) {
-    showDialog<void>(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
-      builder: (BuildContext context) {
-        return _SortDialog(
-          currentSort: state.sortCriterion,
-          onSortChanged: (SortCriterion newSort) {
-            ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
-  }
 
   Widget _buildEmptyState(bool hasFilters) {
     return Center(
@@ -443,151 +409,9 @@ class BallLibraryPage extends ConsumerWidget {
   }
 
   void _showBallDetail(BuildContext context, BowlingBall ball) {
-    if (kDebugMode) {
-      print('Tapped on ball: ${ball.name}');
-    }
-    
     showDialog<void>(
       context: context,
       builder: (context) => BowlingBallDetailWidget(ball: ball),
-    );
-  }
-}
-
-class _SortDialog extends StatelessWidget {
-  const _SortDialog({
-    required this.currentSort,
-    required this.onSortChanged,
-  });
-
-  final SortCriterion currentSort;
-  final void Function(SortCriterion) onSortChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: 320,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.grey[900]?.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[700]!),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Sort Options',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildSortOption('ID', SortField.id),
-            _buildSortOption('Name', SortField.name),
-            _buildSortOption('Brand', SortField.brand),
-            _buildSortOption('Release Year', SortField.releaseYear),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildAppStandardButton(
-                    text: 'Cancel',
-                    onPressed: () => Navigator.of(context).pop(),
-                    isPrimary: false,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildAppStandardButton(
-                    text: 'Apply',
-                    onPressed: () => Navigator.of(context).pop(),
-                    isPrimary: true,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSortOption(String title, SortField field) {
-    final isSelected = currentSort.field == field;
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (isSelected) {
-                  // Toggle ascending/descending if same field
-                  onSortChanged(currentSort.copyWith(ascending: !currentSort.ascending));
-                } else {
-                  // Select new field with ascending order
-                  onSortChanged(SortCriterion(field: field));
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.blue.withOpacity(0.2) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey[600]!,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: isSelected ? Colors.blue : Colors.white,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                    ),
-                    const Spacer(),
-                    if (isSelected)
-                      Icon(
-                        currentSort.ascending ? Icons.arrow_upward : Icons.arrow_downward,
-                        color: Colors.blue,
-                        size: 18,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppStandardButton({
-    required String text,
-    required VoidCallback onPressed,
-    required bool isPrimary,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isPrimary ? Colors.blue : Colors.grey[800],
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        elevation: 2,
-      ),
-      child: Text(text),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -55,15 +56,15 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
             minWidth: 320,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.black.withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.grey.shade300,
+              color: Colors.grey.shade600,
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -80,7 +81,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: Colors.grey.shade200,
+                      color: Colors.grey.shade600,
                       width: 1,
                     ),
                   ),
@@ -91,7 +92,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                     const Text(
                       'Filter Options',
                       style: TextStyle(
-                        color: Colors.black87,
+                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -99,7 +100,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                     IconButton(
                       icon: const Icon(
                         Icons.close,
-                        color: Colors.black54,
+                        color: Colors.white70,
                         size: 24,
                       ),
                       onPressed: () => Navigator.of(context).pop(),
@@ -136,7 +137,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                 decoration: BoxDecoration(
                   border: Border(
                     top: BorderSide(
-                      color: Colors.grey.shade200,
+                      color: Colors.grey.shade600,
                       width: 1,
                     ),
                   ),
@@ -144,26 +145,27 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton(
+                      child: AppStandardButton(
+                        onPressed: () {
+                          setState(() {
+                            _localFilters = const BallFilters();
+                          });
+                        },
+                        text: 'Reset All',
+                        isPrimary: false,
+                        height: 48,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppStandardButton(
                         onPressed: () {
                           widget.onFiltersChanged(_localFilters);
                           Navigator.of(context).pop();
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          foregroundColor: Colors.white,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
-                        ),
-                        child: const Text(
-                          'Apply Filters',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        text: 'Apply Filters',
+                        isPrimary: true,
+                        height: 48,
                       ),
                     ),
                   ],
@@ -224,7 +226,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: Colors.grey.shade600,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(12),
@@ -233,13 +235,37 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (selectedItems.isNotEmpty)
+                GestureDetector(
+                  onTap: () => onSelectionChanged({}),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade600),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Reset',
+                      style: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 12),
           _buildTagWrap(items, selectedItems, onSelectionChanged),
@@ -279,13 +305,13 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
             ),
             decoration: BoxDecoration(
               color: isSelected 
-                ? Theme.of(context).primaryColor.withOpacity(0.1)
-                : Colors.grey.shade50,
+                ? Theme.of(context).primaryColor
+                : Colors.transparent,
               border: Border.all(
                 color: isSelected 
                   ? Theme.of(context).primaryColor
-                  : Colors.grey.shade300,
-                width: isSelected ? 2 : 1,
+                  : Colors.grey.shade600,
+                width: 1.5,
               ),
               borderRadius: BorderRadius.circular(20),
             ),
@@ -293,8 +319,8 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
               item,
               style: TextStyle(
                 color: isSelected 
-                  ? Theme.of(context).primaryColor
-                  : Colors.black87,
+                  ? Colors.white
+                  : Colors.white,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),

@@ -53,10 +53,6 @@ class BallCardItem extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.grey.withOpacity(0.3),
-                          border: Border.all(
-                            color: brandColor.withOpacity(0.4),
-                            width: 1.5,
-                          ),
                         ),
                         child: ClipOval(
                           child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'

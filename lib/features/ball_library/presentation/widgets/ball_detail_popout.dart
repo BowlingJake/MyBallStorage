@@ -81,10 +81,6 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey.withOpacity(0.3),
-                        border: Border.all(
-                          color: brandColor.withOpacity(0.6),
-                          width: 2,
-                        ),
                       ),
                       child: ClipOval(
                         child: widget.ball.imageUrl.isNotEmpty && 
