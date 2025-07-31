@@ -15,10 +15,12 @@ import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/edit_profile_page.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/favorite_centers_oil_patterns_page.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/view_profile_page.dart';
+import 'package:bowlingarsenal_app/features/favorites/presentation/pages/favorites_page.dart';
 
 // 1. 建立 GoRouterRefreshStream
 // 這是 go_router 官方建議的，用來監聽 Stream 並在事件發生時觸發路由刷新的類別。
@@ -39,11 +41,14 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 // 2. 建立主要的 routerProvider
 final routerProvider = Provider<GoRouter>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final onboardingCompleted = ref.watch(onboardingProvider);
-  // 用 Supabase 狀態判斷
-  final isAuthenticated = authRepository.currentUser != null;
-  final shouldShowOnboarding = isAuthenticated && !onboardingCompleted;
+  // 使用 AuthController 來監聽認證狀態
+  final authState = ref.watch(authControllerProvider);
+  // final onboardingCompleted = ref.watch(onboardingProvider); // 測試階段暫時不用
+  
+  // 從 AuthController 取得認證狀態
+  final isAuthenticated = authState.hasValue && authState.value != null;
+  // 測試階段：暫時禁用 onboarding，直接進入主頁面
+  const shouldShowOnboarding = false; // isAuthenticated && !onboardingCompleted;
 
   return GoRouter(
     // 3. 設定初始路由
@@ -80,6 +85,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/my-arsenal',
         name: 'my-arsenal',
         builder: (context, state) => const MyArsenalPage(),
+      ),
+      GoRoute(
+        path: '/favorites',
+        name: 'favorites',
+        builder: (context, state) => const FavoritesPage(),
       ),
       GoRoute(
         path: '/events',
@@ -123,25 +133,18 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     // 6. 設定重導向邏輯 (核心) - 使用純函式auth guard
     redirect: (context, state) {
-      // 只用 Supabase 狀態
-      /*
-      if (!isAuthenticated && state.matchedLocation != '/login') {
-        return '/login';
-      }
-      if (isAuthenticated && !shouldShowOnboarding && state.matchedLocation == '/login') {
-        return '/';
-      }
-      if (isAuthenticated && shouldShowOnboarding && state.matchedLocation != '/onboarding') {
-        return '/onboarding';
-      }
-      if (isAuthenticated && !shouldShowOnboarding && state.matchedLocation == '/onboarding') {
-        return '/';
-      }
-      return null;
-      */
+      // 使用 AuthGuard 進行重導向決策
+      final authGuardState = AuthGuardState(
+        isAuthenticated: isAuthenticated,
+        shouldShowOnboarding: shouldShowOnboarding,
+      );
+      
+      return authGuard(authGuardState, state.matchedLocation);
     },
 
     // 7. 設定狀態監聽，讓路由響應變化
-    refreshListenable: GoRouterRefreshStream(ref.watch(authStateChangesProvider.stream)),
+    refreshListenable: GoRouterRefreshStream(
+      ref.watch(authStateChangesProvider.stream),
+    ),
   );
 }); 

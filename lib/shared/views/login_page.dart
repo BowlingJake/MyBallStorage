@@ -1,10 +1,9 @@
 import 'dart:ui';
 
-import 'package:bowlingarsenal_app/shared/providers/providers.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
+import 'package:bowlingarsenal_app/routing/app_router_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:bowlingarsenal_app/routing/app_router_config.dart'; // <<< 確保這行存在，並且路徑正確
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -16,10 +15,22 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   bool _isLoading = false;
+  bool _showEmailForm = false;
   int _tapCount = 0;
   DateTime? _lastTapTime;
   static const int _requiredTaps = 7;
   static const Duration _tapInterval = Duration(seconds: 2);
+  
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   // Placeholder for Google Sign-In logic
   Future<void> _signInWithGoogle() async {
@@ -37,6 +48,32 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   // Placeholder for Phone Sign-In logic
   Future<void> _signInWithPhone() async {
     print('Attempting Phone Sign-In...');
+  }
+
+  // Email 登入邏輯
+  Future<void> _signInWithEmail() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    print('Attempting Email Sign-In with ${_emailController.text}...');
+    try {
+      await ref.read(authControllerProvider.notifier).signInWithEmailAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      
+      if (mounted) {
+        // 登入成功後，路由會自動重導向，不需要手動導航
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('登入成功！')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('登入失敗：$e')),
+        );
+      }
+    }
   }
 
   Future<void> _handleLoginAction(Future<void> Function() loginFuture) async {
@@ -73,6 +110,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_tapCount >= _requiredTaps) {
       _tapCount = 0;
       _lastTapTime = null;
+      // 使用 GoRouter 導航到主頁（開發者通道）
       ref.read(routerProvider).go('/');
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('進入開發者通道')));
@@ -178,7 +216,183 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Custom Google Sign-in Button
+                          // Email Login Toggle Button
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _showEmailForm = !_showEmailForm;
+                              });
+                            },
+                            child: Text(
+                              _showEmailForm ? '使用其他方式登入' : '使用 Email 登入（測試用）',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          
+                          // Email Login Form
+                          if (_showEmailForm) ...[
+                            const SizedBox(height: 16),
+                            Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  // Email TextField
+                                  TextFormField(
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      labelText: 'Email',
+                                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                      hintText: 'test@bowlingarsenal.com',
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                      prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.white, width: 2),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.red),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.red, width: 2),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white.withOpacity(0.1),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '請輸入Email';
+                                      }
+                                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                                        return '請輸入有效的Email格式';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Password TextField
+                                  TextFormField(
+                                    controller: _passwordController,
+                                    obscureText: true,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      labelText: '密碼',
+                                      labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                      hintText: 'TestPassword123!',
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                      prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.white, width: 2),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.red),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: Colors.red, width: 2),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white.withOpacity(0.1),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '請輸入密碼';
+                                      }
+                                      if (value.length < 6) {
+                                        return '密碼至少需要6個字符';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Email Login Button
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed: _isLoading ? null : () => _handleLoginAction(_signInWithEmail),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: theme.colorScheme.primary,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                              ),
+                                            )
+                                          : const Text(
+                                              '登入',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            
+                            // Divider
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    '或',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                          
+                          // 只有在不顯示Email表單時才顯示其他登入按鈕
+                          if (!_showEmailForm) ...[
+                            // Custom Google Sign-in Button
                           SignInButtonBuilder(
                             text: '使用 Google 帳戶登入',
                             icon: Icons.circle_outlined,
@@ -225,6 +439,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
+                          ],
                         ],
                       ),
                     ),

@@ -1,19 +1,20 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/favorites/presentation/widgets/favorite_button_widget.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BowlingBallDetailWidget extends StatefulWidget {
+class BowlingBallDetailWidget extends ConsumerStatefulWidget {
   const BowlingBallDetailWidget({required this.ball, super.key});
   final BowlingBall ball;
 
   @override
-  State<BowlingBallDetailWidget> createState() =>
+  ConsumerState<BowlingBallDetailWidget> createState() =>
       _BowlingBallDetailWidgetState();
 }
 
-class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
-  bool isFavorited = false;
+class _BowlingBallDetailWidgetState extends ConsumerState<BowlingBallDetailWidget> {
 
   @override
   Widget build(BuildContext context) {
@@ -57,20 +58,10 @@ class _BowlingBallDetailWidgetState extends State<BowlingBallDetailWidget> {
                   Positioned(
                     top: 12,
                     right: 12,
-                    child: IconButton(
-                      icon: Icon(
-                        isFavorited ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorited ? Colors.red : Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isFavorited = !isFavorited;
-                        });
-                        // TODO: 實際收藏功能
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    child: FavoriteButtonWidget(
+                      ball: widget.ball,
+                      size: 28,
+                      iconColor: Colors.white,
                     ),
                   ),
                   // 中央圓形圖片

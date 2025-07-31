@@ -2,6 +2,7 @@ import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart'
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
+import 'package:bowlingarsenal_app/features/favorites/logic/favorites_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -55,74 +56,11 @@ class BallLibraryPage extends ConsumerWidget {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           actions: [
-            PopupMenuButton<SortCriterion>(
-              icon: const Icon(Icons.sort, color: Colors.white),
-              color: Colors.grey[800],
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.id, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('ID (Low-High)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.id, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('ID (High-Low)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.name, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Name (A-Z)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.name, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Name (Z-A)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.brand, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Brand (A-Z)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.brand, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Brand (Z-A)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ],
-              onSelected: (SortCriterion newSort) {
-                ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
-              },
+            // Favorites 按鈕
+            IconButton(
+              icon: const Icon(Icons.favorite, color: Colors.white),
+              onPressed: () => context.go('/favorites'),
+              tooltip: 'My Favorites',
             ),
           ],
         ),
@@ -291,6 +229,91 @@ class BallLibraryPage extends ConsumerWidget {
                   ),
                 ),
             ],
+          ),
+          const SizedBox(width: 8),
+          // 排序按鈕
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: PopupMenuButton<SortCriterion>(
+              icon: const Icon(Icons.sort, color: Colors.grey, size: 20),
+              color: Colors.grey[800],
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.id, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('ID (Low-High)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.id, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('ID (High-Low)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.name, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Name (A-Z)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.name, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Name (Z-A)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.brand, ascending: true),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Brand (A-Z)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: const SortCriterion(field: SortField.brand, ascending: false),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.sort, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Brand (Z-A)', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (SortCriterion newSort) {
+                ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
+              },
+            ),
           ),
         ],
       ),

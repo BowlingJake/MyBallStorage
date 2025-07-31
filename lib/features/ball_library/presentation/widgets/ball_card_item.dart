@@ -1,10 +1,12 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/favorites/presentation/widgets/favorite_button_widget.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BallCardItem extends StatelessWidget {
+class BallCardItem extends ConsumerWidget {
   const BallCardItem({
     required this.ball,
     required this.theme,
@@ -20,7 +22,7 @@ class BallCardItem extends StatelessWidget {
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final brandPalette = getBrandTonalPalette(ball.brand, theme);
     final brandColor = brandPalette[400]!;
     
@@ -38,8 +40,8 @@ class BallCardItem extends StatelessWidget {
               ),
             ),
             child: InkWell(
-              onTap: onTap,
-              onLongPress: onLongPress,
+              onTap: null, // 移除短按功能
+              onLongPress: onTap, // 長按才顯示詳細資料
               borderRadius: BorderRadius.circular(14),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -263,6 +265,12 @@ class BallCardItem extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          // 愛心按鈕 - positioned在右上角
+          Positioned(
+            top: 8,
+            right: 8,
+            child: CompactFavoriteButton(ball: ball),
           ),
         ],
       ),
