@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_sta
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -369,11 +370,11 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 280),
           decoration: BoxDecoration(
-            color: Colors.grey[900],
+            color: Colors.black.withOpacity(0.8),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey[600]!,
-              width: 1,
+              color: BrandColors.accentColorDark,
+              width: 1.5,
             ),
           ),
           child: Column(
@@ -384,17 +385,17 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.grey[700]!, width: 1),
+                    bottom: BorderSide(color: BrandColors.accentColorDark.withOpacity(0.3), width: 1),
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.sort, color: Colors.grey[400], size: 20),
+                    Icon(Icons.sort, color: BrandColors.accentColorDark, size: 20),
                     const SizedBox(width: 8),
                     const Text(
                       'Sort By',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: BrandColors.textPrimaryDark,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -489,14 +490,14 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? Colors.blue : Colors.grey[400],
+              color: isSelected ? BrandColors.accentColorDark : BrandColors.textSecondaryDark,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  color: isSelected ? Colors.blue : Colors.white,
+                  color: isSelected ? BrandColors.accentColorDark : BrandColors.textPrimaryDark,
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -506,7 +507,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
               const Icon(
                 Icons.check_circle,
                 size: 18,
-                color: Colors.blue,
+                color: BrandColors.accentColorDark,
               ),
           ],
         ),
