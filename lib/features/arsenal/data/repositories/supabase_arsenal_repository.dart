@@ -29,14 +29,14 @@ class SupabaseArsenalRepository implements ArsenalRepository {
           .from('arsenal_ball_instances')
           .select('''
             *,
-            bowling_balls(*)
+            ball_data(*)
           ''')
           .eq('user_id', userId)
           .order('added_date', ascending: false);
 
       return response.map<ArsenalBallInstance>((json) {
         // Parse the joined bowling ball data
-        final bowlingBallData = json['bowling_balls'] as Map<String, dynamic>?;
+        final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
         BowlingBall? bowlingBall;
         if (bowlingBallData != null) {
           bowlingBall = BowlingBall.fromJson(bowlingBallData);
@@ -44,7 +44,7 @@ class SupabaseArsenalRepository implements ArsenalRepository {
 
         // Create the instance with the bowling ball data
         final instanceData = Map<String, dynamic>.from(json);
-        instanceData.remove('bowling_balls'); // Remove the joined data
+        instanceData.remove('ball_data'); // Remove the joined data
         instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
 
         return ArsenalBallInstance.fromJson(instanceData);
@@ -61,21 +61,21 @@ class SupabaseArsenalRepository implements ArsenalRepository {
           .from('arsenal_ball_instances')
           .select('''
             *,
-            bowling_balls(*)
+            ball_data(*)
           ''')
           .eq('user_id', userId)
           .eq('bag_category_id', categoryId)
           .order('added_date', ascending: false);
 
       return response.map<ArsenalBallInstance>((json) {
-        final bowlingBallData = json['bowling_balls'] as Map<String, dynamic>?;
+        final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
         BowlingBall? bowlingBall;
         if (bowlingBallData != null) {
           bowlingBall = BowlingBall.fromJson(bowlingBallData);
         }
 
         final instanceData = Map<String, dynamic>.from(json);
-        instanceData.remove('bowling_balls');
+        instanceData.remove('ball_data');
         instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
 
         return ArsenalBallInstance.fromJson(instanceData);
@@ -152,7 +152,7 @@ class SupabaseArsenalRepository implements ArsenalRepository {
         customBallData.remove('id'); // Let database generate ID
         
         final ballResponse = await _supabase
-            .from('bowling_balls')
+            .from('ball_data')
             .insert(customBallData)
             .select()
             .single();
@@ -496,20 +496,20 @@ class SupabaseArsenalRepository implements ArsenalRepository {
           .from('arsenal_ball_instances')
           .select('''
             *,
-            bowling_balls(*)
+            ball_data(*)
           ''')
           .eq('user_id', userId)
-          .or('nickname.ilike.%$query%,bowling_balls.ball_name.ilike.%$query%,bowling_balls.brand.ilike.%$query%');
+          .or('nickname.ilike.%$query%,ball_data.ball_name.ilike.%$query%,ball_data.brand.ilike.%$query%');
 
       return response.map<ArsenalBallInstance>((json) {
-        final bowlingBallData = json['bowling_balls'] as Map<String, dynamic>?;
+        final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
         BowlingBall? bowlingBall;
         if (bowlingBallData != null) {
           bowlingBall = BowlingBall.fromJson(bowlingBallData);
         }
 
         final instanceData = Map<String, dynamic>.from(json);
-        instanceData.remove('bowling_balls');
+        instanceData.remove('ball_data');
         instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
 
         return ArsenalBallInstance.fromJson(instanceData);
@@ -535,7 +535,7 @@ class SupabaseArsenalRepository implements ArsenalRepository {
           .from('arsenal_ball_instances')
           .select('''
             *,
-            bowling_balls(*)
+            ball_data(*)
           ''')
           .eq('user_id', userId);
 
@@ -548,14 +548,14 @@ class SupabaseArsenalRepository implements ArsenalRepository {
       final response = await query.order('added_date', ascending: false);
 
       var instances = response.map<ArsenalBallInstance>((json) {
-        final bowlingBallData = json['bowling_balls'] as Map<String, dynamic>?;
+        final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
         BowlingBall? bowlingBall;
         if (bowlingBallData != null) {
           bowlingBall = BowlingBall.fromJson(bowlingBallData);
         }
 
         final instanceData = Map<String, dynamic>.from(json);
-        instanceData.remove('bowling_balls');
+        instanceData.remove('ball_data');
         instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
 
         return ArsenalBallInstance.fromJson(instanceData);
@@ -661,19 +661,19 @@ class SupabaseArsenalRepository implements ArsenalRepository {
         .from('arsenal_ball_instances')
         .select('''
           *,
-          bowling_balls(*)
+          ball_data(*)
         ''')
         .eq('instance_id', instanceId)
         .single();
 
-    final bowlingBallData = response['bowling_balls'] as Map<String, dynamic>?;
+    final bowlingBallData = response['ball_data'] as Map<String, dynamic>?;
     BowlingBall? bowlingBall;
     if (bowlingBallData != null) {
       bowlingBall = BowlingBall.fromJson(bowlingBallData);
     }
 
     final instanceData = Map<String, dynamic>.from(response);
-    instanceData.remove('bowling_balls');
+    instanceData.remove('ball_data');
     instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
 
     return ArsenalBallInstance.fromJson(instanceData);
