@@ -332,76 +332,14 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 width: 1.5,
               ),
             ),
-            child: PopupMenuButton<SortCriterion>(
-              icon: const Icon(Icons.sort, color: Colors.grey, size: 20),
-              color: Colors.grey[800],
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.id, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('ID (Low-High)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.id, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('ID (High-Low)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.name, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Name (A-Z)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.name, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Name (Z-A)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.brand, ascending: true),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Brand (A-Z)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: const SortCriterion(field: SortField.brand, ascending: false),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.sort, size: 16, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('Brand (Z-A)', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ],
-              onSelected: (SortCriterion newSort) {
-                ref.read(ballLibraryControllerProvider.notifier).updateSort(newSort);
-              },
+            child: InkWell(
+              onTap: () => _showSortDialog(context, ref, state),
+              borderRadius: BorderRadius.circular(12),
+              child: const Icon(
+                Icons.sort,
+                color: Colors.grey,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -418,6 +356,161 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       onFiltersChanged: (newFilters) {
         ref.read(ballLibraryControllerProvider.notifier).updateFilters(newFilters);
       },
+    );
+  }
+
+  void _showSortDialog(BuildContext context, WidgetRef ref, BallLibraryState state) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.8),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey[600]!,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 標題
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey[700]!, width: 1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.sort, color: Colors.grey[400], size: 20),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Sort By',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 排序選項
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  children: [
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'ID (Low-High)',
+                      const SortCriterion(field: SortField.id, ascending: true),
+                      Icons.keyboard_arrow_up,
+                    ),
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'ID (High-Low)',
+                      const SortCriterion(field: SortField.id, ascending: false),
+                      Icons.keyboard_arrow_down,
+                    ),
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'Name (A-Z)',
+                      const SortCriterion(field: SortField.name, ascending: true),
+                      Icons.sort_by_alpha,
+                    ),
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'Name (Z-A)',
+                      const SortCriterion(field: SortField.name, ascending: false),
+                      Icons.sort_by_alpha,
+                    ),
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'Brand (A-Z)',
+                      const SortCriterion(field: SortField.brand, ascending: true),
+                      Icons.business,
+                    ),
+                    _buildSortOption(
+                      context,
+                      ref,
+                      state,
+                      'Brand (Z-A)',
+                      const SortCriterion(field: SortField.brand, ascending: false),
+                      Icons.business,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSortOption(
+    BuildContext context,
+    WidgetRef ref,
+    BallLibraryState state,
+    String title,
+    SortCriterion criterion,
+    IconData icon,
+  ) {
+    final isSelected = state.sortCriterion == criterion;
+
+    return InkWell(
+      onTap: () {
+        ref.read(ballLibraryControllerProvider.notifier).updateSort(criterion);
+        Navigator.of(context).pop();
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.blue : Colors.grey[400],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? Colors.blue : Colors.white,
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                size: 18,
+                color: Colors.blue,
+              ),
+          ],
+        ),
+      ),
     );
   }
 
