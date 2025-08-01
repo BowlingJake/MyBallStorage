@@ -3,7 +3,7 @@ import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_cont
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/comparison/presentation/widgets/ball_comparison_dialog.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
-import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
@@ -52,14 +52,10 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       final currentContext = context; // 保存 context 引用
       
       try {
-        // 直接從 repository 獲取球資料，避免分頁限制
-        final repository = ref.read(ballRepositoryProvider);
-        final ball1Future = repository.getBallById(ballIds[0].toString());
-        final ball2Future = repository.getBallById(ballIds[1].toString());
-        
-        final results = await Future.wait([ball1Future, ball2Future]);
-        final ball1 = results[0];
-        final ball2 = results[1];
+        // 符合架構規範：通過邏輯層獲取球資料
+        final (ball1, ball2) = await ref
+            .read(ballLibraryControllerProvider.notifier)
+            .getBallsForComparison(ballIds);
         
         if (ball1 != null && ball2 != null && mounted) {
           await showDialog<void>(

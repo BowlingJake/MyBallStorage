@@ -2,7 +2,7 @@ import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.da
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/supabase_ball_repository.dart';
-import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -336,6 +336,34 @@ class BallLibraryController extends _$BallLibraryController {
     } catch (e) {
       print('❌ Refresh error: $e');
       state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  /// 取得用於比較的球資料
+  /// 
+  /// 根據提供的球ID列表獲取球資料，用於球比較功能
+  /// 符合架構規範：業務邏輯封裝在邏輯層，表現層不直接存取資料層
+  Future<(BowlingBall?, BowlingBall?)> getBallsForComparison(List<int> ballIds) async {
+    if (ballIds.length != 2) {
+      throw ArgumentError('Must provide exactly 2 ball IDs for comparison');
+    }
+    
+    try {
+      print('🔍 Getting balls for comparison: ${ballIds[0]} vs ${ballIds[1]}');
+      
+      final ball1Future = _repository.getBallById(ballIds[0].toString());
+      final ball2Future = _repository.getBallById(ballIds[1].toString());
+      
+      final results = await Future.wait([ball1Future, ball2Future]);
+      final ball1 = results[0];
+      final ball2 = results[1];
+      
+      print('✅ Retrieved balls for comparison: ${ball1?.name} vs ${ball2?.name}');
+      
+      return (ball1, ball2);
+    } catch (e) {
+      print('❌ Error getting balls for comparison: $e');
+      throw Exception('Failed to load balls for comparison: $e');
     }
   }
 }

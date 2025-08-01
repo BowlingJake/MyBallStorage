@@ -14,7 +14,7 @@ export 'presentation/widgets/ball_card_item.dart';
 export 'logic/ball_library_controller.dart';
 
 // Models
-export 'models/ball_library_state.dart';
+export 'data/models/ball_library_state.dart';
 
 // Data
 export 'data/ball_data_service.dart';

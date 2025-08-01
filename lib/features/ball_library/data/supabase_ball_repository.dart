@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
-import 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
