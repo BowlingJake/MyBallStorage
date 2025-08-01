@@ -80,4 +80,6 @@ lib/
     - 類別/Provider：使用 `PascalCase` (大駝峰命名法)，例如：`MyArsenalRepository`。
     - 變數/函式：使用 `camelCase` (小駝峰命名法)，例如：`fetchBalls()`。
 
+    另外，如果要新增按鈕，應優先使用app_standard_button.dart，如果要使用下拉式選單，應優先使用custom_dropdown.dart
+
 ---
