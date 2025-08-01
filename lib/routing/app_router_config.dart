@@ -10,7 +10,7 @@ import 'package:bowlingarsenal_app/routing/auth_guard.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/pages/ball_library_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/my_training_page.dart';
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
-import 'package:bowlingarsenal_app/features/arsenal/views/my_arsenal_page.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
