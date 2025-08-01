@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/category_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_card.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_selector.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/add_ball_from_library_dialog.dart';

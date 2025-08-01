@@ -20,15 +20,25 @@ BagCategory _$BagCategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BagCategory {
+  @JsonKey(name: 'category_id')
   String get categoryId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
   String get userId => throw _privateConstructorUsedError;
-  @IconDataConverter()
-  IconData get icon => throw _privateConstructorUsedError;
+  @JsonKey(name: 'icon_code_point')
+  int get iconCodePoint => throw _privateConstructorUsedError;
+  @JsonKey(name: 'icon_font_family')
+  String get iconFontFamily => throw _privateConstructorUsedError;
+  @JsonKey(name: 'icon_font_package')
+  String? get iconFontPackage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'theme_color')
   @ColorConverter()
   Color get themeColor => throw _privateConstructorUsedError;
+  @JsonKey(name: 'display_order')
   int get displayOrder => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_default')
   bool get isDefault => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
 
@@ -49,14 +59,16 @@ abstract class $BagCategoryCopyWith<$Res> {
       _$BagCategoryCopyWithImpl<$Res, BagCategory>;
   @useResult
   $Res call(
-      {String categoryId,
+      {@JsonKey(name: 'category_id') String categoryId,
       String name,
-      String userId,
-      @IconDataConverter() IconData icon,
-      @ColorConverter() Color themeColor,
-      int displayOrder,
-      bool isDefault,
-      DateTime createdAt,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'icon_code_point') int iconCodePoint,
+      @JsonKey(name: 'icon_font_family') String iconFontFamily,
+      @JsonKey(name: 'icon_font_package') String? iconFontPackage,
+      @JsonKey(name: 'theme_color') @ColorConverter() Color themeColor,
+      @JsonKey(name: 'display_order') int displayOrder,
+      @JsonKey(name: 'is_default') bool isDefault,
+      @JsonKey(name: 'created_at') DateTime createdAt,
       String? description});
 }
 
@@ -78,7 +90,9 @@ class _$BagCategoryCopyWithImpl<$Res, $Val extends BagCategory>
     Object? categoryId = null,
     Object? name = null,
     Object? userId = null,
-    Object? icon = null,
+    Object? iconCodePoint = null,
+    Object? iconFontFamily = null,
+    Object? iconFontPackage = freezed,
     Object? themeColor = null,
     Object? displayOrder = null,
     Object? isDefault = null,
@@ -98,10 +112,18 @@ class _$BagCategoryCopyWithImpl<$Res, $Val extends BagCategory>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as IconData,
+      iconCodePoint: null == iconCodePoint
+          ? _value.iconCodePoint
+          : iconCodePoint // ignore: cast_nullable_to_non_nullable
+              as int,
+      iconFontFamily: null == iconFontFamily
+          ? _value.iconFontFamily
+          : iconFontFamily // ignore: cast_nullable_to_non_nullable
+              as String,
+      iconFontPackage: freezed == iconFontPackage
+          ? _value.iconFontPackage
+          : iconFontPackage // ignore: cast_nullable_to_non_nullable
+              as String?,
       themeColor: null == themeColor
           ? _value.themeColor
           : themeColor // ignore: cast_nullable_to_non_nullable
@@ -135,14 +157,16 @@ abstract class _$$BagCategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String categoryId,
+      {@JsonKey(name: 'category_id') String categoryId,
       String name,
-      String userId,
-      @IconDataConverter() IconData icon,
-      @ColorConverter() Color themeColor,
-      int displayOrder,
-      bool isDefault,
-      DateTime createdAt,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'icon_code_point') int iconCodePoint,
+      @JsonKey(name: 'icon_font_family') String iconFontFamily,
+      @JsonKey(name: 'icon_font_package') String? iconFontPackage,
+      @JsonKey(name: 'theme_color') @ColorConverter() Color themeColor,
+      @JsonKey(name: 'display_order') int displayOrder,
+      @JsonKey(name: 'is_default') bool isDefault,
+      @JsonKey(name: 'created_at') DateTime createdAt,
       String? description});
 }
 
@@ -162,7 +186,9 @@ class __$$BagCategoryImplCopyWithImpl<$Res>
     Object? categoryId = null,
     Object? name = null,
     Object? userId = null,
-    Object? icon = null,
+    Object? iconCodePoint = null,
+    Object? iconFontFamily = null,
+    Object? iconFontPackage = freezed,
     Object? themeColor = null,
     Object? displayOrder = null,
     Object? isDefault = null,
@@ -182,10 +208,18 @@ class __$$BagCategoryImplCopyWithImpl<$Res>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as IconData,
+      iconCodePoint: null == iconCodePoint
+          ? _value.iconCodePoint
+          : iconCodePoint // ignore: cast_nullable_to_non_nullable
+              as int,
+      iconFontFamily: null == iconFontFamily
+          ? _value.iconFontFamily
+          : iconFontFamily // ignore: cast_nullable_to_non_nullable
+              as String,
+      iconFontPackage: freezed == iconFontPackage
+          ? _value.iconFontPackage
+          : iconFontPackage // ignore: cast_nullable_to_non_nullable
+              as String?,
       themeColor: null == themeColor
           ? _value.themeColor
           : themeColor // ignore: cast_nullable_to_non_nullable
@@ -214,47 +248,59 @@ class __$$BagCategoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BagCategoryImpl implements _BagCategory {
   const _$BagCategoryImpl(
-      {required this.categoryId,
+      {@JsonKey(name: 'category_id') required this.categoryId,
       required this.name,
-      required this.userId,
-      @IconDataConverter() this.icon = Iconsax.bag,
-      @ColorConverter() this.themeColor = const Color(0xFF2E7D32),
-      this.displayOrder = 0,
-      this.isDefault = false,
-      required this.createdAt,
+      @JsonKey(name: 'user_id') required this.userId,
+      @JsonKey(name: 'icon_code_point') this.iconCodePoint = 57669,
+      @JsonKey(name: 'icon_font_family') this.iconFontFamily = 'Iconsax',
+      @JsonKey(name: 'icon_font_package') this.iconFontPackage = 'iconsax',
+      @JsonKey(name: 'theme_color')
+      @ColorConverter()
+      this.themeColor = const Color(0xFF2E7D32),
+      @JsonKey(name: 'display_order') this.displayOrder = 0,
+      @JsonKey(name: 'is_default') this.isDefault = false,
+      @JsonKey(name: 'created_at') required this.createdAt,
       this.description});
 
   factory _$BagCategoryImpl.fromJson(Map<String, dynamic> json) =>
       _$$BagCategoryImplFromJson(json);
 
   @override
+  @JsonKey(name: 'category_id')
   final String categoryId;
   @override
   final String name;
   @override
+  @JsonKey(name: 'user_id')
   final String userId;
   @override
-  @JsonKey()
-  @IconDataConverter()
-  final IconData icon;
+  @JsonKey(name: 'icon_code_point')
+  final int iconCodePoint;
   @override
-  @JsonKey()
+  @JsonKey(name: 'icon_font_family')
+  final String iconFontFamily;
+  @override
+  @JsonKey(name: 'icon_font_package')
+  final String? iconFontPackage;
+  @override
+  @JsonKey(name: 'theme_color')
   @ColorConverter()
   final Color themeColor;
   @override
-  @JsonKey()
+  @JsonKey(name: 'display_order')
   final int displayOrder;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_default')
   final bool isDefault;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
   final String? description;
 
   @override
   String toString() {
-    return 'BagCategory(categoryId: $categoryId, name: $name, userId: $userId, icon: $icon, themeColor: $themeColor, displayOrder: $displayOrder, isDefault: $isDefault, createdAt: $createdAt, description: $description)';
+    return 'BagCategory(categoryId: $categoryId, name: $name, userId: $userId, iconCodePoint: $iconCodePoint, iconFontFamily: $iconFontFamily, iconFontPackage: $iconFontPackage, themeColor: $themeColor, displayOrder: $displayOrder, isDefault: $isDefault, createdAt: $createdAt, description: $description)';
   }
 
   @override
@@ -266,7 +312,12 @@ class _$BagCategoryImpl implements _BagCategory {
                 other.categoryId == categoryId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.icon, icon) || other.icon == icon) &&
+            (identical(other.iconCodePoint, iconCodePoint) ||
+                other.iconCodePoint == iconCodePoint) &&
+            (identical(other.iconFontFamily, iconFontFamily) ||
+                other.iconFontFamily == iconFontFamily) &&
+            (identical(other.iconFontPackage, iconFontPackage) ||
+                other.iconFontPackage == iconFontPackage) &&
             (identical(other.themeColor, themeColor) ||
                 other.themeColor == themeColor) &&
             (identical(other.displayOrder, displayOrder) ||
@@ -281,8 +332,19 @@ class _$BagCategoryImpl implements _BagCategory {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, categoryId, name, userId, icon,
-      themeColor, displayOrder, isDefault, createdAt, description);
+  int get hashCode => Object.hash(
+      runtimeType,
+      categoryId,
+      name,
+      userId,
+      iconCodePoint,
+      iconFontFamily,
+      iconFontPackage,
+      themeColor,
+      displayOrder,
+      isDefault,
+      createdAt,
+      description);
 
   /// Create a copy of BagCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -302,36 +364,50 @@ class _$BagCategoryImpl implements _BagCategory {
 
 abstract class _BagCategory implements BagCategory {
   const factory _BagCategory(
-      {required final String categoryId,
+      {@JsonKey(name: 'category_id') required final String categoryId,
       required final String name,
-      required final String userId,
-      @IconDataConverter() final IconData icon,
-      @ColorConverter() final Color themeColor,
-      final int displayOrder,
-      final bool isDefault,
-      required final DateTime createdAt,
+      @JsonKey(name: 'user_id') required final String userId,
+      @JsonKey(name: 'icon_code_point') final int iconCodePoint,
+      @JsonKey(name: 'icon_font_family') final String iconFontFamily,
+      @JsonKey(name: 'icon_font_package') final String? iconFontPackage,
+      @JsonKey(name: 'theme_color') @ColorConverter() final Color themeColor,
+      @JsonKey(name: 'display_order') final int displayOrder,
+      @JsonKey(name: 'is_default') final bool isDefault,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
       final String? description}) = _$BagCategoryImpl;
 
   factory _BagCategory.fromJson(Map<String, dynamic> json) =
       _$BagCategoryImpl.fromJson;
 
   @override
+  @JsonKey(name: 'category_id')
   String get categoryId;
   @override
   String get name;
   @override
+  @JsonKey(name: 'user_id')
   String get userId;
   @override
-  @IconDataConverter()
-  IconData get icon;
+  @JsonKey(name: 'icon_code_point')
+  int get iconCodePoint;
   @override
+  @JsonKey(name: 'icon_font_family')
+  String get iconFontFamily;
+  @override
+  @JsonKey(name: 'icon_font_package')
+  String? get iconFontPackage;
+  @override
+  @JsonKey(name: 'theme_color')
   @ColorConverter()
   Color get themeColor;
   @override
+  @JsonKey(name: 'display_order')
   int get displayOrder;
   @override
+  @JsonKey(name: 'is_default')
   bool get isDefault;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
   String? get description;

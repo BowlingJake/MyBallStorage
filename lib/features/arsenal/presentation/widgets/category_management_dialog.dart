@@ -539,7 +539,9 @@ class _CategoryEditDialogState extends ConsumerState<CategoryEditDialog> {
           description: _descriptionController.text.trim().isEmpty 
               ? null 
               : _descriptionController.text.trim(),
-          icon: _selectedIcon,
+          iconCodePoint: _selectedIcon.codePoint,
+          iconFontFamily: _selectedIcon.fontFamily ?? 'Iconsax',
+          iconFontPackage: _selectedIcon.fontPackage ?? 'iconsax',
           themeColor: _selectedColor,
         );
         
