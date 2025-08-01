@@ -14,7 +14,7 @@ export 'user_profile_provider.dart';
 // Ball Library controller and models are now in their new locations
 // They are re-exported here for backwards compatibility
 export 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
-export 'package:bowlingarsenal_app/features/ball_library/models/ball_library_state.dart';
+export 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 
 /// 全局底部導覽列索引
 final bottomNavProvider = StateProvider<int>((ref) => 0);
