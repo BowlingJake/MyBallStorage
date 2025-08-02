@@ -19,22 +19,21 @@ class UserInfoSection extends ConsumerWidget {
   final BoxConstraints? constraints;
 
   // 觸發 Dialog 的方法
-  void _showProfileActions(BuildContext context) {
+  Future<void> _showProfileActions(BuildContext context) async {
     // 呼叫我們升級後的 Dialog 函式
-    showAppConfirmationDialog(
+    final result = await showAppConfirmationDialog(
       context: context,
       title: 'Profile',
       content: const Text('Do you want to view or edit your profile?', textAlign: TextAlign.center),
       confirmText: 'Edit',
-      onConfirm: () {
-        context.go('/edit_profile');
-      },
       cancelText: 'View',
-      onCancel: () {
-        Navigator.of(context).pop(); // 先關閉 Dialog
-        context.go('/view_profile'); // 導向 View Profile 頁面
-      },
     );
+    
+    if (result == true) {
+      context.go('/edit_profile');
+    } else if (result == false) {
+      context.go('/view_profile');
+    }
   }
 
   String _formatUserInfo(userProfile) {

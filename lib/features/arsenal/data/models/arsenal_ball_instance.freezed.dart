@@ -20,23 +20,33 @@ ArsenalBallInstance _$ArsenalBallInstanceFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ArsenalBallInstance {
+  @JsonKey(name: 'instance_id')
   String get instanceId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'ball_id')
   String get ballId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
   String get userId => throw _privateConstructorUsedError;
   String get nickname => throw _privateConstructorUsedError;
+  @JsonKey(name: 'added_date')
   DateTime get addedDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'purchase_date')
   DateTime? get purchaseDate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_category_id')
   String get bagCategoryId => throw _privateConstructorUsedError;
   BallLayout? get layout => throw _privateConstructorUsedError;
+  @JsonKey(name: 'instance_number')
   int get instanceNumber => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError; // Usage tracking
+  @JsonKey(name: 'games_used')
   int get gamesUsed =>
       throw _privateConstructorUsedError; // Reference to the base bowling ball data - stored as JSON map for serialization
   @JsonKey(name: 'bowling_ball_data')
   @BowlingBallConverter()
   BowlingBall? get bowlingBall =>
       throw _privateConstructorUsedError; // Custom ball data (for user-created balls)
+  @JsonKey(name: 'is_custom_ball')
   bool get isCustomBall => throw _privateConstructorUsedError;
+  @JsonKey(name: 'local_image_path')
   String? get localImagePath => throw _privateConstructorUsedError;
 
   /// Serializes this ArsenalBallInstance to a JSON map.
@@ -56,22 +66,22 @@ abstract class $ArsenalBallInstanceCopyWith<$Res> {
       _$ArsenalBallInstanceCopyWithImpl<$Res, ArsenalBallInstance>;
   @useResult
   $Res call(
-      {String instanceId,
-      String ballId,
-      String userId,
+      {@JsonKey(name: 'instance_id') String instanceId,
+      @JsonKey(name: 'ball_id') String ballId,
+      @JsonKey(name: 'user_id') String userId,
       String nickname,
-      DateTime addedDate,
-      DateTime? purchaseDate,
-      String bagCategoryId,
+      @JsonKey(name: 'added_date') DateTime addedDate,
+      @JsonKey(name: 'purchase_date') DateTime? purchaseDate,
+      @JsonKey(name: 'bag_category_id') String bagCategoryId,
       BallLayout? layout,
-      int instanceNumber,
+      @JsonKey(name: 'instance_number') int instanceNumber,
       String? notes,
-      int gamesUsed,
+      @JsonKey(name: 'games_used') int gamesUsed,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       BowlingBall? bowlingBall,
-      bool isCustomBall,
-      String? localImagePath});
+      @JsonKey(name: 'is_custom_ball') bool isCustomBall,
+      @JsonKey(name: 'local_image_path') String? localImagePath});
 
   $BallLayoutCopyWith<$Res>? get layout;
   $BowlingBallCopyWith<$Res>? get bowlingBall;
@@ -205,22 +215,22 @@ abstract class _$$ArsenalBallInstanceImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String instanceId,
-      String ballId,
-      String userId,
+      {@JsonKey(name: 'instance_id') String instanceId,
+      @JsonKey(name: 'ball_id') String ballId,
+      @JsonKey(name: 'user_id') String userId,
       String nickname,
-      DateTime addedDate,
-      DateTime? purchaseDate,
-      String bagCategoryId,
+      @JsonKey(name: 'added_date') DateTime addedDate,
+      @JsonKey(name: 'purchase_date') DateTime? purchaseDate,
+      @JsonKey(name: 'bag_category_id') String bagCategoryId,
       BallLayout? layout,
-      int instanceNumber,
+      @JsonKey(name: 'instance_number') int instanceNumber,
       String? notes,
-      int gamesUsed,
+      @JsonKey(name: 'games_used') int gamesUsed,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       BowlingBall? bowlingBall,
-      bool isCustomBall,
-      String? localImagePath});
+      @JsonKey(name: 'is_custom_ball') bool isCustomBall,
+      @JsonKey(name: 'local_image_path') String? localImagePath});
 
   @override
   $BallLayoutCopyWith<$Res>? get layout;
@@ -321,51 +331,57 @@ class __$$ArsenalBallInstanceImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
   const _$ArsenalBallInstanceImpl(
-      {required this.instanceId,
-      required this.ballId,
-      required this.userId,
+      {@JsonKey(name: 'instance_id') required this.instanceId,
+      @JsonKey(name: 'ball_id') required this.ballId,
+      @JsonKey(name: 'user_id') required this.userId,
       this.nickname = '',
-      required this.addedDate,
-      this.purchaseDate,
-      required this.bagCategoryId,
+      @JsonKey(name: 'added_date') required this.addedDate,
+      @JsonKey(name: 'purchase_date') this.purchaseDate,
+      @JsonKey(name: 'bag_category_id') required this.bagCategoryId,
       this.layout,
-      this.instanceNumber = 1,
+      @JsonKey(name: 'instance_number') this.instanceNumber = 1,
       this.notes,
-      this.gamesUsed = 0,
+      @JsonKey(name: 'games_used') this.gamesUsed = 0,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       this.bowlingBall,
-      this.isCustomBall = false,
-      this.localImagePath});
+      @JsonKey(name: 'is_custom_ball') this.isCustomBall = false,
+      @JsonKey(name: 'local_image_path') this.localImagePath});
 
   factory _$ArsenalBallInstanceImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArsenalBallInstanceImplFromJson(json);
 
   @override
+  @JsonKey(name: 'instance_id')
   final String instanceId;
   @override
+  @JsonKey(name: 'ball_id')
   final String ballId;
   @override
+  @JsonKey(name: 'user_id')
   final String userId;
   @override
   @JsonKey()
   final String nickname;
   @override
+  @JsonKey(name: 'added_date')
   final DateTime addedDate;
   @override
+  @JsonKey(name: 'purchase_date')
   final DateTime? purchaseDate;
   @override
+  @JsonKey(name: 'bag_category_id')
   final String bagCategoryId;
   @override
   final BallLayout? layout;
   @override
-  @JsonKey()
+  @JsonKey(name: 'instance_number')
   final int instanceNumber;
   @override
   final String? notes;
 // Usage tracking
   @override
-  @JsonKey()
+  @JsonKey(name: 'games_used')
   final int gamesUsed;
 // Reference to the base bowling ball data - stored as JSON map for serialization
   @override
@@ -374,9 +390,10 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
   final BowlingBall? bowlingBall;
 // Custom ball data (for user-created balls)
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_custom_ball')
   final bool isCustomBall;
   @override
+  @JsonKey(name: 'local_image_path')
   final String? localImagePath;
 
   @override
@@ -453,55 +470,66 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
 
 abstract class _ArsenalBallInstance implements ArsenalBallInstance {
   const factory _ArsenalBallInstance(
-      {required final String instanceId,
-      required final String ballId,
-      required final String userId,
-      final String nickname,
-      required final DateTime addedDate,
-      final DateTime? purchaseDate,
-      required final String bagCategoryId,
-      final BallLayout? layout,
-      final int instanceNumber,
-      final String? notes,
-      final int gamesUsed,
-      @JsonKey(name: 'bowling_ball_data')
-      @BowlingBallConverter()
-      final BowlingBall? bowlingBall,
-      final bool isCustomBall,
-      final String? localImagePath}) = _$ArsenalBallInstanceImpl;
+          {@JsonKey(name: 'instance_id') required final String instanceId,
+          @JsonKey(name: 'ball_id') required final String ballId,
+          @JsonKey(name: 'user_id') required final String userId,
+          final String nickname,
+          @JsonKey(name: 'added_date') required final DateTime addedDate,
+          @JsonKey(name: 'purchase_date') final DateTime? purchaseDate,
+          @JsonKey(name: 'bag_category_id') required final String bagCategoryId,
+          final BallLayout? layout,
+          @JsonKey(name: 'instance_number') final int instanceNumber,
+          final String? notes,
+          @JsonKey(name: 'games_used') final int gamesUsed,
+          @JsonKey(name: 'bowling_ball_data')
+          @BowlingBallConverter()
+          final BowlingBall? bowlingBall,
+          @JsonKey(name: 'is_custom_ball') final bool isCustomBall,
+          @JsonKey(name: 'local_image_path') final String? localImagePath}) =
+      _$ArsenalBallInstanceImpl;
 
   factory _ArsenalBallInstance.fromJson(Map<String, dynamic> json) =
       _$ArsenalBallInstanceImpl.fromJson;
 
   @override
+  @JsonKey(name: 'instance_id')
   String get instanceId;
   @override
+  @JsonKey(name: 'ball_id')
   String get ballId;
   @override
+  @JsonKey(name: 'user_id')
   String get userId;
   @override
   String get nickname;
   @override
+  @JsonKey(name: 'added_date')
   DateTime get addedDate;
   @override
+  @JsonKey(name: 'purchase_date')
   DateTime? get purchaseDate;
   @override
+  @JsonKey(name: 'bag_category_id')
   String get bagCategoryId;
   @override
   BallLayout? get layout;
   @override
+  @JsonKey(name: 'instance_number')
   int get instanceNumber;
   @override
   String? get notes; // Usage tracking
   @override
+  @JsonKey(name: 'games_used')
   int get gamesUsed; // Reference to the base bowling ball data - stored as JSON map for serialization
   @override
   @JsonKey(name: 'bowling_ball_data')
   @BowlingBallConverter()
   BowlingBall? get bowlingBall; // Custom ball data (for user-created balls)
   @override
+  @JsonKey(name: 'is_custom_ball')
   bool get isCustomBall;
   @override
+  @JsonKey(name: 'local_image_path')
   String? get localImagePath;
 
   /// Create a copy of ArsenalBallInstance

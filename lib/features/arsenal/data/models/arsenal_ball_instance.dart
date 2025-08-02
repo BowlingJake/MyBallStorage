@@ -8,19 +8,19 @@ part 'arsenal_ball_instance.g.dart';
 @freezed
 class ArsenalBallInstance with _$ArsenalBallInstance {
   const factory ArsenalBallInstance({
-    required String instanceId,
-    required String ballId,
-    required String userId,
+    @JsonKey(name: 'instance_id') required String instanceId,
+    @JsonKey(name: 'ball_id') required String ballId,
+    @JsonKey(name: 'user_id') required String userId,
     @Default('') String nickname,
-    required DateTime addedDate,
-    DateTime? purchaseDate,
-    required String bagCategoryId,
+    @JsonKey(name: 'added_date') required DateTime addedDate,
+    @JsonKey(name: 'purchase_date') DateTime? purchaseDate,
+    @JsonKey(name: 'bag_category_id') required String bagCategoryId,
     BallLayout? layout,
-    @Default(1) int instanceNumber,
+    @JsonKey(name: 'instance_number') @Default(1) int instanceNumber,
     String? notes,
     
     // Usage tracking
-    @Default(0) int gamesUsed,
+    @JsonKey(name: 'games_used') @Default(0) int gamesUsed,
     
     // Reference to the base bowling ball data - stored as JSON map for serialization
     @JsonKey(name: 'bowling_ball_data') 
@@ -28,8 +28,8 @@ class ArsenalBallInstance with _$ArsenalBallInstance {
     BowlingBall? bowlingBall,
     
     // Custom ball data (for user-created balls)
-    @Default(false) bool isCustomBall,
-    String? localImagePath,
+    @JsonKey(name: 'is_custom_ball') @Default(false) bool isCustomBall,
+    @JsonKey(name: 'local_image_path') String? localImagePath,
   }) = _ArsenalBallInstance;
 
   factory ArsenalBallInstance.fromJson(Map<String, dynamic> json) => 

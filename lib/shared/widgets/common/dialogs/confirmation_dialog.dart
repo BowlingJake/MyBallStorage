@@ -2,39 +2,32 @@
 
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:core_theme/core_theme.dart';
 import '../buttons/app_standard_button.dart'; // 請確認您的按鈕元件路徑
 
 /// 顯示一個功能完善、通用的確認 Dialog (最終修正版)
-Future<void> showAppConfirmationDialog({
+/// 使用現代化的 outlined 樣式設計
+Future<bool?> showAppConfirmationDialog({
   required BuildContext context,
   required String confirmText,
-  required VoidCallback onConfirm,
   String? title,
+  String? message,
   Widget? content,
   String cancelText = 'Cancel',
-  VoidCallback? onCancel, // 1. 新增 onCancel 參數，使其可選
-  bool isDangerous = false,   // 2. 新增 isDangerous 參數
+  bool isDangerous = false,
+  bool barrierDismissible = false,
 }) {
-  return showDialog(
+  return showDialog<bool>(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: barrierDismissible,
+    barrierColor: Colors.black.withOpacity(0.8),
     builder: (BuildContext dialogContext) {
-      // 如果外部傳入了 onCancel，就使用它；否則預設行為是關閉 Dialog
-      final VoidCallback onCancelHandler = onCancel ?? () => Navigator.of(dialogContext).pop();
-
-      // 點擊確認按鈕時，先關閉 Dialog 再執行後續動作
-      final VoidCallback onConfirmHandler = () {
-        Navigator.of(dialogContext).pop();
-        onConfirm();
-      };
-
       return _ConfirmationDialog(
         title: title,
+        message: message,
         content: content,
         confirmText: confirmText,
-        onConfirm: onConfirmHandler,
         cancelText: cancelText,
-        onCancel: onCancelHandler,
         isDangerous: isDangerous,
       );
     },
@@ -45,61 +38,96 @@ Future<void> showAppConfirmationDialog({
 class _ConfirmationDialog extends StatelessWidget {
   const _ConfirmationDialog({
     this.title,
+    this.message,
     this.content,
     required this.confirmText,
-    required this.onConfirm,
     required this.cancelText,
-    required this.onCancel,
     required this.isDangerous,
+    super.key,
   });
 
   final String? title;
+  final String? message;
   final Widget? content;
   final String confirmText;
-  final VoidCallback onConfirm;
   final String cancelText;
-  final VoidCallback onCancel;
   final bool isDangerous;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // 如果是危險操作，確認按鈕使用紅色，否則使用主題色
+    // 如果是危險操作，確認按鈕使用紅色，否則使用品牌色
     final Color confirmButtonColor = isDangerous
-        ? theme.colorScheme.error
-        : theme.colorScheme.primary;
+        ? Colors.red
+        : BrandColors.accentColorDark;
 
-    return Dialog(
+    return AlertDialog(
+      backgroundColor: Colors.transparent,
       elevation: 0,
-      backgroundColor: theme.cardColor.withOpacity(0.95),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      content: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: confirmButtonColor.withOpacity(0.5),
+            width: 2,
+          ),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Title
             if (title != null) ...[
               Text(
                 title!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: content != null ? 8 : 24),
+              const SizedBox(height: 16),
             ],
-            if (content != null) ...[
+            // Message or Custom Content
+            if (message != null) ...[
+              Text(
+                message!,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+            ] else if (content != null) ...[
               content!,
               const SizedBox(height: 24),
             ],
+            // Buttons
             Row(
               children: [
-                Expanded(child: AppStandardButton(text: cancelText, isPrimary: false, onPressed: onCancel)),
-                const SizedBox(width: 16),
+                Expanded(
+                  child: AppStandardButton(
+                    text: cancelText,
+                    height: 32,
+                    fontSize: 12,
+                    customColor: Colors.grey,
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: AppStandardButton(
                     text: confirmText,
-                    isPrimary: true,
-                    onPressed: onConfirm,
+                    height: 32,
+                    fontSize: 12,
                     customColor: confirmButtonColor,
+                    isPrimary: true,
+                    onPressed: () => Navigator.of(context).pop(true),
                   ),
                 ),
               ],

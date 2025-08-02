@@ -16,6 +16,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_botto
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -35,23 +36,14 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     });
   }
 
+
   void _initializeData() {
-    // 開發模式：使用 mock 數據
-    const bool useMockData = true; // 設為 false 來使用真實數據
-    
-    if (useMockData) {
-      // 使用 mock 數據進行 UI 測試
-      ref.read(arsenalControllerProvider.notifier).initializeWithMockData();
-      // 也為 category controller 載入 mock 數據
-      ref.read(categoryControllerProvider.notifier).initializeWithMockData();
-    } else {
-      // 使用真實數據
-      final authState = ref.read(authControllerProvider);
-      if (authState.hasValue && authState.value != null) {
-        final userId = authState.value!.id;
-        ref.read(arsenalControllerProvider.notifier).initialize(userId);
-        ref.read(categoryControllerProvider.notifier).loadCategories(userId);
-      }
+    // 使用真實數據
+    final authState = ref.read(authControllerProvider);
+    if (authState.hasValue && authState.value != null) {
+      final userId = authState.value!.id;
+      ref.read(arsenalControllerProvider.notifier).initialize(userId);
+      ref.read(categoryControllerProvider.notifier).loadCategories(userId);
     }
   }
 
@@ -99,21 +91,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
 
   /// 獲取分類的英文顯示名稱
   String _getCategoryDisplayName(BagCategory? category) {
-    if (category == null) return 'All Balls';
+    if (category == null) return 'All My Arsenal';
     
-    // 將中文名稱轉換為英文
-    switch (category.name) {
-      case '比賽球袋':
-        return 'Competition';
-      case '練習球袋':
-        return 'Practice';
-      case '收藏球袋':
-        return 'Collection';
-      case '新球測試':
-        return 'Testing';
-      default:
-        return category.name; // 如果已經是英文就直接返回
-    }
+    // 直接返回分類名稱，現在只有英文的 "All My Arsenal"
+    return category.name;
   }
 
   /// B區：球袋管理區 (下拉選單 + 新增球袋按鈕)
@@ -122,47 +103,51 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          // 球袋下拉選單 (移除圖標，改為英文)
-          Expanded(
+          // 球袋下拉選單 - 縮小到螢幕1/3寬度
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 3,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: Colors.grey[600]!,
                   width: 1.5,
                 ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
+              child: CustomDropdown<String>(
+                hintText: 'Select Category',
+                value: arsenalState.selectedCategoryId,
+                items: arsenalState.allAvailableCategories.map((category) {
+                  return DropdownMenuItem<String>(
+                    value: category.categoryId,
                     child: Text(
-                      _getCategoryDisplayName(arsenalState.selectedCategory),
+                      _getCategoryDisplayName(category),
                       style: const TextStyle(
+                        fontSize: 12,
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                ],
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    ref.read(arsenalControllerProvider.notifier).selectCategory(newValue);
+                  }
+                },
               ),
             ),
           ),
           const SizedBox(width: 12),
-          // 新增球袋按鈕 (圓形設計)
+          // 新增球袋按鈕 - 縮小尺寸
           Container(
-            width: 48,
-            height: 48,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.6),
-              shape: BoxShape.circle, // 圓形
+              shape: BoxShape.circle,
               border: Border.all(
                 color: Colors.grey[600]!,
                 width: 1.5,
@@ -178,8 +163,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
               icon: const Icon(
                 Icons.add,
                 color: Colors.white,
-                size: 20,
+                size: 16,
               ),
+              padding: EdgeInsets.zero,
             ),
           ),
         ],
@@ -299,6 +285,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     }
 
     final filteredBalls = arsenalState.filteredBalls;
+    print('Arsenal Page: Displaying ${filteredBalls.length} balls, Selected category: ${arsenalState.selectedCategoryId}');
 
     if (filteredBalls.isEmpty) {
       return _buildEmptyState(theme);
@@ -559,6 +546,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       ),
     );
   }
+
 
   void _navigateToIndex(BuildContext context, int index) {
     switch (index) {

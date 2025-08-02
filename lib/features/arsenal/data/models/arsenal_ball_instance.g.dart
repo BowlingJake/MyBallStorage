@@ -9,43 +9,43 @@ part of 'arsenal_ball_instance.dart';
 _$ArsenalBallInstanceImpl _$$ArsenalBallInstanceImplFromJson(
         Map<String, dynamic> json) =>
     _$ArsenalBallInstanceImpl(
-      instanceId: json['instanceId'] as String,
-      ballId: json['ballId'] as String,
-      userId: json['userId'] as String,
+      instanceId: json['instance_id'] as String,
+      ballId: json['ball_id'] as String,
+      userId: json['user_id'] as String,
       nickname: json['nickname'] as String? ?? '',
-      addedDate: DateTime.parse(json['addedDate'] as String),
-      purchaseDate: json['purchaseDate'] == null
+      addedDate: DateTime.parse(json['added_date'] as String),
+      purchaseDate: json['purchase_date'] == null
           ? null
-          : DateTime.parse(json['purchaseDate'] as String),
-      bagCategoryId: json['bagCategoryId'] as String,
+          : DateTime.parse(json['purchase_date'] as String),
+      bagCategoryId: json['bag_category_id'] as String,
       layout: json['layout'] == null
           ? null
           : BallLayout.fromJson(json['layout'] as Map<String, dynamic>),
-      instanceNumber: (json['instanceNumber'] as num?)?.toInt() ?? 1,
+      instanceNumber: (json['instance_number'] as num?)?.toInt() ?? 1,
       notes: json['notes'] as String?,
-      gamesUsed: (json['gamesUsed'] as num?)?.toInt() ?? 0,
+      gamesUsed: (json['games_used'] as num?)?.toInt() ?? 0,
       bowlingBall: const BowlingBallConverter()
           .fromJson(json['bowling_ball_data'] as Map<String, dynamic>?),
-      isCustomBall: json['isCustomBall'] as bool? ?? false,
-      localImagePath: json['localImagePath'] as String?,
+      isCustomBall: json['is_custom_ball'] as bool? ?? false,
+      localImagePath: json['local_image_path'] as String?,
     );
 
 Map<String, dynamic> _$$ArsenalBallInstanceImplToJson(
         _$ArsenalBallInstanceImpl instance) =>
     <String, dynamic>{
-      'instanceId': instance.instanceId,
-      'ballId': instance.ballId,
-      'userId': instance.userId,
+      'instance_id': instance.instanceId,
+      'ball_id': instance.ballId,
+      'user_id': instance.userId,
       'nickname': instance.nickname,
-      'addedDate': instance.addedDate.toIso8601String(),
-      'purchaseDate': instance.purchaseDate?.toIso8601String(),
-      'bagCategoryId': instance.bagCategoryId,
+      'added_date': instance.addedDate.toIso8601String(),
+      'purchase_date': instance.purchaseDate?.toIso8601String(),
+      'bag_category_id': instance.bagCategoryId,
       'layout': instance.layout,
-      'instanceNumber': instance.instanceNumber,
+      'instance_number': instance.instanceNumber,
       'notes': instance.notes,
-      'gamesUsed': instance.gamesUsed,
+      'games_used': instance.gamesUsed,
       'bowling_ball_data':
           const BowlingBallConverter().toJson(instance.bowlingBall),
-      'isCustomBall': instance.isCustomBall,
-      'localImagePath': instance.localImagePath,
+      'is_custom_ball': instance.isCustomBall,
+      'local_image_path': instance.localImagePath,
     };

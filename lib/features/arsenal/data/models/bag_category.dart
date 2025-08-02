@@ -51,57 +51,19 @@ class DefaultBagCategories {
   static List<BagCategory> get defaults {
     final now = DateTime.now();
     return [
+      // Create a default "My Balls" category (not "All My Arsenal")
       BagCategory(
-        categoryId: 'competition',
-        name: '比賽球袋',
+        categoryId: 'my_balls',
+        name: 'My Balls',
         userId: '', // Will be set when creating for specific user
-        iconCodePoint: 58394, // Iconsax.medal_star
-        iconFontFamily: 'Iconsax',
-        iconFontPackage: 'iconsax',
-        themeColor: const Color(0xFFFFD700), // Gold
-        displayOrder: 0,
-        isDefault: true,
-        createdAt: now,
-        description: '比賽時使用的球具',
-      ),
-      BagCategory(
-        categoryId: 'practice',
-        name: '練習球袋',
-        userId: '',
         iconCodePoint: 57669, // Iconsax.bag
         iconFontFamily: 'Iconsax',
         iconFontPackage: 'iconsax',
         themeColor: const Color(0xFF1976D2), // Blue
-        displayOrder: 1,
+        displayOrder: 0,
         isDefault: true,
         createdAt: now,
-        description: '練習時使用的球具',
-      ),
-      BagCategory(
-        categoryId: 'collection',
-        name: '收藏球袋',
-        userId: '',
-        iconCodePoint: 58155, // Iconsax.heart
-        iconFontFamily: 'Iconsax',
-        iconFontPackage: 'iconsax',
-        themeColor: const Color(0xFF9C27B0), // Purple
-        displayOrder: 2,
-        isDefault: true,
-        createdAt: now,
-        description: '收藏的球具',
-      ),
-      BagCategory(
-        categoryId: 'testing',
-        name: '新球測試',
-        userId: '',
-        iconCodePoint: 58108, // Iconsax.game
-        iconFontFamily: 'Iconsax',
-        iconFontPackage: 'iconsax',
-        themeColor: const Color(0xFFFF8F00), // Orange
-        displayOrder: 3,
-        isDefault: true,
-        createdAt: now,
-        description: '測試中的新球具',
+        description: 'Default category for your bowling balls',
       ),
     ];
   }

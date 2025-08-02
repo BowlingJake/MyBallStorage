@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_arsenal_repository.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/repositories/mock_arsenal_test_data.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/ball_layout.dart';
@@ -49,13 +49,47 @@ class ArsenalState {
   /// Get balls for the currently selected category
   List<ArsenalBallInstance> get filteredBalls {
     if (selectedCategoryId == null) return balls;
+    
+    // Special handling for "All My Arsenal" category - show all balls
+    if (selectedCategoryId!.contains('all_my_arsenal')) {
+      return balls;
+    }
+    
     return balls.where((ball) => ball.bagCategoryId == selectedCategoryId).toList();
   }
 
   /// Get the currently selected category
   BagCategory? get selectedCategory {
     if (selectedCategoryId == null) return null;
+    
+    // Handle virtual "All My Arsenal" category
+    if (selectedCategoryId == 'all_my_arsenal') {
+      return _createVirtualAllArsenalCategory();
+    }
+    
     return categories.where((cat) => cat.categoryId == selectedCategoryId).firstOrNull;
+  }
+
+  /// Create virtual "All My Arsenal" category for UI display
+  BagCategory _createVirtualAllArsenalCategory() {
+    return BagCategory(
+      categoryId: 'all_my_arsenal',
+      name: 'All My Arsenal',
+      userId: '',
+      iconCodePoint: 57669, // Iconsax.bag
+      iconFontFamily: 'Iconsax',
+      iconFontPackage: 'iconsax',
+      themeColor: const  Color(0xFF1976D2), // Blue
+      displayOrder: -1,
+      isDefault: true,
+      createdAt: DateTime.now(),
+      description: 'All balls in your arsenal',
+    );
+  }
+
+  /// Get all available categories including virtual "All My Arsenal"
+  List<BagCategory> get allAvailableCategories {
+    return [_createVirtualAllArsenalCategory(), ...categories];
   }
 
   /// Check if we have any balls
@@ -95,9 +129,9 @@ class ArsenalController extends _$ArsenalController {
       // Load balls
       await _loadBalls(userId);
       
-      // Set default category if none selected
-      if (state.selectedCategoryId == null && state.categories.isNotEmpty) {
-        state = state.copyWith(selectedCategoryId: state.categories.first.categoryId);
+      // Always set "All My Arsenal" as default selected category
+      if (state.selectedCategoryId == null) {
+        state = state.copyWith(selectedCategoryId: 'all_my_arsenal');
       }
       
       state = state.copyWith(isLoading: false);
@@ -109,43 +143,13 @@ class ArsenalController extends _$ArsenalController {
     }
   }
 
-  /// Initialize with mock data for testing UI
-  Future<void> initializeWithMockData() async {
-    state = state.copyWith(isLoading: true, error: null);
-    
-    try {
-      // Small delay to simulate loading
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Load mock categories
-      final categories = MockArsenalTestData.getMockCategories();
-      
-      // Load mock balls
-      final balls = MockArsenalTestData.getMockArsenalBalls();
-      
-      // Set first category as selected
-      final selectedCategoryId = categories.isNotEmpty ? categories.first.categoryId : null;
-      
-      state = state.copyWith(
-        categories: categories,
-        balls: balls,
-        selectedCategoryId: selectedCategoryId,
-        isLoading: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to initialize mock arsenal: $e',
-      );
-    }
-  }
 
   /// Load user's categories
   Future<void> _loadCategories(String userId) async {
     try {
       var categories = await _repository.getUserCategories(userId);
       
-      // If no categories exist, initialize default ones
+      // If no categories exist, initialize default ones for new users
       if (categories.isEmpty) {
         await _repository.initializeDefaultCategories(userId);
         categories = await _repository.getUserCategories(userId);
@@ -160,9 +164,15 @@ class ArsenalController extends _$ArsenalController {
   /// Load user's balls
   Future<void> _loadBalls(String userId) async {
     try {
+      print('Arsenal Controller: Loading balls for user: $userId');
       final balls = await _repository.getUserArsenal(userId);
+      print('Arsenal Controller: Loaded ${balls.length} balls from database');
+      for (final ball in balls) {
+        print('Arsenal Controller: Ball - ID: ${ball.ballId}, Category: ${ball.bagCategoryId}, Name: ${ball.bowlingBall?.name ?? "Unknown"}');
+      }
       state = state.copyWith(balls: balls);
     } catch (e) {
+      print('Arsenal Controller: Error loading balls: $e');
       state = state.copyWith(error: 'Failed to load balls: $e');
     }
   }

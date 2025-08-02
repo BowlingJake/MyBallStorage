@@ -9,7 +9,7 @@ Future<void> showDeleteConfirmationDialog(
   required VoidCallback onConfirm,
 }) async {
   // 直接呼叫我們新的輔助函式，而不是 showDialog
-  return showAppConfirmationDialog(
+  final result = await showAppConfirmationDialog(
     context: context,
     title: 'Confirm Delete',
     content: Text(
@@ -17,7 +17,10 @@ Future<void> showDeleteConfirmationDialog(
       textAlign: TextAlign.center,
     ),
     confirmText: 'Delete',
-    onConfirm: onConfirm,
     isDangerous: true, // 新版 Dialog 現在支援這個參數了！
   );
+  
+  if (result == true) {
+    onConfirm();
+  }
 }

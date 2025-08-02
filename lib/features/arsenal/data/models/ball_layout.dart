@@ -6,26 +6,26 @@ part 'ball_layout.g.dart';
 @freezed
 class BallLayout with _$BallLayout {
   const factory BallLayout({
-    required String layoutId,
-    required String userId,
+    @JsonKey(name: 'layout_id') required String layoutId,
+    @JsonKey(name: 'user_id') required String userId,
     
     // Layout measurements (in inches)
-    @Default(0.0) double pinToPap,        // Pin到PAP距離
-    @Default(0.0) double papToMb,         // PAP到MB距離  
-    @Default(0.0) double psaAngle,        // PSA角度 (度)
-    @Default(0.0) double valAngle,        // VAL角度 (度)
+    @JsonKey(name: 'pin_to_pap') @Default(0.0) double pinToPap,        // Pin到PAP距離
+    @JsonKey(name: 'pap_to_mb') @Default(0.0) double papToMb,         // PAP到MB距離  
+    @JsonKey(name: 'psa_angle') @Default(0.0) double psaAngle,        // PSA角度 (度)
+    @JsonKey(name: 'val_angle') @Default(0.0) double valAngle,        // VAL角度 (度)
     
     // Layout classification
-    @Default(LayoutType.control) LayoutType layoutType,
+    @JsonKey(name: 'layout_type') @Default(LayoutType.control) LayoutType layoutType,
     
     // Additional layout information
-    String? layoutImage,                   // 鑽法圖片URL或本地路徑
-    String? drillerName,                   // 鑽球師名稱
-    DateTime? drilledDate,                 // 鑽球日期
+    @JsonKey(name: 'layout_image') String? layoutImage,                   // 鑽法圖片URL或本地路徑
+    @JsonKey(name: 'driller_name') String? drillerName,                   // 鑽球師名稱
+    @JsonKey(name: 'drilled_date') DateTime? drilledDate,                 // 鑽球日期
     String? notes,                         // 備註
     
-    required DateTime createdAt,
-    DateTime? updatedAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _BallLayout;
 
   factory BallLayout.fromJson(Map<String, dynamic> json) => 

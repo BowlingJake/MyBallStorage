@@ -8,42 +8,42 @@ part of 'ball_layout.dart';
 
 _$BallLayoutImpl _$$BallLayoutImplFromJson(Map<String, dynamic> json) =>
     _$BallLayoutImpl(
-      layoutId: json['layoutId'] as String,
-      userId: json['userId'] as String,
-      pinToPap: (json['pinToPap'] as num?)?.toDouble() ?? 0.0,
-      papToMb: (json['papToMb'] as num?)?.toDouble() ?? 0.0,
-      psaAngle: (json['psaAngle'] as num?)?.toDouble() ?? 0.0,
-      valAngle: (json['valAngle'] as num?)?.toDouble() ?? 0.0,
+      layoutId: json['layout_id'] as String,
+      userId: json['user_id'] as String,
+      pinToPap: (json['pin_to_pap'] as num?)?.toDouble() ?? 0.0,
+      papToMb: (json['pap_to_mb'] as num?)?.toDouble() ?? 0.0,
+      psaAngle: (json['psa_angle'] as num?)?.toDouble() ?? 0.0,
+      valAngle: (json['val_angle'] as num?)?.toDouble() ?? 0.0,
       layoutType:
-          $enumDecodeNullable(_$LayoutTypeEnumMap, json['layoutType']) ??
+          $enumDecodeNullable(_$LayoutTypeEnumMap, json['layout_type']) ??
               LayoutType.control,
-      layoutImage: json['layoutImage'] as String?,
-      drillerName: json['drillerName'] as String?,
-      drilledDate: json['drilledDate'] == null
+      layoutImage: json['layout_image'] as String?,
+      drillerName: json['driller_name'] as String?,
+      drilledDate: json['drilled_date'] == null
           ? null
-          : DateTime.parse(json['drilledDate'] as String),
+          : DateTime.parse(json['drilled_date'] as String),
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$$BallLayoutImplToJson(_$BallLayoutImpl instance) =>
     <String, dynamic>{
-      'layoutId': instance.layoutId,
-      'userId': instance.userId,
-      'pinToPap': instance.pinToPap,
-      'papToMb': instance.papToMb,
-      'psaAngle': instance.psaAngle,
-      'valAngle': instance.valAngle,
-      'layoutType': _$LayoutTypeEnumMap[instance.layoutType]!,
-      'layoutImage': instance.layoutImage,
-      'drillerName': instance.drillerName,
-      'drilledDate': instance.drilledDate?.toIso8601String(),
+      'layout_id': instance.layoutId,
+      'user_id': instance.userId,
+      'pin_to_pap': instance.pinToPap,
+      'pap_to_mb': instance.papToMb,
+      'psa_angle': instance.psaAngle,
+      'val_angle': instance.valAngle,
+      'layout_type': _$LayoutTypeEnumMap[instance.layoutType]!,
+      'layout_image': instance.layoutImage,
+      'driller_name': instance.drillerName,
+      'drilled_date': instance.drilledDate?.toIso8601String(),
       'notes': instance.notes,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$LayoutTypeEnumMap = {

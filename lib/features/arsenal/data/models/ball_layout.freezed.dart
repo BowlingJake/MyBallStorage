@@ -20,21 +20,33 @@ BallLayout _$BallLayoutFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BallLayout {
+  @JsonKey(name: 'layout_id')
   String get layoutId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
   String get userId =>
       throw _privateConstructorUsedError; // Layout measurements (in inches)
+  @JsonKey(name: 'pin_to_pap')
   double get pinToPap => throw _privateConstructorUsedError; // Pin到PAP距離
+  @JsonKey(name: 'pap_to_mb')
   double get papToMb => throw _privateConstructorUsedError; // PAP到MB距離
+  @JsonKey(name: 'psa_angle')
   double get psaAngle => throw _privateConstructorUsedError; // PSA角度 (度)
+  @JsonKey(name: 'val_angle')
   double get valAngle => throw _privateConstructorUsedError; // VAL角度 (度)
 // Layout classification
+  @JsonKey(name: 'layout_type')
   LayoutType get layoutType =>
       throw _privateConstructorUsedError; // Additional layout information
+  @JsonKey(name: 'layout_image')
   String? get layoutImage => throw _privateConstructorUsedError; // 鑽法圖片URL或本地路徑
+  @JsonKey(name: 'driller_name')
   String? get drillerName => throw _privateConstructorUsedError; // 鑽球師名稱
+  @JsonKey(name: 'drilled_date')
   DateTime? get drilledDate => throw _privateConstructorUsedError; // 鑽球日期
   String? get notes => throw _privateConstructorUsedError; // 備註
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this BallLayout to a JSON map.
@@ -54,19 +66,19 @@ abstract class $BallLayoutCopyWith<$Res> {
       _$BallLayoutCopyWithImpl<$Res, BallLayout>;
   @useResult
   $Res call(
-      {String layoutId,
-      String userId,
-      double pinToPap,
-      double papToMb,
-      double psaAngle,
-      double valAngle,
-      LayoutType layoutType,
-      String? layoutImage,
-      String? drillerName,
-      DateTime? drilledDate,
+      {@JsonKey(name: 'layout_id') String layoutId,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'pin_to_pap') double pinToPap,
+      @JsonKey(name: 'pap_to_mb') double papToMb,
+      @JsonKey(name: 'psa_angle') double psaAngle,
+      @JsonKey(name: 'val_angle') double valAngle,
+      @JsonKey(name: 'layout_type') LayoutType layoutType,
+      @JsonKey(name: 'layout_image') String? layoutImage,
+      @JsonKey(name: 'driller_name') String? drillerName,
+      @JsonKey(name: 'drilled_date') DateTime? drilledDate,
       String? notes,
-      DateTime createdAt,
-      DateTime? updatedAt});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -164,19 +176,19 @@ abstract class _$$BallLayoutImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String layoutId,
-      String userId,
-      double pinToPap,
-      double papToMb,
-      double psaAngle,
-      double valAngle,
-      LayoutType layoutType,
-      String? layoutImage,
-      String? drillerName,
-      DateTime? drilledDate,
+      {@JsonKey(name: 'layout_id') String layoutId,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'pin_to_pap') double pinToPap,
+      @JsonKey(name: 'pap_to_mb') double papToMb,
+      @JsonKey(name: 'psa_angle') double psaAngle,
+      @JsonKey(name: 'val_angle') double valAngle,
+      @JsonKey(name: 'layout_type') LayoutType layoutType,
+      @JsonKey(name: 'layout_image') String? layoutImage,
+      @JsonKey(name: 'driller_name') String? drillerName,
+      @JsonKey(name: 'drilled_date') DateTime? drilledDate,
       String? notes,
-      DateTime createdAt,
-      DateTime? updatedAt});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -267,64 +279,71 @@ class __$$BallLayoutImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BallLayoutImpl implements _BallLayout {
   const _$BallLayoutImpl(
-      {required this.layoutId,
-      required this.userId,
-      this.pinToPap = 0.0,
-      this.papToMb = 0.0,
-      this.psaAngle = 0.0,
-      this.valAngle = 0.0,
-      this.layoutType = LayoutType.control,
-      this.layoutImage,
-      this.drillerName,
-      this.drilledDate,
+      {@JsonKey(name: 'layout_id') required this.layoutId,
+      @JsonKey(name: 'user_id') required this.userId,
+      @JsonKey(name: 'pin_to_pap') this.pinToPap = 0.0,
+      @JsonKey(name: 'pap_to_mb') this.papToMb = 0.0,
+      @JsonKey(name: 'psa_angle') this.psaAngle = 0.0,
+      @JsonKey(name: 'val_angle') this.valAngle = 0.0,
+      @JsonKey(name: 'layout_type') this.layoutType = LayoutType.control,
+      @JsonKey(name: 'layout_image') this.layoutImage,
+      @JsonKey(name: 'driller_name') this.drillerName,
+      @JsonKey(name: 'drilled_date') this.drilledDate,
       this.notes,
-      required this.createdAt,
-      this.updatedAt});
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BallLayoutImpl.fromJson(Map<String, dynamic> json) =>
       _$$BallLayoutImplFromJson(json);
 
   @override
+  @JsonKey(name: 'layout_id')
   final String layoutId;
   @override
+  @JsonKey(name: 'user_id')
   final String userId;
 // Layout measurements (in inches)
   @override
-  @JsonKey()
+  @JsonKey(name: 'pin_to_pap')
   final double pinToPap;
 // Pin到PAP距離
   @override
-  @JsonKey()
+  @JsonKey(name: 'pap_to_mb')
   final double papToMb;
 // PAP到MB距離
   @override
-  @JsonKey()
+  @JsonKey(name: 'psa_angle')
   final double psaAngle;
 // PSA角度 (度)
   @override
-  @JsonKey()
+  @JsonKey(name: 'val_angle')
   final double valAngle;
 // VAL角度 (度)
 // Layout classification
   @override
-  @JsonKey()
+  @JsonKey(name: 'layout_type')
   final LayoutType layoutType;
 // Additional layout information
   @override
+  @JsonKey(name: 'layout_image')
   final String? layoutImage;
 // 鑽法圖片URL或本地路徑
   @override
+  @JsonKey(name: 'driller_name')
   final String? drillerName;
 // 鑽球師名稱
   @override
+  @JsonKey(name: 'drilled_date')
   final DateTime? drilledDate;
 // 鑽球日期
   @override
   final String? notes;
 // 備註
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
   @override
@@ -398,49 +417,62 @@ class _$BallLayoutImpl implements _BallLayout {
 
 abstract class _BallLayout implements BallLayout {
   const factory _BallLayout(
-      {required final String layoutId,
-      required final String userId,
-      final double pinToPap,
-      final double papToMb,
-      final double psaAngle,
-      final double valAngle,
-      final LayoutType layoutType,
-      final String? layoutImage,
-      final String? drillerName,
-      final DateTime? drilledDate,
-      final String? notes,
-      required final DateTime createdAt,
-      final DateTime? updatedAt}) = _$BallLayoutImpl;
+          {@JsonKey(name: 'layout_id') required final String layoutId,
+          @JsonKey(name: 'user_id') required final String userId,
+          @JsonKey(name: 'pin_to_pap') final double pinToPap,
+          @JsonKey(name: 'pap_to_mb') final double papToMb,
+          @JsonKey(name: 'psa_angle') final double psaAngle,
+          @JsonKey(name: 'val_angle') final double valAngle,
+          @JsonKey(name: 'layout_type') final LayoutType layoutType,
+          @JsonKey(name: 'layout_image') final String? layoutImage,
+          @JsonKey(name: 'driller_name') final String? drillerName,
+          @JsonKey(name: 'drilled_date') final DateTime? drilledDate,
+          final String? notes,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
+      _$BallLayoutImpl;
 
   factory _BallLayout.fromJson(Map<String, dynamic> json) =
       _$BallLayoutImpl.fromJson;
 
   @override
+  @JsonKey(name: 'layout_id')
   String get layoutId;
   @override
+  @JsonKey(name: 'user_id')
   String get userId; // Layout measurements (in inches)
   @override
+  @JsonKey(name: 'pin_to_pap')
   double get pinToPap; // Pin到PAP距離
   @override
+  @JsonKey(name: 'pap_to_mb')
   double get papToMb; // PAP到MB距離
   @override
+  @JsonKey(name: 'psa_angle')
   double get psaAngle; // PSA角度 (度)
   @override
+  @JsonKey(name: 'val_angle')
   double get valAngle; // VAL角度 (度)
 // Layout classification
   @override
+  @JsonKey(name: 'layout_type')
   LayoutType get layoutType; // Additional layout information
   @override
+  @JsonKey(name: 'layout_image')
   String? get layoutImage; // 鑽法圖片URL或本地路徑
   @override
+  @JsonKey(name: 'driller_name')
   String? get drillerName; // 鑽球師名稱
   @override
+  @JsonKey(name: 'drilled_date')
   DateTime? get drilledDate; // 鑽球日期
   @override
   String? get notes; // 備註
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
 
   /// Create a copy of BallLayout
