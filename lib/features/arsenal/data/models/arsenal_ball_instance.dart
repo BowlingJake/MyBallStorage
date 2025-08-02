@@ -19,6 +19,9 @@ class ArsenalBallInstance with _$ArsenalBallInstance {
     @Default(1) int instanceNumber,
     String? notes,
     
+    // Usage tracking
+    @Default(0) int gamesUsed,
+    
     // Reference to the base bowling ball data - stored as JSON map for serialization
     @JsonKey(name: 'bowling_ball_data') 
     @BowlingBallConverter() 

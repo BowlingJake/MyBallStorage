@@ -20,7 +20,8 @@
       "Bash(rm:*)",
       "Bash(flutter build:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter:*)"
+      "Bash(flutter:*)",
+      "Bash(dart:*)"
     ],
     "deny": []
   }

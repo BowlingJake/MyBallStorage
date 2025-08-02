@@ -13,6 +13,7 @@ class AppStandardButton extends StatelessWidget {
     this.enabled = true,
     this.customColor, // 新增自訂顏色參數
     this.isPrimary = false, // 新增是否為主要按鈕樣式
+    this.fontSize = 14.0, // 新增字體大小參數
   });
   final String? text;
   final IconData? icon;
@@ -22,6 +23,7 @@ class AppStandardButton extends StatelessWidget {
   final bool enabled;
   final Color? customColor; // 新增自訂顏色參數
   final bool isPrimary;
+  final double fontSize; // 新增字體大小參數
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +69,7 @@ class AppStandardButton extends StatelessWidget {
                       size: 18,
                       color:
                           enabled
-                              ? (isPrimary ? Colors.white : buttonColor)
+                              ? (isPrimary ? Colors.black : buttonColor)
                               : theme.colorScheme.onSurface.withOpacity(0.5),
                     ),
                     if (text != null) const SizedBox(width: 8),
@@ -79,12 +81,12 @@ class AppStandardButton extends StatelessWidget {
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color:
                               enabled
-                                  ? (isPrimary ? Colors.white : buttonColor)
+                                  ? (isPrimary ? Colors.black : buttonColor)
                                   : theme.colorScheme.onSurface.withOpacity(
                                     0.5,
                                   ),
                           fontWeight: FontWeight.w500,
-                          fontSize: 14,
+                          fontSize: fontSize,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),

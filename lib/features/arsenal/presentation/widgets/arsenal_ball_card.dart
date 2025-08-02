@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
 
+
 /// Arsenal 專用的球具卡片組件
 class ArsenalBallCard extends StatelessWidget {
   final ArsenalBallInstance ballInstance;
@@ -179,121 +180,151 @@ class ArsenalBallCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(60), // 更加橢圓形
         child: Container(
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // 參考Ball Library設計
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18), // 調整內邊距
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
+            // 橢圓形設計：黑色80%透明背景 + 品牌色邊框
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(60), // 更加橢圓形
             border: Border.all(
-              color: _getBrandColor().withOpacity(0.3),
-              width: 1,
+              color: _getBrandColor(),
+              width: 1.5,
             ),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // 球具圖片
+              // 左側：加大的圓形球具圖片
               Container(
-                width: 60,
-                height: 60,
+                width: 100, // 進一步加大到100
+                height: 100, // 確保 1:1 比例
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
-                    colors: [
-                      _getBrandColor().withOpacity(0.1),
-                      _getBrandColor().withOpacity(0.05),
-                    ],
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: _getBrandColor().withOpacity(0.3),
+                    width: 2,
                   ),
                 ),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: _buildBallImage(context, 50),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              // 球具資訊
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            ballInstance.displayName,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    // 圓形裁切的球圖片
+                    ClipOval(
+                      child: _buildBallImage(context, 100),
+                    ),
+                    // 實例編號標記
+                    if (ballInstance.instanceNumber > 1)
+                      Positioned(
+                        top: 2,
+                        right: 2,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: _getBrandColor(),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 1),
                           ),
-                        ),
-                        if (ballInstance.instanceNumber > 1)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: _getBrandColor().withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                          child: Center(
                             child: Text(
-                              '#${ballInstance.instanceNumber}',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: _getBrandColor(),
-                                fontWeight: FontWeight.w600,
+                              '${ballInstance.instanceNumber}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          ballInstance.brandName,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: _getBrandColor(),
-                            fontWeight: FontWeight.w500,
-                          ),
                         ),
-                        if (ballInstance.hasLayout) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Iconsax.setting_4,
-                            size: 14,
-                            color: theme.colorScheme.secondary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            ballInstance.layout!.layoutType.displayName,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.secondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (ball?.rg != null && ball?.diff != null) ...[
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _buildSpecChip('RG: ${ball!.rg!.toStringAsFixed(2)}', theme),
-                          const SizedBox(width: 8),
-                          _buildSpecChip('Diff: ${ball.diff!.toStringAsFixed(3)}', theme),
-                        ],
                       ),
-                    ],
                   ],
                 ),
               ),
-              // 操作按鈕
-              Icon(
-                Iconsax.arrow_right_3,
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
-                size: 20,
+              
+              const SizedBox(width: 24), // 增加間距
+              
+              // 右側：整合所有資訊的垂直區域
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Ball Name：最大字體、白色、粗體
+                    Text(
+                      ballInstance.displayName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 19, // 稍微加大
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // Brand：橢圓形標籤
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getBrandColor().withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20), // 橢圓形
+                        border: Border.all(
+                          color: _getBrandColor().withOpacity(0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        ballInstance.brandName,
+                        style: TextStyle(
+                          color: _getBrandColor(),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 6),
+                    
+                    // Core Type & Cover Type：直接文字顯示
+                    Text(
+                      _buildCoreAndCoverText(ball),
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 10,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // Layout：獨佔一行
+                    Text(
+                      _buildLayoutText(),
+                      style: TextStyle(
+                        color: Colors.grey[300],
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 4),
+                    
+                    // Games Used：獨佔一行
+                    Text(
+                      'Games Used: ${ballInstance.gamesUsed}',
+                      style: TextStyle(
+                        color: Colors.grey[300],
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -402,6 +433,40 @@ class ArsenalBallCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// 建構 Core Type & Cover Type 文字
+  String _buildCoreAndCoverText(dynamic ball) {
+    final parts = <String>[];
+    
+    if (ball?.coreType != null) {
+      parts.add(ball.coreType);
+    }
+    
+    if (ball?.coverstockType != null) {
+      parts.add(ball.coverstockType);
+    }
+    
+    if (parts.isEmpty) {
+      return 'No core/cover info';
+    }
+    
+    return parts.join(' • ');
+  }
+
+  /// 建構 Layout 文字
+  String _buildLayoutText() {
+    if (!ballInstance.hasLayout) {
+      return 'Layout: Not set';
+    }
+    
+    final layout = ballInstance.layout!;
+    final pinToPap = layout.pinToPap.toStringAsFixed(1);
+    final papToMb = layout.papToMb.toStringAsFixed(1);
+    final psaAngle = layout.psaAngle.toStringAsFixed(0);
+    
+    // 格式：5.0 x 4.0 x 50 (Control)
+    return 'Layout: ${pinToPap}" x ${papToMb}" x ${psaAngle}° (${layout.layoutType.displayName})';
   }
 
   Color _getBrandColor() {

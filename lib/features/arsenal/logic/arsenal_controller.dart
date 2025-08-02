@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_arsenal_repository.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/repositories/mock_arsenal_test_data.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/ball_layout.dart';
@@ -104,6 +105,37 @@ class ArsenalController extends _$ArsenalController {
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to initialize arsenal: $e',
+      );
+    }
+  }
+
+  /// Initialize with mock data for testing UI
+  Future<void> initializeWithMockData() async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      // Small delay to simulate loading
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Load mock categories
+      final categories = MockArsenalTestData.getMockCategories();
+      
+      // Load mock balls
+      final balls = MockArsenalTestData.getMockArsenalBalls();
+      
+      // Set first category as selected
+      final selectedCategoryId = categories.isNotEmpty ? categories.first.categoryId : null;
+      
+      state = state.copyWith(
+        categories: categories,
+        balls: balls,
+        selectedCategoryId: selectedCategoryId,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to initialize mock arsenal: $e',
       );
     }
   }

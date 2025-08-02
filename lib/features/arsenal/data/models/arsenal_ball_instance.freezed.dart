@@ -29,7 +29,8 @@ mixin _$ArsenalBallInstance {
   String get bagCategoryId => throw _privateConstructorUsedError;
   BallLayout? get layout => throw _privateConstructorUsedError;
   int get instanceNumber => throw _privateConstructorUsedError;
-  String? get notes =>
+  String? get notes => throw _privateConstructorUsedError; // Usage tracking
+  int get gamesUsed =>
       throw _privateConstructorUsedError; // Reference to the base bowling ball data - stored as JSON map for serialization
   @JsonKey(name: 'bowling_ball_data')
   @BowlingBallConverter()
@@ -65,6 +66,7 @@ abstract class $ArsenalBallInstanceCopyWith<$Res> {
       BallLayout? layout,
       int instanceNumber,
       String? notes,
+      int gamesUsed,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       BowlingBall? bowlingBall,
@@ -100,6 +102,7 @@ class _$ArsenalBallInstanceCopyWithImpl<$Res, $Val extends ArsenalBallInstance>
     Object? layout = freezed,
     Object? instanceNumber = null,
     Object? notes = freezed,
+    Object? gamesUsed = null,
     Object? bowlingBall = freezed,
     Object? isCustomBall = null,
     Object? localImagePath = freezed,
@@ -145,6 +148,10 @@ class _$ArsenalBallInstanceCopyWithImpl<$Res, $Val extends ArsenalBallInstance>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
+      gamesUsed: null == gamesUsed
+          ? _value.gamesUsed
+          : gamesUsed // ignore: cast_nullable_to_non_nullable
+              as int,
       bowlingBall: freezed == bowlingBall
           ? _value.bowlingBall
           : bowlingBall // ignore: cast_nullable_to_non_nullable
@@ -208,6 +215,7 @@ abstract class _$$ArsenalBallInstanceImplCopyWith<$Res>
       BallLayout? layout,
       int instanceNumber,
       String? notes,
+      int gamesUsed,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       BowlingBall? bowlingBall,
@@ -243,6 +251,7 @@ class __$$ArsenalBallInstanceImplCopyWithImpl<$Res>
     Object? layout = freezed,
     Object? instanceNumber = null,
     Object? notes = freezed,
+    Object? gamesUsed = null,
     Object? bowlingBall = freezed,
     Object? isCustomBall = null,
     Object? localImagePath = freezed,
@@ -288,6 +297,10 @@ class __$$ArsenalBallInstanceImplCopyWithImpl<$Res>
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
+      gamesUsed: null == gamesUsed
+          ? _value.gamesUsed
+          : gamesUsed // ignore: cast_nullable_to_non_nullable
+              as int,
       bowlingBall: freezed == bowlingBall
           ? _value.bowlingBall
           : bowlingBall // ignore: cast_nullable_to_non_nullable
@@ -318,6 +331,7 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
       this.layout,
       this.instanceNumber = 1,
       this.notes,
+      this.gamesUsed = 0,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       this.bowlingBall,
@@ -349,6 +363,10 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
   final int instanceNumber;
   @override
   final String? notes;
+// Usage tracking
+  @override
+  @JsonKey()
+  final int gamesUsed;
 // Reference to the base bowling ball data - stored as JSON map for serialization
   @override
   @JsonKey(name: 'bowling_ball_data')
@@ -363,7 +381,7 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
 
   @override
   String toString() {
-    return 'ArsenalBallInstance(instanceId: $instanceId, ballId: $ballId, userId: $userId, nickname: $nickname, addedDate: $addedDate, purchaseDate: $purchaseDate, bagCategoryId: $bagCategoryId, layout: $layout, instanceNumber: $instanceNumber, notes: $notes, bowlingBall: $bowlingBall, isCustomBall: $isCustomBall, localImagePath: $localImagePath)';
+    return 'ArsenalBallInstance(instanceId: $instanceId, ballId: $ballId, userId: $userId, nickname: $nickname, addedDate: $addedDate, purchaseDate: $purchaseDate, bagCategoryId: $bagCategoryId, layout: $layout, instanceNumber: $instanceNumber, notes: $notes, gamesUsed: $gamesUsed, bowlingBall: $bowlingBall, isCustomBall: $isCustomBall, localImagePath: $localImagePath)';
   }
 
   @override
@@ -387,6 +405,8 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
             (identical(other.instanceNumber, instanceNumber) ||
                 other.instanceNumber == instanceNumber) &&
             (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.gamesUsed, gamesUsed) ||
+                other.gamesUsed == gamesUsed) &&
             (identical(other.bowlingBall, bowlingBall) ||
                 other.bowlingBall == bowlingBall) &&
             (identical(other.isCustomBall, isCustomBall) ||
@@ -409,6 +429,7 @@ class _$ArsenalBallInstanceImpl implements _ArsenalBallInstance {
       layout,
       instanceNumber,
       notes,
+      gamesUsed,
       bowlingBall,
       isCustomBall,
       localImagePath);
@@ -442,6 +463,7 @@ abstract class _ArsenalBallInstance implements ArsenalBallInstance {
       final BallLayout? layout,
       final int instanceNumber,
       final String? notes,
+      final int gamesUsed,
       @JsonKey(name: 'bowling_ball_data')
       @BowlingBallConverter()
       final BowlingBall? bowlingBall,
@@ -470,8 +492,9 @@ abstract class _ArsenalBallInstance implements ArsenalBallInstance {
   @override
   int get instanceNumber;
   @override
-  String?
-      get notes; // Reference to the base bowling ball data - stored as JSON map for serialization
+  String? get notes; // Usage tracking
+  @override
+  int get gamesUsed; // Reference to the base bowling ball data - stored as JSON map for serialization
   @override
   @JsonKey(name: 'bowling_ball_data')
   @BowlingBallConverter()

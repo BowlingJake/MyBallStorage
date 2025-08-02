@@ -23,6 +23,7 @@ _$ArsenalBallInstanceImpl _$$ArsenalBallInstanceImplFromJson(
           : BallLayout.fromJson(json['layout'] as Map<String, dynamic>),
       instanceNumber: (json['instanceNumber'] as num?)?.toInt() ?? 1,
       notes: json['notes'] as String?,
+      gamesUsed: (json['gamesUsed'] as num?)?.toInt() ?? 0,
       bowlingBall: const BowlingBallConverter()
           .fromJson(json['bowling_ball_data'] as Map<String, dynamic>?),
       isCustomBall: json['isCustomBall'] as bool? ?? false,
@@ -42,6 +43,7 @@ Map<String, dynamic> _$$ArsenalBallInstanceImplToJson(
       'layout': instance.layout,
       'instanceNumber': instance.instanceNumber,
       'notes': instance.notes,
+      'gamesUsed': instance.gamesUsed,
       'bowling_ball_data':
           const BowlingBallConverter().toJson(instance.bowlingBall),
       'isCustomBall': instance.isCustomBall,

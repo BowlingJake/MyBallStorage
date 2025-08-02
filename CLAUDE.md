@@ -77,6 +77,10 @@ lib/features/{feature_name}/
 - Always use curly braces for control structures
 - Prefer `try-catch` for error handling
 
+### UI Components Standards
+- **Buttons**: Always use `AppStandardButton` from `lib/shared/widgets/buttons/app_standard_button.dart` unless explicitly told to use another button
+- **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
+
 ### Cursor Rules Integration
 The project has specific Cursor rules that emphasize:
 - Reading `AI_CONTEXT.md` and `docs/TECHNICAL_SPEC.md` before making changes

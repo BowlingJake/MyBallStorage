@@ -230,7 +230,7 @@ class _CategoryBallCountProviderElement extends AutoDisposeProviderElement<int>
   String get categoryId => (origin as CategoryBallCountProvider).categoryId;
 }
 
-String _$arsenalControllerHash() => r'e196a0e28ac2b9dc254f5a13703d72d3e50668c9';
+String _$arsenalControllerHash() => r'989ccf4028221f77407a84958b6c8948ba36f383';
 
 /// Main Arsenal controller
 ///

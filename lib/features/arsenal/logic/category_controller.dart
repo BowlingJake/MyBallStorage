@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/arsenal_repository.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/repositories/mock_arsenal_test_data.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/arsenal_controller.dart';
 
@@ -52,6 +53,24 @@ class CategoryController extends _$CategoryController {
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to load categories: $e',
+      );
+    }
+  }
+
+  /// Initialize with mock data for testing
+  Future<void> initializeWithMockData() async {
+    state = state.copyWith(isLoading: true, error: null);
+    
+    try {
+      // Small delay to simulate loading
+      await Future.delayed(const Duration(milliseconds: 300));
+      
+      final categories = MockArsenalTestData.getMockCategories();
+      state = state.copyWith(categories: categories, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to load mock categories: $e',
       );
     }
   }

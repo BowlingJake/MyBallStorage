@@ -190,7 +190,7 @@ class _CategoryByIdProviderElement
 }
 
 String _$categoryControllerHash() =>
-    r'6874684d7517db47d5f3d33abbcb7bc6aeb4f3ab';
+    r'e336807afb63eb3b0af9d36ac69cc66a695f5248';
 
 /// Category management controller
 ///

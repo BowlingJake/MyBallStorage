@@ -7,12 +7,15 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/category_controller.da
 import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_card.dart';
+import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_selector.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/add_ball_from_library_dialog.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_management_dialog.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -33,11 +36,22 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   }
 
   void _initializeData() {
-    final authState = ref.read(authControllerProvider);
-    if (authState.hasValue && authState.value != null) {
-      final userId = authState.value!.id;
-      ref.read(arsenalControllerProvider.notifier).initialize(userId);
-      ref.read(categoryControllerProvider.notifier).loadCategories(userId);
+    // 開發模式：使用 mock 數據
+    const bool useMockData = true; // 設為 false 來使用真實數據
+    
+    if (useMockData) {
+      // 使用 mock 數據進行 UI 測試
+      ref.read(arsenalControllerProvider.notifier).initializeWithMockData();
+      // 也為 category controller 載入 mock 數據
+      ref.read(categoryControllerProvider.notifier).initializeWithMockData();
+    } else {
+      // 使用真實數據
+      final authState = ref.read(authControllerProvider);
+      if (authState.hasValue && authState.value != null) {
+        final userId = authState.value!.id;
+        ref.read(arsenalControllerProvider.notifier).initialize(userId);
+        ref.read(categoryControllerProvider.notifier).loadCategories(userId);
+      }
     }
   }
 
@@ -59,25 +73,18 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: _buildAppBar(theme),
+        appBar: AppBarConfigs.arsenal(
+          title: 'My Arsenal',
+          onBackPressed: () => context.go('/'),
+        ),
         body: Column(
           children: [
-            // 分類選擇器
-            if (sortedCategories.isNotEmpty)
-              CategorySelector(
-                categories: sortedCategories,
-                selectedCategoryId: arsenalState.selectedCategoryId,
-                onCategorySelected: (categoryId) {
-                  ref.read(arsenalControllerProvider.notifier).selectCategory(categoryId);
-                },
-              ),
+            // B區：球袋管理區 (移到頂部)
+            _buildBagManagementSection(theme, sortedCategories, arsenalState),
             
-            // 主要內容區域
+            // C區：內容顯示區
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: _buildMainContent(theme, arsenalState),
-              ),
+              child: _buildContentDisplaySection(theme, arsenalState),
             ),
           ],
         ),
@@ -90,81 +97,191 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  AppBar _buildAppBar(ThemeData theme) {
-    return AppBar(
-      centerTitle: false,
-      title: Row(
+  /// 獲取分類的英文顯示名稱
+  String _getCategoryDisplayName(BagCategory? category) {
+    if (category == null) return 'All Balls';
+    
+    // 將中文名稱轉換為英文
+    switch (category.name) {
+      case '比賽球袋':
+        return 'Competition';
+      case '練習球袋':
+        return 'Practice';
+      case '收藏球袋':
+        return 'Collection';
+      case '新球測試':
+        return 'Testing';
+      default:
+        return category.name; // 如果已經是英文就直接返回
+    }
+  }
+
+  /// B區：球袋管理區 (下拉選單 + 新增球袋按鈕)
+  Widget _buildBagManagementSection(ThemeData theme, List<BagCategory> categories, ArsenalState arsenalState) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
         children: [
-          Icon(
-            Iconsax.bag,
-            color: theme.colorScheme.primary,
-            size: 28,
+          // 球袋下拉選單 (移除圖標，改為英文)
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.grey[600]!,
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _getCategoryDisplayName(arsenalState.selectedCategory),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(width: 12),
-          Text(
-            'My Arsenal',
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 24,
-              color: theme.colorScheme.onSurface,
+          // 新增球袋按鈕 (圓形設計)
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              shape: BoxShape.circle, // 圓形
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const CategoryManagementDialog(),
+                );
+              },
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
         ],
       ),
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
-      actions: [
-        // 視圖切換按鈕
-        Consumer(
-          builder: (context, ref, child) {
-            final viewMode = ref.watch(arsenalControllerProvider.select((state) => state.viewMode));
-            return IconButton(
-              onPressed: () {
-                final newMode = viewMode == ArsenalViewMode.grid 
-                    ? ArsenalViewMode.list 
-                    : ArsenalViewMode.grid;
-                ref.read(arsenalControllerProvider.notifier).setViewMode(newMode);
-              },
-              icon: Icon(
-                viewMode == ArsenalViewMode.grid ? Iconsax.element_equal : Iconsax.grid_1,
-                color: theme.colorScheme.onSurface,
+    );
+  }
+
+  /// C區：內容顯示區
+  Widget _buildContentDisplaySection(ThemeData theme, ArsenalState arsenalState) {
+    return Column(
+      children: [
+        // 控制按鈕區域 - 參考Ball Library的簡潔設計
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              // Grid/List 切換按鈕
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey[600]!,
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildViewModeButton(
+                      theme,
+                      icon: Iconsax.grid_1,
+                      isSelected: arsenalState.viewMode == ArsenalViewMode.grid,
+                      onTap: () => ref.read(arsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.grid),
+                    ),
+                    _buildViewModeButton(
+                      theme,
+                      icon: Iconsax.element_equal,
+                      isSelected: arsenalState.viewMode == ArsenalViewMode.list,
+                      onTap: () => ref.read(arsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.list),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
-        ),
-        // 分類管理按鈕
-        IconButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => const CategoryManagementDialog(),
-            );
-          },
-          icon: Icon(
-            Iconsax.setting_4,
-            color: theme.colorScheme.onSurface,
+              
+              const Spacer(),
+              
+              // Add balls 按鈕 (移除圖標)
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey[600]!,
+                    width: 1.5,
+                  ),
+                ),
+                child: TextButton(
+                  onPressed: () => context.go('/library'),
+                  child: const Text(
+                    'Add Balls',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        // 搜尋按鈕
-        IconButton(
-          onPressed: () {
-            // TODO: 實現搜尋功能
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('搜尋功能即將推出'),
-                backgroundColor: theme.colorScheme.surface.withOpacity(0.9),
-              ),
-            );
-          },
-          icon: Icon(
-            Iconsax.search_normal,
-            color: theme.colorScheme.onSurface,
-          ),
+        
+        // 內容區域 - 直接顯示，無額外容器
+        Expanded(
+          child: _buildMainContent(theme, arsenalState),
         ),
-        const SizedBox(width: 8),
       ],
+    );
+  }
+
+
+  Widget _buildViewModeButton(
+    ThemeData theme, {
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? Colors.white.withOpacity(0.2)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: isSelected 
+              ? Colors.white
+              : Colors.grey,
+        ),
+      ),
     );
   }
 
@@ -187,94 +304,11 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       return _buildEmptyState(theme);
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          // 球袋標題
-          _buildSectionHeader(theme, arsenalState),
-          
-          // 球具列表
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: arsenalState.viewMode == ArsenalViewMode.grid
-                  ? _buildGridView(filteredBalls)
-                  : _buildListView(filteredBalls),
-            ),
-          ),
-        ],
-      ),
-    );
+    return arsenalState.viewMode == ArsenalViewMode.grid
+        ? _buildGridView(filteredBalls)
+        : _buildListView(filteredBalls);
   }
 
-  Widget _buildSectionHeader(ThemeData theme, ArsenalState arsenalState) {
-    final selectedCategory = arsenalState.selectedCategory;
-    final ballCount = arsenalState.filteredBalls.length;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: selectedCategory?.themeColor.withOpacity(0.1) ?? 
-               theme.colorScheme.primary.withOpacity(0.1),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            selectedCategory?.icon ?? Iconsax.bag,
-            color: selectedCategory?.themeColor ?? theme.colorScheme.primary,
-            size: 24,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  selectedCategory?.name ?? '所有球具',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  '$ballCount 顆球具',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 加號按鈕
-          Container(
-            decoration: BoxDecoration(
-              color: (selectedCategory?.themeColor ?? theme.colorScheme.primary).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              onPressed: () => _showAddBallOptions(context),
-              icon: Icon(
-                Iconsax.add,
-                color: selectedCategory?.themeColor ?? theme.colorScheme.primary,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildGridView(List<ArsenalBallInstance> filteredBalls) {
     return GridView.builder(
@@ -297,19 +331,64 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
 
   Widget _buildListView(List<ArsenalBallInstance> filteredBalls) {
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 32), // 參考Ball Library的設計
       itemCount: filteredBalls.length,
       itemBuilder: (context, index) {
         final ball = filteredBalls[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: ArsenalBallCard(
-            ballInstance: ball,
-            onTap: () => _showBallDetails(ball),
-            isListView: true,
-          ),
+        return UnifiedBallCard(
+          arsenalBallInstance: ball,
+          theme: Theme.of(context),
+          onTap: () => _showBallDetails(ball),
+          showFavoriteButton: false, // Arsenal balls don't need favorite button
+          extraInfo: _buildArsenalExtraInfo(ball),
         );
       },
     );
+  }
+
+  /// 建構 Arsenal 專用的額外資訊
+  Widget _buildArsenalExtraInfo(ArsenalBallInstance ball) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Layout info
+        Text(
+          _buildLayoutText(ball),
+          style: TextStyle(
+            color: Colors.grey[300],
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        // Games used
+        Text(
+          'Games Used: ${ball.gamesUsed}',
+          style: TextStyle(
+            color: Colors.grey[300],
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 建構 Layout 文字
+  String _buildLayoutText(ArsenalBallInstance ball) {
+    if (!ball.hasLayout) {
+      return 'Layout: Not set';
+    }
+    
+    final layout = ball.layout!;
+    final pinToPap = layout.pinToPap.toStringAsFixed(1);
+    final papToMb = layout.papToMb.toStringAsFixed(1);
+    final psaAngle = layout.psaAngle.toStringAsFixed(0);
+    
+    // 格式：5.0 x 4.0 x 50 (Control)
+    return 'Layout: ${pinToPap}" x ${papToMb}" x ${psaAngle}° (${layout.layoutType.displayName})';
   }
 
   Widget _buildEmptyState(ThemeData theme) {
@@ -324,7 +403,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            '球袋是空的',
+            'Your bag is empty',
             style: theme.textTheme.headlineSmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.7),
               fontWeight: FontWeight.w600,
@@ -332,16 +411,15 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '從球庫新增你的第一顆球',
+            'Add your first ball from the library',
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
+          ElevatedButton(
             onPressed: () => context.go('/library'),
-            icon: const Icon(Iconsax.add_circle),
-            label: const Text('瀏覽球庫'),
+            child: const Text('Browse Library'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,

@@ -11,6 +11,7 @@ import 'package:gradient_borders/gradient_borders.dart';
 import 'package:bowlingarsenal_app/shared/widgets/painters/grid_painter.dart';
 import 'package:bowlingarsenal_app/shared/widgets/painters/metal_texture_painter.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_card_item.dart';
+import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 
 class BallListView extends StatelessWidget {
   const BallListView({
@@ -79,8 +80,8 @@ class BallListView extends StatelessWidget {
             final ball = balls[index];
             final isSelected = selectedBallIds.contains(ball.id);
             
-            return BallCardItem(
-              ball: ball,
+            return UnifiedBallCard(
+              bowlingBall: ball,
               theme: Theme.of(context),
               onTap: () {
                 if (isSelectionMode) {
@@ -94,6 +95,7 @@ class BallListView extends StatelessWidget {
               },
               isSelectionMode: isSelectionMode,
               isSelected: isSelected,
+              showFavoriteButton: !isSelectionMode, // Show favorite button only when not in selection mode
             );
           },
         ),

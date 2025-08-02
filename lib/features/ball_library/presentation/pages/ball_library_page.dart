@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
+import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/comparison/presentation/widgets/ball_comparison_dialog.dart';
@@ -7,6 +8,9 @@ import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_librar
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +45,12 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         // Limit to 2 balls for comparison
         if (_selectedBallIds.length < 2) {
           _selectedBallIds.add(ballId);
+          // Auto-show comparison when 2 balls are selected
+          if (_selectedBallIds.length == 2) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showComparison();
+            });
+          }
         }
       }
     });
@@ -106,39 +116,10 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => context.go('/'),
-          ),
-          title: const Text(
-            'Ball Library',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 24,
-            ),
-          ),
-          titleSpacing: 0, // 讓標題緊靠返回按鈕
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
+        appBar: AppBarConfigs.ballLibrary(
+          title: 'Ball Library',
+          onBackPressed: () => context.go('/'),
           actions: [
-            // Comparison 按鈕
-            if (_isComparisonMode && _selectedBallIds.length == 2)
-              IconButton(
-                icon: const Icon(Icons.check, color: Colors.green),
-                onPressed: _showComparison,
-                tooltip: 'Compare Selected',
-              ),
-            IconButton(
-              icon: Icon(
-                _isComparisonMode ? Icons.close : Icons.compare_arrows,
-                color: _isComparisonMode ? Colors.orange : Colors.white,
-              ),
-              onPressed: _toggleComparisonMode,
-              tooltip: _isComparisonMode ? 'Cancel Comparison' : 'Compare Balls',
-            ),
             // Favorites 按鈕
             IconButton(
               icon: const Icon(Icons.favorite, color: Colors.white),
@@ -155,7 +136,53 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 // 為AppBar留出空間 (AppBar高度 + 狀態列高度)
                 SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 8),
                 // 控制面板
-                _buildSimplifiedControls(context, ref, state),
+                SimpleSearchControls(
+                  searchHint: 'Search balls...',
+                  onSearchChanged: (text) {
+                    ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
+                  },
+                  onFilterTap: () => _showFilterDialog(context, ref, state),
+                  onSortTap: () => _showSortDialog(context, ref, state),
+                  filterCount: state.filters.activeFilterCount,
+                ),
+                // 兩個水平按鈕
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Ball Comparison',
+                          icon: Icons.compare_arrows,
+                          height: 36,
+                          fontSize: 12,
+                          onPressed: _toggleComparisonMode,
+                          customColor: Colors.white,
+                          isPrimary: _isComparisonMode,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Add to Arsenal',
+                          icon: Icons.add_circle_outline,
+                          height: 36,
+                          fontSize: 12,
+                          customColor: Colors.white,
+                          onPressed: () {
+                            // TODO: Implement add to arsenal functionality
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Add to Arsenal功能將在後續實作'),
+                                backgroundColor: BrandColors.accentColorDark,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // 球列表
                 Expanded(
                   child: state.filteredBalls.isEmpty
@@ -228,121 +255,6 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     );
   }
 
-  Widget _buildSimplifiedControls(BuildContext context, WidgetRef ref, BallLibraryState state) {
-    return Container(
-      // 透明背景，讓球具資料自然滾動穿過
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          // 搜尋框 - 佔據大部分空間
-          Expanded(
-            child: TextField(
-              onChanged: (text) {
-                ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
-              },
-              decoration: InputDecoration(
-                hintText: 'Search balls...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                filled: true,
-                fillColor: Colors.black.withOpacity(0.6),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              ),
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // 篩選按鈕
-          Stack(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey[600]!,
-                    width: 1.5,
-                  ),
-                ),
-                child: InkWell(
-                  onTap: () => _showFilterDialog(context, ref, state),
-                  borderRadius: BorderRadius.circular(12),
-                  child: const Icon(
-                    Icons.filter_list,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                ),
-              ),
-              if (state.filters.activeFilterCount > 0)
-                Positioned(
-                  right: -2,
-                  top: -2,
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${state.filters.activeFilterCount}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          // 排序按鈕
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: InkWell(
-              onTap: () => _showSortDialog(context, ref, state),
-              borderRadius: BorderRadius.circular(12),
-              child: const Icon(
-                Icons.sort,
-                color: Colors.grey,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
 
 

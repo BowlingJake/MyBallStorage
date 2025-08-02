@@ -539,6 +539,142 @@ dependencies:
 
 ---
 
+## 🚧 UI 重新設計實作計劃
+
+### 新版 Arsenal 頁面布局設計
+
+根據使用者需求，新版 My Arsenal 頁面將採用以下布局架構：
+
+#### A. 頂部操作區 (Search & Filter Section)
+- **位置:** 頂部導航欄下方
+- **組件:** 搜尋框 + 篩選按鈕 + 排序按鈕
+- **設計參考:** 使用 Library 頁面的現有 UI 元件
+- **功能:** 支援球具名稱、品牌、類型的搜尋和多條件篩選
+
+#### B. 球袋管理區 (Bag Management Section)  
+- **位置:** 頂部操作區下方一行
+- **組件:** 球袋下拉選單 + "+" 新增球袋按鈕
+- **功能:** 
+  - 切換不同球袋分類
+  - 快速新增自定義球袋
+  - 顯示當前球袋的球具數量
+
+#### C. 內容顯示區 (Main Content Area)
+- **左上角控制區:**
+  - Grid View / List View 切換按鈕
+  - "Add balls to my arsenal" 按鈕 (導航至 Library 選球)
+- **主要內容:** 響應式球具容器，支援兩種視圖模式
+
+### 視圖模式設計規格
+
+#### List View - 水晶樣式設計
+```
+┌─────────────────────────────────────────────┐
+│  🏀    │  Ball Name (Primary Text)          │
+│ Ball   │  Brand Name                        │
+│ Image  │  Core Type & Cover Type            │
+│        ├─────────────────────────────────────│
+│        │  Layout: 4.5" x 3.25"             │
+│        │  Games Used: 15                    │
+└─────────────────────────────────────────────┘
+```
+- **視覺特色:** 長方形水晶外框，左右兩側尖角設計
+- **布局:** 水平排列，左側圖片，右側信息，下方佈局資料
+- **主色調:** 個人化色調，區別於 Library 頁面
+
+#### Grid View - 卡片式設計
+```
+┌─────────────────┐
+│                 │
+│   Ball Image    │
+│                 │
+├─────────────────┤
+│   Ball Name     │
+│   Brand         │
+│ Core & Cover    │
+│   Layout        │
+│  Games Used     │
+└─────────────────┘
+```
+- **視覺特色:** 垂直卡片布局
+- **信息排列:** 頂部圖片，底部所有文字信息垂直排列
+
+### 實作階段規劃
+
+#### 第一階段: 基礎架構重構 (Week 1-2)
+- [ ] **1.1** 分析現有 Arsenal 頁面程式碼結構
+- [ ] **1.2** 分析 Library 頁面搜尋/篩選/排序 UI 元件
+- [ ] **1.3** 設計新的 UI 元件架構和檔案結構
+- [ ] **1.4** 建立新的狀態管理模型 (搜尋、篩選、排序狀態)
+
+#### 第二階段: UI 元件實作 (Week 3-4)
+- [ ] **2.1** 實作頂部操作區 (SearchBar + FilterButton + SortButton)
+- [ ] **2.2** 實作球袋管理區 (BagSelector + AddBagButton)
+- [ ] **2.3** 實作內容顯示區控制按鈕 (ViewToggle + AddBallsButton)
+- [ ] **2.4** 設計和實作 List View 的水晶樣式元件
+- [ ] **2.5** 設計和實作 Grid View 的卡片樣式元件
+
+#### 第三階段: 功能整合 (Week 5-6)
+- [ ] **3.1** 實作搜尋、篩選、排序的業務邏輯
+- [ ] **3.2** 實作球袋管理功能 (選擇、新增、切換)
+- [ ] **3.3** 整合 Library 頁面導航功能
+- [ ] **3.4** 實作視圖切換動畫和狀態管理
+
+#### 第四階段: 測試與優化 (Week 7)
+- [ ] **4.1** 功能測試和錯誤修復
+- [ ] **4.2** UI/UX 細節調整和動畫優化
+- [ ] **4.3** 響應式設計測試 (手機、平板)
+- [ ] **4.4** 效能優化和記憶體使用優化
+
+### 技術實作重點
+
+#### 新增檔案結構
+```
+lib/features/arsenal/presentation/
+├── pages/
+│   └── my_arsenal_page.dart (重構)
+├── widgets/
+│   ├── search_filter_section.dart     # 頂部操作區
+│   ├── bag_management_section.dart    # 球袋管理區
+│   ├── content_display_section.dart   # 內容顯示區
+│   ├── arsenal_list_item.dart         # List View 水晶樣式元件
+│   ├── arsenal_grid_item.dart         # Grid View 卡片元件
+│   └── view_toggle_controls.dart      # 視圖切換控制
+```
+
+#### 狀態管理更新
+```dart
+// 新增的狀態管理需求
+@riverpod
+class ArsenalViewState extends _$ArsenalViewState {
+  // 視圖模式 (Grid/List)
+  ViewMode viewMode = ViewMode.grid;
+  
+  // 搜尋狀態
+  String searchQuery = '';
+  
+  // 篩選狀態  
+  FilterOptions filterOptions = FilterOptions.empty;
+  
+  // 排序狀態
+  SortOption sortOption = SortOption.newest;
+  
+  // 當前選中的球袋
+  String selectedBagId = 'default';
+}
+```
+
+#### UI 差異化策略
+| 設計元素 | Library 頁面 | Arsenal 頁面 |
+|---------|-------------|-------------|
+| **主色調** | 藍色系 (探索感) | 綠色系 (收藏感) |
+| **卡片樣式** | 標準圓角卡片 | 水晶樣式 (List) / 個人化卡片 (Grid) |
+| **操作按鈕** | "Add to Arsenal" | "Edit", "Move", "Remove" |
+| **資訊重點** | 技術規格 | 個人資料 (Layout, Games Used) |
+| **視覺氛圍** | 專業探索 | 個人收藏 |
+
+---
+
 ## 🎯 成功指標 (KPIs)
 
 ### 功能完整性指標

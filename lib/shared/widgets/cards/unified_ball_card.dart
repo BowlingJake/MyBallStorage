@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
 import 'package:bowlingarsenal_app/features/favorites/presentation/widgets/favorite_button_widget.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
@@ -6,28 +7,55 @@ import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BallCardItem extends ConsumerWidget {
-  const BallCardItem({
-    required this.ball,
+/// 統一的球卡組件，可同時支援 BowlingBall 和 ArsenalBallInstance
+class UnifiedBallCard extends ConsumerWidget {
+  const UnifiedBallCard({
+    this.bowlingBall,
+    this.arsenalBallInstance,
     required this.theme,
     this.onTap,
     this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
+    this.showFavoriteButton = true,
+    this.extraInfo,
     super.key,
-  });
+  }) : assert(bowlingBall != null || arsenalBallInstance != null, 'Either bowlingBall or arsenalBallInstance must be provided');
   
-  final BowlingBall ball;
+  final BowlingBall? bowlingBall;
+  final ArsenalBallInstance? arsenalBallInstance;
   final ThemeData theme;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
+  final bool showFavoriteButton;
+  final Widget? extraInfo; // 額外資訊，如 arsenal 的 games used 等
 
+  // 統一的數據獲取方法
+  String get ballName => bowlingBall?.name ?? arsenalBallInstance?.displayName ?? '';
+  String get brandName => bowlingBall?.brand ?? arsenalBallInstance?.brandName ?? '';
+  String get imageUrl => bowlingBall?.imageUrl ?? arsenalBallInstance?.effectiveImageUrl ?? '';
+  double? get rg => bowlingBall?.rg ?? arsenalBallInstance?.bowlingBall?.rg;
+  double? get diff => bowlingBall?.diff ?? arsenalBallInstance?.bowlingBall?.diff;
+  double? get mbDiff => bowlingBall?.mbDiff ?? arsenalBallInstance?.bowlingBall?.mbDiff;
+  String? get coreType => bowlingBall?.core ?? arsenalBallInstance?.bowlingBall?.coreType;
+  String? get coverstockType => bowlingBall?.coverstockType ?? arsenalBallInstance?.bowlingBall?.coverstockType;
+  String? get coverstock => bowlingBall?.coverstock ?? arsenalBallInstance?.bowlingBall?.coverstock;
+  String? get region => bowlingBall?.region;
+  int get ballId {
+    if (bowlingBall != null) {
+      return bowlingBall!.id;
+    }
+    if (arsenalBallInstance != null) {
+      return int.tryParse(arsenalBallInstance!.ballId) ?? 0;
+    }
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final brandPalette = getBrandTonalPalette(ball.brand, theme);
+    final brandPalette = getBrandTonalPalette(brandName, theme);
     final brandColor = brandPalette[400]!;
     
     return Container(
@@ -55,8 +83,8 @@ class BallCardItem extends ConsumerWidget {
                   : null,
             ),
             child: InkWell(
-              onTap: isSelectionMode ? onTap : null, // 在選擇模式下允許點擊
-              onLongPress: isSelectionMode ? null : onTap, // 在選擇模式下禁用長按
+              onTap: isSelectionMode ? onTap : null,
+              onLongPress: isSelectionMode ? null : onTap,
               borderRadius: BorderRadius.circular(14),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -64,32 +92,45 @@ class BallCardItem extends ConsumerWidget {
                   children: [
                     // Left: Ball Image (Circular)
                     SizedBox(
-                      width: 120, // Fixed square width
-                      height: 120, // Fixed square height
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
-                        child: ClipOval(
-                          child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
-                              ? Image.network(
-                                  ball.imageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(
-                                      Icons.sports_baseball,
-                                      color: Colors.white54,
-                                      size: 35,
-                                    );
-                                  },
-                                )
-                              : const Icon(
-                                  Icons.sports_baseball,
-                                  color: Colors.white54,
-                                  size: 35,
+                      width: 120,
+                      height: 120,
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.withOpacity(0.3),
+                            ),
+                            child: ClipOval(
+                              child: _buildBallImage(),
+                            ),
+                          ),
+                          // Arsenal instance number
+                          if (arsenalBallInstance != null && arsenalBallInstance!.instanceNumber > 1)
+                            Positioned(
+                              top: 2,
+                              right: 2,
+                              child: Container(
+                                width: 26,
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  color: brandColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black, width: 1),
                                 ),
-                        ),
+                                child: Center(
+                                  child: Text(
+                                    '${arsenalBallInstance!.instanceNumber}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -101,7 +142,7 @@ class BallCardItem extends ConsumerWidget {
                         children: [
                           // Top: Ball Name
                           Text(
-                            ball.name,
+                            ballName,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -112,7 +153,7 @@ class BallCardItem extends ConsumerWidget {
                           const SizedBox(height: 4),
                           // Core & Cover Types in one line
                           Text(
-                            '${getCoreCategory(ball.core)} | ${ball.coverstockType ?? ball.coverstock ?? 'Unknown'}',
+                            _buildCoreAndCoverText(),
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white70,
@@ -135,7 +176,7 @@ class BallCardItem extends ConsumerWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  ball.brand,
+                                  brandName,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: brandColor,
@@ -145,7 +186,7 @@ class BallCardItem extends ConsumerWidget {
                               ),
                               const SizedBox(width: 6),
                               // Region Tag (if available)
-                              if (ball.region != null && ball.region!.isNotEmpty)
+                              if (region != null && region!.isNotEmpty)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
@@ -157,7 +198,7 @@ class BallCardItem extends ConsumerWidget {
                                     ),
                                   ),
                                   child: Text(
-                                    ball.region!,
+                                    region!,
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -168,6 +209,11 @@ class BallCardItem extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
+                          // Extra info (like games used for arsenal)
+                          if (extraInfo != null) ...[
+                            extraInfo!,
+                            const SizedBox(height: 8),
+                          ],
                           // Bottom: RG, Diff, MB Data Blocks
                           Row(
                             children: [
@@ -192,7 +238,7 @@ class BallCardItem extends ConsumerWidget {
                                         ),
                                       ),
                                       Text(
-                                        ball.rg?.toStringAsFixed(3) ?? 'N/A',
+                                        rg?.toStringAsFixed(3) ?? 'N/A',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,
@@ -225,7 +271,7 @@ class BallCardItem extends ConsumerWidget {
                                         ),
                                       ),
                                       Text(
-                                        ball.diff?.toStringAsFixed(3) ?? 'N/A',
+                                        diff?.toStringAsFixed(3) ?? 'N/A',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,
@@ -258,9 +304,9 @@ class BallCardItem extends ConsumerWidget {
                                         ),
                                       ),
                                       Text(
-                                        (ball.mbDiff == null || ball.mbDiff == 0) 
+                                        (mbDiff == null || mbDiff == 0) 
                                             ? 'N/A' 
-                                            : ball.mbDiff!.toStringAsFixed(3),
+                                            : mbDiff!.toStringAsFixed(3),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,
@@ -281,7 +327,7 @@ class BallCardItem extends ConsumerWidget {
               ),
             ),
           ),
-          // 選擇模式指示器或愛心按鈕
+          // Selection mode indicator or favorite button
           Positioned(
             top: 8,
             right: 8,
@@ -304,11 +350,53 @@ class BallCardItem extends ConsumerWidget {
                           size: 18,
                         ),
                       )
-                    : const SizedBox.shrink()) // 未選中時不顯示任何icon
-                : CompactFavoriteButton(ball: ball),
+                    : const SizedBox.shrink())
+                : (showFavoriteButton && bowlingBall != null 
+                    ? CompactFavoriteButton(ball: bowlingBall!)
+                    : const SizedBox.shrink()),
           ),
         ],
       ),
     );
   }
-} 
+
+  Widget _buildBallImage() {
+    return imageUrl.isNotEmpty && imageUrl != 'https://via.placeholder.com/150'
+        ? Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(
+                Icons.sports_baseball,
+                color: Colors.white54,
+                size: 35,
+              );
+            },
+          )
+        : const Icon(
+            Icons.sports_baseball,
+            color: Colors.white54,
+            size: 35,
+          );
+  }
+
+  String _buildCoreAndCoverText() {
+    final parts = <String>[];
+    
+    if (coreType != null) {
+      parts.add(getCoreCategory(coreType!));
+    } else if (bowlingBall?.core != null) {
+      parts.add(getCoreCategory(bowlingBall!.core!));
+    }
+    
+    if (coverstockType != null) {
+      parts.add(coverstockType!);
+    } else if (coverstock != null) {
+      parts.add(coverstock!);
+    } else {
+      parts.add('Unknown');
+    }
+    
+    return parts.join(' | ');
+  }
+}
