@@ -26,14 +26,40 @@ class BallLibraryPage extends ConsumerStatefulWidget {
 
 class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
   bool _isComparisonMode = false;
+  bool _isAddToArsenalMode = false;
   Set<int> _selectedBallIds = {};
 
   void _toggleComparisonMode() {
     setState(() {
       _isComparisonMode = !_isComparisonMode;
+      _isAddToArsenalMode = false; // Exit add to arsenal mode
       if (!_isComparisonMode) {
         _selectedBallIds.clear();
       }
+    });
+  }
+
+  void _toggleAddToArsenalMode() {
+    setState(() {
+      _isAddToArsenalMode = !_isAddToArsenalMode;
+      _isComparisonMode = false; // Exit comparison mode
+      if (!_isAddToArsenalMode) {
+        _selectedBallIds.clear();
+      }
+    });
+  }
+
+  void _resetSelection() {
+    setState(() {
+      _selectedBallIds.clear();
+    });
+  }
+
+  void _exitSelectionMode() {
+    setState(() {
+      _isComparisonMode = false;
+      _isAddToArsenalMode = false;
+      _selectedBallIds.clear();
     });
   }
 
@@ -42,15 +68,14 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       if (_selectedBallIds.contains(ballId)) {
         _selectedBallIds.remove(ballId);
       } else {
-        // Limit to 2 balls for comparison
-        if (_selectedBallIds.length < 2) {
-          _selectedBallIds.add(ballId);
-          // Auto-show comparison when 2 balls are selected
-          if (_selectedBallIds.length == 2) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showComparison();
-            });
+        if (_isComparisonMode) {
+          // Limit to 2 balls for comparison
+          if (_selectedBallIds.length < 2) {
+            _selectedBallIds.add(ballId);
           }
+        } else if (_isAddToArsenalMode) {
+          // No limit for add to arsenal mode
+          _selectedBallIds.add(ballId);
         }
       }
     });
@@ -145,43 +170,12 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                   onSortTap: () => _showSortDialog(context, ref, state),
                   filterCount: state.filters.activeFilterCount,
                 ),
-                // 兩個水平按鈕
+                // 兩個水平按鈕或選擇模式資訊
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Ball Comparison',
-                          icon: Icons.compare_arrows,
-                          height: 36,
-                          fontSize: 12,
-                          onPressed: _toggleComparisonMode,
-                          customColor: Colors.white,
-                          isPrimary: _isComparisonMode,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Add to Arsenal',
-                          icon: Icons.add_circle_outline,
-                          height: 36,
-                          fontSize: 12,
-                          customColor: Colors.white,
-                          onPressed: () {
-                            // TODO: Implement add to arsenal functionality
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Add to Arsenal功能將在後續實作'),
-                                backgroundColor: BrandColors.accentColorDark,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: (_isComparisonMode || _isAddToArsenalMode) 
+                      ? _buildSelectionModeInfo()
+                      : _buildActionButtons(),
                 ),
                 // 球列表
                 Expanded(
@@ -197,7 +191,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                               ref.read(ballLibraryControllerProvider.notifier).loadMore();
                             }
                           },
-                          isSelectionMode: _isComparisonMode,
+                          isSelectionMode: _isComparisonMode || _isAddToArsenalMode,
                           selectedBallIds: _selectedBallIds,
                           onBallSelectionToggle: _toggleBallSelection,
                         ),
@@ -526,6 +520,131 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     showDialog<void>(
       context: context,
       builder: (context) => BowlingBallDetailWidget(ball: ball),
+    );
+  }
+
+  /// 建構操作按鈕（正常模式）
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: AppStandardButton(
+            text: 'Ball Comparison',
+            icon: Icons.compare_arrows,
+            height: 36,
+            fontSize: 12,
+            onPressed: _toggleComparisonMode,
+            customColor: Colors.white,
+            isPrimary: _isComparisonMode,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: AppStandardButton(
+            text: 'Add to Arsenal',
+            icon: Icons.add_circle_outline,
+            height: 36,
+            fontSize: 12,
+            customColor: Colors.white,
+            onPressed: _toggleAddToArsenalMode,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 建構選擇模式資訊顯示
+  Widget _buildSelectionModeInfo() {
+    final selectedCount = _selectedBallIds.length;
+    final modeText = _isComparisonMode ? 'Comparison' : 'Add to Arsenal';
+    final hasSelection = selectedCount > 0;
+    
+    return Row(
+      children: [
+        // 選擇資訊文字
+        Expanded(
+          child: Text(
+            '$modeText: $selectedCount ball${selectedCount != 1 ? 's' : ''} selected',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Add/Compare 標籤 (只在有選擇時顯示)
+        if (hasSelection) ...[
+          _buildActionTag(
+            text: _isComparisonMode ? '' : 'Add', // Comparison mode shows no text, just icon
+            icon: _isComparisonMode ? Icons.check : Icons.add,
+            color: Colors.green,
+            onTap: _isComparisonMode ? _showComparison : () {
+              // TODO: Implement add functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Add $selectedCount balls to arsenal'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+        // Reset/Exit 標籤
+        _buildActionTag(
+          text: hasSelection 
+              ? (_isComparisonMode ? '' : 'Reset') // Arsenal mode shows "Reset", Comparison mode shows no text
+              : 'Exit', // Exit when no selection
+          icon: hasSelection 
+              ? (_isComparisonMode ? Icons.close : Icons.refresh) // Arsenal mode uses refresh icon
+              : Icons.close, // Exit uses close icon
+          color: Colors.orange,
+          onTap: hasSelection ? _resetSelection : _exitSelectionMode,
+        ),
+      ],
+    );
+  }
+
+  /// 建構小標籤按鈕
+  Widget _buildActionTag({
+    required String text,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withOpacity(0.6),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: color,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              text,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
