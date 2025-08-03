@@ -1,4 +1,4 @@
-import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
+// import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart'; // Removed - old widget
 import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
@@ -184,20 +184,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 Expanded(
                   child: state.filteredBalls.isEmpty
                       ? _buildEmptyState(state.hasActiveFilters)
-                      : BallListView(
-                          bowlingBalls: state.filteredBalls,
-                          onBallTapped: (ball) => _showBallDetail(context, ball),
-                          hasMoreData: state.hasMoreData,
-                          isLoadingMore: state.isLoadingMore,
-                          onLoadMore: () {
-                            if (state.hasMoreData && !state.isLoadingMore) {
-                              ref.read(ballLibraryControllerProvider.notifier).loadMore();
-                            }
-                          },
-                          isSelectionMode: _isComparisonMode || _isAddToArsenalMode,
-                          selectedBallIds: _selectedBallIds,
-                          onBallSelectionToggle: _toggleBallSelection,
-                        ),
+                      : _buildBallList(state),
                 ),
               ],
             );
@@ -732,6 +719,37 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Build ball list using UnifiedBallCard
+  Widget _buildBallList(BallLibraryState state) {
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      itemCount: state.filteredBalls.length + (state.hasMoreData ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index >= state.filteredBalls.length) {
+          // Load more indicator
+          return _buildLoadMoreFooter(context, ref, state);
+        }
+        
+        final ball = state.filteredBalls[index];
+        final isSelected = _selectedBallIds.contains(ball.id);
+        
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: UnifiedBallCard(
+            bowlingBall: ball,
+            theme: Theme.of(context),
+            onTap: (_isComparisonMode || _isAddToArsenalMode) 
+                ? () => _toggleBallSelection(ball.id)
+                : () => _showBallDetail(context, ball),
+            isSelectionMode: _isComparisonMode || _isAddToArsenalMode,
+            isSelected: isSelected,
+            showFavoriteButton: !(_isComparisonMode || _isAddToArsenalMode),
+          ),
+        );
+      },
     );
   }
 }

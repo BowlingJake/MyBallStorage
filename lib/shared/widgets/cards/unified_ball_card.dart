@@ -1,5 +1,5 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/favorites/presentation/widgets/favorite_button_widget.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
@@ -7,7 +7,7 @@ import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// 統一的球卡組件，可同時支援 BowlingBall 和 ArsenalBallInstance
+/// 統一的球卡組件，可同時支援 BowlingBall 和 UserArsenalInstance
 class UnifiedBallCard extends ConsumerWidget {
   const UnifiedBallCard({
     this.bowlingBall,
@@ -23,7 +23,7 @@ class UnifiedBallCard extends ConsumerWidget {
   }) : assert(bowlingBall != null || arsenalBallInstance != null, 'Either bowlingBall or arsenalBallInstance must be provided');
   
   final BowlingBall? bowlingBall;
-  final ArsenalBallInstance? arsenalBallInstance;
+  final UserArsenalInstance? arsenalBallInstance;
   final ThemeData theme;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -106,7 +106,7 @@ class UnifiedBallCard extends ConsumerWidget {
                             ),
                           ),
                           // Arsenal instance number
-                          if (arsenalBallInstance != null && arsenalBallInstance!.instanceNumber > 1)
+                          if (arsenalBallInstance != null)
                             Positioned(
                               top: 2,
                               right: 2,
@@ -120,7 +120,7 @@ class UnifiedBallCard extends ConsumerWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    '${arsenalBallInstance!.instanceNumber}',
+                                    'A', // Arsenal indicator
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,

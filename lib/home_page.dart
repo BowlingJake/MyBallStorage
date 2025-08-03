@@ -3,7 +3,7 @@ import 'dart:ui'; // For BackdropFilter
 
 import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
-import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_section.dart';
+// import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_section.dart'; // Removed - old widget
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/app_specific/home/user_info_section.dart';
@@ -55,7 +55,22 @@ class HomePage extends ConsumerWidget {
               ),
             ),
             SizedBox(height: 24),
-            ArsenalSection(), // ArsenalSection 內部管理自己的狀態
+            // TODO: Replace with new Arsenal widget or remove section
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[600]!, width: 1),
+              ),
+              child: const Center(
+                child: Text(
+                  'Arsenal Section - Coming Soon',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
             SizedBox(height: 24),
             SizedBox(height: 80),
           ],
