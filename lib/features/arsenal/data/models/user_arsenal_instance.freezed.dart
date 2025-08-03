@@ -29,25 +29,26 @@ mixin _$UserArsenalInstance {
   @JsonKey(name: 'added_date')
   DateTime get addedDate => throw _privateConstructorUsedError;
   @JsonKey(name: 'games_used')
-  int get gamesUsed => throw _privateConstructorUsedError; // 球袋分類 (最多9個)
-  @JsonKey(name: 'bag_category_1')
-  String? get bagCategory1 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_2')
-  String? get bagCategory2 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_3')
-  String? get bagCategory3 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_4')
-  String? get bagCategory4 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_5')
-  String? get bagCategory5 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_6')
-  String? get bagCategory6 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_7')
-  String? get bagCategory7 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_8')
-  String? get bagCategory8 => throw _privateConstructorUsedError;
-  @JsonKey(name: 'bag_category_9')
-  String? get bagCategory9 => throw _privateConstructorUsedError; // Layout 信息
+  int get gamesUsed =>
+      throw _privateConstructorUsedError; // 球袋分配 (Boolean: true=在該袋中, false=不在, null=袋子未開通)
+  @JsonKey(name: 'bag_1')
+  bool? get bag1 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_2')
+  bool? get bag2 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_3')
+  bool? get bag3 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_4')
+  bool? get bag4 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_5')
+  bool? get bag5 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_6')
+  bool? get bag6 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_7')
+  bool? get bag7 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_8')
+  bool? get bag8 => throw _privateConstructorUsedError;
+  @JsonKey(name: 'bag_9')
+  bool? get bag9 => throw _privateConstructorUsedError; // Layout 信息
   @JsonKey(name: 'has_layout')
   bool get hasLayout => throw _privateConstructorUsedError;
   @JsonKey(name: 'layout_type')
@@ -87,15 +88,15 @@ abstract class $UserArsenalInstanceCopyWith<$Res> {
       String? notes,
       @JsonKey(name: 'added_date') DateTime addedDate,
       @JsonKey(name: 'games_used') int gamesUsed,
-      @JsonKey(name: 'bag_category_1') String? bagCategory1,
-      @JsonKey(name: 'bag_category_2') String? bagCategory2,
-      @JsonKey(name: 'bag_category_3') String? bagCategory3,
-      @JsonKey(name: 'bag_category_4') String? bagCategory4,
-      @JsonKey(name: 'bag_category_5') String? bagCategory5,
-      @JsonKey(name: 'bag_category_6') String? bagCategory6,
-      @JsonKey(name: 'bag_category_7') String? bagCategory7,
-      @JsonKey(name: 'bag_category_8') String? bagCategory8,
-      @JsonKey(name: 'bag_category_9') String? bagCategory9,
+      @JsonKey(name: 'bag_1') bool? bag1,
+      @JsonKey(name: 'bag_2') bool? bag2,
+      @JsonKey(name: 'bag_3') bool? bag3,
+      @JsonKey(name: 'bag_4') bool? bag4,
+      @JsonKey(name: 'bag_5') bool? bag5,
+      @JsonKey(name: 'bag_6') bool? bag6,
+      @JsonKey(name: 'bag_7') bool? bag7,
+      @JsonKey(name: 'bag_8') bool? bag8,
+      @JsonKey(name: 'bag_9') bool? bag9,
       @JsonKey(name: 'has_layout') bool hasLayout,
       @JsonKey(name: 'layout_type') String? layoutType,
       @JsonKey(name: 'layout_value_1') double? layoutValue1,
@@ -129,15 +130,15 @@ class _$UserArsenalInstanceCopyWithImpl<$Res, $Val extends UserArsenalInstance>
     Object? notes = freezed,
     Object? addedDate = null,
     Object? gamesUsed = null,
-    Object? bagCategory1 = freezed,
-    Object? bagCategory2 = freezed,
-    Object? bagCategory3 = freezed,
-    Object? bagCategory4 = freezed,
-    Object? bagCategory5 = freezed,
-    Object? bagCategory6 = freezed,
-    Object? bagCategory7 = freezed,
-    Object? bagCategory8 = freezed,
-    Object? bagCategory9 = freezed,
+    Object? bag1 = freezed,
+    Object? bag2 = freezed,
+    Object? bag3 = freezed,
+    Object? bag4 = freezed,
+    Object? bag5 = freezed,
+    Object? bag6 = freezed,
+    Object? bag7 = freezed,
+    Object? bag8 = freezed,
+    Object? bag9 = freezed,
     Object? hasLayout = null,
     Object? layoutType = freezed,
     Object? layoutValue1 = freezed,
@@ -170,42 +171,42 @@ class _$UserArsenalInstanceCopyWithImpl<$Res, $Val extends UserArsenalInstance>
           ? _value.gamesUsed
           : gamesUsed // ignore: cast_nullable_to_non_nullable
               as int,
-      bagCategory1: freezed == bagCategory1
-          ? _value.bagCategory1
-          : bagCategory1 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory2: freezed == bagCategory2
-          ? _value.bagCategory2
-          : bagCategory2 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory3: freezed == bagCategory3
-          ? _value.bagCategory3
-          : bagCategory3 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory4: freezed == bagCategory4
-          ? _value.bagCategory4
-          : bagCategory4 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory5: freezed == bagCategory5
-          ? _value.bagCategory5
-          : bagCategory5 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory6: freezed == bagCategory6
-          ? _value.bagCategory6
-          : bagCategory6 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory7: freezed == bagCategory7
-          ? _value.bagCategory7
-          : bagCategory7 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory8: freezed == bagCategory8
-          ? _value.bagCategory8
-          : bagCategory8 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory9: freezed == bagCategory9
-          ? _value.bagCategory9
-          : bagCategory9 // ignore: cast_nullable_to_non_nullable
-              as String?,
+      bag1: freezed == bag1
+          ? _value.bag1
+          : bag1 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag2: freezed == bag2
+          ? _value.bag2
+          : bag2 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag3: freezed == bag3
+          ? _value.bag3
+          : bag3 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag4: freezed == bag4
+          ? _value.bag4
+          : bag4 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag5: freezed == bag5
+          ? _value.bag5
+          : bag5 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag6: freezed == bag6
+          ? _value.bag6
+          : bag6 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag7: freezed == bag7
+          ? _value.bag7
+          : bag7 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag8: freezed == bag8
+          ? _value.bag8
+          : bag8 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag9: freezed == bag9
+          ? _value.bag9
+          : bag9 // ignore: cast_nullable_to_non_nullable
+              as bool?,
       hasLayout: null == hasLayout
           ? _value.hasLayout
           : hasLayout // ignore: cast_nullable_to_non_nullable
@@ -263,15 +264,15 @@ abstract class _$$UserArsenalInstanceImplCopyWith<$Res>
       String? notes,
       @JsonKey(name: 'added_date') DateTime addedDate,
       @JsonKey(name: 'games_used') int gamesUsed,
-      @JsonKey(name: 'bag_category_1') String? bagCategory1,
-      @JsonKey(name: 'bag_category_2') String? bagCategory2,
-      @JsonKey(name: 'bag_category_3') String? bagCategory3,
-      @JsonKey(name: 'bag_category_4') String? bagCategory4,
-      @JsonKey(name: 'bag_category_5') String? bagCategory5,
-      @JsonKey(name: 'bag_category_6') String? bagCategory6,
-      @JsonKey(name: 'bag_category_7') String? bagCategory7,
-      @JsonKey(name: 'bag_category_8') String? bagCategory8,
-      @JsonKey(name: 'bag_category_9') String? bagCategory9,
+      @JsonKey(name: 'bag_1') bool? bag1,
+      @JsonKey(name: 'bag_2') bool? bag2,
+      @JsonKey(name: 'bag_3') bool? bag3,
+      @JsonKey(name: 'bag_4') bool? bag4,
+      @JsonKey(name: 'bag_5') bool? bag5,
+      @JsonKey(name: 'bag_6') bool? bag6,
+      @JsonKey(name: 'bag_7') bool? bag7,
+      @JsonKey(name: 'bag_8') bool? bag8,
+      @JsonKey(name: 'bag_9') bool? bag9,
       @JsonKey(name: 'has_layout') bool hasLayout,
       @JsonKey(name: 'layout_type') String? layoutType,
       @JsonKey(name: 'layout_value_1') double? layoutValue1,
@@ -304,15 +305,15 @@ class __$$UserArsenalInstanceImplCopyWithImpl<$Res>
     Object? notes = freezed,
     Object? addedDate = null,
     Object? gamesUsed = null,
-    Object? bagCategory1 = freezed,
-    Object? bagCategory2 = freezed,
-    Object? bagCategory3 = freezed,
-    Object? bagCategory4 = freezed,
-    Object? bagCategory5 = freezed,
-    Object? bagCategory6 = freezed,
-    Object? bagCategory7 = freezed,
-    Object? bagCategory8 = freezed,
-    Object? bagCategory9 = freezed,
+    Object? bag1 = freezed,
+    Object? bag2 = freezed,
+    Object? bag3 = freezed,
+    Object? bag4 = freezed,
+    Object? bag5 = freezed,
+    Object? bag6 = freezed,
+    Object? bag7 = freezed,
+    Object? bag8 = freezed,
+    Object? bag9 = freezed,
     Object? hasLayout = null,
     Object? layoutType = freezed,
     Object? layoutValue1 = freezed,
@@ -345,42 +346,42 @@ class __$$UserArsenalInstanceImplCopyWithImpl<$Res>
           ? _value.gamesUsed
           : gamesUsed // ignore: cast_nullable_to_non_nullable
               as int,
-      bagCategory1: freezed == bagCategory1
-          ? _value.bagCategory1
-          : bagCategory1 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory2: freezed == bagCategory2
-          ? _value.bagCategory2
-          : bagCategory2 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory3: freezed == bagCategory3
-          ? _value.bagCategory3
-          : bagCategory3 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory4: freezed == bagCategory4
-          ? _value.bagCategory4
-          : bagCategory4 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory5: freezed == bagCategory5
-          ? _value.bagCategory5
-          : bagCategory5 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory6: freezed == bagCategory6
-          ? _value.bagCategory6
-          : bagCategory6 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory7: freezed == bagCategory7
-          ? _value.bagCategory7
-          : bagCategory7 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory8: freezed == bagCategory8
-          ? _value.bagCategory8
-          : bagCategory8 // ignore: cast_nullable_to_non_nullable
-              as String?,
-      bagCategory9: freezed == bagCategory9
-          ? _value.bagCategory9
-          : bagCategory9 // ignore: cast_nullable_to_non_nullable
-              as String?,
+      bag1: freezed == bag1
+          ? _value.bag1
+          : bag1 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag2: freezed == bag2
+          ? _value.bag2
+          : bag2 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag3: freezed == bag3
+          ? _value.bag3
+          : bag3 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag4: freezed == bag4
+          ? _value.bag4
+          : bag4 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag5: freezed == bag5
+          ? _value.bag5
+          : bag5 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag6: freezed == bag6
+          ? _value.bag6
+          : bag6 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag7: freezed == bag7
+          ? _value.bag7
+          : bag7 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag8: freezed == bag8
+          ? _value.bag8
+          : bag8 // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      bag9: freezed == bag9
+          ? _value.bag9
+          : bag9 // ignore: cast_nullable_to_non_nullable
+              as bool?,
       hasLayout: null == hasLayout
           ? _value.hasLayout
           : hasLayout // ignore: cast_nullable_to_non_nullable
@@ -419,15 +420,15 @@ class _$UserArsenalInstanceImpl implements _UserArsenalInstance {
       this.notes,
       @JsonKey(name: 'added_date') required this.addedDate,
       @JsonKey(name: 'games_used') this.gamesUsed = 0,
-      @JsonKey(name: 'bag_category_1') this.bagCategory1,
-      @JsonKey(name: 'bag_category_2') this.bagCategory2,
-      @JsonKey(name: 'bag_category_3') this.bagCategory3,
-      @JsonKey(name: 'bag_category_4') this.bagCategory4,
-      @JsonKey(name: 'bag_category_5') this.bagCategory5,
-      @JsonKey(name: 'bag_category_6') this.bagCategory6,
-      @JsonKey(name: 'bag_category_7') this.bagCategory7,
-      @JsonKey(name: 'bag_category_8') this.bagCategory8,
-      @JsonKey(name: 'bag_category_9') this.bagCategory9,
+      @JsonKey(name: 'bag_1') this.bag1,
+      @JsonKey(name: 'bag_2') this.bag2,
+      @JsonKey(name: 'bag_3') this.bag3,
+      @JsonKey(name: 'bag_4') this.bag4,
+      @JsonKey(name: 'bag_5') this.bag5,
+      @JsonKey(name: 'bag_6') this.bag6,
+      @JsonKey(name: 'bag_7') this.bag7,
+      @JsonKey(name: 'bag_8') this.bag8,
+      @JsonKey(name: 'bag_9') this.bag9,
       @JsonKey(name: 'has_layout') this.hasLayout = false,
       @JsonKey(name: 'layout_type') this.layoutType,
       @JsonKey(name: 'layout_value_1') this.layoutValue1,
@@ -456,34 +457,34 @@ class _$UserArsenalInstanceImpl implements _UserArsenalInstance {
   @override
   @JsonKey(name: 'games_used')
   final int gamesUsed;
-// 球袋分類 (最多9個)
+// 球袋分配 (Boolean: true=在該袋中, false=不在, null=袋子未開通)
   @override
-  @JsonKey(name: 'bag_category_1')
-  final String? bagCategory1;
+  @JsonKey(name: 'bag_1')
+  final bool? bag1;
   @override
-  @JsonKey(name: 'bag_category_2')
-  final String? bagCategory2;
+  @JsonKey(name: 'bag_2')
+  final bool? bag2;
   @override
-  @JsonKey(name: 'bag_category_3')
-  final String? bagCategory3;
+  @JsonKey(name: 'bag_3')
+  final bool? bag3;
   @override
-  @JsonKey(name: 'bag_category_4')
-  final String? bagCategory4;
+  @JsonKey(name: 'bag_4')
+  final bool? bag4;
   @override
-  @JsonKey(name: 'bag_category_5')
-  final String? bagCategory5;
+  @JsonKey(name: 'bag_5')
+  final bool? bag5;
   @override
-  @JsonKey(name: 'bag_category_6')
-  final String? bagCategory6;
+  @JsonKey(name: 'bag_6')
+  final bool? bag6;
   @override
-  @JsonKey(name: 'bag_category_7')
-  final String? bagCategory7;
+  @JsonKey(name: 'bag_7')
+  final bool? bag7;
   @override
-  @JsonKey(name: 'bag_category_8')
-  final String? bagCategory8;
+  @JsonKey(name: 'bag_8')
+  final bool? bag8;
   @override
-  @JsonKey(name: 'bag_category_9')
-  final String? bagCategory9;
+  @JsonKey(name: 'bag_9')
+  final bool? bag9;
 // Layout 信息
   @override
   @JsonKey(name: 'has_layout')
@@ -509,7 +510,7 @@ class _$UserArsenalInstanceImpl implements _UserArsenalInstance {
 
   @override
   String toString() {
-    return 'UserArsenalInstance(id: $id, userId: $userId, ballId: $ballId, notes: $notes, addedDate: $addedDate, gamesUsed: $gamesUsed, bagCategory1: $bagCategory1, bagCategory2: $bagCategory2, bagCategory3: $bagCategory3, bagCategory4: $bagCategory4, bagCategory5: $bagCategory5, bagCategory6: $bagCategory6, bagCategory7: $bagCategory7, bagCategory8: $bagCategory8, bagCategory9: $bagCategory9, hasLayout: $hasLayout, layoutType: $layoutType, layoutValue1: $layoutValue1, layoutValue2: $layoutValue2, layoutValue3: $layoutValue3, bowlingBall: $bowlingBall)';
+    return 'UserArsenalInstance(id: $id, userId: $userId, ballId: $ballId, notes: $notes, addedDate: $addedDate, gamesUsed: $gamesUsed, bag1: $bag1, bag2: $bag2, bag3: $bag3, bag4: $bag4, bag5: $bag5, bag6: $bag6, bag7: $bag7, bag8: $bag8, bag9: $bag9, hasLayout: $hasLayout, layoutType: $layoutType, layoutValue1: $layoutValue1, layoutValue2: $layoutValue2, layoutValue3: $layoutValue3, bowlingBall: $bowlingBall)';
   }
 
   @override
@@ -525,24 +526,15 @@ class _$UserArsenalInstanceImpl implements _UserArsenalInstance {
                 other.addedDate == addedDate) &&
             (identical(other.gamesUsed, gamesUsed) ||
                 other.gamesUsed == gamesUsed) &&
-            (identical(other.bagCategory1, bagCategory1) ||
-                other.bagCategory1 == bagCategory1) &&
-            (identical(other.bagCategory2, bagCategory2) ||
-                other.bagCategory2 == bagCategory2) &&
-            (identical(other.bagCategory3, bagCategory3) ||
-                other.bagCategory3 == bagCategory3) &&
-            (identical(other.bagCategory4, bagCategory4) ||
-                other.bagCategory4 == bagCategory4) &&
-            (identical(other.bagCategory5, bagCategory5) ||
-                other.bagCategory5 == bagCategory5) &&
-            (identical(other.bagCategory6, bagCategory6) ||
-                other.bagCategory6 == bagCategory6) &&
-            (identical(other.bagCategory7, bagCategory7) ||
-                other.bagCategory7 == bagCategory7) &&
-            (identical(other.bagCategory8, bagCategory8) ||
-                other.bagCategory8 == bagCategory8) &&
-            (identical(other.bagCategory9, bagCategory9) ||
-                other.bagCategory9 == bagCategory9) &&
+            (identical(other.bag1, bag1) || other.bag1 == bag1) &&
+            (identical(other.bag2, bag2) || other.bag2 == bag2) &&
+            (identical(other.bag3, bag3) || other.bag3 == bag3) &&
+            (identical(other.bag4, bag4) || other.bag4 == bag4) &&
+            (identical(other.bag5, bag5) || other.bag5 == bag5) &&
+            (identical(other.bag6, bag6) || other.bag6 == bag6) &&
+            (identical(other.bag7, bag7) || other.bag7 == bag7) &&
+            (identical(other.bag8, bag8) || other.bag8 == bag8) &&
+            (identical(other.bag9, bag9) || other.bag9 == bag9) &&
             (identical(other.hasLayout, hasLayout) ||
                 other.hasLayout == hasLayout) &&
             (identical(other.layoutType, layoutType) ||
@@ -567,15 +559,15 @@ class _$UserArsenalInstanceImpl implements _UserArsenalInstance {
         notes,
         addedDate,
         gamesUsed,
-        bagCategory1,
-        bagCategory2,
-        bagCategory3,
-        bagCategory4,
-        bagCategory5,
-        bagCategory6,
-        bagCategory7,
-        bagCategory8,
-        bagCategory9,
+        bag1,
+        bag2,
+        bag3,
+        bag4,
+        bag5,
+        bag6,
+        bag7,
+        bag8,
+        bag9,
         hasLayout,
         layoutType,
         layoutValue1,
@@ -609,15 +601,15 @@ abstract class _UserArsenalInstance implements UserArsenalInstance {
       final String? notes,
       @JsonKey(name: 'added_date') required final DateTime addedDate,
       @JsonKey(name: 'games_used') final int gamesUsed,
-      @JsonKey(name: 'bag_category_1') final String? bagCategory1,
-      @JsonKey(name: 'bag_category_2') final String? bagCategory2,
-      @JsonKey(name: 'bag_category_3') final String? bagCategory3,
-      @JsonKey(name: 'bag_category_4') final String? bagCategory4,
-      @JsonKey(name: 'bag_category_5') final String? bagCategory5,
-      @JsonKey(name: 'bag_category_6') final String? bagCategory6,
-      @JsonKey(name: 'bag_category_7') final String? bagCategory7,
-      @JsonKey(name: 'bag_category_8') final String? bagCategory8,
-      @JsonKey(name: 'bag_category_9') final String? bagCategory9,
+      @JsonKey(name: 'bag_1') final bool? bag1,
+      @JsonKey(name: 'bag_2') final bool? bag2,
+      @JsonKey(name: 'bag_3') final bool? bag3,
+      @JsonKey(name: 'bag_4') final bool? bag4,
+      @JsonKey(name: 'bag_5') final bool? bag5,
+      @JsonKey(name: 'bag_6') final bool? bag6,
+      @JsonKey(name: 'bag_7') final bool? bag7,
+      @JsonKey(name: 'bag_8') final bool? bag8,
+      @JsonKey(name: 'bag_9') final bool? bag9,
       @JsonKey(name: 'has_layout') final bool hasLayout,
       @JsonKey(name: 'layout_type') final String? layoutType,
       @JsonKey(name: 'layout_value_1') final double? layoutValue1,
@@ -645,34 +637,34 @@ abstract class _UserArsenalInstance implements UserArsenalInstance {
   DateTime get addedDate;
   @override
   @JsonKey(name: 'games_used')
-  int get gamesUsed; // 球袋分類 (最多9個)
+  int get gamesUsed; // 球袋分配 (Boolean: true=在該袋中, false=不在, null=袋子未開通)
   @override
-  @JsonKey(name: 'bag_category_1')
-  String? get bagCategory1;
+  @JsonKey(name: 'bag_1')
+  bool? get bag1;
   @override
-  @JsonKey(name: 'bag_category_2')
-  String? get bagCategory2;
+  @JsonKey(name: 'bag_2')
+  bool? get bag2;
   @override
-  @JsonKey(name: 'bag_category_3')
-  String? get bagCategory3;
+  @JsonKey(name: 'bag_3')
+  bool? get bag3;
   @override
-  @JsonKey(name: 'bag_category_4')
-  String? get bagCategory4;
+  @JsonKey(name: 'bag_4')
+  bool? get bag4;
   @override
-  @JsonKey(name: 'bag_category_5')
-  String? get bagCategory5;
+  @JsonKey(name: 'bag_5')
+  bool? get bag5;
   @override
-  @JsonKey(name: 'bag_category_6')
-  String? get bagCategory6;
+  @JsonKey(name: 'bag_6')
+  bool? get bag6;
   @override
-  @JsonKey(name: 'bag_category_7')
-  String? get bagCategory7;
+  @JsonKey(name: 'bag_7')
+  bool? get bag7;
   @override
-  @JsonKey(name: 'bag_category_8')
-  String? get bagCategory8;
+  @JsonKey(name: 'bag_8')
+  bool? get bag8;
   @override
-  @JsonKey(name: 'bag_category_9')
-  String? get bagCategory9; // Layout 信息
+  @JsonKey(name: 'bag_9')
+  bool? get bag9; // Layout 信息
   @override
   @JsonKey(name: 'has_layout')
   bool get hasLayout;

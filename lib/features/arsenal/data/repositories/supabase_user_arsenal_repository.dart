@@ -50,7 +50,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
   Future<UserArsenalInstance> addBallFromLibrary({
     required String userId,
     required int ballId,
-    required String categoryName,
+    required String categoryName, // 這個參數現在沒用到，但保持向後相容
     String? notes,
   }) async {
     try {
@@ -59,7 +59,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
         'user_id': userId,
         'ball_id': ballId,
         'notes': notes,
-        'bag_category_1': categoryName, // 預設放在第一個分類
+        'bag_1': true, // 預設放在第一個袋子
         'added_date': DateTime.now().toIso8601String(),
         'games_used': 0,
         'has_layout': false,
@@ -110,6 +110,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
 
   @override
   Future<List<UserArsenalInstance>> getArsenalByCategory(String userId, String categoryName) async {
+    // 這個方法暫時保留以維持向後相容，但實際上應該使用 getArsenalByBag
     try {
       final response = await _supabase
           .from('user_arsenal')
@@ -118,7 +119,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
             ball_data(*)
           ''')
           .eq('user_id', userId)
-          .or('bag_category_1.eq.$categoryName,bag_category_2.eq.$categoryName,bag_category_3.eq.$categoryName,bag_category_4.eq.$categoryName,bag_category_5.eq.$categoryName,bag_category_6.eq.$categoryName,bag_category_7.eq.$categoryName,bag_category_8.eq.$categoryName,bag_category_9.eq.$categoryName')
+          .eq('bag_1', true) // 暫時只返回第一個袋子的球
           .order('added_date', ascending: false);
 
       return response.map<UserArsenalInstance>((json) {
@@ -142,19 +143,25 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
   @override
   Future<List<String>> getUserCategories(String userId) async {
     try {
+      // 從 profiles 獲取球袋名稱
       final response = await _supabase
-          .from('user_arsenal')
-          .select('bag_category_1,bag_category_2,bag_category_3,bag_category_4,bag_category_5,bag_category_6,bag_category_7,bag_category_8,bag_category_9')
-          .eq('user_id', userId);
+          .from('profiles')
+          .select('bag_1_name,bag_1_unlocked,bag_2_name,bag_2_unlocked,bag_3_name,bag_3_unlocked,bag_4_name,bag_4_unlocked,bag_5_name,bag_5_unlocked,bag_6_name,bag_6_unlocked,bag_7_name,bag_7_unlocked,bag_8_name,bag_8_unlocked,bag_9_name,bag_9_unlocked')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      if (response == null) {
+        return ['All My Arsenal']; // 預設返回第一個袋子名稱
+      }
 
       final Set<String> categories = {};
       
-      for (final row in response) {
-        for (int i = 1; i <= 9; i++) {
-          final category = row['bag_category_$i'] as String?;
-          if (category != null && category.isNotEmpty) {
-            categories.add(category);
-          }
+      for (int i = 1; i <= 9; i++) {
+        final isUnlocked = response['bag_${i}_unlocked'] as bool?;
+        final bagName = response['bag_${i}_name'] as String?;
+        
+        if (isUnlocked == true && bagName != null && bagName.isNotEmpty) {
+          categories.add(bagName);
         }
       }
 
@@ -222,5 +229,65 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
     instanceData['bowling_ball_data'] = bowlingBallData;
 
     return UserArsenalInstance.fromJson(instanceData);
+  }
+
+  @override
+  Future<void> updateBagAssignment({
+    required int instanceId,
+    required int bagNumber,
+    required bool isInBag,
+  }) async {
+    try {
+      if (bagNumber < 1 || bagNumber > 9) {
+        throw ArgumentError('Bag number must be between 1 and 9');
+      }
+      
+      final columnName = 'bag_$bagNumber';
+      
+      await _supabase
+          .from('user_arsenal')
+          .update({columnName: isInBag})
+          .eq('id', instanceId);
+          
+    } catch (e) {
+      throw Exception('Failed to update bag assignment: $e');
+    }
+  }
+
+  @override
+  Future<List<UserArsenalInstance>> getArsenalByBag(String userId, int bagNumber) async {
+    try {
+      if (bagNumber < 1 || bagNumber > 9) {
+        throw ArgumentError('Bag number must be between 1 and 9');
+      }
+      
+      final columnName = 'bag_$bagNumber';
+      
+      final response = await _supabase
+          .from('user_arsenal')
+          .select('''
+            *,
+            ball_data(*)
+          ''')
+          .eq('user_id', userId)
+          .eq(columnName, true)
+          .order('added_date', ascending: false);
+
+      return response.map<UserArsenalInstance>((json) {
+        final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
+        BowlingBall? bowlingBall;
+        if (bowlingBallData != null) {
+          bowlingBall = BowlingBall.fromJson(bowlingBallData);
+        }
+
+        final instanceData = Map<String, dynamic>.from(json);
+        instanceData.remove('ball_data');
+        instanceData['bowling_ball_data'] = bowlingBallData;
+
+        return UserArsenalInstance.fromJson(instanceData);
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get arsenal by bag: $e');
+    }
   }
 }

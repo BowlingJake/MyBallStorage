@@ -13,6 +13,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_management_dialog.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_grid_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
 
@@ -96,9 +97,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
           Expanded(
             child: _buildManagementButton(
               text: 'Bag Management',
-              onPressed: () {
-                // TODO: Implement bag management functionality
-              },
+              onPressed: () => showBagManagementDialog(context),
             ),
           ),
           const SizedBox(width: 12),

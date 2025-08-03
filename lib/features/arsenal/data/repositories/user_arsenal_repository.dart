@@ -35,4 +35,14 @@ abstract class UserArsenalRepository {
     required double value2,
     required double value3,
   });
+  
+  /// Update bag assignment for a ball instance
+  Future<void> updateBagAssignment({
+    required int instanceId,
+    required int bagNumber,
+    required bool isInBag,
+  });
+  
+  /// Get arsenal instances filtered by bag number
+  Future<List<UserArsenalInstance>> getArsenalByBag(String userId, int bagNumber);
 }

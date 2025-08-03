@@ -345,6 +345,32 @@ class NewArsenalController extends _$NewArsenalController {
       rethrow;
     }
   }
+
+  /// Update bag assignment for a ball instance
+  Future<void> updateBagAssignment({
+    required int instanceId,
+    required int bagNumber,
+    required bool isInBag,
+  }) async {
+    try {
+      await _repository.updateBagAssignment(
+        instanceId: instanceId,
+        bagNumber: bagNumber,
+        isInBag: isInBag,
+      );
+      
+      // Refresh instances to reflect the change
+      final userId = state.allInstances.isNotEmpty 
+          ? state.allInstances.first.userId 
+          : '';
+      if (userId.isNotEmpty) {
+        await _loadAllInstances(userId);
+      }
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to update bag assignment: $e');
+      rethrow;
+    }
+  }
 }
 
 /// Provider to get filtered instances for current category
