@@ -1,5 +1,8 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_detail_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/edit_layout_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -64,7 +67,9 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                   : null,
             ),
             child: InkWell(
-              onTap: isSelectionMode ? onTap : null,
+              onTap: isSelectionMode 
+                  ? onTap 
+                  : () => _showArsenalActionDialog(context, arsenalBallInstance),
               onLongPress: isSelectionMode ? null : onTap,
               borderRadius: BorderRadius.circular(14),
               child: Padding(
@@ -266,5 +271,110 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
     }
     
     return parts.join(' | ');
+  }
+
+  /// 顯示 Arsenal 操作選擇對話框
+  void _showArsenalActionDialog(BuildContext context, UserArsenalInstance arsenalInstance) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.8),
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            constraints: const BoxConstraints(maxWidth: 350),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 球名標題
+                      Text(
+                        arsenalInstance.displayName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // 兩個平行按鈕
+                      Row(
+                        children: [
+                          // 左側按鈕：Edit My Layout
+                          Expanded(
+                            child: AppStandardButton(
+                              text: 'Edit My Layout',
+                              height: 40,
+                              fontSize: 14,
+                              customColor: Colors.white,
+                              onPressed: () async {
+                                Navigator.of(dialogContext).pop();
+                                final result = await showEditLayoutDialog(context, arsenalInstance);
+                                if (result != null && result['success'] == true) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Layout updated successfully: ${result['layoutType']}'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                          
+                          const SizedBox(width: 12),
+                          
+                          // 右側按鈕：View Details
+                          Expanded(
+                            child: AppStandardButton(
+                              text: 'View Details',
+                              height: 40,
+                              fontSize: 14,
+                              customColor: Colors.white,
+                              isPrimary: true,
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop();
+                                showArsenalBallDetails(context, arsenalInstance);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // 右上角關閉按鈕
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

@@ -95,16 +95,16 @@ extension UserArsenalInstanceExtension on UserArsenalInstance {
   
   /// Get layout display string
   String get layoutDisplayString {
-    if (!hasLayout || layoutType == null) return 'No Layout';
+    if (!hasLayout || layoutType == null) return 'Layout Not Set';
     
     final v1 = layoutValue1?.toStringAsFixed(1) ?? '0.0';
     final v2 = layoutValue2?.toStringAsFixed(1) ?? '0.0';
     final v3 = layoutValue3?.toStringAsFixed(1) ?? '0.0';
     
     if (layoutType == 'VLS') {
-      return 'VLS: ${v1}" x ${v2}" x ${v3}°';
+      return 'VLS(2LS): ${v1}" x ${v2}" x ${v3}"';
     } else if (layoutType == 'DUAL_ANGLE') {
-      return 'Dual: ${v1}° x ${v2}" x ${v3}°';
+      return 'Dual Angle: ${v1}° x ${v2}" x ${v3}°';
     }
     
     return 'Layout: $v1 x $v2 x $v3';

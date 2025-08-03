@@ -300,7 +300,6 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         return ArsenalSpecificBallCard(
           arsenalBallInstance: instance,
           theme: Theme.of(context),
-          onTap: () => _showInstanceDetails(instance),
           extraInfo: _buildArsenalExtraInfo(instance),
         );
       },
@@ -316,7 +315,6 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         return ArsenalSpecificBallCard(
           arsenalBallInstance: instance,
           theme: Theme.of(context),
-          onTap: () => _showInstanceDetails(instance),
           extraInfo: _buildArsenalExtraInfo(instance),
         );
       },

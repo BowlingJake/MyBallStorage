@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 
 
 /// Arsenal 專用的球具卡片組件
 class ArsenalBallCard extends StatelessWidget {
-  final ArsenalBallInstance ballInstance;
+  final UserArsenalInstance ballInstance;
   final VoidCallback onTap;
   final bool isListView;
 
@@ -25,7 +25,6 @@ class ArsenalBallCard extends StatelessWidget {
 
   Widget _buildGridCard(BuildContext context) {
     final theme = Theme.of(context);
-    final ball = ballInstance.bowlingBall;
 
     return Material(
       color: Colors.transparent,
@@ -79,27 +78,27 @@ class ArsenalBallCard extends StatelessWidget {
                           child: _buildBallImage(context, 80),
                         ),
                       ),
-                      // 實例編號標記
-                      if (ballInstance.instanceNumber > 1)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: _getBrandColor(),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '#${ballInstance.instanceNumber}',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
+                      // 實例編號標記 (UserArsenalInstance 沒有 instanceNumber，暫時移除)
+                      // if (ballInstance.instanceNumber > 1)
+                      //   Positioned(
+                      //     top: 8,
+                      //     right: 8,
+                      //     child: Container(
+                      //       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      //       decoration: BoxDecoration(
+                      //         color: _getBrandColor(),
+                      //         borderRadius: BorderRadius.circular(10),
+                      //       ),
+                      //       child: Text(
+                      //         '#${ballInstance.instanceNumber}',
+                      //         style: theme.textTheme.labelSmall?.copyWith(
+                      //           color: Colors.white,
+                      //           fontWeight: FontWeight.w600,
+                      //           fontSize: 10,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
                       // 鑽法類型標記
                       if (ballInstance.hasLayout)
                         Positioned(
@@ -152,15 +151,7 @@ class ArsenalBallCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const Spacer(),
-                      // RG/Diff 資訊
-                      if (ball?.rg != null && ball?.diff != null)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildSpecItem('RG', ball!.rg!.toStringAsFixed(2), theme),
-                            _buildSpecItem('Diff', ball.diff!.toStringAsFixed(3), theme),
-                          ],
-                        ),
+                      // 移除 RG/Diff 資訊顯示
                     ],
                   ),
                 ),
@@ -173,7 +164,6 @@ class ArsenalBallCard extends StatelessWidget {
   }
 
   Widget _buildListCard(BuildContext context) {
-    final theme = Theme.of(context);
     final ball = ballInstance.bowlingBall;
 
     return Material(
@@ -213,31 +203,31 @@ class ArsenalBallCard extends StatelessWidget {
                     ClipOval(
                       child: _buildBallImage(context, 100),
                     ),
-                    // 實例編號標記
-                    if (ballInstance.instanceNumber > 1)
-                      Positioned(
-                        top: 2,
-                        right: 2,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            color: _getBrandColor(),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${ballInstance.instanceNumber}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    // 實例編號標記 (UserArsenalInstance 沒有 instanceNumber，暫時移除)
+                    // if (ballInstance.instanceNumber > 1)
+                    //   Positioned(
+                    //     top: 2,
+                    //     right: 2,
+                    //     child: Container(
+                    //       width: 26,
+                    //       height: 26,
+                    //       decoration: BoxDecoration(
+                    //         color: _getBrandColor(),
+                    //         shape: BoxShape.circle,
+                    //         border: Border.all(color: Colors.black, width: 1),
+                    //       ),
+                    //       child: Center(
+                    //         child: Text(
+                    //           '${ballInstance.instanceNumber}',
+                    //           style: const TextStyle(
+                    //             color: Colors.white,
+                    //             fontWeight: FontWeight.w700,
+                    //             fontSize: 12,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
                   ],
                 ),
               ),
@@ -336,33 +326,21 @@ class ArsenalBallCard extends StatelessWidget {
   Widget _buildBallImage(BuildContext context, double size) {
     final imageUrl = ballInstance.effectiveImageUrl;
     
-    if (ballInstance.localImagePath != null) {
-      // 本地圖片
-      return Image.asset(
-        ballInstance.localImagePath!,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context, size),
-      );
-    } else {
-      // 網路圖片
-      return Image.network(
-        imageUrl,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return _buildLoadingPlaceholder(context, size);
-        },
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context, size),
-      );
-    }
+    // 直接使用網路圖片，UserArsenalInstance 沒有 localImagePath 屬性
+    return Image.network(
+      imageUrl,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return _buildLoadingPlaceholder(context, size);
+      },
+      errorBuilder: (context, error, stackTrace) => _buildPlaceholder(context, size),
+    );
   }
 
   Widget _buildPlaceholder(BuildContext context, double size) {
-    final theme = Theme.of(context);
     return Container(
       width: size,
       height: size,
@@ -392,59 +370,23 @@ class ArsenalBallCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecItem(String label, String value, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
-            fontSize: 9,
-          ),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-            fontSize: 11,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSpecChip(String text, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
-        ),
-      ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
 
   /// 建構 Core Type & Cover Type 文字
   String _buildCoreAndCoverText(dynamic ball) {
     final parts = <String>[];
     
-    if (ball?.coreType != null) {
-      parts.add(ball.coreType);
-    }
-    
-    if (ball?.coverstockType != null) {
-      parts.add(ball.coverstockType);
+    // 使用 BowlingBall 的 core 和 cover 擴展屬性
+    if (ball != null) {
+      final coreInfo = ball.core as String? ?? 'Unknown Core';
+      final coverInfo = ball.cover as String? ?? '未知';
+      
+      if (coreInfo != 'Unknown Core') {
+        parts.add(coreInfo);
+      }
+      
+      if (coverInfo != '未知') {
+        parts.add(coverInfo);
+      }
     }
     
     if (parts.isEmpty) {
@@ -456,17 +398,7 @@ class ArsenalBallCard extends StatelessWidget {
 
   /// 建構 Layout 文字
   String _buildLayoutText() {
-    if (!ballInstance.hasLayout) {
-      return 'Layout: Not set';
-    }
-    
-    final layout = ballInstance.layout!;
-    final pinToPap = layout.pinToPap.toStringAsFixed(1);
-    final papToMb = layout.papToMb.toStringAsFixed(1);
-    final psaAngle = layout.psaAngle.toStringAsFixed(0);
-    
-    // 格式：5.0 x 4.0 x 50 (Control)
-    return 'Layout: ${pinToPap}" x ${papToMb}" x ${psaAngle}° (${layout.layoutType.displayName})';
+    return ballInstance.layoutDisplayString;
   }
 
   Color _getBrandColor() {
