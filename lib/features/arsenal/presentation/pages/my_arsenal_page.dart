@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
-import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_specific_ball_card.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
@@ -297,11 +297,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       itemCount: filteredInstances.length,
       itemBuilder: (context, index) {
         final instance = filteredInstances[index];
-        return UnifiedBallCard(
-          bowlingBall: instance.bowlingBall,
+        return ArsenalSpecificBallCard(
+          arsenalBallInstance: instance,
           theme: Theme.of(context),
           onTap: () => _showInstanceDetails(instance),
-          showFavoriteButton: false,
           extraInfo: _buildArsenalExtraInfo(instance),
         );
       },
@@ -314,11 +313,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       itemCount: filteredInstances.length,
       itemBuilder: (context, index) {
         final instance = filteredInstances[index];
-        return UnifiedBallCard(
-          bowlingBall: instance.bowlingBall,
+        return ArsenalSpecificBallCard(
+          arsenalBallInstance: instance,
           theme: Theme.of(context),
           onTap: () => _showInstanceDetails(instance),
-          showFavoriteButton: false, // Arsenal balls don't need favorite button
           extraInfo: _buildArsenalExtraInfo(instance),
         );
       },
@@ -351,19 +349,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 4),
-        // Categories
-        if (instance.allCategories.isNotEmpty)
-          Text(
-            'Categories: ${instance.allCategories.join(", ")}',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 10,
-              fontWeight: FontWeight.w400,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+        // 移除 Categories 顯示
       ],
     );
   }

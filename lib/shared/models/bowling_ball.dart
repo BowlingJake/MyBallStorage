@@ -34,6 +34,7 @@ class BowlingBall with _$BowlingBall {
 
   /// 客製化的 fromJson 工廠方法，能同時支持 Supabase 和舊有的 JSON 格式
   factory BowlingBall.fromJson(Map<String, dynamic> json) {
+    
     // Helper to safely parse double values (你的這段邏輯很棒，完全保留)
     double? tryParseDouble(dynamic value) {
       if (value is num) {
@@ -52,10 +53,10 @@ class BowlingBall with _$BowlingBall {
       brand: json['brand'] as String? ?? json['Brand'] as String? ?? 'Unknown Brand',
       coreName: json['core_name'] as String?,
       coreType: json['core_type'] as String?,
-      coverstockType: json['coverstock_type'] as String?,
+      coverstockType: json['coverstock_type'] as String? ?? json['coverstock_tpye'] as String?,
       coverstockName: json['coverstock_name'] as String?,
       coverstock: json['coverstock'] as String?,
-      imageUrl: json['image_url'] as String? ?? 'https://via.placeholder.com/150',
+      imageUrl: json['image_url'] as String? ?? json['imageUrl'] as String? ?? 'https://via.placeholder.com/150',
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
       mbDiff: tryParseDouble(json['mb_diff'] ?? json['intDiff'] ?? json['MB Diff']),

@@ -27,6 +27,8 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
       return response.map<UserArsenalInstance>((json) {
         // Parse the joined bowling ball data
         final bowlingBallData = json['ball_data'] as Map<String, dynamic>?;
+        
+        
         BowlingBall? bowlingBall;
         if (bowlingBallData != null) {
           bowlingBall = BowlingBall.fromJson(bowlingBallData);
@@ -35,7 +37,8 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
         // Create the instance with the bowling ball data
         final instanceData = Map<String, dynamic>.from(json);
         instanceData.remove('ball_data'); // Remove the joined data
-        instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
+        // 直接使用原始的 bowlingBallData，不要經過序列化
+        instanceData['bowling_ball_data'] = bowlingBallData;
 
         print('Supabase Arsenal Repository: Processing instance ${instanceData['id']} - Ball: ${bowlingBall?.name}');
         
@@ -135,7 +138,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
 
         final instanceData = Map<String, dynamic>.from(json);
         instanceData.remove('ball_data');
-        instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
+        instanceData['bowling_ball_data'] = bowlingBallData;
 
         return UserArsenalInstance.fromJson(instanceData);
       }).toList();
@@ -224,7 +227,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
 
     final instanceData = Map<String, dynamic>.from(response);
     instanceData.remove('ball_data');
-    instanceData['bowling_ball_data'] = bowlingBall?.toJsonWithCustomFields();
+    instanceData['bowling_ball_data'] = bowlingBallData;
 
     return UserArsenalInstance.fromJson(instanceData);
   }
