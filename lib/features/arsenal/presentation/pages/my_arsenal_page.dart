@@ -11,6 +11,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_backg
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_grid_card.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -288,20 +289,17 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
 
   Widget _buildGridView(List<UserArsenalInstance> filteredInstances) {
     return GridView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 0.8,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1, // 調整比例，減少高度但保持足夠空間
       ),
       itemCount: filteredInstances.length,
       itemBuilder: (context, index) {
         final instance = filteredInstances[index];
-        return ArsenalSpecificBallCard(
-          arsenalBallInstance: instance,
-          theme: Theme.of(context),
-          extraInfo: _buildArsenalExtraInfo(instance),
-        );
+        return ArsenalGridCard(instance: instance);
       },
     );
   }
@@ -638,4 +636,5 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         context.go('/events');
     }
   }
+
 }
