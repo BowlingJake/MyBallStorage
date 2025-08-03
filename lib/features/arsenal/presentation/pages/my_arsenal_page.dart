@@ -4,11 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_selector.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/add_ball_from_library_dialog.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_management_dialog.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
@@ -148,9 +144,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
             ),
             child: IconButton(
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const CategoryManagementDialog(),
+                // TODO: Implement new category management
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Category management coming soon')),
                 );
               },
               icon: const Icon(
