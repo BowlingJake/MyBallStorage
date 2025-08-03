@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_ins
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 
 /// Edit Layout Dialog for Arsenal balls
 class EditLayoutDialog extends ConsumerStatefulWidget {
@@ -323,11 +324,9 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
     final value3 = double.tryParse(_value3Controller.text);
     
     if (value1 == null || value2 == null || value3 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter valid numbers for all fields'),
-          backgroundColor: Colors.red,
-        ),
+      TopNotification.showError(
+        context,
+        'Please enter valid numbers for all fields',
       );
       return;
     }
@@ -373,11 +372,9 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
     } catch (e) {
       // 顯示錯誤訊息
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to update layout: $e'),
-            backgroundColor: Colors.red,
-          ),
+        TopNotification.showError(
+          context,
+          'Failed to update layout: $e',
         );
       }
     }

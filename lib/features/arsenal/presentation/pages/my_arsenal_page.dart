@@ -10,7 +10,9 @@ import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_botto
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_grid_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
 
@@ -65,8 +67,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         ),
         body: Column(
           children: [
-            // B區：球袋管理區 (移到頂部)
-            _buildBagManagementSection(theme, arsenalState),
+            // B區：管理按鈕區
+            _buildManagementButtonsSection(),
             
             // C區：內容顯示區
             Expanded(
@@ -83,84 +85,49 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  /// 獲取分類的顯示名稱
-  String _getCategoryDisplayName(String? category) {
-    return category ?? 'All My Arsenal';
-  }
 
-  /// B區：球袋管理區 (下拉選單 + 新增球袋按鈕)
-  Widget _buildBagManagementSection(ThemeData theme, NewArsenalState arsenalState) {
+  /// B區：管理按鈕區 (Bag Management + Arsenal Management)
+  Widget _buildManagementButtonsSection() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          // 球袋下拉選單 - 縮小到螢幕1/3寬度
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.grey[600]!,
-                  width: 1.5,
-                ),
-              ),
-              child: CustomDropdown<String>(
-                hintText: 'Select Category',
-                value: _getCategoryDisplayName(arsenalState.selectedCategory),
-                items: ref.read(newArsenalControllerProvider.notifier).allAvailableCategories.map((category) {
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Text(
-                      category,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    ref.read(newArsenalControllerProvider.notifier).selectCategory(newValue);
-                  }
-                },
-              ),
+          // Bag Management 按鈕
+          Expanded(
+            child: _buildManagementButton(
+              text: 'Bag Management',
+              onPressed: () {
+                // TODO: Implement bag management functionality
+              },
             ),
           ),
           const SizedBox(width: 12),
-          // 新增球袋按鈕 - 縮小尺寸
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: IconButton(
+          // Arsenal Management 按鈕
+          Expanded(
+            child: _buildManagementButton(
+              text: 'Arsenal Management',
               onPressed: () {
-                // TODO: Implement new category management
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Category management coming soon')),
-                );
+                // TODO: Implement arsenal management functionality
               },
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 16,
-              ),
-              padding: EdgeInsets.zero,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// 建構管理按鈕
+  Widget _buildManagementButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
+    return AppStandardButton(
+      text: text,
+      height: 36,
+      fontSize: 14,
+      customColor: Colors.white,
+      isPrimary: false, // 使用outlined樣式
+      onPressed: onPressed,
     );
   }
 
@@ -413,6 +380,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
+
   /// 建構 Arsenal 專用的額外資訊
   Widget _buildArsenalExtraInfo(UserArsenalInstance instance) {
     return Column(
@@ -532,11 +500,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     return FloatingActionButton(
       onPressed: () {
         // TODO: 導航到分析頁面
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('分析功能即將推出'),
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.9),
-          ),
+        TopNotification.showError(
+          context,
+          '分析功能即將推出',
         );
       },
       backgroundColor: theme.colorScheme.primary,
@@ -642,8 +608,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
                     onPressed: () {
                       Navigator.of(context).pop();
                       // TODO: Implement edit functionality
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Edit functionality coming soon')),
+                      TopNotification.showError(
+                        context,
+                        'Edit functionality coming soon',
                       );
                     },
                     child: const Text('Edit', style: TextStyle(color: Colors.blue)),
@@ -688,19 +655,15 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
                 if (authState.hasValue && authState.value != null) {
                   final userId = authState.value!.id;
                   await ref.read(newArsenalControllerProvider.notifier).removeInstance(instance.id, userId);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ball removed successfully'),
-                      backgroundColor: Colors.green,
-                    ),
+                  TopNotification.showSuccess(
+                    context,
+                    'Ball removed successfully',
                   );
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Failed to remove ball: $e'),
-                    backgroundColor: Colors.red,
-                  ),
+                TopNotification.showError(
+                  context,
+                  'Failed to remove ball: $e',
                 );
               }
             },
@@ -741,48 +704,6 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  /// Build action button for add/remove functionality
-  Widget _buildActionButton({
-    required String text,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: color.withOpacity(0.6),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: color,
-              size: 16,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              text,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   /// Navigate to library with add to arsenal mode enabled
   void _navigateToLibraryAddMode() {
@@ -800,20 +721,24 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     return Row(
       children: [
         Expanded(
-          child: _buildActionButton(
+          child: AppStandardButton(
             text: 'Add from Library',
             icon: Icons.add_circle_outline,
-            color: Colors.green,
-            onTap: () => _navigateToLibraryAddMode(),
+            height: 36,
+            fontSize: 12,
+            customColor: Colors.green,
+            onPressed: () => _navigateToLibraryAddMode(),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildActionButton(
+          child: AppStandardButton(
             text: 'Remove Balls',
             icon: Icons.remove_circle_outline,
-            color: Colors.red,
-            onTap: () => _toggleRemoveMode(),
+            height: 36,
+            fontSize: 12,
+            customColor: Colors.red,
+            onPressed: () => _toggleRemoveMode(),
           ),
         ),
       ],
@@ -889,32 +814,12 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   Future<void> _confirmRemoveSelected() async {
     final selectedCount = ref.read(newArsenalControllerProvider).selectedForRemoval.length;
     
-    final result = await showDialog<bool>(
+    final result = await showAppConfirmationDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Remove Selected Balls',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'Are you sure you want to remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from your arsenal?',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              'Remove',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
+      title: 'Remove Selected Balls',
+      message: 'Are you sure you want to remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from your arsenal?',
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
     );
 
     if (result == true) {
@@ -925,21 +830,17 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
           await ref.read(newArsenalControllerProvider.notifier).removeSelectedInstances(userId);
           
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Successfully removed $selectedCount ball${selectedCount != 1 ? 's' : ''}'),
-                backgroundColor: Colors.green,
-              ),
+            TopNotification.showSuccess(
+              context,
+              'Successfully removed $selectedCount ball${selectedCount != 1 ? 's' : ''}',
             );
           }
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to remove balls: $e'),
-              backgroundColor: Colors.red,
-            ),
+          TopNotification.showError(
+            context,
+            'Failed to remove balls: $e',
           );
         }
       }
