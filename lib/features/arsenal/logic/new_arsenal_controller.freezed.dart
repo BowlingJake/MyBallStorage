@@ -26,6 +26,8 @@ mixin _$NewArsenalState {
   ArsenalViewMode get viewMode => throw _privateConstructorUsedError;
   String get searchText => throw _privateConstructorUsedError;
   BallFilters get filters => throw _privateConstructorUsedError;
+  bool get isRemoveMode => throw _privateConstructorUsedError;
+  Set<int> get selectedForRemoval => throw _privateConstructorUsedError;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -48,7 +50,9 @@ abstract class $NewArsenalStateCopyWith<$Res> {
       String? error,
       ArsenalViewMode viewMode,
       String searchText,
-      BallFilters filters});
+      BallFilters filters,
+      bool isRemoveMode,
+      Set<int> selectedForRemoval});
 
   $BallFiltersCopyWith<$Res> get filters;
 }
@@ -76,6 +80,8 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
     Object? viewMode = null,
     Object? searchText = null,
     Object? filters = null,
+    Object? isRemoveMode = null,
+    Object? selectedForRemoval = null,
   }) {
     return _then(_value.copyWith(
       allInstances: null == allInstances
@@ -110,6 +116,14 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
           ? _value.filters
           : filters // ignore: cast_nullable_to_non_nullable
               as BallFilters,
+      isRemoveMode: null == isRemoveMode
+          ? _value.isRemoveMode
+          : isRemoveMode // ignore: cast_nullable_to_non_nullable
+              as bool,
+      selectedForRemoval: null == selectedForRemoval
+          ? _value.selectedForRemoval
+          : selectedForRemoval // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
     ) as $Val);
   }
 
@@ -140,7 +154,9 @@ abstract class _$$NewArsenalStateImplCopyWith<$Res>
       String? error,
       ArsenalViewMode viewMode,
       String searchText,
-      BallFilters filters});
+      BallFilters filters,
+      bool isRemoveMode,
+      Set<int> selectedForRemoval});
 
   @override
   $BallFiltersCopyWith<$Res> get filters;
@@ -167,6 +183,8 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
     Object? viewMode = null,
     Object? searchText = null,
     Object? filters = null,
+    Object? isRemoveMode = null,
+    Object? selectedForRemoval = null,
   }) {
     return _then(_$NewArsenalStateImpl(
       allInstances: null == allInstances
@@ -201,6 +219,14 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
           ? _value.filters
           : filters // ignore: cast_nullable_to_non_nullable
               as BallFilters,
+      isRemoveMode: null == isRemoveMode
+          ? _value.isRemoveMode
+          : isRemoveMode // ignore: cast_nullable_to_non_nullable
+              as bool,
+      selectedForRemoval: null == selectedForRemoval
+          ? _value._selectedForRemoval
+          : selectedForRemoval // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
     ));
   }
 }
@@ -216,9 +242,12 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       this.error,
       this.viewMode = ArsenalViewMode.grid,
       this.searchText = '',
-      this.filters = const BallFilters()})
+      this.filters = const BallFilters(),
+      this.isRemoveMode = false,
+      final Set<int> selectedForRemoval = const {}})
       : _allInstances = allInstances,
-        _userCategories = userCategories;
+        _userCategories = userCategories,
+        _selectedForRemoval = selectedForRemoval;
 
   final List<UserArsenalInstance> _allInstances;
   @override
@@ -255,10 +284,22 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
   @override
   @JsonKey()
   final BallFilters filters;
+  @override
+  @JsonKey()
+  final bool isRemoveMode;
+  final Set<int> _selectedForRemoval;
+  @override
+  @JsonKey()
+  Set<int> get selectedForRemoval {
+    if (_selectedForRemoval is EqualUnmodifiableSetView)
+      return _selectedForRemoval;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_selectedForRemoval);
+  }
 
   @override
   String toString() {
-    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters)';
+    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters, isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval)';
   }
 
   @override
@@ -279,7 +320,11 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
                 other.viewMode == viewMode) &&
             (identical(other.searchText, searchText) ||
                 other.searchText == searchText) &&
-            (identical(other.filters, filters) || other.filters == filters));
+            (identical(other.filters, filters) || other.filters == filters) &&
+            (identical(other.isRemoveMode, isRemoveMode) ||
+                other.isRemoveMode == isRemoveMode) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedForRemoval, _selectedForRemoval));
   }
 
   @override
@@ -292,7 +337,9 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       error,
       viewMode,
       searchText,
-      filters);
+      filters,
+      isRemoveMode,
+      const DeepCollectionEquality().hash(_selectedForRemoval));
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -313,7 +360,9 @@ abstract class _NewArsenalState implements NewArsenalState {
       final String? error,
       final ArsenalViewMode viewMode,
       final String searchText,
-      final BallFilters filters}) = _$NewArsenalStateImpl;
+      final BallFilters filters,
+      final bool isRemoveMode,
+      final Set<int> selectedForRemoval}) = _$NewArsenalStateImpl;
 
   @override
   List<UserArsenalInstance> get allInstances;
@@ -331,6 +380,10 @@ abstract class _NewArsenalState implements NewArsenalState {
   String get searchText;
   @override
   BallFilters get filters;
+  @override
+  bool get isRemoveMode;
+  @override
+  Set<int> get selectedForRemoval;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.

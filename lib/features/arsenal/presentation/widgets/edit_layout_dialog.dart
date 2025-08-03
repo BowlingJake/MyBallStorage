@@ -299,7 +299,11 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
             textAlign: TextAlign.center,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              filled: true,
+              fillColor: Colors.transparent,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
               hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.grey[500],

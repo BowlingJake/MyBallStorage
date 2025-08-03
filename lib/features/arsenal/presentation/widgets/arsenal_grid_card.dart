@@ -12,10 +12,16 @@ import 'package:core_theme/core_theme.dart';
 class ArsenalGridCard extends ConsumerWidget {
   const ArsenalGridCard({
     required this.instance,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onTap,
     super.key,
   });
 
   final UserArsenalInstance instance;
+  final bool isSelectionMode;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,12 +34,25 @@ class ArsenalGridCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         color: Colors.black.withOpacity(0.8),
         border: Border.all(
-          color: brandColor.withOpacity(0.6),
-          width: 1.5,
+          color: isSelected 
+              ? theme.primaryColor.withOpacity(0.8)
+              : brandColor.withOpacity(0.6),
+          width: isSelected ? 3.0 : 1.5,
         ),
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                  color: theme.primaryColor.withOpacity(0.5),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
       ),
       child: InkWell(
-        onTap: () => _showArsenalActionDialog(context, instance),
+        onTap: isSelectionMode 
+            ? onTap 
+            : () => _showArsenalActionDialog(context, instance),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(8),

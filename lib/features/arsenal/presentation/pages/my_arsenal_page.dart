@@ -260,6 +260,14 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
           ),
         ),
         
+        // 新增/刪除按鈕列或選擇模式控制列
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: arsenalState.isRemoveMode 
+              ? _buildRemoveModeControls(arsenalState)
+              : _buildActionButtons(),
+        ),
+        
         // 內容區域 - 直接顯示，無額外容器
         Expanded(
           child: _buildMainContent(theme, arsenalState),
@@ -348,6 +356,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
 
 
   Widget _buildGridView(List<UserArsenalInstance> filteredInstances) {
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: GridView.builder(
@@ -361,13 +371,24 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         itemCount: filteredInstances.length,
         itemBuilder: (context, index) {
           final instance = filteredInstances[index];
-          return ArsenalGridCard(instance: instance);
+          final isSelected = arsenalState.selectedForRemoval.contains(instance.id);
+          
+          return ArsenalGridCard(
+            instance: instance,
+            isSelectionMode: arsenalState.isRemoveMode,
+            isSelected: isSelected,
+            onTap: arsenalState.isRemoveMode 
+                ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id)
+                : null,
+          );
         },
       ),
     );
   }
 
   Widget _buildListView(List<UserArsenalInstance> filteredInstances) {
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: ListView.builder(
@@ -375,9 +396,16 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         itemCount: filteredInstances.length,
         itemBuilder: (context, index) {
           final instance = filteredInstances[index];
+          final isSelected = arsenalState.selectedForRemoval.contains(instance.id);
+          
           return ArsenalSpecificBallCard(
             arsenalBallInstance: instance,
             theme: Theme.of(context),
+            isSelectionMode: arsenalState.isRemoveMode,
+            isSelected: isSelected,
+            onTap: arsenalState.isRemoveMode 
+                ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id)
+                : null,
             extraInfo: _buildArsenalExtraInfo(instance),
           );
         },
@@ -711,6 +739,211 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         ref.read(newArsenalControllerProvider.notifier).updateFilters(newFilters);
       },
     );
+  }
+
+  /// Build action button for add/remove functionality
+  Widget _buildActionButton({
+    required String text,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withOpacity(0.6),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: color,
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              text,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Navigate to library with add to arsenal mode enabled
+  void _navigateToLibraryAddMode() {
+    // TODO: Implementation needed - navigate to library and enable add to arsenal mode
+    context.go('/library?addToArsenal=true');
+  }
+
+  /// Toggle remove mode in arsenal
+  void _toggleRemoveMode() {
+    ref.read(newArsenalControllerProvider.notifier).toggleRemoveMode();
+  }
+
+  /// Build normal action buttons (add from library / remove balls)
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildActionButton(
+            text: 'Add from Library',
+            icon: Icons.add_circle_outline,
+            color: Colors.green,
+            onTap: () => _navigateToLibraryAddMode(),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildActionButton(
+            text: 'Remove Balls',
+            icon: Icons.remove_circle_outline,
+            color: Colors.red,
+            onTap: () => _toggleRemoveMode(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build remove mode controls (selection info + action buttons)
+  Widget _buildRemoveModeControls(NewArsenalState arsenalState) {
+    final selectedCount = arsenalState.selectedForRemoval.length;
+    final hasSelection = selectedCount > 0;
+
+    return Row(
+      children: [
+        // Selection info
+        Expanded(
+          child: Text(
+            'Remove Mode: $selectedCount ball${selectedCount != 1 ? 's' : ''} selected',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Delete selected button (only show if has selection)
+        if (hasSelection) ...[
+          _buildRemoveModeActionButton(
+            icon: Icons.delete,
+            color: Colors.red,
+            onTap: () => _confirmRemoveSelected(),
+          ),
+          const SizedBox(width: 8),
+        ],
+        // Exit remove mode button
+        _buildRemoveModeActionButton(
+          icon: Icons.close,
+          color: Colors.orange,
+          onTap: () => _toggleRemoveMode(),
+        ),
+      ],
+    );
+  }
+
+  /// Build small action button for remove mode
+  Widget _buildRemoveModeActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withOpacity(0.6),
+            width: 1,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 16,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  /// Confirm and remove selected instances
+  Future<void> _confirmRemoveSelected() async {
+    final selectedCount = ref.read(newArsenalControllerProvider).selectedForRemoval.length;
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          'Remove Selected Balls',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          'Are you sure you want to remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from your arsenal?',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      try {
+        final authState = ref.read(authControllerProvider);
+        if (authState.hasValue && authState.value != null) {
+          final userId = authState.value!.id;
+          await ref.read(newArsenalControllerProvider.notifier).removeSelectedInstances(userId);
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Successfully removed $selectedCount ball${selectedCount != 1 ? 's' : ''}'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to remove balls: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
 }

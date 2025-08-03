@@ -22,6 +22,8 @@ class NewArsenalState with _$NewArsenalState {
     @Default(ArsenalViewMode.grid) ArsenalViewMode viewMode,
     @Default('') String searchText,
     @Default(BallFilters()) BallFilters filters,
+    @Default(false) bool isRemoveMode,
+    @Default({}) Set<int> selectedForRemoval,
   }) = _NewArsenalState;
 }
 
@@ -294,6 +296,54 @@ class NewArsenalController extends _$NewArsenalController {
   /// Clear error
   void clearError() {
     state = state.copyWith(error: null);
+  }
+
+  /// Toggle remove mode
+  void toggleRemoveMode() {
+    state = state.copyWith(
+      isRemoveMode: !state.isRemoveMode,
+      selectedForRemoval: {}, // Clear selection when toggling
+    );
+  }
+
+  /// Toggle instance selection for removal
+  void toggleInstanceForRemoval(int instanceId) {
+    final currentSelection = Set<int>.from(state.selectedForRemoval);
+    if (currentSelection.contains(instanceId)) {
+      currentSelection.remove(instanceId);
+    } else {
+      currentSelection.add(instanceId);
+    }
+    state = state.copyWith(selectedForRemoval: currentSelection);
+  }
+
+  /// Remove selected instances
+  Future<void> removeSelectedInstances(String userId) async {
+    try {
+      final selectedIds = state.selectedForRemoval.toList();
+      
+      // Remove each selected instance
+      for (final instanceId in selectedIds) {
+        await _repository.removeArsenalInstance(instanceId);
+      }
+      
+      // Update state by removing all selected instances
+      final updatedInstances = state.allInstances
+          .where((instance) => !selectedIds.contains(instance.id))
+          .toList();
+      
+      state = state.copyWith(
+        allInstances: updatedInstances,
+        selectedForRemoval: {},
+        isRemoveMode: false,
+      );
+      
+      // Refresh categories in case we removed balls from categories
+      await _loadUserCategories(userId);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to remove selected instances: $e');
+      rethrow;
+    }
   }
 }
 

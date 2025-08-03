@@ -33,6 +33,25 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
   bool _isAddToArsenalMode = false;
   Set<int> _selectedBallIds = {};
 
+  @override
+  void initState() {
+    super.initState();
+    // Check if we should auto-enable add to arsenal mode from URL
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForAutoAddMode();
+    });
+  }
+
+  void _checkForAutoAddMode() {
+    final location = GoRouterState.of(context).uri.toString();
+    if (location.contains('addToArsenal=true')) {
+      setState(() {
+        _isAddToArsenalMode = true;
+        _isComparisonMode = false;
+      });
+    }
+  }
+
   void _toggleComparisonMode() {
     setState(() {
       _isComparisonMode = !_isComparisonMode;
