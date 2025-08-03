@@ -9,7 +9,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class BallInfo {
   final String id;
   final String name;
-  const BallInfo({required this.id, required this.name});
+  final String brand;
+  final String brandColor;
+  final String? imagePath;
+  
+  const BallInfo({
+    required this.id, 
+    required this.name,
+    this.brand = '',
+    this.brandColor = '#000000',
+    this.imagePath,
+  });
 }
 
 class BallSelectionDialog extends ConsumerStatefulWidget {

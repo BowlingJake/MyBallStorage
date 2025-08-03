@@ -28,15 +28,29 @@ class BallSelectionSection extends StatelessWidget {
             icon: Icons.sports_handball_outlined,
             text: 'Select Ball(s) for this Game',
             onPressed: () async {
-              final List<BallInfo>? result = await showDialog(
+              final List<dialog.BallInfo>? result = await showDialog(
                 context: context,
                 builder: (_) => dialog.BallSelectionDialog(
-                  initialSelectedBalls: selectedBalls,
+                  initialSelectedBalls: selectedBalls.map((ball) => dialog.BallInfo(
+                    id: ball.id,
+                    name: ball.name,
+                    brand: ball.brand,
+                    brandColor: ball.brandColor,
+                    imagePath: ball.imagePath,
+                  )).toList(),
                 ),
               );
 
               if (result != null) {
-                onSelectionChanged(result);
+                // Convert back to training BallInfo
+                final convertedResult = result.map((ball) => BallInfo(
+                  id: ball.id,
+                  name: ball.name,
+                  brand: ball.brand,
+                  brandColor: ball.brandColor,
+                  imagePath: ball.imagePath,
+                )).toList();
+                onSelectionChanged(convertedResult);
               }
             },
           ),

@@ -41,14 +41,14 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).matchedLocation;
 
-    // 將靜態的 body 內容提取出來，並標記為 const
-    const pageBody = SingleChildScrollView(
+    // Page body content
+    final pageBody = SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
+            const Align(
               child: SizedBox(
                 width: 400,
                 child: UserInfoSection(),
@@ -78,13 +78,13 @@ class HomePage extends ConsumerWidget {
       ),
     );
 
-    return const ProfessionalDarkBackground(
+    return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: _HomePageAppBar(), // 使用提取的 AppBar
-        drawer: _HomePageDrawer(), // 使用提取的 Drawer
-        body: pageBody, // 使用 const body
-        bottomNavigationBar: _HomePageBottomNav(), // 使用提取的 BottomNav
+        appBar: const _HomePageAppBar(), // 使用提取的 AppBar
+        drawer: const _HomePageDrawer(), // 使用提取的 Drawer
+        body: pageBody, // 使用 body
+        bottomNavigationBar: const _HomePageBottomNav(), // 使用提取的 BottomNav
       ),
     );
   }
