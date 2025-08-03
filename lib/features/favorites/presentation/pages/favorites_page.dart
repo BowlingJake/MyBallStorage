@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/features/favorites/logic/favorites_controller.dart';
-import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart';
+import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
@@ -71,11 +71,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                 Expanded(
                   child: state.favoriteBalls.isEmpty
                       ? _buildEmptyState(context)
-                      : BallListView(
-                          bowlingBalls: state.favoriteBalls,
-                          onBallTapped: (ball) => _showBallDetail(context, ball),
-                          onBallLongPress: (ball) => _showRemoveConfirmation(context, ref, ball),
-                        ),
+                      : _buildFavoritesList(state.favoriteBalls),
                 ),
               ],
             );
@@ -155,6 +151,26 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFavoritesList(List<BowlingBall> balls) {
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80),
+      itemCount: balls.length,
+      itemBuilder: (context, index) {
+        final ball = balls[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: UnifiedBallCard(
+            bowlingBall: ball,
+            theme: Theme.of(context),
+            onTap: () => _showBallDetail(context, ball),
+            onLongPress: () => _showRemoveConfirmation(context, ref, ball),
+            showFavoriteButton: true,
+          ),
+        );
+      },
     );
   }
 

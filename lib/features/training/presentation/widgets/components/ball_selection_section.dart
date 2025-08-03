@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/ball_selection_dialog.dart' as dialog;
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 
 class BallSelectionSection extends StatelessWidget {
@@ -30,7 +30,7 @@ class BallSelectionSection extends StatelessWidget {
             onPressed: () async {
               final List<BallInfo>? result = await showDialog(
                 context: context,
-                builder: (_) => BallSelectionDialog(
+                builder: (_) => dialog.BallSelectionDialog(
                   initialSelectedBalls: selectedBalls,
                 ),
               );

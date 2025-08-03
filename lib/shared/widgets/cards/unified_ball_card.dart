@@ -48,7 +48,7 @@ class UnifiedBallCard extends ConsumerWidget {
       return bowlingBall!.id;
     }
     if (arsenalBallInstance != null) {
-      return int.tryParse(arsenalBallInstance!.ballId) ?? 0;
+      return arsenalBallInstance!.ballId;
     }
     return 0;
   }

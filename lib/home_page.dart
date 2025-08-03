@@ -54,7 +54,7 @@ class HomePage extends ConsumerWidget {
                 child: UserInfoSection(),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             // TODO: Replace with new Arsenal widget or remove section
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -71,8 +71,8 @@ class HomePage extends ConsumerWidget {
                 ),
               ),
             ),
-            SizedBox(height: 24),
-            SizedBox(height: 80),
+            const SizedBox(height: 24),
+            const SizedBox(height: 80),
           ],
         ),
       ),
