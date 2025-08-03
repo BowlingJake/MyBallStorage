@@ -35,29 +35,33 @@ class SimpleSearchControls extends StatelessWidget {
         children: [
           // 搜尋框 - 佔據大部分空間
           Expanded(
-            child: TextField(
-              onChanged: onSearchChanged,
-              decoration: InputDecoration(
-                hintText: searchHint,
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                filled: true,
-                fillColor: Colors.black.withOpacity(0.6),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+            child: SizedBox(
+              height: 40, // 明確設置高度
+              child: TextField(
+                onChanged: onSearchChanged,
+                decoration: InputDecoration(
+                  hintText: searchHint,
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 18),
+                  filled: true,
+                  fillColor: Colors.black.withOpacity(0.6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  isDense: true, // 使TextField更緊湊
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
-              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           const SizedBox(width: 12),
@@ -93,8 +97,8 @@ class SimpleSearchControls extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 48,
-          height: 48,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.6),
             borderRadius: BorderRadius.circular(12),
@@ -109,7 +113,7 @@ class SimpleSearchControls extends StatelessWidget {
             child: Icon(
               icon,
               color: Colors.grey,
-              size: 20,
+              size: 18,
             ),
           ),
         ),
@@ -118,8 +122,8 @@ class SimpleSearchControls extends StatelessWidget {
             right: -2,
             top: -2,
             child: Container(
-              width: 16,
-              height: 16,
+              width: 14,
+              height: 14,
               decoration: const BoxDecoration(
                 color: Colors.red,
                 shape: BoxShape.circle,
@@ -129,7 +133,7 @@ class SimpleSearchControls extends StatelessWidget {
                   '$badgeCount',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

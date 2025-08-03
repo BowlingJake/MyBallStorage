@@ -167,7 +167,25 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   Widget _buildContentDisplaySection(ThemeData theme, NewArsenalState arsenalState) {
     return Column(
       children: [
-        // 控制按鈕區域 - 參考Ball Library的簡潔設計
+        // 搜索控制欄 - 參考Ball Library的設計
+        SimpleSearchControls(
+          searchHint: 'Search my arsenal...',
+          onSearchChanged: (text) {
+            // TODO: 實作搜索功能
+            print('Arsenal search: $text');
+          },
+          onFilterTap: () {
+            // TODO: 實作篩選功能
+            print('Arsenal filter tapped');
+          },
+          onSortTap: () {
+            // TODO: 實作排序功能
+            print('Arsenal sort tapped');
+          },
+          filterCount: 0, // TODO: 實作篩選計數
+        ),
+        
+        // Grid/List 切換按鈕區域
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -203,24 +221,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
               
               const Spacer(),
               
-              // Add balls 按鈕 (移除圖標)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey[600]!,
-                    width: 1.5,
-                  ),
-                ),
-                child: TextButton(
-                  onPressed: () => context.go('/library'),
-                  child: const Text(
-                    'Add Balls',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ),
+              // 移除 Add balls 按鈕
             ],
           ),
         ),
