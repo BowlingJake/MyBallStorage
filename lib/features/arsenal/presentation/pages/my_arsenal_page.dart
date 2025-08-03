@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:bowlingarsenal_app/features/arsenal/logic/arsenal_controller.dart';
-import 'package:bowlingarsenal_app/features/arsenal/logic/category_controller.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/models/arsenal_ball_instance.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/models/bag_category.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/category_selector.dart';
@@ -42,8 +40,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     final authState = ref.read(authControllerProvider);
     if (authState.hasValue && authState.value != null) {
       final userId = authState.value!.id;
-      ref.read(arsenalControllerProvider.notifier).initialize(userId);
-      ref.read(categoryControllerProvider.notifier).loadCategories(userId);
+      ref.read(newArsenalControllerProvider.notifier).initialize(userId);
     }
   }
 
@@ -58,8 +55,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
-    final arsenalState = ref.watch(arsenalControllerProvider);
-    final sortedCategories = ref.watch(sortedCategoriesProvider);
+    final arsenalState = ref.watch(newArsenalControllerProvider);
     final theme = Theme.of(context);
 
     return ProfessionalDarkBackground(
@@ -72,7 +68,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         body: Column(
           children: [
             // B區：球袋管理區 (移到頂部)
-            _buildBagManagementSection(theme, sortedCategories, arsenalState),
+            _buildBagManagementSection(theme, arsenalState),
             
             // C區：內容顯示區
             Expanded(
@@ -89,16 +85,13 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  /// 獲取分類的英文顯示名稱
-  String _getCategoryDisplayName(BagCategory? category) {
-    if (category == null) return 'All My Arsenal';
-    
-    // 直接返回分類名稱，現在只有英文的 "All My Arsenal"
-    return category.name;
+  /// 獲取分類的顯示名稱
+  String _getCategoryDisplayName(String? category) {
+    return category ?? 'All My Arsenal';
   }
 
   /// B區：球袋管理區 (下拉選單 + 新增球袋按鈕)
-  Widget _buildBagManagementSection(ThemeData theme, List<BagCategory> categories, ArsenalState arsenalState) {
+  Widget _buildBagManagementSection(ThemeData theme, NewArsenalState arsenalState) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -118,12 +111,12 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
               ),
               child: CustomDropdown<String>(
                 hintText: 'Select Category',
-                value: arsenalState.selectedCategoryId,
-                items: arsenalState.allAvailableCategories.map((category) {
+                value: _getCategoryDisplayName(arsenalState.selectedCategory),
+                items: ref.read(newArsenalControllerProvider.notifier).allAvailableCategories.map((category) {
                   return DropdownMenuItem<String>(
-                    value: category.categoryId,
+                    value: category,
                     child: Text(
-                      _getCategoryDisplayName(category),
+                      category,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white,
@@ -134,7 +127,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
                 }).toList(),
                 onChanged: (String? newValue) {
                   if (newValue != null) {
-                    ref.read(arsenalControllerProvider.notifier).selectCategory(newValue);
+                    ref.read(newArsenalControllerProvider.notifier).selectCategory(newValue);
                   }
                 },
               ),
@@ -174,7 +167,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   }
 
   /// C區：內容顯示區
-  Widget _buildContentDisplaySection(ThemeData theme, ArsenalState arsenalState) {
+  Widget _buildContentDisplaySection(ThemeData theme, NewArsenalState arsenalState) {
     return Column(
       children: [
         // 控制按鈕區域 - 參考Ball Library的簡潔設計
@@ -199,13 +192,13 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
                       theme,
                       icon: Iconsax.grid_1,
                       isSelected: arsenalState.viewMode == ArsenalViewMode.grid,
-                      onTap: () => ref.read(arsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.grid),
+                      onTap: () => ref.read(newArsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.grid),
                     ),
                     _buildViewModeButton(
                       theme,
                       icon: Iconsax.element_equal,
                       isSelected: arsenalState.viewMode == ArsenalViewMode.list,
-                      onTap: () => ref.read(arsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.list),
+                      onTap: () => ref.read(newArsenalControllerProvider.notifier).setViewMode(ArsenalViewMode.list),
                     ),
                   ],
                 ),
@@ -271,7 +264,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  Widget _buildMainContent(ThemeData theme, ArsenalState arsenalState) {
+  Widget _buildMainContent(ThemeData theme, NewArsenalState arsenalState) {
     if (arsenalState.isLoading) {
       return Center(
         child: CircularProgressIndicator(
@@ -284,20 +277,20 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       return _buildErrorState(theme, arsenalState.error!);
     }
 
-    final filteredBalls = arsenalState.filteredBalls;
-    print('Arsenal Page: Displaying ${filteredBalls.length} balls, Selected category: ${arsenalState.selectedCategoryId}');
+    final filteredInstances = ref.read(newArsenalControllerProvider.notifier).filteredInstances;
+    print('Arsenal Page: Displaying ${filteredInstances.length} instances, Selected category: ${arsenalState.selectedCategory ?? "All My Arsenal"}');
 
-    if (filteredBalls.isEmpty) {
+    if (filteredInstances.isEmpty) {
       return _buildEmptyState(theme);
     }
 
     return arsenalState.viewMode == ArsenalViewMode.grid
-        ? _buildGridView(filteredBalls)
-        : _buildListView(filteredBalls);
+        ? _buildGridView(filteredInstances)
+        : _buildListView(filteredInstances);
   }
 
 
-  Widget _buildGridView(List<ArsenalBallInstance> filteredBalls) {
+  Widget _buildGridView(List<UserArsenalInstance> filteredInstances) {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -305,42 +298,45 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         crossAxisSpacing: 16,
         childAspectRatio: 0.8,
       ),
-      itemCount: filteredBalls.length,
+      itemCount: filteredInstances.length,
       itemBuilder: (context, index) {
-        final ball = filteredBalls[index];
-        return ArsenalBallCard(
-          ballInstance: ball,
-          onTap: () => _showBallDetails(ball),
+        final instance = filteredInstances[index];
+        return UnifiedBallCard(
+          bowlingBall: instance.bowlingBall,
+          theme: Theme.of(context),
+          onTap: () => _showInstanceDetails(instance),
+          showFavoriteButton: false,
+          extraInfo: _buildArsenalExtraInfo(instance),
         );
       },
     );
   }
 
-  Widget _buildListView(List<ArsenalBallInstance> filteredBalls) {
+  Widget _buildListView(List<UserArsenalInstance> filteredInstances) {
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 32), // 參考Ball Library的設計
-      itemCount: filteredBalls.length,
+      itemCount: filteredInstances.length,
       itemBuilder: (context, index) {
-        final ball = filteredBalls[index];
+        final instance = filteredInstances[index];
         return UnifiedBallCard(
-          arsenalBallInstance: ball,
+          bowlingBall: instance.bowlingBall,
           theme: Theme.of(context),
-          onTap: () => _showBallDetails(ball),
+          onTap: () => _showInstanceDetails(instance),
           showFavoriteButton: false, // Arsenal balls don't need favorite button
-          extraInfo: _buildArsenalExtraInfo(ball),
+          extraInfo: _buildArsenalExtraInfo(instance),
         );
       },
     );
   }
 
   /// 建構 Arsenal 專用的額外資訊
-  Widget _buildArsenalExtraInfo(ArsenalBallInstance ball) {
+  Widget _buildArsenalExtraInfo(UserArsenalInstance instance) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Layout info
         Text(
-          _buildLayoutText(ball),
+          instance.layoutDisplayString,
           style: TextStyle(
             color: Colors.grey[300],
             fontSize: 11,
@@ -352,30 +348,28 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         const SizedBox(height: 4),
         // Games used
         Text(
-          'Games Used: ${ball.gamesUsed}',
+          'Games Used: ${instance.gamesUsed}',
           style: TextStyle(
             color: Colors.grey[300],
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
         ),
+        const SizedBox(height: 4),
+        // Categories
+        if (instance.allCategories.isNotEmpty)
+          Text(
+            'Categories: ${instance.allCategories.join(", ")}',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
       ],
     );
-  }
-
-  /// 建構 Layout 文字
-  String _buildLayoutText(ArsenalBallInstance ball) {
-    if (!ball.hasLayout) {
-      return 'Layout: Not set';
-    }
-    
-    final layout = ball.layout!;
-    final pinToPap = layout.pinToPap.toStringAsFixed(1);
-    final papToMb = layout.papToMb.toStringAsFixed(1);
-    final psaAngle = layout.psaAngle.toStringAsFixed(0);
-    
-    // 格式：5.0 x 4.0 x 50 (Control)
-    return 'Layout: ${pinToPap}" x ${papToMb}" x ${psaAngle}° (${layout.layoutType.displayName})';
   }
 
   Widget _buildEmptyState(ThemeData theme) {
@@ -479,70 +473,168 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  void _showAddBallOptions(BuildContext context) {
-    showModalBottomSheet(
+
+  void _showInstanceDetails(UserArsenalInstance instance) {
+    showDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '新增球具',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black.withOpacity(0.9),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with ball name
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      instance.bowlingBall?.name ?? 'Unknown Ball',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 24),
-            ListTile(
-              leading: const Icon(Iconsax.book),
-              title: const Text('從球庫選擇'),
-              subtitle: const Text('選擇現有的保齡球'),
-              onTap: () {
-                Navigator.pop(context);
-                _showAddFromLibraryDialog(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Iconsax.add_square),
-              title: const Text('自定義新增'),
-              subtitle: const Text('手動新增球具'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: 導航到自定義新增頁面
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('自定義新增功能即將推出')),
-                );
-              },
-            ),
-          ],
+              const SizedBox(height: 16),
+              
+              // Ball details
+              if (instance.bowlingBall != null) ...[
+                Text(
+                  'Brand: ${instance.bowlingBall!.brand}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+              ],
+              
+              // Layout information
+              Text(
+                'Layout: ${instance.layoutDisplayString}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              
+              // Games used
+              Text(
+                'Games Used: ${instance.gamesUsed}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              
+              // Categories
+              if (instance.allCategories.isNotEmpty) ...[
+                Text(
+                  'Categories: ${instance.allCategories.join(", ")}',
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+              ],
+              
+              // Added date
+              Text(
+                'Added: ${instance.addedDate?.toString().split(' ')[0] ?? 'Unknown'}',
+                style: const TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              
+              // Notes if available
+              if (instance.notes != null && instance.notes!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Notes:',
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  instance.notes!,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ],
+              
+              const SizedBox(height: 24),
+              
+              // Action buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // TODO: Implement edit functionality
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Edit functionality coming soon')),
+                      );
+                    },
+                    child: const Text('Edit', style: TextStyle(color: Colors.blue)),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // TODO: Implement remove functionality
+                      _confirmRemoveInstance(instance);
+                    },
+                    child: const Text('Remove', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showBallDetails(ArsenalBallInstance ball) {
-    // TODO: 實現球具詳細資訊頁面
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('查看 ${ball.displayName} 的詳細資訊')),
-    );
-  }
-
-  void _showAddFromLibraryDialog(BuildContext context) {
-    final arsenalState = ref.read(arsenalControllerProvider);
+  void _confirmRemoveInstance(UserArsenalInstance instance) {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AddBallFromLibraryDialog(
-        preselectedCategoryId: arsenalState.selectedCategoryId,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.black.withOpacity(0.9),
+        title: const Text('Remove Ball', style: TextStyle(color: Colors.white)),
+        content: Text(
+          'Are you sure you want to remove "${instance.bowlingBall?.name ?? 'this ball'}" from your arsenal?',
+          style: const TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              try {
+                final authState = ref.read(authControllerProvider);
+                if (authState.hasValue && authState.value != null) {
+                  final userId = authState.value!.id;
+                  await ref.read(newArsenalControllerProvider.notifier).removeInstance(instance.id, userId);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ball removed successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to remove ball: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

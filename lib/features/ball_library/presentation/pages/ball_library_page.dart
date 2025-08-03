@@ -6,7 +6,7 @@ import 'package:bowlingarsenal_app/features/comparison/presentation/widgets/ball
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
-import 'package:bowlingarsenal_app/features/arsenal/logic/arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -560,38 +560,15 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       }
       final userId = authState.value!.id;
 
-      // Get arsenal categories to use default category
-      final arsenalState = ref.read(arsenalControllerProvider);
+      // Initialize arsenal and get categories
+      await ref.read(newArsenalControllerProvider.notifier).initialize(userId);
+      final arsenalState = ref.read(newArsenalControllerProvider);
       
-      // Ensure categories are loaded first
-      if (arsenalState.categories.isEmpty) {
-        await ref.read(arsenalControllerProvider.notifier).initialize(userId);
+      // Use "My Balls" as default category, or create it if no categories exist
+      String categoryName = 'My Balls';
+      if (arsenalState.userCategories.isNotEmpty) {
+        categoryName = arsenalState.userCategories.first;
       }
-      
-      // Get the updated state after initialization
-      final updatedArsenalState = ref.read(arsenalControllerProvider);
-      if (updatedArsenalState.categories.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to initialize arsenal categories'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      
-      // Use the first available real category (should always exist due to auto-initialization)
-      if (updatedArsenalState.categories.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No categories available. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      
-      final categoryId = updatedArsenalState.categories.first.categoryId;
       
 
       final ballLibraryState = ref.read(ballLibraryControllerProvider);
@@ -601,27 +578,22 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           .where((ball) => _selectedBallIds.contains(ball.id))
           .toList();
 
-      print('Ball Library: Starting to add ${selectedBalls.length} balls to category: $categoryId');
+      print('Ball Library: Starting to add ${selectedBalls.length} balls to category: $categoryName');
       
       // Add each selected ball to arsenal
       for (final ball in selectedBalls) {
         try {
           print('Ball Library: Adding ball ID: ${ball.id}, Name: ${ball.name}');
-          await ref.read(arsenalControllerProvider.notifier).addBallFromLibrary(
+          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
             userId: userId,
-            ballId: ball.id.toString(),
-            categoryId: categoryId,
+            ballId: ball.id,
+            categoryName: categoryName,
           );
           print('Ball Library: Successfully added ball ID: ${ball.id}');
         } catch (e) {
           print('Ball Library: Failed to add ball ID: ${ball.id}, Error: $e');
         }
       }
-      
-      // Force refresh Arsenal data after adding all balls
-      print('Ball Library: Refreshing Arsenal data...');
-      await ref.read(arsenalControllerProvider.notifier).refresh(userId);
-      print('Ball Library: Arsenal refresh completed');
       
       final selectedCount = selectedBalls.length;
       ScaffoldMessenger.of(context).showSnackBar(
