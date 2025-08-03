@@ -11,7 +11,6 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
   @override
   Future<List<UserArsenalInstance>> getUserArsenal(String userId) async {
     try {
-      print('Supabase Arsenal Repository: Getting arsenal for user $userId');
       
       final response = await _supabase
           .from('user_arsenal')
@@ -22,7 +21,6 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
           .eq('user_id', userId)
           .order('added_date', ascending: false);
 
-      print('Supabase Arsenal Repository: Raw response: $response');
 
       return response.map<UserArsenalInstance>((json) {
         // Parse the joined bowling ball data
@@ -40,12 +38,10 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
         // 直接使用原始的 bowlingBallData，不要經過序列化
         instanceData['bowling_ball_data'] = bowlingBallData;
 
-        print('Supabase Arsenal Repository: Processing instance ${instanceData['id']} - Ball: ${bowlingBall?.name}');
         
         return UserArsenalInstance.fromJson(instanceData);
       }).toList();
     } catch (e) {
-      print('Supabase Arsenal Repository: Error getting user arsenal: $e');
       throw Exception('Failed to get user arsenal: $e');
     }
   }
@@ -58,7 +54,6 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
     String? notes,
   }) async {
     try {
-      print('Supabase Arsenal Repository: Adding ball $ballId to category "$categoryName" for user $userId');
 
       final instanceData = {
         'user_id': userId,
@@ -70,7 +65,6 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
         'has_layout': false,
       };
 
-      print('Supabase Arsenal Repository: Inserting data: $instanceData');
 
       final response = await _supabase
           .from('user_arsenal')
@@ -78,12 +72,10 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
           .select()
           .single();
 
-      print('Supabase Arsenal Repository: Insert successful: $response');
 
       // Fetch the complete instance with bowling ball data
       return _getCompleteInstance(response['id']);
     } catch (e) {
-      print('Supabase Arsenal Repository: Error adding ball from library: $e');
       throw Exception('Failed to add ball from library: $e');
     }
   }

@@ -1,14 +1,15 @@
 // import 'package:bowlingarsenal_app/features/arsenal/widgets/ball_list_view.dart'; // Removed - old widget
-import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
+import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_card_item.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
 import 'package:bowlingarsenal_app/features/comparison/presentation/widgets/ball_comparison_dialog.dart';
-import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/filter_popout.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
@@ -110,11 +111,9 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       } catch (e) {
         // 顯示錯誤訊息
         if (mounted) {
-          ScaffoldMessenger.of(currentContext).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to load balls for comparison'),
-              backgroundColor: Colors.red,
-            ),
+          TopNotification.showError(
+            currentContext,
+            'Failed to load balls for comparison',
           );
         }
       }
@@ -537,11 +536,9 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       // Get user ID
       final authState = ref.read(authControllerProvider);
       if (!authState.hasValue || authState.value == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please log in to add balls to arsenal'),
-            backgroundColor: Colors.red,
-          ),
+        TopNotification.showError(
+          context,
+          'Please log in to add balls to arsenal',
         );
         return;
       }
@@ -583,24 +580,18 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       }
       
       final selectedCount = selectedBalls.length;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Successfully added $selectedCount ball${selectedCount != 1 ? 's' : ''} to arsenal!'),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
+      TopNotification.showSuccess(
+        context,
+        'Successfully added $selectedCount ball${selectedCount != 1 ? 's' : ''} to arsenal!',
       );
 
       // Exit selection mode after successful addition
       _exitSelectionMode();
       
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to add balls to arsenal: $e'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      TopNotification.showError(
+        context,
+        'Failed to add balls to arsenal: $e',
       );
     }
   }
@@ -724,9 +715,11 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
 
   /// Build ball list using UnifiedBallCard
   Widget _buildBallList(BallLibraryState state) {
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
-      itemCount: state.filteredBalls.length + (state.hasMoreData ? 1 : 0),
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 80),
+        itemCount: state.filteredBalls.length + (state.hasMoreData ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= state.filteredBalls.length) {
           // Load more indicator
@@ -736,20 +729,17 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         final ball = state.filteredBalls[index];
         final isSelected = _selectedBallIds.contains(ball.id);
         
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: UnifiedBallCard(
-            bowlingBall: ball,
-            theme: Theme.of(context),
-            onTap: (_isComparisonMode || _isAddToArsenalMode) 
-                ? () => _toggleBallSelection(ball.id)
-                : () => _showBallDetail(context, ball),
-            isSelectionMode: _isComparisonMode || _isAddToArsenalMode,
-            isSelected: isSelected,
-            showFavoriteButton: !(_isComparisonMode || _isAddToArsenalMode),
-          ),
+        return BallCardItem(
+          ball: ball,
+          theme: Theme.of(context),
+          onTap: (_isComparisonMode || _isAddToArsenalMode) 
+              ? () => _toggleBallSelection(ball.id)
+              : () => _showBallDetail(context, ball),
+          isSelectionMode: _isComparisonMode || _isAddToArsenalMode,
+          isSelected: isSelected,
         );
       },
+      ),
     );
   }
 }

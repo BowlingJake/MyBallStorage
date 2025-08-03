@@ -80,6 +80,7 @@ lib/features/{feature_name}/
 ### UI Components Standards
 - **Buttons**: Always use `AppStandardButton` from `lib/shared/widgets/buttons/app_standard_button.dart` unless explicitly told to use another button
 - **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
+- **Notifications**: Always use `TopNotification` from `lib/shared/widgets/common/notifications/top_notification.dart` for all user notifications instead of SnackBar. Use `TopNotification.showSuccess()` for success messages and `TopNotification.showError()` for error messages
 
 ### Cursor Rules Integration
 The project has specific Cursor rules that emphasize:

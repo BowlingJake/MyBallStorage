@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_user_arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
+import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 
 part 'new_arsenal_controller.freezed.dart';
@@ -19,6 +20,8 @@ class NewArsenalState with _$NewArsenalState {
     @Default(false) bool isLoading,
     String? error,
     @Default(ArsenalViewMode.grid) ArsenalViewMode viewMode,
+    @Default('') String searchText,
+    @Default(BallFilters()) BallFilters filters,
   }) = _NewArsenalState;
 }
 
@@ -46,7 +49,6 @@ class NewArsenalController extends _$NewArsenalController {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      print('New Arsenal Controller: Initializing for user $userId');
       
       // Load all instances
       await _loadAllInstances(userId);
@@ -60,9 +62,7 @@ class NewArsenalController extends _$NewArsenalController {
         isLoading: false,
       );
       
-      print('New Arsenal Controller: Initialization complete - ${state.allInstances.length} instances, ${state.userCategories.length} categories');
     } catch (e) {
-      print('New Arsenal Controller: Initialization error: $e');
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to initialize arsenal: $e',
@@ -74,10 +74,8 @@ class NewArsenalController extends _$NewArsenalController {
   Future<void> _loadAllInstances(String userId) async {
     try {
       final instances = await _repository.getUserArsenal(userId);
-      print('New Arsenal Controller: Loaded ${instances.length} instances');
       state = state.copyWith(allInstances: instances);
     } catch (e) {
-      print('New Arsenal Controller: Error loading instances: $e');
       throw Exception('Failed to load instances: $e');
     }
   }
@@ -86,25 +84,64 @@ class NewArsenalController extends _$NewArsenalController {
   Future<void> _loadUserCategories(String userId) async {
     try {
       final categories = await _repository.getUserCategories(userId);
-      print('New Arsenal Controller: Loaded categories: $categories');
       state = state.copyWith(userCategories: categories);
     } catch (e) {
-      print('New Arsenal Controller: Error loading categories: $e');
       throw Exception('Failed to load categories: $e');
     }
   }
 
-  /// Get filtered instances based on selected category
+  /// Get filtered instances based on selected category, search text, and filters
   List<UserArsenalInstance> get filteredInstances {
-    if (state.selectedCategory == null) {
-      // "All My Arsenal" - show all instances
-      return state.allInstances;
+    var instances = state.allInstances;
+    
+    // Filter by category first
+    if (state.selectedCategory != null) {
+      instances = instances
+          .where((instance) => instance.belongsToCategory(state.selectedCategory!))
+          .toList();
     }
     
-    // Filter by specific category
-    return state.allInstances
-        .where((instance) => instance.belongsToCategory(state.selectedCategory!))
-        .toList();
+    // Filter by search text
+    if (state.searchText.isNotEmpty) {
+      final searchLower = state.searchText.toLowerCase();
+      instances = instances.where((instance) {
+        final ball = instance.bowlingBall;
+        if (ball == null) return false;
+        final ballName = ball.name.toLowerCase();
+        final ballBrand = ball.brand.toLowerCase();
+        return ballName.contains(searchLower) || ballBrand.contains(searchLower);
+      }).toList();
+    }
+    
+    // Filter by brands
+    if (state.filters.brands.isNotEmpty) {
+      instances = instances.where((instance) {
+        final ball = instance.bowlingBall;
+        return ball != null && state.filters.brands.contains(ball.brand);
+      }).toList();
+    }
+    
+    // Filter by cores
+    if (state.filters.cores.isNotEmpty) {
+      instances = instances.where((instance) {
+        final ball = instance.bowlingBall;
+        if (ball?.coreType == null) return false;
+        // Check if ball's core type is in selected cores
+        final coreType = ball!.coreType!.toLowerCase().contains('asym') ? 'Asymmetric' : 'Symmetric';
+        return state.filters.cores.contains(coreType);
+      }).toList();
+    }
+    
+    // Filter by coverstocks
+    if (state.filters.coverstocks.isNotEmpty) {
+      instances = instances.where((instance) {
+        final ball = instance.bowlingBall;
+        return ball?.coverstockType != null && 
+               state.filters.coverstocks.contains(ball!.coverstockType!);
+      }).toList();
+    }
+    
+    return instances;
   }
 
   /// Get all available categories including virtual "All My Arsenal"
@@ -119,12 +156,29 @@ class NewArsenalController extends _$NewArsenalController {
     } else {
       state = state.copyWith(selectedCategory: categoryName);
     }
-    print('New Arsenal Controller: Selected category: ${state.selectedCategory ?? "All My Arsenal"}');
   }
 
   /// Change view mode
   void setViewMode(ArsenalViewMode mode) {
     state = state.copyWith(viewMode: mode);
+  }
+
+  /// Update search text
+  void updateSearchText(String searchText) {
+    state = state.copyWith(searchText: searchText);
+  }
+
+  /// Update filters
+  void updateFilters(BallFilters newFilters) {
+    state = state.copyWith(filters: newFilters);
+  }
+
+  /// Clear all filters
+  void clearFilters() {
+    state = state.copyWith(
+      searchText: '',
+      filters: const BallFilters(),
+    );
   }
 
   /// Add a ball from library to arsenal
@@ -135,7 +189,6 @@ class NewArsenalController extends _$NewArsenalController {
     String? notes,
   }) async {
     try {
-      print('New Arsenal Controller: Adding ball $ballId to category "$categoryName"');
       
       final instance = await _repository.addBallFromLibrary(
         userId: userId,
@@ -151,9 +204,7 @@ class NewArsenalController extends _$NewArsenalController {
       // Refresh categories in case it's a new category
       await _loadUserCategories(userId);
       
-      print('New Arsenal Controller: Successfully added ball');
     } catch (e) {
-      print('New Arsenal Controller: Error adding ball: $e');
       state = state.copyWith(error: 'Failed to add ball: $e');
       rethrow;
     }

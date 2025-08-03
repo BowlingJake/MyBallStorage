@@ -5,9 +5,19 @@ import 'package:bowlingarsenal_app/core/error/error_handler.dart';
 import 'package:bowlingarsenal_app/routing/app_router_config.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// Custom ScrollBehavior to enable touch scrolling on web
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
 
 void main() {
   AppErrorHandler.runGuarded(() async {
@@ -99,6 +109,7 @@ class MyApp extends ConsumerWidget {
       themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      scrollBehavior: CustomScrollBehavior(),
     );
   }
 }

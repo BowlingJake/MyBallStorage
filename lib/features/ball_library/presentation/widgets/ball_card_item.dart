@@ -1,5 +1,9 @@
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/features/favorites/presentation/widgets/favorite_button_widget.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -24,6 +28,65 @@ class BallCardItem extends ConsumerWidget {
   final bool isSelectionMode;
   final bool isSelected;
 
+
+  /// 顯示加入Arsenal確認對話框
+  Future<void> _showAddToArsenalConfirmation(BuildContext context, WidgetRef ref) async {
+    final result = await showAppConfirmationDialog(
+      context: context,
+      title: 'Add to Arsenal',
+      message: 'Do you want to add this ball to your arsenal?',
+      confirmText: 'Yes',
+      cancelText: 'No',
+    );
+
+    if (result == true) {
+      await _addBallToArsenal(context, ref);
+    }
+  }
+
+  /// 將球加入Arsenal
+  Future<void> _addBallToArsenal(BuildContext context, WidgetRef ref) async {
+    try {
+      // Get user ID
+      final authState = ref.read(authControllerProvider);
+      if (!authState.hasValue || authState.value == null) {
+        TopNotification.showError(
+          context,
+          'Please log in to add balls to arsenal',
+        );
+        return;
+      }
+      final userId = authState.value!.id;
+
+      // Initialize arsenal and get categories
+      await ref.read(newArsenalControllerProvider.notifier).initialize(userId);
+      final arsenalState = ref.read(newArsenalControllerProvider);
+      
+      // Use "My Balls" as default category, or create it if no categories exist
+      String categoryName = 'My Balls';
+      if (arsenalState.userCategories.isNotEmpty) {
+        categoryName = arsenalState.userCategories.first;
+      }
+
+      // Add ball to arsenal
+      await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
+        userId: userId,
+        ballId: ball.id,
+        categoryName: categoryName,
+      );
+      
+      TopNotification.showSuccess(
+        context,
+        'Successfully added "${ball.name}" to arsenal!',
+      );
+      
+    } catch (e) {
+      TopNotification.showError(
+        context,
+        'Failed to add ball to arsenal: $e',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -305,7 +368,32 @@ class BallCardItem extends ConsumerWidget {
                         ),
                       )
                     : const SizedBox.shrink()) // 未選中時不顯示任何icon
-                : CompactFavoriteButton(ball: ball),
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CompactFavoriteButton(ball: ball),
+                      const SizedBox(height: 24),
+                      GestureDetector(
+                        onTap: () => _showAddToArsenalConfirmation(context, ref),
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.8),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),

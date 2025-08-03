@@ -3,8 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/features/favorites/logic/favorites_controller.dart';
-import 'package:bowlingarsenal_app/shared/widgets/cards/unified_ball_card.dart';
+import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_card_item.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_detail_popout.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 
@@ -52,11 +56,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           systemOverlayStyle: SystemUiOverlayStyle.light,
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.white),
-              onPressed: () {
-                ref.read(favoritesControllerProvider.notifier).refresh();
-              },
-              tooltip: 'Refresh',
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () => _showAddAllToArsenalConfirmation(context, ref),
+              tooltip: 'Add All to Arsenal',
             ),
           ],
         ),
@@ -155,23 +157,108 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   }
 
   Widget _buildFavoritesList(List<BowlingBall> balls) {
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 80),
-      itemCount: balls.length,
-      itemBuilder: (context, index) {
-        final ball = balls[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: UnifiedBallCard(
-            bowlingBall: ball,
-            theme: Theme.of(context),
-            onTap: () => _showBallDetail(context, ball),
-            onLongPress: () => _showRemoveConfirmation(context, ref, ball),
-            showFavoriteButton: true,
-          ),
-        );
-      },
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 80),
+        itemCount: balls.length,
+        itemBuilder: (context, index) {
+          final ball = balls[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: BallCardItem(
+              ball: ball,
+              theme: Theme.of(context),
+              onTap: () => _showBallDetail(context, ball),
+              onLongPress: () => _showRemoveConfirmation(context, ref, ball),
+            ),
+          );
+        },
+      ),
     );
+  }
+
+  /// 顯示加入所有favorite球到Arsenal的確認對話框
+  Future<void> _showAddAllToArsenalConfirmation(BuildContext context, WidgetRef ref) async {
+    final favoritesAsync = ref.read(favoritesControllerProvider);
+    if (!favoritesAsync.hasValue || favoritesAsync.value == null) return;
+    
+    final favoriteCount = favoritesAsync.value!.favoriteBalls.length;
+    if (favoriteCount == 0) {
+      TopNotification.showError(
+        context,
+        'No favorite balls to add to arsenal',
+      );
+      return;
+    }
+
+    final result = await showAppConfirmationDialog(
+      context: context,
+      title: 'Add All to Arsenal',
+      message: 'Do you want to add all $favoriteCount favorite ball${favoriteCount != 1 ? 's' : ''} to your arsenal?',
+      confirmText: 'Yes',
+      cancelText: 'No',
+    );
+
+    if (result == true) {
+      await _addAllFavoritesToArsenal(context, ref);
+    }
+  }
+
+  /// 將所有favorite球加入Arsenal
+  Future<void> _addAllFavoritesToArsenal(BuildContext context, WidgetRef ref) async {
+    try {
+      // Get user ID
+      final authState = ref.read(authControllerProvider);
+      if (!authState.hasValue || authState.value == null) {
+        TopNotification.showError(
+          context,
+          'Please log in to add balls to arsenal',
+        );
+        return;
+      }
+      final userId = authState.value!.id;
+
+      // Initialize arsenal and get categories
+      await ref.read(newArsenalControllerProvider.notifier).initialize(userId);
+      final arsenalState = ref.read(newArsenalControllerProvider);
+      
+      // Use "My Balls" as default category, or create it if no categories exist
+      String categoryName = 'My Balls';
+      if (arsenalState.userCategories.isNotEmpty) {
+        categoryName = arsenalState.userCategories.first;
+      }
+
+      final favoritesState = ref.read(favoritesControllerProvider);
+      if (!favoritesState.hasValue) return;
+
+      final favoriteBalls = favoritesState.value!.favoriteBalls;
+      
+      // Add each favorite ball to arsenal
+      for (final ball in favoriteBalls) {
+        try {
+          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
+            userId: userId,
+            ballId: ball.id,
+            categoryName: categoryName,
+          );
+        } catch (e) {
+          print('Failed to add ball ID: ${ball.id}, Error: $e');
+        }
+      }
+      
+      final favoriteCount = favoriteBalls.length;
+      TopNotification.showSuccess(
+        context,
+        'Successfully added $favoriteCount favorite ball${favoriteCount != 1 ? 's' : ''} to arsenal!',
+      );
+      
+    } catch (e) {
+      TopNotification.showError(
+        context,
+        'Failed to add favorite balls to arsenal: $e',
+      );
+    }
   }
 
   void _showBallDetail(BuildContext context, BowlingBall ball) {

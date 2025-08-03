@@ -12,6 +12,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_grid_card.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -167,25 +168,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   Widget _buildContentDisplaySection(ThemeData theme, NewArsenalState arsenalState) {
     return Column(
       children: [
-        // 搜索控制欄 - 參考Ball Library的設計
-        SimpleSearchControls(
-          searchHint: 'Search my arsenal...',
-          onSearchChanged: (text) {
-            // TODO: 實作搜索功能
-            print('Arsenal search: $text');
-          },
-          onFilterTap: () {
-            // TODO: 實作篩選功能
-            print('Arsenal filter tapped');
-          },
-          onSortTap: () {
-            // TODO: 實作排序功能
-            print('Arsenal sort tapped');
-          },
-          filterCount: 0, // TODO: 實作篩選計數
-        ),
-        
-        // Grid/List 切換按鈕區域
+        // 水平控制欄：切換按鈕 - 搜索欄 - 篩選排序按鈕
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -219,9 +202,60 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
                 ),
               ),
               
-              const Spacer(),
+              const SizedBox(width: 12),
               
-              // 移除 Add balls 按鈕
+              // 搜索欄 - 縮小版本
+              Expanded(
+                child: Container(
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.grey[600]!,
+                      width: 1,
+                    ),
+                  ),
+                  child: TextField(
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Search arsenal...',
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.grey[400],
+                        size: 18,
+                      ),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onChanged: (text) {
+                      ref.read(newArsenalControllerProvider.notifier).updateSearchText(text);
+                    },
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 12),
+              
+              // 篩選和排序按鈕
+              _buildFilterSortButton(
+                icon: Icons.filter_list,
+                onTap: () => _showFilterDialog(context, ref, arsenalState),
+                tooltip: 'Filter',
+              ),
+              const SizedBox(width: 8),
+              _buildFilterSortButton(
+                icon: Icons.sort,
+                onTap: () {
+                  // TODO: 實作排序功能
+                },
+                tooltip: 'Sort',
+              ),
             ],
           ),
         ),
@@ -262,6 +296,32 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
+  Widget _buildFilterSortButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required String tooltip,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Colors.grey[600]!,
+            width: 1,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: Colors.grey[300],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMainContent(ThemeData theme, NewArsenalState arsenalState) {
     if (arsenalState.isLoading) {
       return Center(
@@ -276,7 +336,6 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     }
 
     final filteredInstances = ref.read(newArsenalControllerProvider.notifier).filteredInstances;
-    print('Arsenal Page: Displaying ${filteredInstances.length} instances, Selected category: ${arsenalState.selectedCategory ?? "All My Arsenal"}');
 
     if (filteredInstances.isEmpty) {
       return _buildEmptyState(theme);
@@ -289,34 +348,40 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
 
 
   Widget _buildGridView(List<UserArsenalInstance> filteredInstances) {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 1, // 調整比例，減少高度但保持足夠空間
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 1, // 調整比例，減少高度但保持足夠空間
+        ),
+        itemCount: filteredInstances.length,
+        itemBuilder: (context, index) {
+          final instance = filteredInstances[index];
+          return ArsenalGridCard(instance: instance);
+        },
       ),
-      itemCount: filteredInstances.length,
-      itemBuilder: (context, index) {
-        final instance = filteredInstances[index];
-        return ArsenalGridCard(instance: instance);
-      },
     );
   }
 
   Widget _buildListView(List<UserArsenalInstance> filteredInstances) {
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 32), // 參考Ball Library的設計
-      itemCount: filteredInstances.length,
-      itemBuilder: (context, index) {
-        final instance = filteredInstances[index];
-        return ArsenalSpecificBallCard(
-          arsenalBallInstance: instance,
-          theme: Theme.of(context),
-          extraInfo: _buildArsenalExtraInfo(instance),
-        );
-      },
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 32), // 參考Ball Library的設計
+        itemCount: filteredInstances.length,
+        itemBuilder: (context, index) {
+          final instance = filteredInstances[index];
+          return ArsenalSpecificBallCard(
+            arsenalBallInstance: instance,
+            theme: Theme.of(context),
+            extraInfo: _buildArsenalExtraInfo(instance),
+          );
+        },
+      ),
     );
   }
 
@@ -636,6 +701,16 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
       case 4:
         context.go('/events');
     }
+  }
+
+  void _showFilterDialog(BuildContext context, WidgetRef ref, NewArsenalState arsenalState) {
+    showFilterPopout(
+      context,
+      initialFilters: arsenalState.filters,
+      onFiltersChanged: (newFilters) {
+        ref.read(newArsenalControllerProvider.notifier).updateFilters(newFilters);
+      },
+    );
   }
 
 }

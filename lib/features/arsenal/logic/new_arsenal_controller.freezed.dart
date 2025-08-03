@@ -24,6 +24,8 @@ mixin _$NewArsenalState {
   bool get isLoading => throw _privateConstructorUsedError;
   String? get error => throw _privateConstructorUsedError;
   ArsenalViewMode get viewMode => throw _privateConstructorUsedError;
+  String get searchText => throw _privateConstructorUsedError;
+  BallFilters get filters => throw _privateConstructorUsedError;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -44,7 +46,11 @@ abstract class $NewArsenalStateCopyWith<$Res> {
       String? selectedCategory,
       bool isLoading,
       String? error,
-      ArsenalViewMode viewMode});
+      ArsenalViewMode viewMode,
+      String searchText,
+      BallFilters filters});
+
+  $BallFiltersCopyWith<$Res> get filters;
 }
 
 /// @nodoc
@@ -68,6 +74,8 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
     Object? isLoading = null,
     Object? error = freezed,
     Object? viewMode = null,
+    Object? searchText = null,
+    Object? filters = null,
   }) {
     return _then(_value.copyWith(
       allInstances: null == allInstances
@@ -94,7 +102,25 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
           ? _value.viewMode
           : viewMode // ignore: cast_nullable_to_non_nullable
               as ArsenalViewMode,
+      searchText: null == searchText
+          ? _value.searchText
+          : searchText // ignore: cast_nullable_to_non_nullable
+              as String,
+      filters: null == filters
+          ? _value.filters
+          : filters // ignore: cast_nullable_to_non_nullable
+              as BallFilters,
     ) as $Val);
+  }
+
+  /// Create a copy of NewArsenalState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BallFiltersCopyWith<$Res> get filters {
+    return $BallFiltersCopyWith<$Res>(_value.filters, (value) {
+      return _then(_value.copyWith(filters: value) as $Val);
+    });
   }
 }
 
@@ -112,7 +138,12 @@ abstract class _$$NewArsenalStateImplCopyWith<$Res>
       String? selectedCategory,
       bool isLoading,
       String? error,
-      ArsenalViewMode viewMode});
+      ArsenalViewMode viewMode,
+      String searchText,
+      BallFilters filters});
+
+  @override
+  $BallFiltersCopyWith<$Res> get filters;
 }
 
 /// @nodoc
@@ -134,6 +165,8 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
     Object? isLoading = null,
     Object? error = freezed,
     Object? viewMode = null,
+    Object? searchText = null,
+    Object? filters = null,
   }) {
     return _then(_$NewArsenalStateImpl(
       allInstances: null == allInstances
@@ -160,6 +193,14 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
           ? _value.viewMode
           : viewMode // ignore: cast_nullable_to_non_nullable
               as ArsenalViewMode,
+      searchText: null == searchText
+          ? _value.searchText
+          : searchText // ignore: cast_nullable_to_non_nullable
+              as String,
+      filters: null == filters
+          ? _value.filters
+          : filters // ignore: cast_nullable_to_non_nullable
+              as BallFilters,
     ));
   }
 }
@@ -173,7 +214,9 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       this.selectedCategory,
       this.isLoading = false,
       this.error,
-      this.viewMode = ArsenalViewMode.grid})
+      this.viewMode = ArsenalViewMode.grid,
+      this.searchText = '',
+      this.filters = const BallFilters()})
       : _allInstances = allInstances,
         _userCategories = userCategories;
 
@@ -206,10 +249,16 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
   @override
   @JsonKey()
   final ArsenalViewMode viewMode;
+  @override
+  @JsonKey()
+  final String searchText;
+  @override
+  @JsonKey()
+  final BallFilters filters;
 
   @override
   String toString() {
-    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode)';
+    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters)';
   }
 
   @override
@@ -227,7 +276,10 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
                 other.isLoading == isLoading) &&
             (identical(other.error, error) || other.error == error) &&
             (identical(other.viewMode, viewMode) ||
-                other.viewMode == viewMode));
+                other.viewMode == viewMode) &&
+            (identical(other.searchText, searchText) ||
+                other.searchText == searchText) &&
+            (identical(other.filters, filters) || other.filters == filters));
   }
 
   @override
@@ -238,7 +290,9 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       selectedCategory,
       isLoading,
       error,
-      viewMode);
+      viewMode,
+      searchText,
+      filters);
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -257,7 +311,9 @@ abstract class _NewArsenalState implements NewArsenalState {
       final String? selectedCategory,
       final bool isLoading,
       final String? error,
-      final ArsenalViewMode viewMode}) = _$NewArsenalStateImpl;
+      final ArsenalViewMode viewMode,
+      final String searchText,
+      final BallFilters filters}) = _$NewArsenalStateImpl;
 
   @override
   List<UserArsenalInstance> get allInstances;
@@ -271,6 +327,10 @@ abstract class _NewArsenalState implements NewArsenalState {
   String? get error;
   @override
   ArsenalViewMode get viewMode;
+  @override
+  String get searchText;
+  @override
+  BallFilters get filters;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
