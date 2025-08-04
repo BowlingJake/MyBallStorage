@@ -6,8 +6,9 @@ part 'user_profile.g.dart';
 @freezed
 class UserProfile with _$UserProfile {
   const factory UserProfile({
-    required String id,
+    String? id,
     @JsonKey(name: 'user_id') required String userId,
+    String? username,
     
     // 球袋名稱設定 (1-9)
     @JsonKey(name: 'bag_1_name') @Default('All My Arsenal') String bag1Name,

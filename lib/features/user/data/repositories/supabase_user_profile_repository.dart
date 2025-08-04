@@ -94,6 +94,36 @@ class SupabaseUserProfileRepository implements UserProfileRepository {
   }
 
   @override
+  Future<void> deleteBag({
+    required String userId,
+    required int bagNumber,
+  }) async {
+    try {
+      if (bagNumber < 1 || bagNumber > 9) {
+        throw ArgumentError('Bag number must be between 1 and 9');
+      }
+      
+      // 不能刪除袋子 1 (All My Arsenal)
+      if (bagNumber == 1) {
+        throw ArgumentError('Cannot delete bag 1 (All My Arsenal)');
+      }
+
+      final nameColumn = 'bag_${bagNumber}_name';
+      final unlockedColumn = 'bag_${bagNumber}_unlocked';
+
+      await _supabase
+          .from('profiles')
+          .update({
+            nameColumn: null,
+            unlockedColumn: false,
+          })
+          .eq('user_id', userId);
+    } catch (e) {
+      throw Exception('Failed to delete bag: $e');
+    }
+  }
+
+  @override
   Future<List<BagInfo>> getUnlockedBags(String userId) async {
     try {
       final profile = await getUserProfile(userId);

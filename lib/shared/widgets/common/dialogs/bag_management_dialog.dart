@@ -43,9 +43,14 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
 
   void _initializeUserProfile() {
     final authState = ref.read(authControllerProvider);
+    final userProfileState = ref.read(userProfileControllerProvider);
+    
     if (authState.hasValue && authState.value != null) {
       final userId = authState.value!.id;
-      ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
+      // 只有當 profile 為 null 或者沒有載入中時才重新載入
+      if (userProfileState.profile == null && !userProfileState.isLoading) {
+        ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
+      }
     }
   }
 
@@ -150,7 +155,10 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
     final arsenalState = ref.watch(newArsenalControllerProvider);
     final bagNumber = index + 1;
     
-    final isUnlocked = userProfileState.profile?.isBagUnlocked(bagNumber) ?? (bagNumber == 1);
+    // 檢查是否已開通，只有當 profile 存在時才檢查，否則只有袋子1預設開通
+    final isUnlocked = userProfileState.profile != null 
+        ? userProfileState.profile!.isBagUnlocked(bagNumber)
+        : (bagNumber == 1);
     final nextBagToUnlock = userProfileState.profile?.nextBagToUnlock ?? 2; // 如果profile是null，預設下一個要開通的是袋子2
     final isNextToUnlock = nextBagToUnlock == bagNumber;
     
@@ -175,8 +183,8 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
       child: InkWell(
         onTap: isNextToUnlock 
             ? () => _showUnlockBagDialog(index) 
-            : (isUnlocked && bagNumber != 1) 
-                ? () => _showEditBagDialog(index) 
+            : isUnlocked 
+                ? () => _showBagOperationDialog(index) 
                 : null,
         borderRadius: BorderRadius.circular(12),
         child: Stack(
@@ -258,6 +266,188 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
       fontSize: 14,
       customColor: Colors.grey[400]!,
       onPressed: Navigator.of(context).pop,
+    );
+  }
+
+  void _showBagOperationDialog(int index) {
+    final bagNumber = index + 1;
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            constraints: const BoxConstraints(maxWidth: 400), // 加大對話框以容納兩個按鈕
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 兩個水平並列按鈕
+                  Row(
+                    children: [
+                      // Edit Bag 按鈕
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Edit Bag',
+                          height: 40, // 縮小高度
+                          fontSize: 14,
+                          customColor: Colors.grey[400]!,
+                          isPrimary: false, // outlined樣式
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            _showEditBagDialog(index);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12), // 按鈕間距
+                      // Delete This Bag 按鈕（袋子 1 不能刪除）
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Delete This Bag',
+                          height: 40, // 縮小高度
+                          fontSize: 14,
+                          customColor: bagNumber == 1 ? Colors.grey : Colors.red,
+                          isPrimary: false, // outlined樣式
+                          onPressed: bagNumber == 1 ? () {} : () {
+                            Navigator.of(dialogContext).pop();
+                            _showDeleteBagDialog(index);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteBagDialog(int index) {
+    final bagNumber = index + 1;
+    final userProfileState = ref.read(userProfileControllerProvider);
+    final currentName = userProfileState.profile?.getBagName(bagNumber) ?? 'Bag $bagNumber';
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            constraints: const BoxConstraints(maxWidth: 350),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 標題
+                  Text(
+                    'Delete $currentName',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // 警告訊息
+                  Text(
+                    'Are you sure you want to delete this bag?',
+                    style: TextStyle(
+                      color: Colors.grey[300],
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // 按鈕
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Cancel',
+                          height: 36,
+                          fontSize: 14,
+                          customColor: Colors.grey[400]!,
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Delete',
+                          height: 36,
+                          fontSize: 14,
+                          customColor: Colors.red,
+                          isPrimary: true,
+                          onPressed: () async {
+                            try {
+                              // 取得使用者ID
+                              final authState = ref.read(authControllerProvider);
+                              if (!authState.hasValue || authState.value == null) {
+                                throw Exception('User not authenticated');
+                              }
+                              final userId = authState.value!.id;
+                              
+                              // 刪除袋子
+                              await ref.read(userProfileControllerProvider.notifier).deleteBag(
+                                userId: userId,
+                                bagNumber: bagNumber,
+                              );
+                              
+                              Navigator.of(dialogContext).pop();
+                              
+                              if (mounted) {
+                                TopNotification.showSuccess(
+                                  context,
+                                  'Bag $bagNumber deleted successfully!',
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                TopNotification.showError(
+                                  dialogContext,
+                                  'Failed to delete bag: $e',
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

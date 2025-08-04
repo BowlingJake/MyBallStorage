@@ -45,7 +45,6 @@ class UserProfileController extends _$UserProfileController {
       // If profile doesn't exist, create default one
       if (profile == null) {
         profile = UserProfile(
-          id: '', // Will be set by database
           userId: userId,
           bag1Name: 'All My Arsenal', // 預設第一個球袋名稱
           bag1Unlocked: true, // 預設開通第一個球袋
@@ -74,6 +73,9 @@ class UserProfileController extends _$UserProfileController {
     required String bagName,
   }) async {
     try {
+      // 先設置載入狀態
+      state = state.copyWith(isLoading: true, error: null);
+      
       await _repository.updateBagName(
         userId: userId,
         bagNumber: bagNumber,
@@ -83,7 +85,10 @@ class UserProfileController extends _$UserProfileController {
       // Reload profile to get updated data
       await loadUserProfile(userId);
     } catch (e) {
-      state = state.copyWith(error: 'Failed to update bag name: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to update bag name: $e',
+      );
       rethrow;
     }
   }
@@ -95,6 +100,9 @@ class UserProfileController extends _$UserProfileController {
     required String bagName,
   }) async {
     try {
+      // 先設置載入狀態
+      state = state.copyWith(isLoading: true, error: null);
+      
       await _repository.unlockBag(
         userId: userId,
         bagNumber: bagNumber,
@@ -104,7 +112,35 @@ class UserProfileController extends _$UserProfileController {
       // Reload profile to get updated data
       await loadUserProfile(userId);
     } catch (e) {
-      state = state.copyWith(error: 'Failed to unlock bag: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to unlock bag: $e',
+      );
+      rethrow;
+    }
+  }
+
+  /// Delete a bag
+  Future<void> deleteBag({
+    required String userId,
+    required int bagNumber,
+  }) async {
+    try {
+      // 先設置載入狀態
+      state = state.copyWith(isLoading: true, error: null);
+      
+      await _repository.deleteBag(
+        userId: userId,
+        bagNumber: bagNumber,
+      );
+      
+      // Reload profile to get updated data
+      await loadUserProfile(userId);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to delete bag: $e',
+      );
       rethrow;
     }
   }

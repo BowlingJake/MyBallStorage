@@ -20,9 +20,10 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserProfile {
-  String get id => throw _privateConstructorUsedError;
+  String? get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
-  String get userId => throw _privateConstructorUsedError; // 球袋名稱設定 (1-9)
+  String get userId => throw _privateConstructorUsedError;
+  String? get username => throw _privateConstructorUsedError; // 球袋名稱設定 (1-9)
   @JsonKey(name: 'bag_1_name')
   String get bag1Name => throw _privateConstructorUsedError;
   @JsonKey(name: 'bag_2_name')
@@ -81,8 +82,9 @@ abstract class $UserProfileCopyWith<$Res> {
       _$UserProfileCopyWithImpl<$Res, UserProfile>;
   @useResult
   $Res call(
-      {String id,
+      {String? id,
       @JsonKey(name: 'user_id') String userId,
+      String? username,
       @JsonKey(name: 'bag_1_name') String bag1Name,
       @JsonKey(name: 'bag_2_name') String? bag2Name,
       @JsonKey(name: 'bag_3_name') String? bag3Name,
@@ -120,8 +122,9 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? userId = null,
+    Object? username = freezed,
     Object? bag1Name = null,
     Object? bag2Name = freezed,
     Object? bag3Name = freezed,
@@ -144,14 +147,18 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
+      username: freezed == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String?,
       bag1Name: null == bag1Name
           ? _value.bag1Name
           : bag1Name // ignore: cast_nullable_to_non_nullable
@@ -245,8 +252,9 @@ abstract class _$$UserProfileImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
+      {String? id,
       @JsonKey(name: 'user_id') String userId,
+      String? username,
       @JsonKey(name: 'bag_1_name') String bag1Name,
       @JsonKey(name: 'bag_2_name') String? bag2Name,
       @JsonKey(name: 'bag_3_name') String? bag3Name,
@@ -282,8 +290,9 @@ class __$$UserProfileImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
+    Object? id = freezed,
     Object? userId = null,
+    Object? username = freezed,
     Object? bag1Name = null,
     Object? bag2Name = freezed,
     Object? bag3Name = freezed,
@@ -306,14 +315,18 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
   }) {
     return _then(_$UserProfileImpl(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
+      username: freezed == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String?,
       bag1Name: null == bag1Name
           ? _value.bag1Name
           : bag1Name // ignore: cast_nullable_to_non_nullable
@@ -402,8 +415,9 @@ class __$$UserProfileImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserProfileImpl implements _UserProfile {
   const _$UserProfileImpl(
-      {required this.id,
+      {this.id,
       @JsonKey(name: 'user_id') required this.userId,
+      this.username,
       @JsonKey(name: 'bag_1_name') this.bag1Name = 'All My Arsenal',
       @JsonKey(name: 'bag_2_name') this.bag2Name,
       @JsonKey(name: 'bag_3_name') this.bag3Name,
@@ -429,10 +443,12 @@ class _$UserProfileImpl implements _UserProfile {
       _$$UserProfileImplFromJson(json);
 
   @override
-  final String id;
+  final String? id;
   @override
   @JsonKey(name: 'user_id')
   final String userId;
+  @override
+  final String? username;
 // 球袋名稱設定 (1-9)
   @override
   @JsonKey(name: 'bag_1_name')
@@ -499,7 +515,7 @@ class _$UserProfileImpl implements _UserProfile {
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, userId: $userId, bag1Name: $bag1Name, bag2Name: $bag2Name, bag3Name: $bag3Name, bag4Name: $bag4Name, bag5Name: $bag5Name, bag6Name: $bag6Name, bag7Name: $bag7Name, bag8Name: $bag8Name, bag9Name: $bag9Name, bag1Unlocked: $bag1Unlocked, bag2Unlocked: $bag2Unlocked, bag3Unlocked: $bag3Unlocked, bag4Unlocked: $bag4Unlocked, bag5Unlocked: $bag5Unlocked, bag6Unlocked: $bag6Unlocked, bag7Unlocked: $bag7Unlocked, bag8Unlocked: $bag8Unlocked, bag9Unlocked: $bag9Unlocked, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserProfile(id: $id, userId: $userId, username: $username, bag1Name: $bag1Name, bag2Name: $bag2Name, bag3Name: $bag3Name, bag4Name: $bag4Name, bag5Name: $bag5Name, bag6Name: $bag6Name, bag7Name: $bag7Name, bag8Name: $bag8Name, bag9Name: $bag9Name, bag1Unlocked: $bag1Unlocked, bag2Unlocked: $bag2Unlocked, bag3Unlocked: $bag3Unlocked, bag4Unlocked: $bag4Unlocked, bag5Unlocked: $bag5Unlocked, bag6Unlocked: $bag6Unlocked, bag7Unlocked: $bag7Unlocked, bag8Unlocked: $bag8Unlocked, bag9Unlocked: $bag9Unlocked, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -509,6 +525,8 @@ class _$UserProfileImpl implements _UserProfile {
             other is _$UserProfileImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.bag1Name, bag1Name) ||
                 other.bag1Name == bag1Name) &&
             (identical(other.bag2Name, bag2Name) ||
@@ -557,6 +575,7 @@ class _$UserProfileImpl implements _UserProfile {
         runtimeType,
         id,
         userId,
+        username,
         bag1Name,
         bag2Name,
         bag3Name,
@@ -597,8 +616,9 @@ class _$UserProfileImpl implements _UserProfile {
 
 abstract class _UserProfile implements UserProfile {
   const factory _UserProfile(
-          {required final String id,
+          {final String? id,
           @JsonKey(name: 'user_id') required final String userId,
+          final String? username,
           @JsonKey(name: 'bag_1_name') final String bag1Name,
           @JsonKey(name: 'bag_2_name') final String? bag2Name,
           @JsonKey(name: 'bag_3_name') final String? bag3Name,
@@ -625,10 +645,12 @@ abstract class _UserProfile implements UserProfile {
       _$UserProfileImpl.fromJson;
 
   @override
-  String get id;
+  String? get id;
   @override
   @JsonKey(name: 'user_id')
-  String get userId; // 球袋名稱設定 (1-9)
+  String get userId;
+  @override
+  String? get username; // 球袋名稱設定 (1-9)
   @override
   @JsonKey(name: 'bag_1_name')
   String get bag1Name;

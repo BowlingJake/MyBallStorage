@@ -28,6 +28,7 @@ mixin _$NewArsenalState {
   BallFilters get filters => throw _privateConstructorUsedError;
   bool get isRemoveMode => throw _privateConstructorUsedError;
   Set<int> get selectedForRemoval => throw _privateConstructorUsedError;
+  int get selectedBagNumber => throw _privateConstructorUsedError;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -52,7 +53,8 @@ abstract class $NewArsenalStateCopyWith<$Res> {
       String searchText,
       BallFilters filters,
       bool isRemoveMode,
-      Set<int> selectedForRemoval});
+      Set<int> selectedForRemoval,
+      int selectedBagNumber});
 
   $BallFiltersCopyWith<$Res> get filters;
 }
@@ -82,6 +84,7 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
     Object? filters = null,
     Object? isRemoveMode = null,
     Object? selectedForRemoval = null,
+    Object? selectedBagNumber = null,
   }) {
     return _then(_value.copyWith(
       allInstances: null == allInstances
@@ -124,6 +127,10 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
           ? _value.selectedForRemoval
           : selectedForRemoval // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      selectedBagNumber: null == selectedBagNumber
+          ? _value.selectedBagNumber
+          : selectedBagNumber // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 
@@ -156,7 +163,8 @@ abstract class _$$NewArsenalStateImplCopyWith<$Res>
       String searchText,
       BallFilters filters,
       bool isRemoveMode,
-      Set<int> selectedForRemoval});
+      Set<int> selectedForRemoval,
+      int selectedBagNumber});
 
   @override
   $BallFiltersCopyWith<$Res> get filters;
@@ -185,6 +193,7 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
     Object? filters = null,
     Object? isRemoveMode = null,
     Object? selectedForRemoval = null,
+    Object? selectedBagNumber = null,
   }) {
     return _then(_$NewArsenalStateImpl(
       allInstances: null == allInstances
@@ -227,6 +236,10 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
           ? _value._selectedForRemoval
           : selectedForRemoval // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      selectedBagNumber: null == selectedBagNumber
+          ? _value.selectedBagNumber
+          : selectedBagNumber // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -244,7 +257,8 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       this.searchText = '',
       this.filters = const BallFilters(),
       this.isRemoveMode = false,
-      final Set<int> selectedForRemoval = const {}})
+      final Set<int> selectedForRemoval = const {},
+      this.selectedBagNumber = 1})
       : _allInstances = allInstances,
         _userCategories = userCategories,
         _selectedForRemoval = selectedForRemoval;
@@ -298,8 +312,12 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
   }
 
   @override
+  @JsonKey()
+  final int selectedBagNumber;
+
+  @override
   String toString() {
-    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters, isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval)';
+    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters, isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval, selectedBagNumber: $selectedBagNumber)';
   }
 
   @override
@@ -324,7 +342,9 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
             (identical(other.isRemoveMode, isRemoveMode) ||
                 other.isRemoveMode == isRemoveMode) &&
             const DeepCollectionEquality()
-                .equals(other._selectedForRemoval, _selectedForRemoval));
+                .equals(other._selectedForRemoval, _selectedForRemoval) &&
+            (identical(other.selectedBagNumber, selectedBagNumber) ||
+                other.selectedBagNumber == selectedBagNumber));
   }
 
   @override
@@ -339,7 +359,8 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       searchText,
       filters,
       isRemoveMode,
-      const DeepCollectionEquality().hash(_selectedForRemoval));
+      const DeepCollectionEquality().hash(_selectedForRemoval),
+      selectedBagNumber);
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -362,7 +383,8 @@ abstract class _NewArsenalState implements NewArsenalState {
       final String searchText,
       final BallFilters filters,
       final bool isRemoveMode,
-      final Set<int> selectedForRemoval}) = _$NewArsenalStateImpl;
+      final Set<int> selectedForRemoval,
+      final int selectedBagNumber}) = _$NewArsenalStateImpl;
 
   @override
   List<UserArsenalInstance> get allInstances;
@@ -384,6 +406,8 @@ abstract class _NewArsenalState implements NewArsenalState {
   bool get isRemoveMode;
   @override
   Set<int> get selectedForRemoval;
+  @override
+  int get selectedBagNumber;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.

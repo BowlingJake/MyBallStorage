@@ -24,6 +24,7 @@ class NewArsenalState with _$NewArsenalState {
     @Default(BallFilters()) BallFilters filters,
     @Default(false) bool isRemoveMode,
     @Default({}) Set<int> selectedForRemoval,
+    @Default(1) int selectedBagNumber, // 預設選擇袋子 1
   }) = _NewArsenalState;
 }
 
@@ -92,11 +93,19 @@ class NewArsenalController extends _$NewArsenalController {
     }
   }
 
-  /// Get filtered instances based on selected category, search text, and filters
+  /// Get filtered instances based on selected bag, category, search text, and filters
   List<UserArsenalInstance> get filteredInstances {
     var instances = state.allInstances;
     
-    // Filter by category first
+    // Filter by selected bag first
+    if (state.selectedBagNumber != 1) {
+      // 如果不是 "All My Arsenal" (袋子1)，則根據袋子篩選
+      instances = instances
+          .where((instance) => instance.isInBag(state.selectedBagNumber))
+          .toList();
+    }
+    
+    // Filter by category
     if (state.selectedCategory != null) {
       instances = instances
           .where((instance) => instance.belongsToCategory(state.selectedCategory!))
@@ -168,6 +177,11 @@ class NewArsenalController extends _$NewArsenalController {
   /// Update search text
   void updateSearchText(String searchText) {
     state = state.copyWith(searchText: searchText);
+  }
+
+  /// Select a specific bag
+  void selectBag(int bagNumber) {
+    state = state.copyWith(selectedBagNumber: bagNumber);
   }
 
   /// Update filters

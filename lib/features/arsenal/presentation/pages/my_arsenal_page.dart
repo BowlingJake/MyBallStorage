@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
@@ -8,14 +9,15 @@ import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/simple_search_controls.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_management_dialog.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_grid_card.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/library_selection_dialog.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -26,13 +28,41 @@ class MyArsenalPage extends ConsumerStatefulWidget {
 }
 
 class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
+  bool _isSearchExpanded = false;
+  final TextEditingController _searchController = TextEditingController();
+  
+  
+  // 與 bag management dialog 相同的9個顏色
+  final List<Color> _bagColors = [
+    Colors.red,     // 🔴 競賽/重要
+    Colors.orange,  // 🟠 練習/日常
+    Colors.yellow,  // 🟡 特殊/活動
+    Colors.green,   // 🟢 備用/新手
+    Colors.blue,    // 🔵 進階/技術
+    Colors.purple,  // 🟣 實驗/測試
+    Colors.cyan,    // 🔵 青色/專業
+    Colors.white,   // 🤍 基礎/標準
+    Colors.brown,   // 🟤 復古/經典
+  ];
+
   @override
   void initState() {
     super.initState();
     // 初始化時載入用戶資料
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForSelectionMode();
       _initializeData();
     });
+  }
+
+  void _checkForSelectionMode() {
+    // 不再需要檢查參數，選擇模式現在由 controller 管理
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
 
@@ -42,6 +72,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     if (authState.hasValue && authState.value != null) {
       final userId = authState.value!.id;
       ref.read(newArsenalControllerProvider.notifier).initialize(userId);
+      // 同時載入用戶 profile 以獲取球袋資訊
+      ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
     }
   }
 
@@ -62,10 +94,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBarConfigs.arsenal(
-          title: 'My Arsenal',
-          onBackPressed: () => context.go('/'),
-        ),
+        appBar: _buildAppBar(),
         body: Column(
           children: [
             // B區：管理按鈕區
@@ -87,31 +116,247 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   }
 
 
-  /// B區：管理按鈕區 (Bag Management + Arsenal Management)
+  /// B區：管理按鈕區 (Bag Management + 搜尋篩選排序功能)
   Widget _buildManagementButtonsSection() {
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          // Bag Management 按鈕
-          Expanded(
-            child: _buildManagementButton(
-              text: 'Bag Management',
-              onPressed: () => showBagManagementDialog(context),
+      child: _isSearchExpanded ? _buildExpandedSearchSection(arsenalState) : _buildNormalManagementSection(arsenalState),
+    );
+  }
+
+  /// 正常管理區域 (顯示 Bag Management + 搜尋篩選排序按鈕)
+  Widget _buildNormalManagementSection(NewArsenalState arsenalState) {
+    return Row(
+      children: [
+        // Bag Management 按鈕
+        Expanded(
+          child: _buildManagementButton(
+            text: 'Bag Management',
+            onPressed: () => showBagManagementDialog(context),
+          ),
+        ),
+        const SizedBox(width: 8),
+        
+        // 搜尋欄 (Ball Library 風格，較短)
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _isSearchExpanded = true;
+            });
+          },
+          child: Container(
+            width: 120, // 較短的搜尋欄
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Icon(Icons.search, color: Colors.grey, size: 18),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'Search...',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 12),
-          // Arsenal Management 按鈕
-          Expanded(
-            child: _buildManagementButton(
-              text: 'Arsenal Management',
-              onPressed: () {
-                // TODO: Implement arsenal management functionality
+        ),
+        const SizedBox(width: 8),
+        
+        // 篩選按鈕 (Ball Library 風格)
+        GestureDetector(
+          onTap: () => _showFilterDialog(context, ref, arsenalState),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: arsenalState.filters.activeFilterCount > 0
+                    ? Colors.blue
+                    : Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Stack(
+              children: [
+                const Center(
+                  child: Icon(Icons.filter_list, color: Colors.grey, size: 18),
+                ),
+                if (arsenalState.filters.activeFilterCount > 0)
+                  Positioned(
+                    right: 4,
+                    top: 4,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        
+        // 排序按鈕 (Ball Library 風格)
+        GestureDetector(
+          onTap: () {
+            // TODO: 實作排序功能
+          },
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: const Center(
+              child: Icon(Icons.sort, color: Colors.grey, size: 18),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 展開搜尋區域 (隱藏 Bag Management，顯示搜尋欄 + 篩選排序按鈕)
+  Widget _buildExpandedSearchSection(NewArsenalState arsenalState) {
+    return Row(
+      children: [
+        // 展開的搜尋欄 (Ball Library 風格：外部 Container + 內部無背景 TextField)
+        Expanded(
+          child: Container(
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'Search arsenal...',
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 18),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSearchExpanded = false;
+                      _searchController.clear();
+                    });
+                    ref.read(newArsenalControllerProvider.notifier).updateSearchText('');
+                  },
+                  icon: const Icon(Icons.close, color: Colors.grey, size: 18),
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                isDense: true,
+              ),
+              onChanged: (text) {
+                ref.read(newArsenalControllerProvider.notifier).updateSearchText(text);
               },
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        
+        // 篩選按鈕 (Ball Library 風格)
+        GestureDetector(
+          onTap: () => _showFilterDialog(context, ref, arsenalState),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: arsenalState.filters.activeFilterCount > 0
+                    ? Colors.blue
+                    : Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: Stack(
+              children: [
+                const Center(
+                  child: Icon(Icons.filter_list, color: Colors.grey, size: 18),
+                ),
+                if (arsenalState.filters.activeFilterCount > 0)
+                  Positioned(
+                    right: 4,
+                    top: 4,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        
+        // 排序按鈕 (Ball Library 風格)
+        GestureDetector(
+          onTap: () {
+            // TODO: 實作排序功能
+          },
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8), // Ball Library 的背景色
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey[600]!,
+                width: 1.5,
+              ),
+            ),
+            child: const Center(
+              child: Icon(Icons.sort, color: Colors.grey, size: 18),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -134,7 +379,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   Widget _buildContentDisplaySection(ThemeData theme, NewArsenalState arsenalState) {
     return Column(
       children: [
-        // 水平控制欄：切換按鈕 - 搜索欄 - 篩選排序按鈕
+        // 水平控制欄：Grid/List 切換按鈕 + 球袋選擇按鈕
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
@@ -170,58 +415,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
               
               const SizedBox(width: 12),
               
-              // 搜索欄 - 縮小版本
-              Expanded(
-                child: Container(
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.grey[600]!,
-                      width: 1,
-                    ),
-                  ),
-                  child: TextField(
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Search arsenal...',
-                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.grey[400],
-                        size: 18,
-                      ),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onChanged: (text) {
-                      ref.read(newArsenalControllerProvider.notifier).updateSearchText(text);
-                    },
-                  ),
-                ),
-              ),
-              
-              const SizedBox(width: 12),
-              
-              // 篩選和排序按鈕
-              _buildFilterSortButton(
-                icon: Icons.filter_list,
-                onTap: () => _showFilterDialog(context, ref, arsenalState),
-                tooltip: 'Filter',
-              ),
-              const SizedBox(width: 8),
-              _buildFilterSortButton(
-                icon: Icons.sort,
-                onTap: () {
-                  // TODO: 實作排序功能
-                },
-                tooltip: 'Sort',
-              ),
+              // 球袋選擇按鈕
+              _buildBagSelectorButton(arsenalState),
             ],
           ),
         ),
@@ -270,28 +465,187 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
     );
   }
 
-  Widget _buildFilterSortButton({
-    required IconData icon,
-    required VoidCallback onTap,
-    required String tooltip,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: Colors.grey[600]!,
-            width: 1,
+  /// 建構自訂的 AppBar
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () => context.go('/'),
+      ),
+      title: const Text(
+        'My Arsenal',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 24,
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+    );
+  }
+
+
+  /// 建構球袋選擇按鈕
+  Widget _buildBagSelectorButton(NewArsenalState arsenalState) {
+    final userProfileState = ref.watch(userProfileControllerProvider);
+    final currentBagNumber = arsenalState.selectedBagNumber ?? 1;
+    
+    // 取得當前球袋名稱
+    String bagName = 'All My Arsenal'; // 預設名稱
+    if (userProfileState.profile != null) {
+      bagName = userProfileState.profile!.getBagName(currentBagNumber) ?? 'Bag $currentBagNumber';
+    }
+    
+    // 取得球袋對應的顏色 (index = bagNumber - 1)
+    final bagColor = _bagColors[currentBagNumber - 1];
+    
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _showBagSelectorBottomSheet(),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(20), // 橢圓形
+            border: Border.all(
+              color: bagColor,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  bagName,
+                  style: TextStyle(
+                    color: bagColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.keyboard_arrow_down,
+                size: 16,
+                color: bagColor.withValues(alpha: 0.7),
+              ),
+            ],
           ),
         ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: Colors.grey[300],
+      ),
+    );
+  }
+
+  /// 顯示球袋選擇底部彈出選單
+  void _showBagSelectorBottomSheet() {
+    final userProfileState = ref.read(userProfileControllerProvider);
+    final arsenalState = ref.read(newArsenalControllerProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _buildBagSelectorSheet(userProfileState, arsenalState),
+    );
+  }
+
+  /// 建構球袋選擇底部彈出選單
+  Widget _buildBagSelectorSheet(UserProfileState userProfileState, NewArsenalState arsenalState) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.grey[600]!,
+          width: 1.5,
         ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 拖拽指示器
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[600],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          
+          // 標題
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Select Bag',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          
+          // 球袋選項列表
+          if (userProfileState.profile != null)
+            ...userProfileState.profile!.unlockedBags.map((bagInfo) {
+              final isSelected = (arsenalState.selectedBagNumber ?? 1) == bagInfo.number;
+              final bagColor = _bagColors[bagInfo.number - 1];
+              
+              return ListTile(
+                title: Text(
+                  bagInfo.name,
+                  style: TextStyle(
+                    color: isSelected ? bagColor : Colors.white,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+                subtitle: Text(
+                  'Bag ${bagInfo.number}',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 12,
+                  ),
+                ),
+                trailing: isSelected 
+                    ? Icon(Icons.check, color: bagColor)
+                    : null,
+                onTap: () {
+                  // 更新選中的球袋
+                  ref.read(newArsenalControllerProvider.notifier).selectBag(bagInfo.number);
+                  Navigator.of(context).pop();
+                },
+              );
+            }).toList()
+          else
+            // 載入中或無資料時的預設選項
+            ListTile(
+              title: Text(
+                'All My Arsenal',
+                style: TextStyle(
+                  color: _bagColors[0], // 袋子1的顏色 (紅色)
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
+                'Bag 1',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 12,
+                ),
+              ),
+              trailing: Icon(Icons.check, color: _bagColors[0]),
+            ),
+          
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }
@@ -704,10 +1058,78 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
   }
 
 
-  /// Navigate to library with add to arsenal mode enabled
-  void _navigateToLibraryAddMode() {
-    // TODO: Implementation needed - navigate to library and enable add to arsenal mode
-    context.go('/library?addToArsenal=true');
+  /// Show library selection dialog for adding balls to arsenal
+  Future<void> _showLibrarySelectionDialog() async {
+    final selectedBallIds = await showLibrarySelectionDialog(context);
+    
+    if (selectedBallIds != null && selectedBallIds.isNotEmpty) {
+      await _addSelectedBallsToArsenal(selectedBallIds);
+    }
+  }
+
+
+  /// Add selected balls from library to arsenal
+  Future<void> _addSelectedBallsToArsenal(List<int> ballIds) async {
+    try {
+      // Get user ID
+      final authState = ref.read(authControllerProvider);
+      if (!authState.hasValue || authState.value == null) {
+        TopNotification.showError(
+          context,
+          'Please log in to add balls to arsenal',
+        );
+        return;
+      }
+      final userId = authState.value!.id;
+
+      // Get current arsenal state to determine category
+      final arsenalState = ref.read(newArsenalControllerProvider);
+      
+      // Use "My Balls" as default category, or first existing category
+      String categoryName = 'My Balls';
+      if (arsenalState.userCategories.isNotEmpty) {
+        categoryName = arsenalState.userCategories.first;
+      }
+
+      // Add each selected ball to arsenal
+      int successCount = 0;
+      int failCount = 0;
+      
+      for (final ballId in ballIds) {
+        try {
+          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
+            userId: userId,
+            ballId: ballId,
+            categoryName: categoryName,
+          );
+          successCount++;
+        } catch (e) {
+          print('Failed to add ball ID: $ballId, Error: $e');
+          failCount++;
+        }
+      }
+
+      // Show success/error notification
+      if (successCount > 0) {
+        TopNotification.showSuccess(
+          context,
+          'Successfully added $successCount ball${successCount != 1 ? 's' : ''} to arsenal!',
+        );
+      }
+      
+      if (failCount > 0) {
+        TopNotification.showError(
+          context,
+          'Failed to add $failCount ball${failCount != 1 ? 's' : ''}. Some balls may already be in your arsenal.',
+        );
+      }
+      
+    } catch (e) {
+      TopNotification.showError(
+        context,
+        'Failed to add balls to arsenal: $e',
+      );
+    }
   }
 
   /// Toggle remove mode in arsenal
@@ -722,11 +1144,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         Expanded(
           child: AppStandardButton(
             text: 'Add from Library',
-            icon: Icons.add_circle_outline,
             height: 36,
             fontSize: 12,
             customColor: Colors.green,
-            onPressed: () => _navigateToLibraryAddMode(),
+            onPressed: () => _showLibrarySelectionDialog(),
           ),
         ),
         const SizedBox(width: 12),
@@ -754,7 +1175,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> {
         // Selection info
         Expanded(
           child: Text(
-            'Remove Mode: $selectedCount ball${selectedCount != 1 ? 's' : ''} selected',
+            '$selectedCount ball${selectedCount != 1 ? 's' : ''} selected',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,

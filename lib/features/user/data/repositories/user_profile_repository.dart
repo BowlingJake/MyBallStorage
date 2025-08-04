@@ -22,6 +22,12 @@ abstract class UserProfileRepository {
     required String bagName,
   });
   
+  /// Delete a specific bag (set to unlocked: false, name: null)
+  Future<void> deleteBag({
+    required String userId,
+    required int bagNumber,
+  });
+  
   /// Get all unlocked bags for a user
   Future<List<BagInfo>> getUnlockedBags(String userId);
 }
