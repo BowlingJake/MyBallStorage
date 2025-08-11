@@ -116,6 +116,11 @@ extension UserProfileExtension on UserProfile {
       );
     }).toList();
   }
+
+  /// Get display name for bag with fallback
+  String displayNameForBag(int bagNumber) {
+    return getBagName(bagNumber) ?? 'Bag $bagNumber';
+  }
 }
 
 /// Helper class for bag information

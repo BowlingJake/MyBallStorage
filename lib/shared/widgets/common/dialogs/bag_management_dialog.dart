@@ -597,20 +597,25 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
                               );
                               
                               Navigator.of(dialogContext).pop();
-                              
-                              if (mounted) {
-                                TopNotification.showSuccess(
-                                  context,
-                                  'Bag ${index + 1} updated successfully!',
-                                );
-                              }
+                              if (!mounted) return;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  TopNotification.showSuccess(
+                                    context,
+                                    'Bag ${index + 1} updated successfully!',
+                                  );
+                                }
+                              });
                             } catch (e) {
-                              if (mounted) {
-                                TopNotification.showError(
-                                  dialogContext,
-                                  'Failed to update bag: $e',
-                                );
-                              }
+                              if (!mounted) return;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  TopNotification.showError(
+                                    context,
+                                    'Failed to update bag: $e',
+                                  );
+                                }
+                              });
                             }
                           },
                         ),
@@ -737,20 +742,25 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
                               );
                               
                               Navigator.of(dialogContext).pop();
-                              
-                              if (mounted) {
-                                TopNotification.showSuccess(
-                                  context,
-                                  'Bag ${index + 1} unlocked successfully!',
-                                );
-                              }
+                              if (!mounted) return;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  TopNotification.showSuccess(
+                                    context,
+                                    'Bag ${index + 1} unlocked successfully!',
+                                  );
+                                }
+                              });
                             } catch (e) {
-                              if (mounted) {
-                                TopNotification.showError(
-                                  dialogContext,
-                                  'Failed to unlock bag: $e',
-                                );
-                              }
+                              if (!mounted) return;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  TopNotification.showError(
+                                    context,
+                                    'Failed to unlock bag: $e',
+                                  );
+                                }
+                              });
                             }
                           },
                         ),

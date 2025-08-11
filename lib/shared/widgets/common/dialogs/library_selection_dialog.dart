@@ -462,7 +462,6 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                   Expanded(
                     child: AppStandardButton(
                       text: 'Cancel',
-                      height: 40,
                       fontSize: 14,
                       customColor: Colors.grey[400]!,
                       onPressed: () => Navigator.of(context).pop(),
@@ -472,7 +471,6 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                   Expanded(
                     child: AppStandardButton(
                       text: 'Add ${_selectedBallIds.length} Ball${_selectedBallIds.length != 1 ? 's' : ''}',
-                      height: 40,
                       fontSize: 14,
                       customColor: BrandColors.accentColorDark,
                       isPrimary: true,

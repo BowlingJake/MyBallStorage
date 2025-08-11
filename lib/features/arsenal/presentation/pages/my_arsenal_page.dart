@@ -17,6 +17,26 @@ import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.d
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/library_selection_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/appbar/arsenal_app_bar.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/appbar/selection_app_bar_actions.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/bottom_sheet/arsenal_more_bottom_sheet.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/tabs/arsenal_tabs.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/lists/arsenal_grid_view.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/lists/arsenal_list_view.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/common/view_mode_toggle.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/lists/arsenal_extra_info.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/unlock_bag_dialog.dart' as unlock_dialog;
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/sort_options_sheet.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/removal_options_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/move_target_bag_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/add_to_bag_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/instance_details_dialog.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/states/arsenal_empty_state.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/states/arsenal_error_state.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_tabs_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/appbar/search_bar.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/appbar/management_section.dart';
 
 /// 全新設計的 My Arsenal 主頁面
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -118,148 +138,23 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   }
 
   /// 顯示解鎖球袋對話框
-  void _showUnlockBagDialog(int index) {
-    final TextEditingController nameController = TextEditingController();
-    
-    showDialog(
+  void _showUnlockBagDialog(int index) async {
+    final ok = await ArsenalActions.unlockBag(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            constraints: const BoxConstraints(maxWidth: 350),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 標題
-                  Text(
-                    'Unlock Bag ${index + 1}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // 名稱輸入框
-                  TextField(
-                    controller: nameController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Enter bag name...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey[600]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey[600]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: _bagColors[index]),
-                      ),
-                      filled: true,
-                      fillColor: Colors.black.withOpacity(0.6),
-                    ),
-                    maxLength: 20,
-                    autofocus: true,
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // 按鈕
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Cancel',
-                          height: 36,
-                          fontSize: 14,
-                          customColor: Colors.grey[400]!,
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Unlock',
-                          height: 36,
-                          fontSize: 14,
-                          customColor: _bagColors[index],
-                          isPrimary: true,
-                          onPressed: () async {
-                            final bagName = nameController.text.trim();
-                            if (bagName.isEmpty) {
-                              TopNotification.showError(
-                                dialogContext,
-                                'Please enter a bag name',
-                              );
-                              return;
-                            }
-                            
-                            try {
-                              // 取得使用者ID
-                              final authState = ref.read(authControllerProvider);
-                              if (!authState.hasValue || authState.value == null) {
-                                throw Exception('User not authenticated');
-                              }
-                              final userId = authState.value!.id;
-                              
-                              // 更新後端
-                              await ref.read(userProfileControllerProvider.notifier).unlockBag(
-                                userId: userId,
-                                bagNumber: index + 1,
-                                bagName: bagName,
-                              );
-                              
-                              Navigator.of(dialogContext).pop();
-                              
-                              // Re-initialize tab controller with new bag
-                              _initializeTabController();
-                              setState(() {});
-                              
-                              if (mounted) {
-                                TopNotification.showSuccess(
-                                  context,
-                                  'Bag ${index + 1} unlocked successfully!',
-                                );
-                              }
-                            } catch (e) {
-                              if (mounted) {
-                                TopNotification.showError(
-                                  dialogContext,
-                                  'Failed to unlock bag: $e',
-                                );
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    ).then((_) {
-      nameController.dispose();
-    });
+      ref: ref,
+      bagIndex: index,
+      accentColor: _bagColors[index],
+    );
+    if (ok) {
+      _tabController?.dispose();
+      final userProfileState = ref.read(userProfileControllerProvider);
+      _tabController = ArsenalTabsController.createTabController(
+        vsync: this,
+        userProfileState: userProfileState,
+        onBagSelected: (bag) => ref.read(newArsenalControllerProvider.notifier).selectBag(bag),
+      );
+      setState(() {});
+    }
   }
 
   int _calculateCurrentIndex(String location) {
@@ -280,7 +175,12 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     // Initialize tab controller when user profile is loaded
     if (userProfileState.profile != null && _tabController == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _initializeTabController();
+        _tabController?.dispose();
+        _tabController = ArsenalTabsController.createTabController(
+          vsync: this,
+          userProfileState: userProfileState,
+          onBagSelected: (bag) => ref.read(newArsenalControllerProvider.notifier).selectBag(bag),
+        );
         setState(() {});
       });
     }
@@ -291,12 +191,74 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
         appBar: _buildAppBar(),
         body: Column(
           children: [
-            // 可滑動分頁標籤區
-            if (_tabController != null) 
-              _buildScrollableTabBar(userProfileState),
+            // 可滑動分頁標籤區（抽出為元件）
+            if (_tabController != null)
+              ArsenalTabs(
+                controller: _tabController!,
+                userProfileState: userProfileState,
+                bagColors: _bagColors,
+                onUnlockTap: (idx) => _showUnlockBagDialog(idx),
+                selectionMode: arsenalState.isMoveMode || arsenalState.isRemoveMode,
+                onBlockedSwitch: () {
+                  // 選擇模式下嘗試切換球袋：預設自動退出選擇模式
+                  if (arsenalState.isMoveMode) {
+                    _toggleMoveMode();
+                  } else if (arsenalState.isRemoveMode) {
+                    _toggleRemoveMode();
+                  }
+                },
+              ),
             
-            // 管理按鈕區
-            _buildManagementButtonsSection(),
+            // 管理按鈕/情境列
+            Builder(builder: (context) {
+              final isMove = arsenalState.isMoveMode;
+              final isRemove = arsenalState.isRemoveMode;
+              final selectionMode = isMove || isRemove;
+              if (selectionMode) {
+                final count = isMove
+                    ? arsenalState.selectedForMove.length
+                    : arsenalState.selectedForRemoval.length;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: AppStandardButton(
+                          text: isMove ? 'Confirm Move ($count)' : 'Confirm Remove ($count)',
+                          onPressed: () {
+                            if (isMove) {
+                              ArsenalActions.showMoveSelected(context: context, ref: ref, bagColors: _bagColors);
+                            } else {
+                              ArsenalActions.confirmRemoveSelected(context: context, ref: ref);
+                            }
+                          },
+                          customColor: isMove ? Colors.blue : Colors.red,
+                          isPrimary: true,
+                          whiteForeground: true,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: AppStandardButton(
+                          text: 'Exit',
+                          onPressed: () {
+                            if (isMove) {
+                              _toggleMoveMode();
+                            } else {
+                              _toggleRemoveMode();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return ManagementSection(
+                getSelectedBagText: (state) => _getSelectedBagDisplayText(state),
+                onMore: () => _showMoreOptionsBottomSheet(arsenalState),
+              );
+            }),
             
             // 內容顯示區
             Expanded(
@@ -304,7 +266,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
             ),
           ],
         ),
-        // 移除 FAB，改用 AppBar/底部面板等方式提供動作
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: _buildBottomActionBar(),
         bottomNavigationBar: ModernBottomNavigation(
           currentIndex: _calculateCurrentIndex(location),
           onTap: (index) => _navigateToIndex(context, index),
@@ -314,257 +277,17 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   }
 
 
-  /// B區：重新設計的功能列
-  Widget _buildManagementButtonsSection() {
-    final arsenalState = ref.watch(newArsenalControllerProvider);
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        children: [
-          // 搜尋欄改移至 AppBar，這裡不再顯示
-          
-          // 視圖控制列
-          _buildSecondRowControls(arsenalState),
-        ],
-      ),
-    );
-  }
-
-  /// 搜尋欄與更多選項列
-  Widget _buildSearchAndMoreOptionsRow(NewArsenalState arsenalState) {
-    return Row(
-      children: [
-        // 搜尋欄
-        Expanded(
-          child: Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: Colors.blue.withOpacity(0.6),
-                width: 1.5,
-              ),
-            ),
-            child: TextField(
-              controller: _searchController,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              decoration: InputDecoration(
-                hintText: 'Search by name or brand...',
-                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
-                filled: true,
-                fillColor: Colors.transparent,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
-              onChanged: (value) {
-                ref.read(newArsenalControllerProvider.notifier).updateSearchText(value);
-              },
-            ),
-          ),
-        ),
-        
-        const SizedBox(width: 12),
-        
-        // 更多選項按鈕（3點選單）
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _hasActiveFilters(arsenalState) 
-                  ? Colors.blue
-                  : Colors.grey[600]!,
-              width: 1.5,
-            ),
-          ),
-          child: IconButton(
-            onPressed: () => _showMoreOptionsBottomSheet(arsenalState),
-            icon: Icon(
-              Icons.more_vert,
-              color: _hasActiveFilters(arsenalState)
-                  ? Colors.blue
-                  : Colors.grey[400],
-              size: 20,
-            ),
-            tooltip: 'More Options',
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 搜尋欄（單獨顯示）
-  Widget _buildSearchBar(NewArsenalState arsenalState) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.blue.withOpacity(0.6),
-          width: 1.5,
-        ),
-      ),
-      child: TextField(
-        controller: _searchController,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
-        decoration: InputDecoration(
-          hintText: 'Search by name or brand...',
-          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-          prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
-          filled: true,
-          fillColor: Colors.transparent,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        ),
-        onChanged: (value) {
-          ref.read(newArsenalControllerProvider.notifier).updateSearchText(value);
-        },
-      ),
-    );
-  }
+  // 管理區與搜尋列已抽出
 
 
-  /// 第一行按鈕組件（有文字版）
-  Widget _buildFirstRowButton({
-    required String text,
-    required IconData icon,
-    required VoidCallback onPressed,
-    bool isActive = false,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isActive ? Colors.blue : Colors.grey[600]!,
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isActive ? Colors.blue : Colors.white,
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isActive ? Colors.blue : Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 第一行按鈕組件（圖示版）
-  Widget _buildFirstRowIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    bool isActive = false,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isActive ? Colors.blue : Colors.grey[600]!,
-            width: 1.5,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Center(
-              child: Icon(
-                icon,
-                size: 18,
-                color: isActive ? Colors.blue : Colors.white,
-              ),
-            ),
-            if (isActive)
-              Positioned(
-                right: 6,
-                top: 6,
-                child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
+  // 舊的第一行按鈕元件已移除
 
   /// C區：內容顯示區（簡化版，主要控制已移至B區）
   Widget _buildContentDisplaySection(ThemeData theme, NewArsenalState arsenalState) {
-    return Column(
-      children: [
-        // 操作按鈕列（新增/刪除/移動或選擇模式控制）
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: arsenalState.isRemoveMode 
-              ? _buildRemoveModeControls(arsenalState)
-              : arsenalState.isMoveMode
-                  ? _buildMoveModeControls(arsenalState)
-                  : _buildActionButtons(),
-        ),
-        
-        // 主內容區域
-        Expanded(
-          child: _buildMainContent(theme, arsenalState),
-        ),
-      ],
-    );
+    return _buildMainContent(theme, arsenalState);
   }
 
-  /// 第二行：視圖控制功能
-  Widget _buildSecondRowControls(NewArsenalState arsenalState) {
-    return Row(
-      children: [
-        // Grid/List 切換按鈕
-        _buildViewModeToggle(),
-        
-        const Spacer(),
-        
-        // Show the selected bag info
-        Text(
-          _getSelectedBagDisplayText(arsenalState),
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
+  // 第二行控制列已抽出
 
   /// Get display text for currently selected bag
   String _getSelectedBagDisplayText(NewArsenalState arsenalState) {
@@ -574,8 +297,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     if (selectedBag == 1) {
       return 'Viewing: All My Arsenal';
     } else if (userProfileState.profile != null) {
-      final bagName = userProfileState.profile!.getBagName(selectedBag);
-      return 'Viewing: ${bagName ?? 'Bag $selectedBag'}';
+      final bagName = userProfileState.profile!.displayNameForBag(selectedBag);
+      return 'Viewing: $bagName';
     }
     
     return 'Viewing: Bag $selectedBag';
@@ -589,166 +312,17 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
 
   /// 顯示更多選項底部彈窗
   void _showMoreOptionsBottomSheet(NewArsenalState arsenalState) {
-    showModalBottomSheet(
+    final canMove = (arsenalState.selectedBagNumber ?? 1) != 1;
+    ArsenalActions.openMoreOptionsSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => _buildMoreOptionsSheet(arsenalState),
+      ref: ref,
+      activeFilterCount: arsenalState.filters.activeFilterCount,
+      sortOption: arsenalState.sortOption,
+      canMove: canMove,
     );
   }
 
-  /// 建構更多選項底部彈窗
-  Widget _buildMoreOptionsSheet(NewArsenalState arsenalState) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.grey[600]!,
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 拖拽指示器
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[600],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          
-          // 標題
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'More Options',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          
-          // 快速動作
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                // Move Balls（僅非主袋顯示）
-                if ((arsenalState.selectedBagNumber ?? 1) != 1)
-                  _buildActionChip(
-                    icon: Icons.swap_horiz,
-                    label: 'Move',
-                    color: Colors.blue,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      _toggleMoveMode();
-                    },
-                  ),
-                if ((arsenalState.selectedBagNumber ?? 1) != 1)
-                  const SizedBox(width: 12),
-                _buildActionChip(
-                  icon: Icons.remove_circle_outline,
-                  label: 'Remove',
-                  color: Colors.red,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _toggleRemoveMode();
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // 選項列表
-          ListTile(
-            leading: Icon(
-              Icons.filter_list, 
-              color: arsenalState.filters.activeFilterCount > 0 
-                  ? Colors.blue 
-                  : Colors.grey[400],
-            ),
-            title: Text(
-              'Filter',
-              style: TextStyle(
-                color: arsenalState.filters.activeFilterCount > 0 
-                    ? Colors.blue 
-                    : Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            subtitle: arsenalState.filters.activeFilterCount > 0 
-                ? Text(
-                    '${arsenalState.filters.activeFilterCount} filter${arsenalState.filters.activeFilterCount != 1 ? 's' : ''} active',
-                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                  )
-                : null,
-            onTap: () {
-              Navigator.of(context).pop();
-              _showFilterDialog(context, ref, arsenalState);
-            },
-          ),
-          
-          ListTile(
-            leading: Icon(
-              Icons.sort, 
-              color: arsenalState.sortOption != SortOption.nameAZ 
-                  ? Colors.blue 
-                  : Colors.grey[400],
-            ),
-            title: Text(
-              'Sort',
-              style: TextStyle(
-                color: arsenalState.sortOption != SortOption.nameAZ 
-                    ? Colors.blue 
-                    : Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            subtitle: arsenalState.sortOption != SortOption.nameAZ 
-                ? Text(
-                    arsenalState.sortOption.displayName,
-                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                  )
-                : null,
-            onTap: () {
-              Navigator.of(context).pop();
-              _showSortDialog(context);
-            },
-          ),
-          
-          // 清除所有篩選器選項
-          if (_hasActiveFilters(arsenalState))
-            ListTile(
-              leading: Icon(Icons.clear, color: Colors.red[400]),
-              title: Text(
-                'Clear All Filters & Sort',
-                style: TextStyle(
-                  color: Colors.red[400],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                Navigator.of(context).pop();
-                ref.read(newArsenalControllerProvider.notifier).clearFilters();
-                ref.read(newArsenalControllerProvider.notifier).setSortOption(SortOption.nameAZ);
-              },
-            ),
-          
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
+  // 舊的更多選項面板已以 `ArsenalMoreBottomSheet` 取代
 
   /// 視圖模式切換按鈕組
   Widget _buildViewModeToggle() {
@@ -811,199 +385,130 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     );
   }
 
-  /// 建構可滑動的分頁標籤欄
-  Widget _buildScrollableTabBar(UserProfileState userProfileState) {
-    if (userProfileState.profile == null || _tabController == null) {
-      return const SizedBox.shrink();
-    }
-
-    final unlockedBags = userProfileState.profile!.unlockedBags;
-    final nextBagToUnlock = userProfileState.profile!.nextBagToUnlock;
-    
-    return Container(
-      padding: const EdgeInsets.only(left: 8, right: 16, top: 0, bottom: 8),
-      child: TabBar(
-        controller: _tabController!,
-        isScrollable: true,
-        indicatorColor: Colors.transparent, // 移除指示線
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey[400],
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-        ),
-        dividerColor: Colors.transparent, // 移除分隔線
-        tabAlignment: TabAlignment.start, // 靠左對齊
-        tabs: [
-          // 第一個標籤：All My Arsenal
-          Tab(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: _bagColors[0].withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: _bagColors[0],
-                  width: 1.5,
-                ),
-              ),
-              child: Text(
-                'All My Arsenal',
-                style: TextStyle(
-                  color: _bagColors[0],
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          
-          // 後續標籤：用戶解鎖的球袋
-          ...unlockedBags.skip(1).map((bagInfo) {
-            final bagIndex = bagInfo.number - 1;
-            final bagColor = bagIndex < _bagColors.length 
-                ? _bagColors[bagIndex] 
-                : Colors.grey;
-            
-            return Tab(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: bagColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: bagColor,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  bagInfo.name,
-                  style: TextStyle(
-                    color: bagColor,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-          
-          // 最後一個按鈕：解鎖新球袋
-          if (nextBagToUnlock != null)
-            Tab(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.green,
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.add,
-                      color: Colors.green,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Unlock Bag $nextBagToUnlock',
-                      style: const TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-        onTap: (index) {
-          // Handle unlock button tap
-          // 最後一個index是unlock button (如果nextBagToUnlock不為null)
-          final unlockButtonIndex = nextBagToUnlock != null 
-              ? 1 + (unlockedBags.length - 1) // "All Arsenal" + skipped bags
-              : -1; // No unlock button
-              
-          if (nextBagToUnlock != null && index == unlockButtonIndex) {
-            _showUnlockBagDialog(nextBagToUnlock - 1);
-          }
-        },
-      ),
-    );
-  }
+  // 分頁標籤欄已抽出為 `ArsenalTabs`
 
   /// 建構自訂的 AppBar
   PreferredSizeWidget _buildAppBar() {
     final arsenalState = ref.watch(newArsenalControllerProvider);
-    
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => context.go('/'),
+    final bool isMove = arsenalState.isMoveMode;
+    final bool isRemove = arsenalState.isRemoveMode;
+    final bool selectionMode = isMove || isRemove;
+
+    return ArsenalAppBar(
+      title: const Text(
+        'My Arsenal',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 24,
+        ),
       ),
-      title: _isSearchExpanded
-          ? _buildSearchBar(arsenalState)
-          : const Text(
-              'My Arsenal',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 24,
+      searchField: ArsenalSearchBar(
+        controller: _searchController,
+        onChanged: (value) => ref.read(newArsenalControllerProvider.notifier).updateSearchText(value),
+      ),
+      isSearching: _isSearchExpanded,
+      onBack: () => context.go('/'),
+      onToggleSearch: () {
+        setState(() {
+          _isSearchExpanded = !_isSearchExpanded;
+          if (!_isSearchExpanded) {
+            _searchController.clear();
+            ref.read(newArsenalControllerProvider.notifier).updateSearchText('');
+          }
+        });
+      },
+      actionsOverride: selectionMode ? [] : null,
+      moreAction: selectionMode
+          ? null
+          : IconButton(
+              onPressed: () => _showMoreOptionsBottomSheet(arsenalState),
+              icon: Icon(
+                Icons.more_vert,
+                color: _hasActiveFilters(arsenalState) ? Colors.blue : Colors.white,
+                size: 24,
+              ),
+              tooltip: 'More Options',
+            ),
+    );
+  }
+
+  /// 底部浮動操作列（加球/移動/刪除）
+  Widget? _buildBottomActionBar() {
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    final isMove = arsenalState.isMoveMode;
+    final isRemove = arsenalState.isRemoveMode;
+    if (isMove || isRemove) {
+      return null;
+    }
+
+    final int currentBagNumber = arsenalState.selectedBagNumber ?? 1;
+    final bool isMainBag = currentBagNumber == 1;
+    final bool hasData = arsenalState.allInstances
+        .any((i) => isMainBag ? true : i.isInBag(currentBagNumber));
+
+    final theme = Theme.of(context);
+    final double width = MediaQuery.of(context).size.width - 24; // 左右各留 12px
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).padding.bottom == 0 ? 0 : 2,
+      ),
+      child: SizedBox(
+        width: width,
+        child: Row(
+          children: [
+            Expanded(
+              child: AppStandardButton(
+                text: isMainBag ? 'Add from Library' : 'Add to This Bag',
+                height: 36,
+                fontSize: 12,
+                backgroundColor: Colors.black,
+                outlineColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                disabledForegroundColor: Colors.grey,
+                disabledOutlineColor: Colors.grey,
+                isPrimary: true,
+                whiteForeground: false,
+                onPressed: () => ArsenalActions.showAddToCurrentBag(context: context, ref: ref),
               ),
             ),
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: [
-        // 搜尋按鈕
-        IconButton(
-          onPressed: () {
-            setState(() {
-              _isSearchExpanded = !_isSearchExpanded;
-              if (!_isSearchExpanded) {
-                _searchController.clear();
-                ref.read(newArsenalControllerProvider.notifier).updateSearchText('');
-              }
-            });
-          },
-          icon: Icon(
-            _isSearchExpanded ? Icons.search_off : Icons.search,
-            color: _isSearchExpanded ? Colors.blue : Colors.white,
-            size: 24,
-          ),
-          tooltip: _isSearchExpanded ? 'Close Search' : 'Search',
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppStandardButton(
+                text: 'Move',
+                icon: Icons.swap_horiz,
+                height: 36,
+                fontSize: 12,
+                backgroundColor: Colors.black,
+                outlineColor: Colors.blue,
+                foregroundColor: Colors.blue,
+                disabledForegroundColor: Colors.grey,
+                disabledOutlineColor: Colors.grey,
+                isPrimary: true,
+                enabled: !isMainBag && hasData,
+                onPressed: _toggleMoveMode,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppStandardButton(
+                text: 'Remove',
+                icon: Icons.remove_circle_outline,
+                height: 36,
+                fontSize: 12,
+                backgroundColor: Colors.black,
+                outlineColor: Colors.red,
+                foregroundColor: Colors.red,
+                disabledForegroundColor: Colors.grey,
+                disabledOutlineColor: Colors.grey,
+                isPrimary: true,
+                enabled: hasData,
+                onPressed: _toggleRemoveMode,
+              ),
+            ),
+          ],
         ),
-        // 直接新增入口
-        IconButton(
-          onPressed: _showCrossSubBagAddDialog,
-          icon: const Icon(Icons.library_add_outlined, color: Colors.white),
-          tooltip: 'Add',
-        ),
-        // 更多選項按鈕（3點選單）移至 AppBar 並置於搜尋按鈕右側
-        IconButton(
-          onPressed: () => _showMoreOptionsBottomSheet(arsenalState),
-          icon: Icon(
-            Icons.more_vert,
-            color: _hasActiveFilters(arsenalState)
-                ? Colors.blue
-                : Colors.white,
-            size: 24,
-          ),
-          tooltip: 'More Options',
-        ),
-        
-        const SizedBox(width: 8),
-      ],
+      ),
     );
   }
 
@@ -1011,395 +516,49 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
 
   Widget _buildMainContent(ThemeData theme, NewArsenalState arsenalState) {
     if (arsenalState.isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: theme.colorScheme.primary,
-        ),
-      );
+      return Center(child: CircularProgressIndicator(color: theme.colorScheme.primary));
     }
 
     if (arsenalState.error != null) {
-      return _buildErrorState(theme, arsenalState.error!);
+      return ArsenalErrorState(error: arsenalState.error!, onRetry: _initializeData);
     }
 
     final filteredInstances = ref.read(newArsenalControllerProvider.notifier).filteredInstances;
 
     if (filteredInstances.isEmpty) {
-      return _buildEmptyState(theme);
+      return const ArsenalEmptyState();
     }
 
     return arsenalState.viewMode == ArsenalViewMode.grid
-        ? _buildGridView(filteredInstances)
-        : _buildListView(filteredInstances);
-  }
-
-
-  Widget _buildGridView(List<UserArsenalInstance> filteredInstances) {
-    final arsenalState = ref.watch(newArsenalControllerProvider);
-    
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 1, // 調整比例，減少高度但保持足夠空間
-        ),
-        itemCount: filteredInstances.length,
-        itemBuilder: (context, index) {
-          final instance = filteredInstances[index];
-          final isSelectedForRemoval = arsenalState.selectedForRemoval.contains(instance.id);
-          final isSelectedForMove = arsenalState.selectedForMove.contains(instance.id);
-          final isSelected = isSelectedForRemoval || isSelectedForMove;
-          
-          return ArsenalGridCard(
-            instance: instance,
-            isSelectionMode: arsenalState.isRemoveMode || arsenalState.isMoveMode,
-            isSelected: isSelected,
-            onTap: arsenalState.isRemoveMode 
-                ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id)
-                : arsenalState.isMoveMode
-                    ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id)
-                    : null,
+        ? ArsenalGridView(instances: filteredInstances)
+        : ArsenalListView(
+            instances: filteredInstances,
+            extraInfoBuilder: _buildArsenalExtraInfo,
           );
-        },
-      ),
-    );
   }
 
-  Widget _buildListView(List<UserArsenalInstance> filteredInstances) {
-    final arsenalState = ref.watch(newArsenalControllerProvider);
-    
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 32), // 參考Ball Library的設計
-        itemCount: filteredInstances.length,
-        itemBuilder: (context, index) {
-          final instance = filteredInstances[index];
-          final isSelectedForRemoval = arsenalState.selectedForRemoval.contains(instance.id);
-          final isSelectedForMove = arsenalState.selectedForMove.contains(instance.id);
-          final isSelected = isSelectedForRemoval || isSelectedForMove;
-          
-          return ArsenalSpecificBallCard(
-            arsenalBallInstance: instance,
-            theme: Theme.of(context),
-            isSelectionMode: arsenalState.isRemoveMode || arsenalState.isMoveMode,
-            isSelected: isSelected,
-            onTap: arsenalState.isRemoveMode 
-                ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id)
-                : arsenalState.isMoveMode
-                    ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id)
-                    : null,
-            extraInfo: _buildArsenalExtraInfo(instance),
-          );
-        },
-      ),
-    );
-  }
+
+  // Grid/List 已抽出為獨立元件
 
 
   /// 建構 Arsenal 專用的額外資訊
-  Widget _buildArsenalExtraInfo(UserArsenalInstance instance) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Layout info
-        Text(
-          instance.layoutDisplayString,
-          style: TextStyle(
-            color: Colors.grey[300],
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        // Games used
-        Text(
-          'Games Used: ${instance.gamesUsed}',
-          style: TextStyle(
-            color: Colors.grey[300],
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        // 移除 Categories 顯示
-      ],
-    );
-  }
+  Widget _buildArsenalExtraInfo(UserArsenalInstance instance) => ArsenalExtraInfo(instance: instance);
 
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Iconsax.bag,
-            size: 80,
-            color: theme.colorScheme.onSurface.withOpacity(0.3),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Your bag is empty',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Add your first ball from the library',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () => context.go('/library'),
-            child: const Text('Browse Library'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(ThemeData theme, String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Iconsax.warning_2,
-            size: 80,
-            color: theme.colorScheme.error,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '載入失敗',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.error,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _initializeData,
-            icon: const Icon(Iconsax.refresh),
-            label: const Text('重新載入'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // 空/錯誤狀態已抽出
 
   // FAB 已暫時移除：改採其他互動模式以避免遮擋內容
 
 
   void _showInstanceDetails(UserArsenalInstance instance) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.black.withOpacity(0.9),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with ball name
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      instance.bowlingBall?.name ?? 'Unknown Ball',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: Colors.white),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              
-              // Ball details
-              if (instance.bowlingBall != null) ...[
-                Text(
-                  'Brand: ${instance.bowlingBall!.brand}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-                const SizedBox(height: 8),
-              ],
-              
-              // Layout information
-              Text(
-                'Layout: ${instance.layoutDisplayString}',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              
-              // Games used
-              Text(
-                'Games Used: ${instance.gamesUsed}',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              
-              // Categories
-              if (instance.allCategories.isNotEmpty) ...[
-                Text(
-                  'Categories: ${instance.allCategories.join(", ")}',
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-              ],
-              
-              // Added date
-              Text(
-                'Added: ${instance.addedDate?.toString().split(' ')[0] ?? 'Unknown'}',
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              
-              // Notes if available
-              if (instance.notes != null && instance.notes!.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Text(
-                  'Notes:',
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  instance.notes!,
-                  style: const TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ],
-              
-              const SizedBox(height: 24),
-              
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // TODO: Implement edit functionality
-                      TopNotification.showError(
-                        context,
-                        'Edit functionality coming soon',
-                      );
-                    },
-                    child: const Text('Edit', style: TextStyle(color: Colors.blue)),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // TODO: Implement remove functionality
-                      _confirmRemoveInstance(instance);
-                    },
-                    child: const Text('Remove', style: TextStyle(color: Colors.red)),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    ArsenalActions.showInstanceDetails(context: context, ref: ref, instance: instance);
   }
 
   void _confirmRemoveInstance(UserArsenalInstance instance) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black.withOpacity(0.9),
-        title: const Text('Remove Ball', style: TextStyle(color: Colors.white)),
-        content: Text(
-          'Are you sure you want to remove "${instance.bowlingBall?.name ?? 'this ball'}" from your arsenal?',
-          style: const TextStyle(color: Colors.grey),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              try {
-                final authState = ref.read(authControllerProvider);
-                if (authState.hasValue && authState.value != null) {
-                  final userId = authState.value!.id;
-                  await ref.read(newArsenalControllerProvider.notifier).removeInstance(instance.id, userId);
-                  TopNotification.showSuccess(
-                    context,
-                    'Ball removed successfully',
-                  );
-                }
-              } catch (e) {
-                TopNotification.showError(
-                  context,
-                  'Failed to remove ball: $e',
-                );
-              }
-            },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+    ArsenalActions.showInstanceDetails(context: context, ref: ref, instance: instance);
   }
 
 
-  void _navigateToIndex(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/');
-        break;
-      case 1:
-        context.go('/library');
-        break;
-      case 2:
-        context.go('/my-arsenal');
-        break;
-      case 3:
-        context.go('/training');
-        break;
-      case 4:
-        context.go('/events');
-    }
-  }
+  void _navigateToIndex(BuildContext context, int index) => ArsenalActions.navigateToIndex(context, index);
 
   void _showFilterDialog(BuildContext context, WidgetRef ref, NewArsenalState arsenalState) {
     showFilterPopout(
@@ -1491,120 +650,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     ref.read(newArsenalControllerProvider.notifier).toggleRemoveMode();
   }
 
-  /// Build normal action buttons (add from library / remove balls)
-  Widget _buildActionButtons() {
-    final arsenalState = ref.watch(newArsenalControllerProvider);
-    final currentBagNumber = arsenalState.selectedBagNumber ?? 1;
-    final isMainBag = currentBagNumber == 1;
-    
-    return Row(
-      children: [
-        // 第一個按鈕：根據當前球袋顯示不同文字
-        Expanded(
-          child: AppStandardButton(
-            text: isMainBag ? 'Add from Library' : 'Add to This Bag',
-            height: 36,
-            fontSize: 12,
-            customColor: Colors.green,
-            onPressed: () => _showCrossSubBagAddDialog(),
-          ),
-        ),
-        const SizedBox(width: 8),
-        
-        // 第二個按鈕：移動球具（非主袋時顯示）
-        if (!isMainBag) ...[
-          Expanded(
-            child: AppStandardButton(
-              text: 'Move Balls',
-              icon: Icons.swap_horiz,
-              height: 36,
-              fontSize: 12,
-              customColor: Colors.blue,
-              onPressed: () => _toggleMoveMode(),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-        
-        // 移除按鈕
-        Expanded(
-          child: AppStandardButton(
-            text: 'Remove Balls',
-            icon: Icons.remove_circle_outline,
-            height: 36,
-            fontSize: 12,
-            customColor: Colors.red,
-            onPressed: () => _toggleRemoveMode(),
-          ),
-        ),
-      ],
-    );
-  }
+  // 舊的行動按鈕列已移除（改由 AppBar + BottomSheet 提供）
 
-  /// Build remove mode controls (selection info + action buttons)
-  Widget _buildRemoveModeControls(NewArsenalState arsenalState) {
-    final selectedCount = arsenalState.selectedForRemoval.length;
-    final hasSelection = selectedCount > 0;
-
-    return Row(
-      children: [
-        // Selection info
-        Expanded(
-          child: Text(
-            '$selectedCount ball${selectedCount != 1 ? 's' : ''} selected',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Delete selected button (only show if has selection)
-        if (hasSelection) ...[
-          _buildRemoveModeActionButton(
-            icon: Icons.delete,
-            color: Colors.red,
-            onTap: () => _confirmRemoveSelected(),
-          ),
-          const SizedBox(width: 8),
-        ],
-        // Exit remove mode button
-        _buildRemoveModeActionButton(
-          icon: Icons.close,
-          color: Colors.orange,
-          onTap: () => _toggleRemoveMode(),
-        ),
-      ],
-    );
-  }
-
-  /// Build small action button for remove mode
-  Widget _buildRemoveModeActionButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withOpacity(0.6),
-            width: 1,
-          ),
-        ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: color,
-        ),
-      ),
-    );
-  }
+  // 移除模式控制列與小按鈕已由 AppBar 情境列接手
 
   // 底部面板用的動作 Chip
   Widget _buildActionChip({
@@ -1672,62 +720,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
       currentBagName = userProfileState.profile!.getBagName(currentBagNumber) ?? 'Bag $currentBagNumber';
     }
 
-    final result = await showDialog<String>(
+    final result = await showRemovalOptionsDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black.withOpacity(0.9),
-        title: Text(
-          'Remove $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Choose removal option:',
-              style: TextStyle(
-                color: Colors.grey[300],
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 20),
-            
-            // 選項 1：僅從當前球袋移除
-            _buildRemovalOptionTile(
-              icon: Icons.remove_circle_outline,
-              title: 'Remove from $currentBagName Only',
-              subtitle: 'Keep balls in All My Arsenal',
-              color: Colors.orange,
-              onTap: () => Navigator.of(context).pop('bag_only'),
-            ),
-            
-            const SizedBox(width: 16),
-            
-            // 選項 2：從總袋完全刪除
-            _buildRemovalOptionTile(
-              icon: Icons.delete_forever,
-              title: 'Remove from All Arsenal',
-              subtitle: 'Completely remove from all bags',
-              color: Colors.red,
-              onTap: () => Navigator.of(context).pop('complete'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[400]),
-            ),
-          ),
-        ],
-      ),
+      selectedCount: selectedCount,
+      currentBagName: currentBagName,
     );
 
     if (result != null) {
@@ -1742,74 +738,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     }
   }
 
-  /// 建構刪除選項項目
-  Widget _buildRemovalOptionTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: color.withOpacity(0.6),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // 刪除選項 UI 已抽出
 
   /// 執行僅從當前球袋移除
   Future<void> _performBagOnlyRemoval(int selectedCount, int bagNumber) async {
@@ -1870,73 +799,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   /// 顯示排序選項對話框
   void _showSortDialog(BuildContext context) {
     final arsenalState = ref.read(newArsenalControllerProvider);
-    
-    showModalBottomSheet(
+    showSortOptionsSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Colors.grey[600]!,
-            width: 1.5,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 拖拽指示器
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[600],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            
-            // 標題
-            const Padding(
-              padding: EdgeInsets.all(20),
-              child: Text(
-                'Sort Options',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            
-            // 排序選項列表
-            ...SortOption.values.map((option) {
-              final isSelected = arsenalState.sortOption == option;
-              return ListTile(
-                title: Text(
-                  option.displayName,
-                  style: TextStyle(
-                    color: isSelected ? Colors.blue : Colors.white,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                ),
-                trailing: isSelected 
-                    ? const Icon(Icons.check, color: Colors.blue)
-                    : null,
-                onTap: () {
-                  ref.read(newArsenalControllerProvider.notifier).setSortOption(option);
-                  Navigator.of(context).pop();
-                },
-              );
-            }).toList(),
-            
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
+      selected: arsenalState.sortOption,
+      onSelect: (option) => ref.read(newArsenalControllerProvider.notifier).setSortOption(option),
     );
   }
 
@@ -1953,63 +819,10 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
       currentBagName = userProfileState.profile!.getBagName(currentBagNumber) ?? 'Bag $currentBagNumber';
     }
     
-    final result = await showDialog<String>(
+    final result = await showAddToBagDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black.withOpacity(0.9),
-        title: Text(
-          isMainBag ? 'Add to Arsenal' : 'Add to $currentBagName',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              isMainBag 
-                ? 'Choose where to add new balls:'
-                : 'Choose source to add balls from:',
-              style: TextStyle(
-                color: Colors.grey[300],
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 20),
-            
-            // 新增選項
-            _buildAddOptionTile(
-              icon: Icons.library_books,
-              title: 'Ball Library',
-              subtitle: 'Add new balls from the library',
-              color: Colors.green,
-              onTap: () => Navigator.of(context).pop('library'),
-            ),
-            
-            if (!isMainBag) ...[
-              const SizedBox(height: 12),
-              _buildAddOptionTile(
-                icon: Icons.inventory,
-                title: 'All My Arsenal',
-                subtitle: 'Move existing balls from main collection',
-                color: Colors.blue,
-                onTap: () => Navigator.of(context).pop('main_bag'),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[400]),
-            ),
-          ),
-        ],
-      ),
+      isMainBag: isMainBag,
+      currentBagName: currentBagName,
     );
     
     if (result != null) {
@@ -2024,74 +837,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     }
   }
 
-  /// 建構新增選項項目
-  Widget _buildAddOptionTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: color.withOpacity(0.6),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // 新增選項 UI 已抽出
 
   /// 為當前球袋從博物館選擇球具
   Future<void> _showLibrarySelectionForCurrentBag() async {
@@ -2211,47 +957,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     ref.read(newArsenalControllerProvider.notifier).toggleMoveMode();
   }
 
-  /// Build move mode controls (selection info + action buttons)
-  Widget _buildMoveModeControls(NewArsenalState arsenalState) {
-    final selectedCount = arsenalState.selectedForMove.length;
-    final hasSelection = selectedCount > 0;
-    final currentBagNumber = arsenalState.selectedBagNumber ?? 1;
-    final userProfileState = ref.watch(userProfileControllerProvider);
-
-    return Row(
-      children: [
-        // Selection info
-        Expanded(
-          child: Text(
-            '$selectedCount ball${selectedCount != 1 ? 's' : ''} selected to move',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        
-        // Move selected button (only show if has selection)
-        if (hasSelection) ...[
-          _buildRemoveModeActionButton(
-            icon: Icons.arrow_forward,
-            color: Colors.blue,
-            onTap: () => _showBagSelectionForMove(arsenalState, userProfileState),
-          ),
-          const SizedBox(width: 8),
-        ],
-        
-        // Exit move mode button
-        _buildRemoveModeActionButton(
-          icon: Icons.close,
-          color: Colors.orange,
-          onTap: () => _toggleMoveMode(),
-        ),
-      ],
-    );
-  }
+  // 移動模式控制列已由 AppBar 情境列接手
 
   /// 顯示移動目標球袋選擇
   Future<void> _showBagSelectionForMove(NewArsenalState arsenalState, UserProfileState userProfileState) async {
@@ -2264,11 +970,12 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     }
 
     final profile = userProfileState.profile!;
-    final availableBags = profile.unlockedBags
-        .where((bag) => bag.number != currentBagNumber) // 排除當前球袋
+    // 僅在子球袋間移動：排除主球袋與當前球袋
+    final subBags = profile.unlockedBags
+        .where((bag) => bag.number != 1)
         .toList();
 
-    if (availableBags.isEmpty) {
+    if (subBags.where((b) => b.number != currentBagNumber).isEmpty) {
       TopNotification.showError(
         context,
         'No other bags available for moving balls',
@@ -2276,119 +983,21 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
       return;
     }
 
-    final targetBagNumber = await showDialog<int>(
+    final targetBagNumber = await showMoveTargetBagDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black.withOpacity(0.9),
-        title: Text(
-          'Move $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Choose target bag:',
-              style: TextStyle(
-                color: Colors.grey[300],
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // 目標球袋選擇列表
-            ...availableBags.map((bagInfo) {
-              final bagColor = _bagColors[bagInfo.number - 1];
-              
-              return ListTile(
-                title: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: bagColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        bagInfo.name,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                onTap: () => Navigator.of(context).pop(bagInfo.number),
-              );
-            }).toList(),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[400]),
-            ),
-          ),
-        ],
-      ),
+      subBags: subBags,
+      bagColors: _bagColors,
+      currentBagNumber: currentBagNumber,
+      selectedCount: selectedCount,
     );
 
     if (targetBagNumber != null) {
-      await _confirmMoveToBag(targetBagNumber, selectedCount);
+      // 交由抽離的動作封裝處理
+      await ArsenalActions.showMoveSelected(context: context, ref: ref, bagColors: _bagColors);
     }
   }
 
   /// 確認移動到目標球袋
-  Future<void> _confirmMoveToBag(int targetBagNumber, int selectedCount) async {
-    final userProfileState = ref.read(userProfileControllerProvider);
-    String targetBagName = 'Bag $targetBagNumber';
-    if (userProfileState.profile != null) {
-      targetBagName = userProfileState.profile!.getBagName(targetBagNumber) ?? 'Bag $targetBagNumber';
-    }
-
-    final result = await showAppConfirmationDialog(
-      context: context,
-      title: 'Confirm Move',
-      message: 'Move $selectedCount ball${selectedCount != 1 ? 's' : ''} to $targetBagName?',
-      confirmText: 'Move',
-      cancelText: 'Cancel',
-    );
-
-    if (result == true) {
-      try {
-        final authState = ref.read(authControllerProvider);
-        if (authState.hasValue && authState.value != null) {
-          final userId = authState.value!.id;
-          await ref.read(newArsenalControllerProvider.notifier).moveSelectedInstancesToBag(targetBagNumber, userId);
-          
-          if (mounted) {
-            TopNotification.showSuccess(
-              context,
-              'Successfully moved $selectedCount ball${selectedCount != 1 ? 's' : ''} to $targetBagName',
-            );
-          }
-        }
-      } catch (e) {
-        if (mounted) {
-          TopNotification.showError(
-            context,
-            'Failed to move balls: $e',
-          );
-        }
-      }
-    }
-  }
+  Future<void> _confirmMoveToBag(int targetBagNumber, int selectedCount) async {}
 
 }

@@ -473,8 +473,18 @@ class NewArsenalController extends _$NewArsenalController {
   Future<void> moveSelectedInstancesToBag(int targetBagNumber, String userId) async {
     try {
       final selectedIds = state.selectedForMove.toList();
+      final int sourceBagNumber = state.selectedBagNumber ?? 1;
       
       for (final instanceId in selectedIds) {
+        // 剪下貼上：先從來源袋移除（若來源與目標不同且來源非主袋時）
+        if (sourceBagNumber != targetBagNumber) {
+          await _repository.updateBagAssignment(
+            instanceId: instanceId,
+            bagNumber: sourceBagNumber,
+            isInBag: false,
+          );
+        }
+        // 加入目標袋
         await _repository.updateBagAssignment(
           instanceId: instanceId,
           bagNumber: targetBagNumber,

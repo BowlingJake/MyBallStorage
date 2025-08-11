@@ -165,31 +165,31 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
             ),
           ),
           // Selection mode indicator (移除 favorite button，Arsenal 不需要)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: isSelectionMode
-                ? (isSelected 
-                    ? Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.8),
-                            width: 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      )
-                    : const SizedBox.shrink())
-                : const SizedBox.shrink(),
-          ),
+          if (isSelectionMode && isSelected) ...[
+            // overlay layer
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+            // centered check icon
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: Icon(
+                    Icons.check_circle,
+                    color: BrandColors.accentColorDark,
+                    size: 42,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

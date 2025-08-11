@@ -11,7 +11,16 @@
 ## 現況摘要（重點）
 - `my_arsenal_page.dart` 體積龐大，含：TabBar、搜尋、管理列、Grid/List 兩種視圖、選擇模式（移動/移除）。
 - 已改為 AppBar 搜尋；右上角三點面板支援 Filter/Sort 並已新增 Move/Remove 快捷。
-- 上方仍有舊的行動按鈕列（Add/Move/Remove）。
+- 舊的頁面上方行動按鈕列已移除，改由 AppBar 情境列 + Bottom Sheet 承接。
+
+## 進度
+- 已完成（v1）
+  - 拆出 `ArsenalAppBar`、`ArsenalMoreBottomSheet`、`ArsenalTabs`、`ArsenalGridView`、`ArsenalListView`。
+  - AppBar 情境化：移動/移除模式顯示選取數與確認/取消（`SelectionAppBarActions`）。
+  - 移除 FAB 與舊的行動按鈕列與模式控制列。
+  - 行為維持不變，所有動作仍呼叫既有 controller APIs。
+
+目前 `my_arsenal_page.dart` 仍偏長（~1,800 行），主要因各式對話框/底部面板與狀態頁面仍在此檔案內。
 
 ## 重構藍圖
 
@@ -57,12 +66,32 @@
 - 移除 FAB，避免與卡片重疊；所有主動作集中到 AppBar/Bottom Sheet。
 
 ### 6. 實作分階段計畫
-1) 拆分元件骨架，無行為改變：
-   - 抽出 `ArsenalAppBar`、`ArsenalTabs`、`ArsenalGridView`、`ArsenalListView`、`ArsenalBottomSheet`。
-2) 將 More 面板的 Move/Remove 行為串上既有 `_toggleMoveMode()`、`_toggleRemoveMode()`。
-3) 將選擇模式的控制列上移至 AppBar，並確保返回鍵可退出選擇模式（攔截 `WillPopScope`）。
-4) 驗證：Grid/List 兩模式、Filter/Sort 狀態同步、各球袋切換與解鎖流程。
-5) 清理：移除頁面內容上方的舊行動按鈕列（在你確認後）。
+1) 拆分元件骨架，無行為改變。（已完成）
+   - `ArsenalAppBar`、`ArsenalTabs`、`ArsenalGridView`、`ArsenalListView`、`ArsenalMoreBottomSheet`、`SelectionAppBarActions`。
+2) 將 More 面板的 Move/Remove 行為串上既有 `_toggleMoveMode()`、`_toggleRemoveMode()`。（已完成）
+3) 選擇模式控制列上移至 AppBar，返回鍵可退出（待確認是否需要 `WillPopScope` 攔截）。（已完成基本版本）
+4) 清理舊行動列與 FAB。（已完成）
+5) Phase-2 精簡（目標將 `my_arsenal_page.dart` 從 ~1800 行降至 < 700 行）：
+   - 抽出對話框/底部面板至 `widgets/dialogs/`：
+     - `unlock_bag_dialog.dart`（`_showUnlockBagDialog`）
+     - `sort_options_sheet.dart`（`_showSortDialog`）
+     - `removal_options_dialog.dart`（`_showTieredRemovalDialog` + `removal option tile`）
+     - `add_to_bag_dialog.dart`（`_showCrossSubBagAddDialog` + `add option tile`）
+     - `move_target_bag_dialog.dart`（`_showBagSelectionForMove`）
+     - `instance_details_dialog.dart`（`_showInstanceDetails` + `confirm remove`）
+   - 抽出狀態頁：
+     - `states/arsenal_empty_state.dart`、`states/arsenal_error_state.dart`
+   - 抽出小元件：
+     - `view_mode_toggle.dart`（取代 `_buildViewModeToggle` + `_buildViewModeButton`）
+     - `action_chip.dart`（取代 `_buildActionChip`，供 Bottom Sheet 復用）
+   - 抽出擴充資訊：
+     - `arsenal_extra_info.dart`（取代 `_buildArsenalExtraInfo`，由 `ArsenalListView` 以 builder/child 注入）
+   - 頁面只保留：生命週期、TabController 初始化、路由/導航、調用各對話框與視圖組裝。
+6) Phase-3（可選）：將「新增/移動/刪除」的 service 呼叫薄封裝為 `ArsenalActions`（pure functions），進一步減少頁面邏輯。
+
+完成後預估：
+- `my_arsenal_page.dart` ≈ 450–650 行。
+- 其他元件各自 < 150 行，便於單元測試與獨立維護。
 
 ### 7. 風險與回退
 - 風險：拆分過程可能導致狀態注入錯位。對策：以 props 傳遞回呼、在子元件內只讀取 provider，動作一律回調到父層。
@@ -75,4 +104,6 @@
 ---
 
 若此提案獲准，將依階段逐步提交 PR；每個階段都確保單元/整合驗證與最少視覺偏差。
+
+— 本文件已於 v1 重構完成後更新（已完成階段標註與 Phase-2 精簡計畫）。
 

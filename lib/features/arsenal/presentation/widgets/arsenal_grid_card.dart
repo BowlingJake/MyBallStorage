@@ -49,99 +49,141 @@ class ArsenalGridCard extends ConsumerWidget {
               ]
             : null,
       ),
-      child: InkWell(
-        onTap: isSelectionMode 
-            ? onTap 
-            : () => _showArsenalActionDialog(context, instance),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // 球的圖片 (圓形) - 放大
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-                child: ClipOval(
-                  child: _buildBallImage(100),
+      child: Stack(
+        children: [
+          // Content with tap handling (fill the card to keep centered layout)
+          Positioned.fill(
+            child: InkWell(
+            onTap: isSelectionMode 
+                ? onTap 
+                : () => _showArsenalActionDialog(context, instance),
+            borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 球的圖片 (圓形) - 放大
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.withOpacity(0.3),
+                      ),
+                      child: ClipOval(
+                        child: _buildBallImage(100),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    // 球名
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        instance.displayName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    // 品牌
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        instance.brandName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: brandColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Core & Cover
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        _buildCoreAndCoverText(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Layout
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        instance.layoutDisplayString,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[300],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    // Games Used
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        'Games Used: ${instance.gamesUsed}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[300],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 6),
-              
-              // 球名
-              Text(
-                instance.displayName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 3),
-              
-              // 品牌
-              Text(
-                instance.brandName,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: brandColor,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              
-              // Core & Cover
-              Text(
-                _buildCoreAndCoverText(),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              
-              // Layout
-              Text(
-                instance.layoutDisplayString,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[300],
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 3),
-              
-              // Games Used
-              Text(
-                'Games Used: ${instance.gamesUsed}',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[300],
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+            ),
           ),
-        ),
+          if (isSelectionMode && isSelected) ...[
+            // Semi-transparent white overlay
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color(0x40FFFFFF),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+            // Centered check icon with app accent color
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: Icon(
+                    Icons.check_circle,
+                    color: BrandColors.accentColorDark,
+                    size: 42,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
