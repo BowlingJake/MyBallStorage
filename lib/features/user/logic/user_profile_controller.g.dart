@@ -29,7 +29,7 @@ final userProfileRepositoryProvider =
 typedef UserProfileRepositoryRef
     = AutoDisposeProviderRef<UserProfileRepository>;
 String _$userProfileControllerHash() =>
-    r'9562cc1e7e9c4b371a282a283ac9612b5ca83632';
+    r'be6be59432e127abc17797118c987e5f87934c40';
 
 /// User profile controller
 ///

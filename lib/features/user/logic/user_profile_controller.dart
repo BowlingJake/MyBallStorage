@@ -72,6 +72,20 @@ class UserProfileController extends _$UserProfileController {
     required int bagNumber,
     required String bagName,
   }) async {
+    // 驗證輸入參數
+    if (!_validateBagNumber(bagNumber)) {
+      throw ArgumentError('Invalid bag number: $bagNumber. Must be between 1-9.');
+    }
+    
+    if (!_validateBagName(bagName)) {
+      throw ArgumentError('Invalid bag name. Must be 1-20 characters long.');
+    }
+    
+    // 檢查球袋是否已解鎖
+    if (!isBagUnlocked(bagNumber)) {
+      throw StateError('Cannot update name for locked bag $bagNumber');
+    }
+    
     try {
       // 先設置載入狀態
       state = state.copyWith(isLoading: true, error: null);
@@ -99,6 +113,25 @@ class UserProfileController extends _$UserProfileController {
     required int bagNumber,
     required String bagName,
   }) async {
+    // 驗證輸入參數
+    if (!_validateBagNumber(bagNumber)) {
+      throw ArgumentError('Invalid bag number: $bagNumber. Must be between 1-9.');
+    }
+    
+    if (!_validateBagName(bagName)) {
+      throw ArgumentError('Invalid bag name. Must be 1-20 characters long.');
+    }
+    
+    // 檢查球袋是否已解鎖
+    if (isBagUnlocked(bagNumber)) {
+      throw StateError('Bag $bagNumber is already unlocked');
+    }
+    
+    // 檢查是否符合解鎖順序
+    if (nextBagToUnlock != bagNumber) {
+      throw StateError('Cannot unlock bag $bagNumber. Next bag to unlock is ${nextBagToUnlock ?? "none"}');
+    }
+    
     try {
       // 先設置載入狀態
       state = state.copyWith(isLoading: true, error: null);
@@ -125,6 +158,26 @@ class UserProfileController extends _$UserProfileController {
     required String userId,
     required int bagNumber,
   }) async {
+    // 驗證輸入參數
+    if (!_validateBagNumber(bagNumber)) {
+      throw ArgumentError('Invalid bag number: $bagNumber. Must be between 1-9.');
+    }
+    
+    // 禁止刪除第一個球袋
+    if (bagNumber == 1) {
+      throw StateError('Cannot delete the main bag (Bag 1)');
+    }
+    
+    // 檢查球袋是否已解鎖
+    if (!isBagUnlocked(bagNumber)) {
+      throw StateError('Cannot delete locked bag $bagNumber');
+    }
+    
+    // 檢查是否為最後一個解鎖的球袋（保持順序性）
+    if (!_canDeleteBag(bagNumber)) {
+      throw StateError('Cannot delete bag $bagNumber. You can only delete the most recently unlocked bag.');
+    }
+    
     try {
       // 先設置載入狀態
       state = state.copyWith(isLoading: true, error: null);
@@ -173,5 +226,49 @@ class UserProfileController extends _$UserProfileController {
   /// Get next bag to unlock
   int? get nextBagToUnlock {
     return state.profile?.nextBagToUnlock;
+  }
+
+  /// 驗證球袋編號是否有效 (1-9)
+  bool _validateBagNumber(int bagNumber) {
+    return bagNumber >= 1 && bagNumber <= 9;
+  }
+
+  /// 驗證球袋名稱是否有效
+  bool _validateBagName(String bagName) {
+    final trimmed = bagName.trim();
+    return trimmed.isNotEmpty && trimmed.length <= 20;
+  }
+
+  /// 檢查是否可以刪除指定球袋（只能刪除最後解鎖的球袋）
+  bool _canDeleteBag(int bagNumber) {
+    if (state.profile == null) return false;
+    
+    final unlockedBags = state.profile!.unlockedBagNumbers;
+    if (unlockedBags.isEmpty) return false;
+    
+    // 只能刪除最後一個解鎖的球袋
+    final lastUnlockedBag = unlockedBags.last;
+    return bagNumber == lastUnlockedBag;
+  }
+
+  /// 取得球袋使用狀態統計
+  Map<String, dynamic> getBagStatistics() {
+    if (state.profile == null) {
+      return {
+        'totalBags': 1,
+        'unlockedBags': 1,
+        'lockedBags': 8,
+        'unlockProgress': 1.0 / 9.0,
+      };
+    }
+    
+    final unlockedCount = state.profile!.unlockedBagCount;
+    
+    return {
+      'totalBags': 9,
+      'unlockedBags': unlockedCount,
+      'lockedBags': 9 - unlockedCount,
+      'unlockProgress': unlockedCount / 9.0,
+    };
   }
 }

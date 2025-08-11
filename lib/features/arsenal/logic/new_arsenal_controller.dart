@@ -24,11 +24,30 @@ class NewArsenalState with _$NewArsenalState {
     @Default(BallFilters()) BallFilters filters,
     @Default(false) bool isRemoveMode,
     @Default({}) Set<int> selectedForRemoval,
+    @Default(false) bool isMoveMode,
+    @Default({}) Set<int> selectedForMove,
     @Default(1) int selectedBagNumber, // 預設選擇袋子 1
+    @Default(SortOption.nameAZ) SortOption sortOption, // 排序選項
+    @Default(false) bool sortAscending, // 排序方向
   }) = _NewArsenalState;
 }
 
 enum ArsenalViewMode { grid, list }
+
+/// 排序選項枚舉
+enum SortOption {
+  nameAZ('Name (A-Z)'),
+  nameZA('Name (Z-A)'),
+  brandAZ('Brand (A-Z)'),
+  brandZA('Brand (Z-A)'),
+  dateNewest('Date Added (Newest)'),
+  dateOldest('Date Added (Oldest)'),
+  gamesUsedMost('Games Used (Most)'),
+  gamesUsedLeast('Games Used (Least)');
+
+  const SortOption(this.displayName);
+  final String displayName;
+}
 
 /// New Arsenal repository provider
 @riverpod
@@ -152,7 +171,56 @@ class NewArsenalController extends _$NewArsenalController {
       }).toList();
     }
     
-    return instances;
+    // Apply sorting
+    return _sortInstances(instances);
+  }
+
+  /// 排序球具列表
+  List<UserArsenalInstance> _sortInstances(List<UserArsenalInstance> instances) {
+    final sortedInstances = List<UserArsenalInstance>.from(instances);
+    
+    switch (state.sortOption) {
+      case SortOption.nameAZ:
+        sortedInstances.sort((a, b) => 
+            (a.bowlingBall?.name ?? '').compareTo(b.bowlingBall?.name ?? ''));
+        break;
+      case SortOption.nameZA:
+        sortedInstances.sort((a, b) => 
+            (b.bowlingBall?.name ?? '').compareTo(a.bowlingBall?.name ?? ''));
+        break;
+      case SortOption.brandAZ:
+        sortedInstances.sort((a, b) => 
+            (a.bowlingBall?.brand ?? '').compareTo(b.bowlingBall?.brand ?? ''));
+        break;
+      case SortOption.brandZA:
+        sortedInstances.sort((a, b) => 
+            (b.bowlingBall?.brand ?? '').compareTo(a.bowlingBall?.brand ?? ''));
+        break;
+      case SortOption.dateNewest:
+        sortedInstances.sort((a, b) {
+          if (a.addedDate == null && b.addedDate == null) return 0;
+          if (a.addedDate == null) return 1;
+          if (b.addedDate == null) return -1;
+          return b.addedDate!.compareTo(a.addedDate!);
+        });
+        break;
+      case SortOption.dateOldest:
+        sortedInstances.sort((a, b) {
+          if (a.addedDate == null && b.addedDate == null) return 0;
+          if (a.addedDate == null) return 1;
+          if (b.addedDate == null) return -1;
+          return a.addedDate!.compareTo(b.addedDate!);
+        });
+        break;
+      case SortOption.gamesUsedMost:
+        sortedInstances.sort((a, b) => b.gamesUsed.compareTo(a.gamesUsed));
+        break;
+      case SortOption.gamesUsedLeast:
+        sortedInstances.sort((a, b) => a.gamesUsed.compareTo(b.gamesUsed));
+        break;
+    }
+    
+    return sortedInstances;
   }
 
   /// Get all available categories including virtual "All My Arsenal"
@@ -189,6 +257,21 @@ class NewArsenalController extends _$NewArsenalController {
     state = state.copyWith(filters: newFilters);
   }
 
+  /// 設定排序選項
+  void setSortOption(SortOption sortOption) {
+    state = state.copyWith(sortOption: sortOption);
+  }
+
+  /// 切換排序方向
+  void toggleSortDirection() {
+    state = state.copyWith(sortAscending: !state.sortAscending);
+  }
+
+  /// 獲取當前排序狀態的描述
+  String get currentSortDescription {
+    return state.sortOption.displayName;
+  }
+
   /// Clear all filters
   void clearFilters() {
     state = state.copyWith(
@@ -222,6 +305,49 @@ class NewArsenalController extends _$NewArsenalController {
       
     } catch (e) {
       state = state.copyWith(error: 'Failed to add ball: $e');
+      rethrow;
+    }
+  }
+
+  /// Add a ball from library to multiple bags
+  Future<void> addBallFromLibraryToMultipleBags({
+    required String userId,
+    required int ballId,
+    required String categoryName,
+    required List<int> bagNumbers,
+    String? notes,
+  }) async {
+    try {
+      // First add the ball to arsenal (this will add to bag 1 by default)
+      final instance = await _repository.addBallFromLibrary(
+        userId: userId,
+        ballId: ballId,
+        categoryName: categoryName,
+        notes: notes,
+      );
+
+      // Add to current state
+      final updatedInstances = [...state.allInstances, instance];
+      state = state.copyWith(allInstances: updatedInstances);
+      
+      // Add to additional bags if needed (exclude bag 1 as it's already added)
+      final additionalBags = bagNumbers.where((bagNum) => bagNum != 1).toList();
+      for (final bagNumber in additionalBags) {
+        await _repository.updateBagAssignment(
+          instanceId: instance.id,
+          bagNumber: bagNumber,
+          isInBag: true,
+        );
+      }
+      
+      // Refresh data to get updated bag assignments
+      await _loadAllInstances(userId);
+      
+      // Refresh categories in case it's a new category
+      await _loadUserCategories(userId);
+      
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to add ball to multiple bags: $e');
       rethrow;
     }
   }
@@ -317,7 +443,86 @@ class NewArsenalController extends _$NewArsenalController {
     state = state.copyWith(
       isRemoveMode: !state.isRemoveMode,
       selectedForRemoval: {}, // Clear selection when toggling
+      isMoveMode: false, // Disable move mode when remove mode is active
+      selectedForMove: {}, // Clear move selection
     );
+  }
+
+  /// Toggle move mode
+  void toggleMoveMode() {
+    state = state.copyWith(
+      isMoveMode: !state.isMoveMode,
+      selectedForMove: {}, // Clear selection when toggling
+      isRemoveMode: false, // Disable remove mode when move mode is active
+      selectedForRemoval: {}, // Clear removal selection
+    );
+  }
+
+  /// Toggle instance for move
+  void toggleInstanceForMove(int instanceId) {
+    final currentSelection = Set<int>.from(state.selectedForMove);
+    if (currentSelection.contains(instanceId)) {
+      currentSelection.remove(instanceId);
+    } else {
+      currentSelection.add(instanceId);
+    }
+    state = state.copyWith(selectedForMove: currentSelection);
+  }
+
+  /// Move selected instances to target bag
+  Future<void> moveSelectedInstancesToBag(int targetBagNumber, String userId) async {
+    try {
+      final selectedIds = state.selectedForMove.toList();
+      
+      for (final instanceId in selectedIds) {
+        await _repository.updateBagAssignment(
+          instanceId: instanceId,
+          bagNumber: targetBagNumber,
+          isInBag: true,
+        );
+      }
+      
+      // Refresh data to get updated bag assignments
+      await _loadAllInstances(userId);
+      
+      // Clear move mode and selection
+      state = state.copyWith(
+        isMoveMode: false,
+        selectedForMove: {},
+      );
+      
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to move balls: $e');
+      rethrow;
+    }
+  }
+
+  /// Remove selected instances from current bag (not from arsenal)
+  Future<void> removeSelectedInstancesFromBag(int bagNumber, String userId) async {
+    try {
+      final selectedIds = state.selectedForRemoval.toList();
+      
+      for (final instanceId in selectedIds) {
+        await _repository.updateBagAssignment(
+          instanceId: instanceId,
+          bagNumber: bagNumber,
+          isInBag: false,
+        );
+      }
+      
+      // Refresh data to get updated bag assignments
+      await _loadAllInstances(userId);
+      
+      // Clear remove mode and selection
+      state = state.copyWith(
+        isRemoveMode: false,
+        selectedForRemoval: {},
+      );
+      
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to remove balls from bag: $e');
+      rethrow;
+    }
   }
 
   /// Toggle instance selection for removal

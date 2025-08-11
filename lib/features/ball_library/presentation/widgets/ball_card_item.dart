@@ -4,6 +4,8 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -29,23 +31,207 @@ class BallCardItem extends ConsumerWidget {
   final bool isSelected;
 
 
-  /// 顯示加入Arsenal確認對話框
+  /// 顯示加入Arsenal球袋選擇對話框
   Future<void> _showAddToArsenalConfirmation(BuildContext context, WidgetRef ref) async {
-    final result = await showAppConfirmationDialog(
-      context: context,
-      title: 'Add to Arsenal',
-      message: 'Do you want to add this ball to your arsenal?',
-      confirmText: 'Yes',
-      cancelText: 'No',
-    );
-
-    if (result == true) {
-      await _addBallToArsenal(context, ref);
+    final selectedBags = await _showBagSelectionDialog(context, ref);
+    
+    if (selectedBags != null && selectedBags.isNotEmpty) {
+      await _addBallToSelectedBags(context, ref, selectedBags);
     }
   }
 
-  /// 將球加入Arsenal
-  Future<void> _addBallToArsenal(BuildContext context, WidgetRef ref) async {
+  /// 顯示球袋選擇對話框
+  Future<List<int>?> _showBagSelectionDialog(BuildContext context, WidgetRef ref) async {
+    // Get user profile to access unlocked bags
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      TopNotification.showError(
+        context,
+        'Please log in to add balls to arsenal',
+      );
+      return null;
+    }
+    
+    final userId = authState.value!.id;
+    await ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
+    final userProfileState = ref.read(userProfileControllerProvider);
+    
+    if (userProfileState.profile == null) {
+      TopNotification.showError(
+        context,
+        'Failed to load user profile',
+      );
+      return null;
+    }
+
+    final profile = userProfileState.profile!;
+    final unlockedBags = profile.unlockedBags;
+
+    // 球袋顏色對應 (與 My Arsenal 頁面一致)
+    final bagColors = [
+      Colors.red,     // 紅色 - 袋子1
+      Colors.orange,  // 橙色 - 袋子2
+      Colors.yellow,  // 黃色 - 袋子3
+      Colors.green,   // 綠色 - 袋子4
+      Colors.blue,    // 藍色 - 袋子5
+      Colors.purple,  // 紫色 - 袋子6
+      Colors.cyan,    // 青色 - 袋子7
+      Colors.white,   // 白色 - 袋子8
+      Colors.brown,   // 棕色 - 袋子9
+    ];
+
+    // 預設選中第一個球袋 (通常是 "All My Arsenal")
+    final selectedBags = <int>{1}; // 預設選中球袋1
+
+    return await showDialog<List<int>>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: Colors.black.withOpacity(0.9),
+          title: Row(
+            children: [
+              Icon(
+                Icons.sports_baseball,
+                color: Colors.white,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Add to Arsenal',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      ball.name,
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select which bags to add this ball to:',
+                  style: TextStyle(
+                    color: Colors.grey[300],
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // 球袋選擇列表
+                ...unlockedBags.map((bagInfo) {
+                  final isSelected = selectedBags.contains(bagInfo.number);
+                  final bagColor = bagColors[bagInfo.number - 1];
+                  
+                  return CheckboxListTile(
+                    value: isSelected,
+                    onChanged: bagInfo.number == 1 
+                        ? null // 禁用取消選擇第一個球袋 (必須加入總袋)
+                        : (value) {
+                            setState(() {
+                              if (value == true) {
+                                selectedBags.add(bagInfo.number);
+                              } else {
+                                selectedBags.remove(bagInfo.number);
+                              }
+                            });
+                          },
+                    title: Row(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: bagColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            bagInfo.name,
+                            style: TextStyle(
+                              color: isSelected ? bagColor : Colors.white,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        if (bagInfo.number == 1)
+                          Text(
+                            '(Required)',
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    ),
+                    checkColor: Colors.white,
+                    activeColor: bagColor,
+                  );
+                }).toList(),
+                
+                if (unlockedBags.length == 1)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      'Tip: Unlock more bags in Bag Management to organize your arsenal better!',
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey[400]),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(selectedBags.toList()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Add to ${selectedBags.length} bag${selectedBags.length != 1 ? 's' : ''}',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 將球加入選定的球袋
+  Future<void> _addBallToSelectedBags(BuildContext context, WidgetRef ref, List<int> selectedBagNumbers) async {
     try {
       // Get user ID
       final authState = ref.read(authControllerProvider);
@@ -68,16 +254,19 @@ class BallCardItem extends ConsumerWidget {
         categoryName = arsenalState.userCategories.first;
       }
 
-      // Add ball to arsenal
-      await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
+      // Add ball to selected bags using the new multi-bag functionality
+      final arsenalController = ref.read(newArsenalControllerProvider.notifier);
+      await arsenalController.addBallFromLibraryToMultipleBags(
         userId: userId,
         ballId: ball.id,
         categoryName: categoryName,
+        bagNumbers: selectedBagNumbers,
       );
       
+      final bagCount = selectedBagNumbers.length;
       TopNotification.showSuccess(
         context,
-        'Successfully added "${ball.name}" to arsenal!',
+        'Successfully added "${ball.name}" to $bagCount bag${bagCount != 1 ? 's' : ''}!',
       );
       
     } catch (e) {

@@ -28,7 +28,11 @@ mixin _$NewArsenalState {
   BallFilters get filters => throw _privateConstructorUsedError;
   bool get isRemoveMode => throw _privateConstructorUsedError;
   Set<int> get selectedForRemoval => throw _privateConstructorUsedError;
-  int get selectedBagNumber => throw _privateConstructorUsedError;
+  bool get isMoveMode => throw _privateConstructorUsedError;
+  Set<int> get selectedForMove => throw _privateConstructorUsedError;
+  int get selectedBagNumber => throw _privateConstructorUsedError; // 預設選擇袋子 1
+  SortOption get sortOption => throw _privateConstructorUsedError; // 排序選項
+  bool get sortAscending => throw _privateConstructorUsedError;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -54,7 +58,11 @@ abstract class $NewArsenalStateCopyWith<$Res> {
       BallFilters filters,
       bool isRemoveMode,
       Set<int> selectedForRemoval,
-      int selectedBagNumber});
+      bool isMoveMode,
+      Set<int> selectedForMove,
+      int selectedBagNumber,
+      SortOption sortOption,
+      bool sortAscending});
 
   $BallFiltersCopyWith<$Res> get filters;
 }
@@ -84,7 +92,11 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
     Object? filters = null,
     Object? isRemoveMode = null,
     Object? selectedForRemoval = null,
+    Object? isMoveMode = null,
+    Object? selectedForMove = null,
     Object? selectedBagNumber = null,
+    Object? sortOption = null,
+    Object? sortAscending = null,
   }) {
     return _then(_value.copyWith(
       allInstances: null == allInstances
@@ -127,10 +139,26 @@ class _$NewArsenalStateCopyWithImpl<$Res, $Val extends NewArsenalState>
           ? _value.selectedForRemoval
           : selectedForRemoval // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      isMoveMode: null == isMoveMode
+          ? _value.isMoveMode
+          : isMoveMode // ignore: cast_nullable_to_non_nullable
+              as bool,
+      selectedForMove: null == selectedForMove
+          ? _value.selectedForMove
+          : selectedForMove // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       selectedBagNumber: null == selectedBagNumber
           ? _value.selectedBagNumber
           : selectedBagNumber // ignore: cast_nullable_to_non_nullable
               as int,
+      sortOption: null == sortOption
+          ? _value.sortOption
+          : sortOption // ignore: cast_nullable_to_non_nullable
+              as SortOption,
+      sortAscending: null == sortAscending
+          ? _value.sortAscending
+          : sortAscending // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -164,7 +192,11 @@ abstract class _$$NewArsenalStateImplCopyWith<$Res>
       BallFilters filters,
       bool isRemoveMode,
       Set<int> selectedForRemoval,
-      int selectedBagNumber});
+      bool isMoveMode,
+      Set<int> selectedForMove,
+      int selectedBagNumber,
+      SortOption sortOption,
+      bool sortAscending});
 
   @override
   $BallFiltersCopyWith<$Res> get filters;
@@ -193,7 +225,11 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
     Object? filters = null,
     Object? isRemoveMode = null,
     Object? selectedForRemoval = null,
+    Object? isMoveMode = null,
+    Object? selectedForMove = null,
     Object? selectedBagNumber = null,
+    Object? sortOption = null,
+    Object? sortAscending = null,
   }) {
     return _then(_$NewArsenalStateImpl(
       allInstances: null == allInstances
@@ -236,10 +272,26 @@ class __$$NewArsenalStateImplCopyWithImpl<$Res>
           ? _value._selectedForRemoval
           : selectedForRemoval // ignore: cast_nullable_to_non_nullable
               as Set<int>,
+      isMoveMode: null == isMoveMode
+          ? _value.isMoveMode
+          : isMoveMode // ignore: cast_nullable_to_non_nullable
+              as bool,
+      selectedForMove: null == selectedForMove
+          ? _value._selectedForMove
+          : selectedForMove // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       selectedBagNumber: null == selectedBagNumber
           ? _value.selectedBagNumber
           : selectedBagNumber // ignore: cast_nullable_to_non_nullable
               as int,
+      sortOption: null == sortOption
+          ? _value.sortOption
+          : sortOption // ignore: cast_nullable_to_non_nullable
+              as SortOption,
+      sortAscending: null == sortAscending
+          ? _value.sortAscending
+          : sortAscending // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -258,10 +310,15 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       this.filters = const BallFilters(),
       this.isRemoveMode = false,
       final Set<int> selectedForRemoval = const {},
-      this.selectedBagNumber = 1})
+      this.isMoveMode = false,
+      final Set<int> selectedForMove = const {},
+      this.selectedBagNumber = 1,
+      this.sortOption = SortOption.nameAZ,
+      this.sortAscending = false})
       : _allInstances = allInstances,
         _userCategories = userCategories,
-        _selectedForRemoval = selectedForRemoval;
+        _selectedForRemoval = selectedForRemoval,
+        _selectedForMove = selectedForMove;
 
   final List<UserArsenalInstance> _allInstances;
   @override
@@ -313,11 +370,31 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
 
   @override
   @JsonKey()
+  final bool isMoveMode;
+  final Set<int> _selectedForMove;
+  @override
+  @JsonKey()
+  Set<int> get selectedForMove {
+    if (_selectedForMove is EqualUnmodifiableSetView) return _selectedForMove;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_selectedForMove);
+  }
+
+  @override
+  @JsonKey()
   final int selectedBagNumber;
+// 預設選擇袋子 1
+  @override
+  @JsonKey()
+  final SortOption sortOption;
+// 排序選項
+  @override
+  @JsonKey()
+  final bool sortAscending;
 
   @override
   String toString() {
-    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters, isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval, selectedBagNumber: $selectedBagNumber)';
+    return 'NewArsenalState(allInstances: $allInstances, userCategories: $userCategories, selectedCategory: $selectedCategory, isLoading: $isLoading, error: $error, viewMode: $viewMode, searchText: $searchText, filters: $filters, isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval, isMoveMode: $isMoveMode, selectedForMove: $selectedForMove, selectedBagNumber: $selectedBagNumber, sortOption: $sortOption, sortAscending: $sortAscending)';
   }
 
   @override
@@ -343,8 +420,16 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
                 other.isRemoveMode == isRemoveMode) &&
             const DeepCollectionEquality()
                 .equals(other._selectedForRemoval, _selectedForRemoval) &&
+            (identical(other.isMoveMode, isMoveMode) ||
+                other.isMoveMode == isMoveMode) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedForMove, _selectedForMove) &&
             (identical(other.selectedBagNumber, selectedBagNumber) ||
-                other.selectedBagNumber == selectedBagNumber));
+                other.selectedBagNumber == selectedBagNumber) &&
+            (identical(other.sortOption, sortOption) ||
+                other.sortOption == sortOption) &&
+            (identical(other.sortAscending, sortAscending) ||
+                other.sortAscending == sortAscending));
   }
 
   @override
@@ -360,7 +445,11 @@ class _$NewArsenalStateImpl implements _NewArsenalState {
       filters,
       isRemoveMode,
       const DeepCollectionEquality().hash(_selectedForRemoval),
-      selectedBagNumber);
+      isMoveMode,
+      const DeepCollectionEquality().hash(_selectedForMove),
+      selectedBagNumber,
+      sortOption,
+      sortAscending);
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.
@@ -384,7 +473,11 @@ abstract class _NewArsenalState implements NewArsenalState {
       final BallFilters filters,
       final bool isRemoveMode,
       final Set<int> selectedForRemoval,
-      final int selectedBagNumber}) = _$NewArsenalStateImpl;
+      final bool isMoveMode,
+      final Set<int> selectedForMove,
+      final int selectedBagNumber,
+      final SortOption sortOption,
+      final bool sortAscending}) = _$NewArsenalStateImpl;
 
   @override
   List<UserArsenalInstance> get allInstances;
@@ -407,7 +500,15 @@ abstract class _NewArsenalState implements NewArsenalState {
   @override
   Set<int> get selectedForRemoval;
   @override
-  int get selectedBagNumber;
+  bool get isMoveMode;
+  @override
+  Set<int> get selectedForMove;
+  @override
+  int get selectedBagNumber; // 預設選擇袋子 1
+  @override
+  SortOption get sortOption; // 排序選項
+  @override
+  bool get sortAscending;
 
   /// Create a copy of NewArsenalState
   /// with the given fields replaced by the non-null parameter values.

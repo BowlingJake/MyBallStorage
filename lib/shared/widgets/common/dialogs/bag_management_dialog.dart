@@ -101,14 +101,46 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
   }
 
   Widget _buildHeader() {
-    return const Text(
-      'Bag Management',
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
+    return Column(
+      children: [
+        const Text(
+          'Bag Management',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        _buildBagStatistics(),
+      ],
+    );
+  }
+
+  /// 建構球袋統計資訊
+  Widget _buildBagStatistics() {
+    final userProfileState = ref.watch(userProfileControllerProvider);
+    final statistics = ref.read(userProfileControllerProvider.notifier).getBagStatistics();
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.grey[700]!,
+          width: 1,
+        ),
       ),
-      textAlign: TextAlign.center,
+      child: Text(
+        '${statistics['unlockedBags']}/${statistics['totalBags']} Bags Unlocked',
+        style: TextStyle(
+          color: Colors.grey[300],
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 
