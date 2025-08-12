@@ -164,9 +164,19 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     final selectionMode = ArsenalSelectionHandler.isInSelectionMode(arsenalState);
     
     return ArsenalAppBar(
-      isSearchExpanded: false,
-      searchController: _searchController,
-      onSearchToggle: () {
+      title: const Text('My Arsenal'),
+      searchField: TextField(
+        controller: _searchController,
+        decoration: const InputDecoration(
+          hintText: 'Search balls...',
+          border: InputBorder.none,
+          hintStyle: TextStyle(color: Colors.white70),
+        ),
+        style: const TextStyle(color: Colors.white),
+      ),
+      isSearching: false, // You can connect this to a state variable
+      onBack: () => Navigator.of(context).pop(),
+      onToggleSearch: () {
         setState(() {
           // Handle search toggle if needed
         });

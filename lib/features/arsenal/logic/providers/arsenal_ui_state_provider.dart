@@ -107,32 +107,26 @@ class ArsenalUiStateProvider extends _$ArsenalUiStateProvider {
 
   /// Update specific brand filter
   void updateBrandFilter(List<String> brands) {
-    final updatedFilters = state.filters.copyWith(selectedBrands: brands);
+    final updatedFilters = state.filters.copyWith(brands: brands.toSet());
     state = state.copyWith(filters: updatedFilters);
   }
 
-  /// Update specific category filter
+  /// Update specific category filter (using cores as category placeholder)
   void updateCategoryFilter(List<String> categories) {
-    final updatedFilters = state.filters.copyWith(selectedCategories: categories);
+    final updatedFilters = state.filters.copyWith(cores: categories.toSet());
     state = state.copyWith(filters: updatedFilters);
   }
 
-  /// Update weight range filter
+  /// Update weight range filter (not supported by BallFilters)
   void updateWeightRangeFilter(double? minWeight, double? maxWeight) {
-    final updatedFilters = state.filters.copyWith(
-      minWeight: minWeight,
-      maxWeight: maxWeight,
-    );
-    state = state.copyWith(filters: updatedFilters);
+    // TODO: Implement Arsenal-specific filters that include weight
+    // For now, BallFilters doesn't support weight filtering
   }
 
-  /// Update games used range filter
+  /// Update games used range filter (not supported by BallFilters)
   void updateGamesUsedRangeFilter(int? minGames, int? maxGames) {
-    final updatedFilters = state.filters.copyWith(
-      minGamesUsed: minGames,
-      maxGamesUsed: maxGames,
-    );
-    state = state.copyWith(filters: updatedFilters);
+    // TODO: Implement Arsenal-specific filters that include games used
+    // For now, BallFilters doesn't support games used filtering
   }
 
   // === Sort Operations ===
@@ -165,12 +159,9 @@ class ArsenalUiStateProvider extends _$ArsenalUiStateProvider {
   /// Check if any filters are active
   bool get hasActiveFilters {
     final filters = state.filters;
-    return filters.selectedBrands.isNotEmpty ||
-           filters.selectedCategories.isNotEmpty ||
-           filters.minWeight != null ||
-           filters.maxWeight != null ||
-           filters.minGamesUsed != null ||
-           filters.maxGamesUsed != null;
+    return filters.brands.isNotEmpty ||
+           filters.cores.isNotEmpty ||
+           filters.coverstocks.isNotEmpty;
   }
 
   /// Check if search is active
@@ -185,17 +176,14 @@ class ArsenalUiStateProvider extends _$ArsenalUiStateProvider {
     final activeFilters = <String>[];
     final filters = state.filters;
     
-    if (filters.selectedBrands.isNotEmpty) {
-      activeFilters.add('${filters.selectedBrands.length} brands');
+    if (filters.brands.isNotEmpty) {
+      activeFilters.add('${filters.brands.length} brands');
     }
-    if (filters.selectedCategories.isNotEmpty) {
-      activeFilters.add('${filters.selectedCategories.length} categories');
+    if (filters.cores.isNotEmpty) {
+      activeFilters.add('${filters.cores.length} cores');
     }
-    if (filters.minWeight != null || filters.maxWeight != null) {
-      activeFilters.add('weight range');
-    }
-    if (filters.minGamesUsed != null || filters.maxGamesUsed != null) {
-      activeFilters.add('games used range');
+    if (filters.coverstocks.isNotEmpty) {
+      activeFilters.add('${filters.coverstocks.length} coverstocks');
     }
     
     return activeFilters.join(', ');

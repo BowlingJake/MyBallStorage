@@ -56,7 +56,10 @@ class ArsenalContentSection extends ConsumerWidget {
         Expanded(
           child: state.viewMode == ArsenalViewMode.grid
               ? ArsenalGridView(instances: filteredBalls)
-              : ArsenalListView(instances: filteredBalls),
+              : ArsenalListView(
+                  instances: filteredBalls,
+                  extraInfoBuilder: (instance) => const SizedBox.shrink(),
+                ),
         ),
       ],
     );

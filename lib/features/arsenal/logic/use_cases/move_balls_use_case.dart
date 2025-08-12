@@ -115,7 +115,7 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
                 backgroundColor: bagColors[bag.number - 1],
                 child: Text('${bag.number}'),
               ),
-              title: Text(bag.displayName),
+              title: Text(bag.name),
               onTap: () => Navigator.of(context).pop(bag.number),
             )),
           ],
@@ -207,10 +207,11 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
     int sourceBagNumber,
     int targetBagNumber,
   ) async {
-    // Implementation would depend on the controller's methods
-    // This is a placeholder for the actual move logic
-    await ref.read(newArsenalControllerProvider.notifier)
-        .moveBallBetweenBags(instanceId, sourceBagNumber, targetBagNumber);
+    // TODO: Implement ball movement using existing controller methods
+    // For now, this is a placeholder as the exact move logic needs to be implemented
+    final controller = ref.read(newArsenalControllerProvider.notifier);
+    // This would need custom implementation in the controller
+    throw UnimplementedError('Ball movement between bags not yet implemented');
   }
 
   /// Show move result to user

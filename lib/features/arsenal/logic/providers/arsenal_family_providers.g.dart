@@ -7,7 +7,7 @@ part of 'arsenal_family_providers.dart';
 // **************************************************************************
 
 String _$arsenalInstancesByBagHash() =>
-    r'445e647983d47e751d6d762fa3ab3d569bc2a74c';
+    r'a6a5db5ddb16996ef9b219b720d65bd711930d8c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -483,7 +483,7 @@ class _IsInstanceSelectedProviderElement
   int get instanceId => (origin as IsInstanceSelectedProvider).instanceId;
 }
 
-String _$bagStatisticsHash() => r'ac2625e44c78f07e1a2ec207fd192aff4a37749c';
+String _$bagStatisticsHash() => r'fe0cfbc2ab7017634b3d7aaaa7276c17c8d8a14e';
 
 /// Family provider for bag statistics
 /// This allows each bag to have its own cached statistics

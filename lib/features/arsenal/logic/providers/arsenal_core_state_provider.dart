@@ -181,7 +181,7 @@ class ArsenalCoreStateProvider extends _$ArsenalCoreStateProvider {
     }
     
     return instances
-        .where((instance) => instance.category == state.selectedCategory)
+        .where((instance) => instance.belongsToCategory(state.selectedCategory!))
         .toList();
   }
 

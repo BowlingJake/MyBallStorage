@@ -76,7 +76,7 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
               child: Column(
                 children: availableBags
                     .where((bag) => bag.number != currentBagNumber && bag.number != 1)
-                    .map((bag) => _buildBagOptionTile(bag, bagColors))
+                    .map((bag) => _buildBagOptionTile(context, bag, bagColors))
                     .toList(),
               ),
             ),
@@ -309,7 +309,7 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
   }
 
   /// Build bag option tile for move dialog
-  Widget _buildBagOptionTile(BagInfo bag, List<Color> bagColors) {
+  Widget _buildBagOptionTile(BuildContext context, BagInfo bag, List<Color> bagColors) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: bagColors[bag.number - 1],
@@ -321,7 +321,7 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
           ),
         ),
       ),
-      title: Text(bag.displayName),
+      title: Text(bag.name),
       onTap: () => Navigator.of(context).pop(bag.number),
     );
   }

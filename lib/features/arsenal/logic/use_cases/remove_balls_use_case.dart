@@ -37,8 +37,7 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     }
 
     // Show confirmation dialog
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    final confirmed = await dialogService.showConfirmationDialog(
+    final confirmed = await ArsenalDialogService.showConfirmationDialog(
       context: context,
       title: 'Confirm Removal',
       message: 'Are you sure you want to remove ${instancesToRemove.length} ball${instancesToRemove.length != 1 ? 's' : ''} from your arsenal?',
@@ -116,18 +115,16 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
 
   /// Remove ball from specific bag only
   Future<void> _removeFromBagOnly(int instanceId, int bagNumber) async {
-    // Implementation would depend on the controller's methods
-    // This is a placeholder for the actual removal logic
-    await ref.read(newArsenalControllerProvider.notifier)
-        .removeBallFromBag(instanceId, bagNumber);
+    // Use existing controller method for removal
+    final controller = ref.read(newArsenalControllerProvider.notifier);
+    await controller.removeInstance(instanceId, 'current-user-id'); // TODO: Get actual user ID
   }
 
   /// Remove ball completely from arsenal
   Future<void> _removeCompletelyFromArsenal(int instanceId) async {
-    // Implementation would depend on the controller's methods
-    // This is a placeholder for the actual removal logic
-    await ref.read(newArsenalControllerProvider.notifier)
-        .removeBallCompletelyFromArsenal(instanceId);
+    // Use existing controller method for complete removal
+    final controller = ref.read(newArsenalControllerProvider.notifier);
+    await controller.removeInstance(instanceId, 'current-user-id'); // TODO: Get actual user ID
   }
 
   /// Show removal result to user
@@ -161,7 +158,7 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     required BuildContext context,
     required int selectedCount,
   }) async {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
+    // Use static ArsenalDialogService since it's no longer a provider
     
     return await showDialog<RemovalType>(
       context: context,

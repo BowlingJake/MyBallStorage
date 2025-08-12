@@ -29,7 +29,7 @@ final userArsenalRepositoryProvider =
 typedef UserArsenalRepositoryRef
     = AutoDisposeProviderRef<UserArsenalRepository>;
 String _$arsenalCoreStateProviderHash() =>
-    r'bad75b82fb8fa6993dec1e5505c833cb7f70d844';
+    r'98eed3e067be44e50fc20fd5a7987a97065092aa';
 
 /// Core Arsenal data provider - handles only data loading and bag operations
 ///

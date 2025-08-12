@@ -74,7 +74,7 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
 
 
       // Fetch the complete instance with bowling ball data
-      return _getCompleteInstance(response['id']);
+      return _getCompleteInstance(response['id'] as int);
     } catch (e) {
       throw Exception('Failed to add ball from library: $e');
     }

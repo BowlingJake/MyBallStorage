@@ -7,7 +7,7 @@ part of 'arsenal_ui_state_provider.dart';
 // **************************************************************************
 
 String _$arsenalUiStateProviderHash() =>
-    r'eba86d60c82fbe3f434258cf37096664bb7bcf89';
+    r'4eabf5025b40b5c73a8136bf38e4a60566979bdf';
 
 /// Arsenal UI state provider - handles only display and filter state
 ///

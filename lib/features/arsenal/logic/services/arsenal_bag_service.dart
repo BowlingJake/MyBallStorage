@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_ins
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 
 part 'arsenal_bag_service.g.dart';
 
