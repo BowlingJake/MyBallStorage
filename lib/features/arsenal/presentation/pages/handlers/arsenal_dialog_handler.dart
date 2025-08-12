@@ -11,9 +11,9 @@ class ArsenalDialogHandler {
     required WidgetRef ref,
     required NewArsenalState arsenalState,
   }) {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    dialogService.showMoreOptionsBottomSheet(
+    ArsenalDialogService.showMoreOptionsBottomSheet(
       context: context,
+      ref: ref,
       arsenalState: arsenalState,
     );
   }
@@ -22,8 +22,10 @@ class ArsenalDialogHandler {
     required BuildContext context,
     required WidgetRef ref,
   }) {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    dialogService.showAddToCurrentBag(context: context);
+    ArsenalDialogService.showAddToCurrentBag(
+      context: context,
+      ref: ref,
+    );
   }
 
   static Future<void> showMoveSelected({
@@ -59,9 +61,9 @@ class ArsenalDialogHandler {
     required int bagIndex,
     required Color accentColor,
   }) async {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    return await dialogService.showUnlockBagDialog(
+    return await ArsenalDialogService.showUnlockBagDialog(
       context: context,
+      ref: ref,
       bagIndex: bagIndex,
       accentColor: accentColor,
     );
@@ -71,8 +73,10 @@ class ArsenalDialogHandler {
     required BuildContext context,
     required WidgetRef ref,
   }) {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    dialogService.showLibrarySelection(context: context);
+    ArsenalDialogService.showLibrarySelection(
+      context: context,
+      ref: ref,
+    );
   }
 
   static void showBallDetails({
@@ -80,8 +84,7 @@ class ArsenalDialogHandler {
     required WidgetRef ref,
     required int instanceId,
   }) {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    dialogService.showBallDetails(
+    ArsenalDialogService.showBallDetails(
       context: context,
       instanceId: instanceId,
     );

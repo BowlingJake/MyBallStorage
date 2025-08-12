@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/providers/arsenal_selection_state_provider.dart';
 
 part 'arsenal_selection_service.g.dart';
 
@@ -113,22 +114,4 @@ class ArsenalSelectionService extends _$ArsenalSelectionService {
   }
 }
 
-/// Enum for selection mode colors
-enum SelectionModeColor {
-  none,
-  move,
-  remove,
-}
-
-extension SelectionModeColorExtension on SelectionModeColor {
-  String get colorName {
-    switch (this) {
-      case SelectionModeColor.move:
-        return 'blue';
-      case SelectionModeColor.remove:
-        return 'red';
-      case SelectionModeColor.none:
-        return 'grey';
-    }
-  }
-}
+// Note: SelectionModeColor enum is now defined in arsenal_selection_state_provider.dart

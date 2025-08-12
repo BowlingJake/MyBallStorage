@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller
 import 'package:bowlingarsenal_app/features/arsenal/logic/managers/arsenal_dialog_manager.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/use_cases/move_balls_use_case.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/use_cases/remove_balls_use_case.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/providers/arsenal_selection_state_provider.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/mixins/arsenal_error_handling_mixin.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/mixins/arsenal_notification_mixin.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/mixins/arsenal_state_mixin.dart';

@@ -16,9 +16,9 @@ class ArsenalBagHandler {
     required TickerProvider vsync,
     required Function(TabController?) onTabControllerUpdate,
   }) async {
-    final dialogService = ref.read(arsenalDialogServiceProvider.notifier);
-    final ok = await dialogService.showUnlockBagDialog(
+    final ok = await ArsenalDialogService.showUnlockBagDialog(
       context: context,
+      ref: ref,
       bagIndex: bagIndex,
       accentColor: bagColors[bagIndex],
     );

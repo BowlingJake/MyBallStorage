@@ -6,7 +6,7 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/providers/arsenal_sele
 import 'package:bowlingarsenal_app/features/arsenal/presentation/mixins/arsenal_state_mixin.dart';
 
 /// Optimized Arsenal ball item widget with performance improvements
-class ArsenalBallItemOptimized extends ConsumerWidget with ArsenalStateMixin {
+class ArsenalBallItemOptimized extends ConsumerWidget {
   final int instanceId;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
