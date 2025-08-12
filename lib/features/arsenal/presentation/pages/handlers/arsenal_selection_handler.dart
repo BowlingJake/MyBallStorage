@@ -1,53 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_selection_service.dart';
 
 class ArsenalSelectionHandler {
   static void toggleMoveMode(WidgetRef ref) {
-    ref.read(newArsenalControllerProvider.notifier).toggleMoveMode();
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.toggleMoveMode();
   }
 
   static void toggleRemoveMode(WidgetRef ref) {
-    ref.read(newArsenalControllerProvider.notifier).toggleRemoveMode();
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.toggleRemoveMode();
   }
 
   static void exitSelectionMode(WidgetRef ref, NewArsenalState arsenalState) {
-    if (arsenalState.isMoveMode) {
-      toggleMoveMode(ref);
-    } else if (arsenalState.isRemoveMode) {
-      toggleRemoveMode(ref);
-    }
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.exitSelectionMode(arsenalState);
   }
 
   static bool isInSelectionMode(NewArsenalState arsenalState) {
+    // Keep this as static utility since it's just a simple check
     return arsenalState.isMoveMode || arsenalState.isRemoveMode;
   }
 
-  static int getSelectionCount(NewArsenalState arsenalState) {
-    if (arsenalState.isMoveMode) {
-      return arsenalState.selectedForMove.length;
-    } else if (arsenalState.isRemoveMode) {
-      return arsenalState.selectedForRemoval.length;
-    }
-    return 0;
+  static int getSelectionCount(WidgetRef ref, NewArsenalState arsenalState) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    return selectionService.getSelectionCount(arsenalState);
   }
 
-  static String getSelectionModeText(NewArsenalState arsenalState) {
-    final count = getSelectionCount(arsenalState);
-    if (arsenalState.isMoveMode) {
-      return 'Confirm Move ($count)';
-    } else if (arsenalState.isRemoveMode) {
-      return 'Confirm Remove ($count)';
-    }
-    return '';
+  static String getSelectionModeText(WidgetRef ref, NewArsenalState arsenalState) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    return selectionService.getSelectionModeText(arsenalState);
   }
 
-  static Color getSelectionModeColor(NewArsenalState arsenalState) {
-    if (arsenalState.isMoveMode) {
-      return Colors.blue;
-    } else if (arsenalState.isRemoveMode) {
-      return Colors.red;
-    }
-    return Colors.grey;
+  static SelectionModeColor getSelectionModeColor(WidgetRef ref, NewArsenalState arsenalState) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    return selectionService.getSelectionModeColor(arsenalState);
+  }
+
+  static void toggleInstanceForMove(WidgetRef ref, int instanceId) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.toggleInstanceForMove(instanceId);
+  }
+
+  static void toggleInstanceForRemoval(WidgetRef ref, int instanceId) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.toggleInstanceForRemoval(instanceId);
+  }
+
+  static void clearSelections(WidgetRef ref, NewArsenalState arsenalState) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    selectionService.clearSelections(arsenalState);
+  }
+
+  static bool isInstanceSelected(WidgetRef ref, NewArsenalState arsenalState, int instanceId) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    return selectionService.isInstanceSelected(arsenalState, instanceId);
+  }
+
+  static Set<int> getSelectedInstances(WidgetRef ref, NewArsenalState arsenalState) {
+    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
+    return selectionService.getSelectedInstances(arsenalState);
   }
 }

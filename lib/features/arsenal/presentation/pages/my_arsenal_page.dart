@@ -182,7 +182,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
               ),
               icon: Icon(
                 Icons.more_vert,
-                color: ArsenalBagHandler.hasActiveFilters(arsenalState) ? Colors.blue : Colors.white,
+                color: ArsenalBagHandler.hasActiveFilters(ref, arsenalState) ? Colors.blue : Colors.white,
                 size: 24,
               ),
               tooltip: 'More Options',
