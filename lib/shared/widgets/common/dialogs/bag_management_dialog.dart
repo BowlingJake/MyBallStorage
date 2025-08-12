@@ -6,6 +6,7 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -365,113 +366,46 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
     final userProfileState = ref.read(userProfileControllerProvider);
     final currentName = userProfileState.profile?.getBagName(bagNumber) ?? 'Bag $bagNumber';
     
-    showDialog(
+    AppBaseDialog.showConfirmation(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.8),
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            constraints: const BoxConstraints(maxWidth: 350),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 標題
-                  Text(
-                    'Delete $currentName',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // 警告訊息
-                  Text(
-                    'Are you sure you want to delete this bag?',
-                    style: TextStyle(
-                      color: Colors.grey[300],
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  
-                  // 按鈕
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Cancel',
-                          height: 36,
-                          fontSize: 14,
-                          customColor: Colors.grey[400]!,
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Delete',
-                          height: 36,
-                          fontSize: 14,
-                          customColor: Colors.red,
-                          isPrimary: true,
-                          onPressed: () async {
-                            try {
-                              // 取得使用者ID
-                              final authState = ref.read(authControllerProvider);
-                              if (!authState.hasValue || authState.value == null) {
-                                throw Exception('User not authenticated');
-                              }
-                              final userId = authState.value!.id;
-                              
-                              // 刪除袋子
-                              await ref.read(userProfileControllerProvider.notifier).deleteBag(
-                                userId: userId,
-                                bagNumber: bagNumber,
-                              );
-                              
-                              Navigator.of(dialogContext).pop();
-                              
-                              if (mounted) {
-                                TopNotification.showSuccess(
-                                  context,
-                                  'Bag $bagNumber deleted successfully!',
-                                );
-                              }
-                            } catch (e) {
-                              if (mounted) {
-                                TopNotification.showError(
-                                  dialogContext,
-                                  'Failed to delete bag: $e',
-                                );
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
+      title: 'Delete $currentName',
+      message: 'Are you sure you want to delete this bag?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      confirmColor: Colors.red,
+      isDestructive: true,
+    ).then((confirmed) async {
+      if (confirmed == true) {
+        try {
+          // 取得使用者ID
+          final authState = ref.read(authControllerProvider);
+          if (!authState.hasValue || authState.value == null) {
+            throw Exception('User not authenticated');
+          }
+          final userId = authState.value!.id;
+          
+          // 刪除袋子
+          await ref.read(userProfileControllerProvider.notifier).deleteBag(
+            userId: userId,
+            bagNumber: bagNumber,
+          );
+          
+          if (mounted) {
+            TopNotification.showSuccess(
+              context,
+              'Bag $bagNumber deleted successfully!',
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            TopNotification.showError(
+              context,
+              'Failed to delete bag: $e',
+            );
+          }
+        }
+      }
+    });
   }
 
   void _showEditBagDialog(int index) {
