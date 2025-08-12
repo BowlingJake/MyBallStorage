@@ -1,6 +1,7 @@
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_user_arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsenal_repository.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_data_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_filter_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_sort_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
@@ -42,6 +43,13 @@ UserArsenalRepository userArsenalRepository(UserArsenalRepositoryRef ref) {
   return SupabaseUserArsenalRepository(supabase);
 }
 
+/// Arsenal data service provider
+@riverpod
+ArsenalDataService arsenalDataService(ArsenalDataServiceRef ref) {
+  final repository = ref.watch(userArsenalRepositoryProvider);
+  return ArsenalDataService(repository);
+}
+
 /// New Arsenal controller
 @riverpod
 class NewArsenalController extends _$NewArsenalController {
@@ -51,50 +59,33 @@ class NewArsenalController extends _$NewArsenalController {
   }
 
   UserArsenalRepository get _repository => ref.read(userArsenalRepositoryProvider);
+  ArsenalDataService get _dataService => ref.read(arsenalDataServiceProvider);
 
   /// Initialize arsenal data for user
   Future<void> initialize(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
+      final result = await _dataService.initialize(userId);
       
-      // Load all instances
-      await _loadAllInstances(userId);
-      
-      // Load user categories
-      await _loadUserCategories(userId);
-      
-      // Set default selected category to "All My Arsenal" (null)
-      state = state.copyWith(
-        selectedCategory: null, // "All My Arsenal" 
-        isLoading: false,
-      );
-      
+      if (result.isSuccess) {
+        state = state.copyWith(
+          allInstances: result.instances!,
+          userCategories: result.categories!,
+          selectedCategory: null, // "All My Arsenal" 
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: result.error,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to initialize arsenal: $e',
       );
-    }
-  }
-
-  /// Load all user instances
-  Future<void> _loadAllInstances(String userId) async {
-    try {
-      final instances = await _repository.getUserArsenal(userId);
-      state = state.copyWith(allInstances: instances);
-    } catch (e) {
-      throw Exception('Failed to load instances: $e');
-    }
-  }
-
-  /// Load user categories
-  Future<void> _loadUserCategories(String userId) async {
-    try {
-      final categories = await _repository.getUserCategories(userId);
-      state = state.copyWith(userCategories: categories);
-    } catch (e) {
-      throw Exception('Failed to load categories: $e');
     }
   }
 
@@ -194,8 +185,7 @@ class NewArsenalController extends _$NewArsenalController {
     String? notes,
   }) async {
     try {
-      
-      final instance = await _repository.addBallFromLibrary(
+      final instance = await _dataService.addBallFromLibrary(
         userId: userId,
         ballId: ballId,
         categoryName: categoryName,
@@ -207,7 +197,8 @@ class NewArsenalController extends _$NewArsenalController {
       state = state.copyWith(allInstances: updatedInstances);
       
       // Refresh categories in case it's a new category
-      await _loadUserCategories(userId);
+      final categories = await _dataService.loadUserCategories(userId);
+      state = state.copyWith(userCategories: categories);
       
     } catch (e) {
       state = state.copyWith(error: 'Failed to add ball: $e');

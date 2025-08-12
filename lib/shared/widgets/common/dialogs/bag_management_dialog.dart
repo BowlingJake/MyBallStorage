@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_ins
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/buttons/dialog_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -711,6 +712,58 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
       return instance.isInBag(bagNumber);
     }).length;
   }
+}
+
+/// 顯示袋子名稱輸入對話框
+Future<String?> _showBagNameInputDialog({
+  required BuildContext context,
+  required String title,
+  required Color accentColor,
+  String? initialValue,
+  String? hintText,
+}) async {
+  final TextEditingController nameController = TextEditingController(
+    text: initialValue ?? '',
+  );
+  
+  return AppBaseDialog.show<String>(
+    context: context,
+    title: title,
+    maxWidth: 350,
+    content: TextField(
+      controller: nameController,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hintText ?? 'Enter bag name...',
+        hintStyle: TextStyle(color: Colors.grey[400]),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[600]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[600]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: accentColor),
+        ),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.6),
+      ),
+      maxLength: 20,
+      autofocus: true,
+    ),
+    actions: [
+      DialogActionButtons(
+        primaryText: title.contains('Edit') ? 'Save' : 'Unlock',
+        secondaryText: 'Cancel',
+        onPrimary: () => Navigator.of(context).pop(nameController.text.trim()),
+        onSecondary: () => Navigator.of(context).pop(),
+        primaryColor: accentColor,
+      ),
+    ],
+  );
 }
 
 /// Helper function to show the bag management dialog
