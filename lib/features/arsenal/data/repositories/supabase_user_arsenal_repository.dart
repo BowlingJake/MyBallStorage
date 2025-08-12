@@ -207,6 +207,21 @@ class SupabaseUserArsenalRepository implements UserArsenalRepository {
     }
   }
 
+  @override
+  Future<void> updateNotes({
+    required int instanceId,
+    String? notes,
+  }) async {
+    try {
+      await _supabase
+          .from('user_arsenal')
+          .update({'notes': notes})
+          .eq('id', instanceId);
+    } catch (e) {
+      throw Exception('Failed to update notes: $e');
+    }
+  }
+
   /// Get complete instance with ball data
   Future<UserArsenalInstance> _getCompleteInstance(int instanceId) async {
     final response = await _supabase

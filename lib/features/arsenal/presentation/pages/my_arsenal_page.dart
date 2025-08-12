@@ -27,6 +27,7 @@ class MyArsenalPage extends ConsumerStatefulWidget {
 class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   TabController? _tabController;
+  bool _isSearching = false;
 
   final List<Color> _bagColors = [
     Colors.orange,  // 🟠 主球袋
@@ -167,6 +168,9 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
       title: const Text('My Arsenal'),
       searchField: TextField(
         controller: _searchController,
+        onChanged: (value) {
+          ref.read(newArsenalControllerProvider.notifier).updateSearchText(value);
+        },
         decoration: const InputDecoration(
           hintText: 'Search balls...',
           border: InputBorder.none,
@@ -174,11 +178,22 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
         ),
         style: const TextStyle(color: Colors.white),
       ),
-      isSearching: false, // You can connect this to a state variable
-      onBack: () => Navigator.of(context).pop(),
+      isSearching: _isSearching,
+      onBack: () {
+        final router = GoRouter.of(context);
+        if (router.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
+      },
       onToggleSearch: () {
         setState(() {
-          // Handle search toggle if needed
+          _isSearching = !_isSearching;
+          if (!_isSearching) {
+            _searchController.clear();
+            ref.read(newArsenalControllerProvider.notifier).updateSearchText('');
+          }
         });
       },
       actionsOverride: selectionMode ? [] : null,

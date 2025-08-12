@@ -49,7 +49,7 @@ class ArsenalManagementSection extends ConsumerWidget {
         children: [
           Expanded(
             child: AppStandardButton(
-              text: isMove ? 'Confirm Move ($count)' : 'Confirm Remove ($count)',
+              text: isMove ? 'Confirm Move' : 'Confirm Remove ($count)',
               onPressed: () {
                 if (isMove) {
                   ArsenalActions.showMoveSelected(

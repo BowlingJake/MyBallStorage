@@ -41,11 +41,8 @@ class BallLibraryController extends _$BallLibraryController {
     _repository = ref.watch(ballRepositoryProvider);
     
     try {
-      print('🔄 BallLibraryController: Starting build...');
-      
       // 獲取總數量（無篩選條件）
       final totalCount = await _repository.getTotalCount();
-      print('📊 Total count: $totalCount');
       
       // 使用新的方法獲取第一頁資料
       final balls = await _repository.getBallsWithFilters(
@@ -53,8 +50,6 @@ class BallLibraryController extends _$BallLibraryController {
         offset: 0,
         limit: 50,
       );
-      print('🎯 First page balls: ${balls.length}');
-      print('🎾 Sample ball names: ${balls.take(3).map((b) => b.name).toList()}');
       
       final state = BallLibraryState(
         allBalls: balls,
@@ -64,12 +59,8 @@ class BallLibraryController extends _$BallLibraryController {
         hasMoreData: balls.length < totalCount,
         currentPage: 0,
       );
-      
-      print('✅ State created: ${state.filteredBalls.length} balls, hasMore: ${state.hasMoreData}');
       return state;
     } catch (e, stackTrace) {
-      print('❌ BallLibraryController build error: $e');
-      print('Stack trace: $stackTrace');
       return BallLibraryState(
         isLoading: false,
         error: e.toString(),
@@ -82,8 +73,6 @@ class BallLibraryController extends _$BallLibraryController {
     final currentState = state.value;
     if (currentState == null) return;
 
-    print('🔍 Searching for: "$searchText"');
-    
     try {
       // 使用新的Repository方法直接從資料庫搜尋
       final filteredBalls = await _repository.getBallsWithFilters(
@@ -94,14 +83,6 @@ class BallLibraryController extends _$BallLibraryController {
         limit: null, // 搜尋時取得所有符合條件的資料
       );
       
-      // 獲取符合搜尋條件的總數量
-      final filteredCount = await _repository.getTotalCountWithFilters(
-        searchText: searchText.isEmpty ? null : searchText,
-        filters: currentState.filters,
-      );
-      
-      print('✅ Search results: ${filteredBalls.length} balls');
-      
       final newState = currentState.copyWith(
         searchText: searchText,
         filteredBalls: filteredBalls,
@@ -111,7 +92,6 @@ class BallLibraryController extends _$BallLibraryController {
       
       state = AsyncValue.data(newState);
     } catch (e) {
-      print('❌ Search error: $e');
       final newState = currentState.copyWith(
         searchText: searchText,
         error: e.toString(),
@@ -126,16 +106,12 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      print('🔧 Updating filters: ${filters.activeFilterCount} active');
-      
       // 使用新的Repository方法直接從資料庫篩選
       final filteredBalls = await _repository.getBallsWithFilters(
         searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
         filters: filters,
         sortCriterion: currentState.sortCriterion,
       );
-      
-      print('✅ Filter results: ${filteredBalls.length} balls');
       
       final newState = currentState.copyWith(
         filters: filters,
@@ -146,7 +122,6 @@ class BallLibraryController extends _$BallLibraryController {
       
       state = AsyncValue.data(newState);
     } catch (e) {
-      print('❌ Filter error: $e');
       final newState = currentState.copyWith(
         filters: filters,
         error: e.toString(),
@@ -188,16 +163,12 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      print('📊 Updating sort: ${sortCriterion.field} ${sortCriterion.ascending ? "ASC" : "DESC"}');
-      
       // 使用新的Repository方法直接從資料庫排序
       final filteredBalls = await _repository.getBallsWithFilters(
         searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
         filters: currentState.filters,
         sortCriterion: sortCriterion,
       );
-      
-      print('✅ Sort results: ${filteredBalls.length} balls');
       
       final newState = currentState.copyWith(
         sortCriterion: sortCriterion,
@@ -208,7 +179,6 @@ class BallLibraryController extends _$BallLibraryController {
       
       state = AsyncValue.data(newState);
     } catch (e) {
-      print('❌ Sort error: $e');
       final newState = currentState.copyWith(
         sortCriterion: sortCriterion,
         error: e.toString(),
@@ -228,8 +198,6 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      print('🧹 Clearing all filters');
-      
       // 重新載入第一頁資料，無任何篩選條件
       final balls = await _repository.getBallsWithFilters(
         sortCriterion: currentState.sortCriterion,
@@ -238,8 +206,6 @@ class BallLibraryController extends _$BallLibraryController {
       );
       
       final totalCount = await _repository.getTotalCount();
-      
-      print('✅ Cleared filters: ${balls.length} balls');
       
       final newState = currentState.copyWith(
         searchText: '',
@@ -251,7 +217,6 @@ class BallLibraryController extends _$BallLibraryController {
       
       state = AsyncValue.data(newState);
     } catch (e) {
-      print('❌ Clear filters error: $e');
       final newState = currentState.copyWith(
         searchText: '',
         filters: const BallFilters(),
@@ -270,7 +235,6 @@ class BallLibraryController extends _$BallLibraryController {
 
     // 如果有搜尋或篩選條件，不支援分頁載入更多
     if (currentState.searchText.isNotEmpty || currentState.filters.activeFilterCount > 0) {
-      print('⚠️ Load more not supported with active filters/search');
       return;
     }
 
@@ -280,8 +244,6 @@ class BallLibraryController extends _$BallLibraryController {
       final nextPage = currentState.currentPage + 1;
       final offset = nextPage * currentState.pageSize;
       
-      print('📄 Loading more: page $nextPage, offset $offset');
-      
       final newBalls = await _repository.getBallsWithFilters(
         sortCriterion: currentState.sortCriterion,
         offset: offset,
@@ -290,8 +252,6 @@ class BallLibraryController extends _$BallLibraryController {
 
       final allBalls = [...currentState.filteredBalls, ...newBalls];
       
-      print('✅ Loaded ${newBalls.length} more balls, total: ${allBalls.length}');
-      
       state = AsyncValue.data(currentState.copyWith(
         filteredBalls: allBalls,
         currentPage: nextPage,
@@ -299,7 +259,6 @@ class BallLibraryController extends _$BallLibraryController {
         hasMoreData: allBalls.length < currentState.totalCount,
       ));
     } catch (e) {
-      print('❌ Load more error: $e');
       state = AsyncValue.data(currentState.copyWith(
         isLoadingMore: false,
         error: e.toString(),
@@ -312,8 +271,6 @@ class BallLibraryController extends _$BallLibraryController {
     state = const AsyncValue.loading();
     
     try {
-      print('🔄 Refreshing ball library...');
-      
       final totalCount = await _repository.getTotalCount();
       
       final balls = await _repository.getBallsWithFilters(
@@ -321,8 +278,6 @@ class BallLibraryController extends _$BallLibraryController {
         offset: 0,
         limit: 50,
       );
-      
-      print('✅ Refreshed: ${balls.length} balls');
       
       state = AsyncValue.data(BallLibraryState(
         allBalls: balls,
@@ -334,7 +289,6 @@ class BallLibraryController extends _$BallLibraryController {
         error: null,
       ));
     } catch (e) {
-      print('❌ Refresh error: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
@@ -349,8 +303,6 @@ class BallLibraryController extends _$BallLibraryController {
     }
     
     try {
-      print('🔍 Getting balls for comparison: ${ballIds[0]} vs ${ballIds[1]}');
-      
       final ball1Future = _repository.getBallById(ballIds[0].toString());
       final ball2Future = _repository.getBallById(ballIds[1].toString());
       
@@ -358,11 +310,8 @@ class BallLibraryController extends _$BallLibraryController {
       final ball1 = results[0];
       final ball2 = results[1];
       
-      print('✅ Retrieved balls for comparison: ${ball1?.name} vs ${ball2?.name}');
-      
       return (ball1, ball2);
     } catch (e) {
-      print('❌ Error getting balls for comparison: $e');
       throw Exception('Failed to load balls for comparison: $e');
     }
   }

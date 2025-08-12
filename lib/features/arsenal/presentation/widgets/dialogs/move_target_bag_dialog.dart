@@ -10,6 +10,8 @@ Future<int?> showMoveTargetBagDialog({
   required List<Color> bagColors,
   required int currentBagNumber,
   required int selectedCount,
+  List<int> alreadyInBags = const [],
+  UserProfile? userProfile,
 }) async {
   int? selectedTarget;
   final bool onlyOneSubBag = subBags.length <= 1;
@@ -19,57 +21,53 @@ Future<int?> showMoveTargetBagDialog({
     title: 'Move $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
     content: StatefulBuilder(
       builder: (context, setState) {
-        List<Widget> buildGrid() {
-          final List<Widget> rows = [];
-          for (int i = 0; i < subBags.length; i += 2) {
-            final first = subBags[i];
-            final second = i + 1 < subBags.length ? subBags[i + 1] : null;
-
-            rows.add(Row(
-              children: [
-                Expanded(child: _BagButton(
-                  bag: first,
-                  bagColor: bagColors[first.number - 1],
-                  disabled: onlyOneSubBag || first.number == currentBagNumber,
-                  selected: selectedTarget == first.number,
-                  onTap: () {
-                    if (onlyOneSubBag || first.number == currentBagNumber) {
-                      return;
-                    }
-                    setState(() => selectedTarget = first.number);
-                  },
-                )),
-                const SizedBox(width: 12),
-                if (second != null)
-                  Expanded(child: _BagButton(
-                    bag: second,
-                    bagColor: bagColors[second.number - 1],
-                    disabled: onlyOneSubBag || second.number == currentBagNumber,
-                    selected: selectedTarget == second.number,
-                    onTap: () {
-                      if (onlyOneSubBag || second.number == currentBagNumber) {
-                        return;
-                      }
-                      setState(() => selectedTarget = second.number);
-                    },
-                  ))
-                else
-                  const Expanded(child: SizedBox()),
-              ],
-            ));
-
-            rows.add(const SizedBox(height: 12));
-          }
-          return rows;
-        }
-
         return Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text('Choose target bag:', style: TextStyle(color: Colors.white70, fontSize: 14)),
+            const SizedBox(height: 8),
+            if (alreadyInBags.isNotEmpty) ...[
+              Builder(
+                builder: (context) {
+                  final alsoIn = alreadyInBags
+                      .where((n) => n != currentBagNumber && n != 1)
+                      .toList();
+                  if (alsoIn.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  final names = alsoIn
+                      .map((n) => userProfile?.getBagName(n) ?? 'Bag $n')
+                      .toList();
+                  return Text(
+                    'Also in: ${names.join(', ')}',
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
             const SizedBox(height: 16),
-            ...buildGrid(),
+            // 垂直排列每個子球袋按鈕
+            ...subBags.map((bag) {
+              final disabled = onlyOneSubBag || bag.number == currentBagNumber || alreadyInBags.contains(bag.number);
+              final selected = selectedTarget == bag.number;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _BagButton(
+                  bag: bag,
+                  bagColor: bagColors[bag.number - 1],
+                  disabled: disabled,
+                  selected: selected,
+                  onTap: () {
+                    if (disabled) {
+                      return;
+                    }
+                    setState(() => selectedTarget = bag.number);
+                  },
+                ),
+              );
+            }),
             const SizedBox(height: 4),
             AppStandardButton(
               text: 'Move',
@@ -115,7 +113,42 @@ class _BagButton extends StatelessWidget {
       isPrimary: selected,
       whiteForeground: false,
       fontSize: 12,
+      width: double.infinity,
     );
+  }
+}
+
+class _AlsoInBagsNames extends StatelessWidget {
+  const _AlsoInBagsNames({required this.bagNumbers});
+  final List<int> bagNumbers;
+
+  @override
+  Widget build(BuildContext context) {
+    // 需要使用 UserProfile 來查詢袋名
+    return _ProfileConsumer(
+      builder: (profile) {
+        final names = bagNumbers.map((n) => profile.getBagName(n) ?? 'Bag $n').toList();
+        return Text(
+          'Also in: ' + names.join(', '),
+          style: const TextStyle(color: Colors.white54, fontSize: 12),
+        );
+      },
+    );
+  }
+}
+
+class _ProfileConsumer extends StatelessWidget {
+  const _ProfileConsumer({required this.builder});
+  final Widget Function(UserProfile profile) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    // 簡化：透過 InheritedWidget 無法取得，這裡直接使用最簡單方式：
+    // 交由上層傳入 UserProfile 也可以，但目前檔案已有 import UserProfile
+    // 因此此處改為使用 Dialog 外層傳入 UserProfile 更穩妥。
+    // 為避免大改，暫用 InheritedModel 取不到，直接 fallback 顯示 Bag N。
+    // 若無法取得 profile，顯示數字。
+    return const SizedBox.shrink();
   }
 }
 

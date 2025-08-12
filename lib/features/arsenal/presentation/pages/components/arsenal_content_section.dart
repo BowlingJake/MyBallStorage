@@ -15,6 +15,7 @@ class ArsenalContentSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final arsenalState = ref.watch(newArsenalControllerProvider);
+    final filteredBalls = ref.watch(filteredArsenalInstancesProvider);
     
     if (arsenalState.isLoading) {
       return const Center(
@@ -29,36 +30,23 @@ class ArsenalContentSection extends ConsumerWidget {
       );
     }
 
-    return _buildLoadedContent(arsenalState, ref);
+    return _buildLoadedContent(arsenalState, filteredBalls);
   }
 
-  Widget _buildLoadedContent(NewArsenalState state, WidgetRef ref) {
-    final filteredBalls = _getFilteredBalls(state);
-    
+  Widget _buildLoadedContent(NewArsenalState state, List<UserArsenalInstance> filteredBalls) {
     if (filteredBalls.isEmpty) {
       return const ArsenalEmptyState();
     }
 
     return Column(
       children: [
-        // View mode toggle
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              const ViewModeToggle(),
-            ],
-          ),
-        ),
-        
         // Main content based on view mode
         Expanded(
           child: state.viewMode == ArsenalViewMode.grid
               ? ArsenalGridView(instances: filteredBalls)
               : ArsenalListView(
                   instances: filteredBalls,
-                  extraInfoBuilder: (instance) => const SizedBox.shrink(),
+                  extraInfoBuilder: (instance) => _buildListExtraInfo(instance),
                 ),
         ),
       ],
@@ -69,8 +57,23 @@ class ArsenalContentSection extends ConsumerWidget {
     return ArsenalBagHandler.hasActiveFilters(ref, arsenalState);
   }
 
-  List<UserArsenalInstance> _getFilteredBalls(NewArsenalState state) {
-    // For now, return all instances - this logic should be moved to the controller
-    return state.allInstances;
+  // Removed local filtering; using filteredArsenalInstancesProvider from controller
+
+  Widget _buildListExtraInfo(UserArsenalInstance instance) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Layout: ${instance.layoutDisplayString}',
+          style: const TextStyle(fontSize: 12, color: Colors.white70),
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Games Used: ${instance.gamesUsed}',
+          style: const TextStyle(fontSize: 12, color: Colors.white70),
+        ),
+      ],
+    );
   }
 }

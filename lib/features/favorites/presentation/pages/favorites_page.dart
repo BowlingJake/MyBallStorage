@@ -11,6 +11,10 @@ import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_di
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up;
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_selection_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
@@ -192,21 +196,39 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
       return;
     }
 
-    final result = await showAppConfirmationDialog(
-      context: context,
-      title: 'Add All to Arsenal',
-      message: 'Do you want to add all $favoriteCount favorite ball${favoriteCount != 1 ? 's' : ''} to your arsenal?',
-      confirmText: 'Yes',
-      cancelText: 'No',
+    // Use common bag selection dialog instead of simple confirmation
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      TopNotification.showError(context, 'Please log in to add balls to arsenal');
+      return;
+    }
+    final userId = authState.value!.id;
+    final repo = ref.read(userProfileRepositoryProvider);
+    final up.UserProfile? maybeProfile = await repo.getUserProfile(userId);
+    final up.UserProfile profile = maybeProfile ?? await repo.saveUserProfile(
+      up.UserProfile(
+        userId: userId,
+        bag1Name: 'All My Arsenal',
+        bag1Unlocked: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
     );
 
-    if (result == true) {
-      await _addAllFavoritesToArsenal(context, ref);
+    final selectedBagNumbers = await showBagSelectionDialog(
+      context: context,
+      profile: profile,
+      title: 'Add All to Arsenal',
+      subtitle: '$favoriteCount selected',
+    );
+
+    if (selectedBagNumbers != null && selectedBagNumbers.isNotEmpty) {
+      await _addAllFavoritesToArsenal(context, ref, selectedBagNumbers);
     }
   }
 
   /// 將所有favorite球加入Arsenal
-  Future<void> _addAllFavoritesToArsenal(BuildContext context, WidgetRef ref) async {
+  Future<void> _addAllFavoritesToArsenal(BuildContext context, WidgetRef ref, List<int> selectedBagNumbers) async {
     try {
       // Get user ID
       final authState = ref.read(authControllerProvider);
@@ -234,16 +256,17 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
 
       final favoriteBalls = favoritesState.value!.favoriteBalls;
       
-      // Add each favorite ball to arsenal
+      // Add each favorite ball to selected bags
       for (final ball in favoriteBalls) {
         try {
-          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
-            userId: userId,
-            ballId: ball.id,
-            categoryName: categoryName,
-          );
+          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibraryToMultipleBags(
+                userId: userId,
+                ballId: ball.id,
+                categoryName: categoryName,
+                bagNumbers: selectedBagNumbers,
+              );
         } catch (e) {
-          print('Failed to add ball ID: ${ball.id}, Error: $e');
+          // ignore individual errors and continue
         }
       }
       

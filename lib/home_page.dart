@@ -287,7 +287,7 @@ class _HomePageBottomNav extends StatelessWidget {
     final currentIndex = _calculateCurrentIndex(location);
     
     // 使用 print 來幫助調試
-    print('Current location: $location, calculated index: $currentIndex');
+    // removed debug print
     
     return ModernBottomNavigation(
       currentIndex: currentIndex,

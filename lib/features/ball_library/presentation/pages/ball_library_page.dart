@@ -20,6 +20,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up;
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_selection_dialog.dart';
 
 class BallLibraryPage extends ConsumerStatefulWidget {
   const BallLibraryPage({super.key});
@@ -161,9 +165,11 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: true,
+        extendBodyBehindAppBar: false,
         appBar: AppBarConfigs.ballLibrary(
-          title: 'Ball Library',
+          title: (_isComparisonMode || _isAddToArsenalMode)
+              ? '${_isComparisonMode ? 'Comparison' : 'Add to Arsenal'}: ${_selectedBallIds.length} selected'
+              : 'Ball Library',
           onBackPressed: () => context.go('/'),
           actions: [
             // Favorites 按鈕
@@ -177,10 +183,10 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         body: ballLibraryAsync.when(
           data: (state) {
             
-            return Column(
+              return Column(
               children: [
-                // 為AppBar留出空間 (AppBar高度 + 狀態列高度)
-                SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 8),
+                // 與 My Arsenal 對齊：緊貼 AppBar（移除多餘空白）
+                const SizedBox(height: 0),
                 // 控制面板
                 SimpleSearchControls(
                   searchHint: 'Search balls...',
@@ -194,8 +200,8 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 // 兩個水平按鈕或選擇模式資訊
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: (_isComparisonMode || _isAddToArsenalMode) 
-                      ? _buildSelectionModeInfo()
+                  child: (_isComparisonMode || _isAddToArsenalMode)
+                      ? _buildSelectionActionButtons()
                       : _buildActionButtons(),
                 ),
                 // 球列表
@@ -533,24 +539,14 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
 
   /// 顯示加入Arsenal確認對話框
   Future<void> _showAddToArsenalConfirmation() async {
-    final selectedCount = _selectedBallIds.length;
-    
-    final result = await showAppConfirmationDialog(
-      context: context,
-      title: 'Add to Arsenal',
-      message: 'Are you sure you want to add $selectedCount ball${selectedCount != 1 ? 's' : ''} to your arsenal?',
-      confirmText: 'Yes',
-      cancelText: 'No',
-    );
-
-    if (result == true) {
-      await _addSelectedBallsToArsenal();
+    final selectedBagNumbers = await _showBagSelectionDialogForMultipleBalls(context, ref);
+    if (selectedBagNumbers != null && selectedBagNumbers.isNotEmpty) {
+      await _addSelectedBallsToArsenal(selectedBagNumbers);
     }
-    // If result is false or null, do nothing (stay in selection mode)
   }
 
   /// 將選中的球加入Arsenal
-  Future<void> _addSelectedBallsToArsenal() async {
+  Future<void> _addSelectedBallsToArsenal(List<int> selectedBagNumbers) async {
     try {
       // Get user ID
       final authState = ref.read(authControllerProvider);
@@ -580,21 +576,18 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
       final selectedBalls = ballLibraryState.value!.filteredBalls
           .where((ball) => _selectedBallIds.contains(ball.id))
           .toList();
-
-      print('Ball Library: Starting to add ${selectedBalls.length} balls to category: $categoryName');
       
       // Add each selected ball to arsenal
       for (final ball in selectedBalls) {
         try {
-          print('Ball Library: Adding ball ID: ${ball.id}, Name: ${ball.name}');
-          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibrary(
-            userId: userId,
-            ballId: ball.id,
-            categoryName: categoryName,
-          );
-          print('Ball Library: Successfully added ball ID: ${ball.id}');
+          await ref.read(newArsenalControllerProvider.notifier).addBallFromLibraryToMultipleBags(
+                userId: userId,
+                ballId: ball.id,
+                categoryName: categoryName,
+                bagNumbers: selectedBagNumbers,
+              );
         } catch (e) {
-          print('Ball Library: Failed to add ball ID: ${ball.id}, Error: $e');
+          // ignore individual failures; continue adding others
         }
       }
       
@@ -613,6 +606,36 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
         'Failed to add balls to arsenal: $e',
       );
     }
+  }
+
+  Future<List<int>?> _showBagSelectionDialogForMultipleBalls(BuildContext context, WidgetRef ref) async {
+    // Ensure user is authenticated
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      TopNotification.showError(context, 'Please log in to add balls to arsenal');
+      return null;
+    }
+    final userId = authState.value!.id;
+
+    // Fetch profile via repository to avoid provider disposal issues
+    final repo = ref.read(userProfileRepositoryProvider);
+    final up.UserProfile? maybeProfile = await repo.getUserProfile(userId);
+    final up.UserProfile profile = maybeProfile ?? await repo.saveUserProfile(
+      up.UserProfile(
+        userId: userId,
+        bag1Name: 'All My Arsenal',
+        bag1Unlocked: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
+
+    return showBagSelectionDialog(
+      context: context,
+      profile: profile,
+      title: 'Add to Arsenal',
+      subtitle: '${_selectedBallIds.length} selected',
+    );
   }
 
   /// 建構操作按鈕（正常模式）
@@ -729,6 +752,41 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           ],
         ),
       ),
+    );
+  }
+
+  /// 選擇模式下的操作按鈕（確認 + 重置/取消）
+  Widget _buildSelectionActionButtons() {
+    final selectedCount = _selectedBallIds.length;
+    final hasSelection = selectedCount > 0;
+    final isComparison = _isComparisonMode;
+
+    return Row(
+      children: [
+        Expanded(
+          child: AppStandardButton(
+            text: isComparison ? 'Compare' : 'Add',
+            icon: isComparison ? Icons.check : Icons.add,
+            height: 36,
+            fontSize: 12,
+            isPrimary: true,
+            customColor: BrandColors.accentColorDark,
+            whiteForeground: true,
+            enabled: hasSelection,
+            onPressed: isComparison ? _showComparison : _showAddToArsenalConfirmation,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: AppStandardButton(
+            text: hasSelection ? 'Reset' : 'Exit',
+            icon: hasSelection ? Icons.refresh : Icons.close,
+            height: 36,
+            fontSize: 12,
+            onPressed: hasSelection ? _resetSelection : _exitSelectionMode,
+          ),
+        ),
+      ],
     );
   }
 

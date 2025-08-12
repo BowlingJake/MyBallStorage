@@ -95,9 +95,36 @@ class ArsenalActions {
       currentBagName: currentBagName,
     );
     if (result == 'bag_only') {
-      await _performBagOnlyRemoval(context: context, ref: ref, selectedCount: selectedCount, bagNumber: currentBagNumber);
+      final confirmed = await showAppConfirmationDialog(
+        context: context,
+        title: 'Confirm Remove from $currentBagName',
+        message: 'Remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from $currentBagName only? They will remain in All My Arsenal.',
+        confirmText: 'Remove',
+        isDangerous: true,
+      );
+      if (confirmed == true) {
+        await _performBagOnlyRemoval(
+          context: context,
+          ref: ref,
+          selectedCount: selectedCount,
+          bagNumber: currentBagNumber,
+        );
+      }
     } else if (result == 'complete') {
-      await _performCompleteRemoval(context: context, ref: ref, selectedCount: selectedCount);
+      final confirmed = await showAppConfirmationDialog(
+        context: context,
+        title: 'Confirm Complete Removal',
+        message: 'Completely remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from all bags and your arsenal?',
+        confirmText: 'Remove',
+        isDangerous: true,
+      );
+      if (confirmed == true) {
+        await _performCompleteRemoval(
+          context: context,
+          ref: ref,
+          selectedCount: selectedCount,
+        );
+      }
     }
   }
 
@@ -123,12 +150,23 @@ class ArsenalActions {
       return;
     }
 
+    // 決定每顆選中球已在哪些袋（為避免多顆不同狀態，這裡取 OR 後的集合，UI 顯示「也在」資訊，並禁用已在之袋）
+    final selectedInstances = arsenalState.allInstances
+        .where((inst) => arsenalState.selectedForMove.contains(inst.id))
+        .toList();
+    final alreadyInBags = <int>{};
+    for (final inst in selectedInstances) {
+      alreadyInBags.addAll(inst.activeBagNumbers);
+    }
+
     final targetBagNumber = await showMoveTargetBagDialog(
       context: context,
       subBags: subBags,
       bagColors: bagColors,
       currentBagNumber: currentBagNumber,
       selectedCount: selectedCount,
+      alreadyInBags: alreadyInBags.toList(),
+      userProfile: profile,
     );
     if (targetBagNumber == null) return;
 

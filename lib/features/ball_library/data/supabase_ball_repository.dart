@@ -33,8 +33,6 @@ class SupabaseBallRepository implements BallRepository {
     bool ascending = true,
   }) async {
     try {
-      print('🔍 SupabaseBallRepository: getBallsPaginated');
-      print('   offset: $offset, limit: $limit, orderBy: $orderBy');
       
       final query = _supabase
           .from('ball_data')
@@ -43,37 +41,29 @@ class SupabaseBallRepository implements BallRepository {
       
       // 預設排序：create_at優先，null的話用ID排序
       if (orderBy == null || orderBy == 'created_at' || orderBy == 'create_at') {
-        print('   Using create_at + id sorting');
+        
         final response = await query
             .order('create_at', nullsFirst: false)
             .order('id');
         
-        print('   Raw response length: ${response.length}');
-        if (response.isNotEmpty) {
-          print('   First item: ${response.first}');
-        }
+        
         
         final balls = (response as List<dynamic>)
             .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
             .toList();
             
-        print('   Mapped balls: ${balls.length}');
         return balls;
       } else {
         // 其他排序方式
-        print('   Using custom sorting: $orderBy');
         final response = ascending
             ? await query.order(orderBy)
             : await query.order(orderBy, ascending: false);
         
-        print('   Raw response length: ${response.length}');
         return (response as List<dynamic>)
             .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
             .toList();
       }
     } catch (e, stackTrace) {
-      print('❌ SupabaseBallRepository error: $e');
-      print('Stack trace: $stackTrace');
       throw Exception('Failed to fetch paginated balls: $e');
     }
   }
@@ -178,11 +168,6 @@ class SupabaseBallRepository implements BallRepository {
     int? limit,
   }) async {
     try {
-      print('🔍 SupabaseBallRepository: getBallsWithFilters');
-      print('   searchText: $searchText');
-      print('   filters: ${filters?.activeFilterCount ?? 0} active');
-      print('   sortCriterion: ${sortCriterion?.field}');
-      print('   offset: $offset, limit: $limit');
 
       // 建立基本查詢
       var query = _supabase.from('ball_data').select('*');
@@ -298,15 +283,11 @@ class SupabaseBallRepository implements BallRepository {
             .order(orderByField, ascending: ascending)
             .range(offset, offset + limit - 1);
         
-        print('   Result count: ${(response as List).length}');
-        
         return (response as List<dynamic>)
             .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
             .toList();
       } else {
         final response = await query.order(orderByField, ascending: ascending);
-        
-        print('   Result count: ${(response as List).length}');
         
         return (response as List<dynamic>)
             .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
@@ -315,8 +296,6 @@ class SupabaseBallRepository implements BallRepository {
 
       // 這部分已經在上面處理了
     } catch (e, stackTrace) {
-      print('❌ SupabaseBallRepository getBallsWithFilters error: $e');
-      print('Stack trace: $stackTrace');
       throw Exception('Failed to fetch balls with filters: $e');
     }
   }
@@ -327,9 +306,6 @@ class SupabaseBallRepository implements BallRepository {
     BallFilters? filters,
   }) async {
     try {
-      print('🔍 SupabaseBallRepository: getTotalCountWithFilters');
-      print('   searchText: $searchText');
-      print('   filters: ${filters?.activeFilterCount ?? 0} active');
 
       // 建立查詢來取得符合條件的資料並計算數量
       var query = _supabase.from('ball_data').select('id');
@@ -422,12 +398,8 @@ class SupabaseBallRepository implements BallRepository {
       // 執行查詢並計算數量
       final response = await query;
       final count = (response as List).length;
-      
-      print('   Total count with filters: $count');
       return count;
     } catch (e, stackTrace) {
-      print('❌ SupabaseBallRepository getTotalCountWithFilters error: $e');
-      print('Stack trace: $stackTrace');
       throw Exception('Failed to get total count with filters: $e');
     }
   }

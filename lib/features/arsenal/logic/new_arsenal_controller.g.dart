@@ -51,7 +51,7 @@ final filteredArsenalInstancesProvider =
 typedef FilteredArsenalInstancesRef
     = AutoDisposeProviderRef<List<UserArsenalInstance>>;
 String _$newArsenalControllerHash() =>
-    r'ec440c943390b6e3f7bff0717308ac873e5b3b83';
+    r'577505170b82ed0909d34ee70d75f173c384a5b6';
 
 /// New Arsenal controller
 ///

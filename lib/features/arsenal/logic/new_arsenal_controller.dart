@@ -428,6 +428,18 @@ class NewArsenalController extends _$NewArsenalController {
     }
   }
 
+  /// Update notes for an instance
+  Future<void> updateNotes(int instanceId, String note, String userId) async {
+    try {
+      await _repository.updateNotes(instanceId: instanceId, notes: note.isEmpty ? null : note);
+      final updated = state.allInstances.map((inst) => inst.id == instanceId ? inst.copyWith(notes: note.isEmpty ? null : note) : inst).toList();
+      state = state.copyWith(allInstances: updated);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to update notes: $e');
+      rethrow;
+    }
+  }
+
   /// Refresh all data
   Future<void> refresh(String userId) async {
     await initialize(userId);
@@ -460,13 +472,12 @@ class NewArsenalController extends _$NewArsenalController {
 
   /// Toggle instance for move
   void toggleInstanceForMove(int instanceId) {
-    final currentSelection = Set<int>.from(state.selectedForMove);
-    if (currentSelection.contains(instanceId)) {
-      currentSelection.remove(instanceId);
+    // 單選模式：若點同一顆則取消，否則只保留該顆
+    if (state.selectedForMove.contains(instanceId)) {
+      state = state.copyWith(selectedForMove: {});
     } else {
-      currentSelection.add(instanceId);
+      state = state.copyWith(selectedForMove: {instanceId});
     }
-    state = state.copyWith(selectedForMove: currentSelection);
   }
 
   /// Move selected instances to target bag

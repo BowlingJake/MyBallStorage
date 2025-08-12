@@ -43,6 +43,12 @@ abstract class UserArsenalRepository {
     required bool isInBag,
   });
   
+  /// Update notes for an instance
+  Future<void> updateNotes({
+    required int instanceId,
+    String? notes,
+  });
+  
   /// Get arsenal instances filtered by bag number
   Future<List<UserArsenalInstance>> getArsenalByBag(String userId, int bagNumber);
 }

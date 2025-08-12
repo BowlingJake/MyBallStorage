@@ -30,13 +30,13 @@ class SimpleSearchControls extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
       child: Row(
         children: [
           // 搜尋框 - 佔據大部分空間
           Expanded(
             child: SizedBox(
-              height: 40, // 明確設置高度
+              height: 36,
               child: TextField(
                 onChanged: onSearchChanged,
                 decoration: InputDecoration(
@@ -57,7 +57,7 @@ class SimpleSearchControls extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                   isDense: true, // 使TextField更緊湊
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 14),
@@ -97,8 +97,8 @@ class SimpleSearchControls extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.6),
             borderRadius: BorderRadius.circular(12),
@@ -113,7 +113,7 @@ class SimpleSearchControls extends StatelessWidget {
             child: Icon(
               icon,
               color: Colors.grey,
-              size: 18,
+              size: 16,
             ),
           ),
         ),

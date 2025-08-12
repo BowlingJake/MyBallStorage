@@ -8,6 +8,8 @@ import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 
 /// Arsenal 專用的球卡組件，基於 UnifiedBallCard 但針對 My Arsenal 需求定制
 class ArsenalSpecificBallCard extends ConsumerWidget {
@@ -69,7 +71,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
             child: InkWell(
               onTap: isSelectionMode 
                   ? onTap 
-                  : () => _showArsenalActionDialog(context, arsenalBallInstance),
+                  : () => _showArsenalActionDialog(context, arsenalBallInstance, ref),
               onLongPress: isSelectionMode ? null : onTap,
               borderRadius: BorderRadius.circular(14),
               child: Padding(
@@ -91,6 +93,22 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                               child: _buildBallImage(),
                             ),
                           ),
+                          if ((arsenalBallInstance.notes ?? '').isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                arsenalBallInstance.notes!,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                           // 移除無意義的 Arsenal indicator
                         ],
                       ),
@@ -274,7 +292,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
   }
 
   /// 顯示 Arsenal 操作選擇對話框
-  void _showArsenalActionDialog(BuildContext context, UserArsenalInstance arsenalInstance) {
+  void _showArsenalActionDialog(BuildContext context, UserArsenalInstance arsenalInstance, WidgetRef ref) {
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.8),
@@ -313,46 +331,51 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       
-                      // 兩個平行按鈕
-                      Row(
+                      // 三個垂直置中按鈕
+                      Column(
                         children: [
-                          // 左側按鈕：Edit My Layout
-                          Expanded(
-                            child: AppStandardButton(
-                              text: 'Edit My Layout',
-                              height: 40,
-                              fontSize: 14,
-                              customColor: Colors.white,
-                              onPressed: () async {
-                                Navigator.of(dialogContext).pop();
-                                final result = await showEditLayoutDialog(context, arsenalInstance);
-                                if (result != null && result['success'] == true) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Layout updated successfully: ${result['layoutType']}'),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
+                          AppStandardButton(
+                            text: 'Edit My Layout',
+                            height: 36,
+                            fontSize: 14,
+                            customColor: Colors.white,
+                            width: double.infinity,
+                            onPressed: () async {
+                              Navigator.of(dialogContext).pop();
+                              final result = await showEditLayoutDialog(context, arsenalInstance);
+                          if (result != null && result['success'] == true) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Layout updated successfully: ${result['layoutType']}'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                          
-                          const SizedBox(width: 12),
-                          
-                          // 右側按鈕：View Details
-                          Expanded(
-                            child: AppStandardButton(
-                              text: 'View Details',
-                              height: 40,
-                              fontSize: 14,
-                              customColor: Colors.white,
-                              isPrimary: true,
-                              onPressed: () {
-                                Navigator.of(dialogContext).pop();
-                                showArsenalBallDetails(context, arsenalInstance);
-                              },
-                            ),
+                          const SizedBox(height: 12),
+                          AppStandardButton(
+                            text: 'View Details',
+                            height: 36,
+                            fontSize: 14,
+                            customColor: Colors.white,
+                            width: double.infinity,
+                            onPressed: () {
+                              Navigator.of(dialogContext).pop();
+                              showArsenalBallDetails(context, arsenalInstance);
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          AppStandardButton(
+                            text: 'Add Note',
+                            height: 36,
+                            fontSize: 14,
+                            customColor: Colors.white,
+                            width: double.infinity,
+                            onPressed: () async {
+                              Navigator.of(dialogContext).pop();
+                              await _showEditNoteDialog(context, arsenalInstance, ref);
+                            },
                           ),
                         ],
                       ),
@@ -375,6 +398,98 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  Future<void> _showEditNoteDialog(BuildContext context, UserArsenalInstance instance, WidgetRef ref) async {
+    final controller = TextEditingController(text: instance.notes ?? '');
+    await showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.8),
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 380),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: BrandColors.accentColorDark, width: 1.5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Add Note',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  maxLength: 20,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    counterStyle: const TextStyle(color: Colors.grey),
+                    hintText: 'Enter note (max 20 chars)',
+                    hintStyle: const TextStyle(color: Colors.white54),
+                    filled: true,
+                    fillColor: Colors.black.withOpacity(0.6),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide(color: BrandColors.accentColorDark, width: 2),
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppStandardButton(
+                        text: 'Cancel',
+                        height: 36,
+                        outlineColor: Colors.white,
+                        foregroundColor: Colors.white,
+                        onPressed: () => Navigator.of(ctx).pop(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppStandardButton(
+                        text: 'Save',
+                        height: 36,
+                        isPrimary: true,
+                        customColor: BrandColors.accentColorDark,
+                        whiteForeground: true,
+                        onPressed: () async {
+                          final text = controller.text.trim();
+                          Navigator.of(ctx).pop();
+                          final auth = ref.read(authControllerProvider);
+                          if (auth.hasValue && auth.value != null) {
+                            final userId = auth.value!.id;
+                            await ref.read(newArsenalControllerProvider.notifier).updateNotes(instance.id, text, userId);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
