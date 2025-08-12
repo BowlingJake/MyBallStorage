@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:core_theme/core_theme.dart';
 
 /// Arsenal Management Dialog for managing ball assignments between bags
@@ -27,18 +28,8 @@ class _ArsenalManagementDialogState extends ConsumerState<ArsenalManagementDialo
   String _selectedOperation = '';
   int? _targetBagNumber;
   
-  // 與 bag management dialog 相同的9個顏色
-  final List<Color> _bagColors = [
-    Colors.red,     // 🔴 競賽/重要
-    Colors.orange,  // 🟠 練習/日常
-    Colors.yellow,  // 🟡 特殊/活動
-    Colors.green,   // 🟢 備用/新手
-    Colors.blue,    // 🔵 進階/技術
-    Colors.purple,  // 🟣 實驗/測試
-    Colors.cyan,    // 🔵 青色/專業
-    Colors.white,   // 🤍 基礎/標準
-    Colors.brown,   // 🟤 復古/經典
-  ];
+  // 使用統一的袋子顏色服務
+  List<Color> get _bagColors => BagColorService.getAllBagColors();
 
   void _toggleBallSelection(int ballId) {
     setState(() {

@@ -5,6 +5,7 @@ import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,18 +21,8 @@ class BagManagementDialog extends ConsumerStatefulWidget {
 
 class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
   
-  // 預設的9個顏色
-  final List<Color> _bagColors = [
-    Colors.red,     // 🔴 競賽/重要
-    Colors.orange,  // 🟠 練習/日常
-    Colors.yellow,  // 🟡 特殊/活動
-    Colors.green,   // 🟢 備用/新手
-    Colors.blue,    // 🔵 進階/技術
-    Colors.purple,  // 🟣 實驗/測試
-    Colors.cyan,    // 🔵 青色/專業
-    Colors.white,   // 🤍 基礎/標準
-    Colors.brown,   // 🟤 復古/經典
-  ];
+  // 使用統一的袋子顏色服務
+  List<Color> get _bagColors => BagColorService.getAllBagColors();
 
   @override
   void initState() {

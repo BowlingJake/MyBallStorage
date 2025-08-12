@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notif
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up_model;
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
@@ -67,18 +68,8 @@ class BallCardItem extends ConsumerWidget {
 
     final unlockedBags = profile.unlockedBags;
 
-    // 球袋顏色對應（與 My Arsenal 頁面一致）
-    final bagColors = [
-      Colors.orange, // 袋子1（主球袋）
-      Colors.red,    // 袋子2
-      Colors.yellow, // 袋子3
-      Colors.green,  // 袋子4
-      Colors.blue,   // 袋子5
-      Colors.purple, // 袋子6
-      Colors.cyan,   // 袋子7
-      Colors.white,  // 袋子8
-      Colors.brown,  // 袋子9
-    ];
+    // 使用統一的袋子顏色服務
+    final bagColors = BagColorService.getAllBagColors();
 
     // 預設選中第一個球袋 (通常是 "All My Arsenal")
     final selectedBags = <int>{1}; // 預設選中球袋1

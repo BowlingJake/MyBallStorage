@@ -1,5 +1,6 @@
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up;
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -11,17 +12,8 @@ Future<List<int>?> showBagSelectionDialog({
 }) async {
   final unlockedBags = profile.unlockedBags;
   final selectedBags = <int>{1};
-  final bagColors = <Color>[
-    Colors.orange,
-    Colors.red,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.purple,
-    Colors.cyan,
-    Colors.white,
-    Colors.brown,
-  ];
+  // 使用統一的袋子顏色服務
+  final bagColors = BagColorService.getAllBagColors();
 
   return showDialog<List<int>>(
     context: context,

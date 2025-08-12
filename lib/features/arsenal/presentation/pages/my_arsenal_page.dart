@@ -15,6 +15,7 @@ import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 
 /// Refactored My Arsenal Page - simplified and component-based
 class MyArsenalPage extends ConsumerStatefulWidget {
@@ -29,17 +30,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   TabController? _tabController;
   bool _isSearching = false;
 
-  final List<Color> _bagColors = [
-    Colors.orange,  // 🟠 主球袋
-    Colors.red,     // 🔴 進攻/重型
-    Colors.yellow,  // 🟡 全能/中型
-    Colors.green,   // 🟢 備用/新手
-    Colors.blue,    // 🔵 進階/技術
-    Colors.purple,  // 🟣 實驗/測試
-    Colors.cyan,    // 🔵 青色/專業
-    Colors.white,   // 🤍 基礎/標準
-    Colors.brown,   // 🟤 復古/經典
-  ];
+  // 使用統一的袋子顏色服務
+  List<Color> get _bagColors => BagColorService.getAllBagColors();
 
   @override
   void initState() {
