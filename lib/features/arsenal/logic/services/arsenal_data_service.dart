@@ -124,7 +124,6 @@ class ArsenalDataService {
     required double value1,
     required double value2,
     required double value3,
-    String? notes,
   }) async {
     try {
       await _repository.updateLayout(
@@ -133,7 +132,6 @@ class ArsenalDataService {
         value1: value1,
         value2: value2,
         value3: value3,
-        notes: notes,
       );
     } catch (e) {
       throw Exception('Failed to update layout: $e');
@@ -141,9 +139,12 @@ class ArsenalDataService {
   }
 
   /// 更新球具備註
-  Future<void> updateNotes(int instanceId, String note) async {
+  Future<void> updateNotes(int instanceId, String? notes) async {
     try {
-      await _repository.updateNotes(instanceId, note);
+      await _repository.updateNotes(
+        instanceId: instanceId,
+        notes: notes,
+      );
     } catch (e) {
       throw Exception('Failed to update notes: $e');
     }

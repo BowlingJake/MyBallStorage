@@ -328,7 +328,7 @@ class NewArsenalController extends _$NewArsenalController {
   /// Update notes for an instance
   Future<void> updateNotes(int instanceId, String note, String userId) async {
     try {
-      await _repository.updateNotes(instanceId: instanceId, notes: note.isEmpty ? null : note);
+      await _dataService.updateNotes(instanceId, note.isEmpty ? null : note);
       final updated = state.allInstances.map((inst) => inst.id == instanceId ? inst.copyWith(notes: note.isEmpty ? null : note) : inst).toList();
       state = state.copyWith(allInstances: updated);
     } catch (e) {
@@ -506,6 +506,26 @@ class NewArsenalController extends _$NewArsenalController {
     } catch (e) {
       state = state.copyWith(error: 'Failed to update bag assignment: $e');
       rethrow;
+    }
+  }
+
+  /// Load all instances for a user
+  Future<void> _loadAllInstances(String userId) async {
+    try {
+      final instances = await _dataService.loadAllInstances(userId);
+      state = state.copyWith(allInstances: instances);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to load instances: $e');
+    }
+  }
+
+  /// Load user categories
+  Future<void> _loadUserCategories(String userId) async {
+    try {
+      final categories = await _dataService.loadUserCategories(userId);
+      state = state.copyWith(userCategories: categories);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to load categories: $e');
     }
   }
 }
