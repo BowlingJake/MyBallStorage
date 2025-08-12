@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsenal_repository.dart';
-import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_user_arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_user_arsenal_repository.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsenal_repository.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_filter_service.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_sort_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'new_arsenal_controller.freezed.dart';
 part 'new_arsenal_controller.g.dart';
@@ -33,21 +34,6 @@ class NewArsenalState with _$NewArsenalState {
 }
 
 enum ArsenalViewMode { grid, list }
-
-/// 排序選項枚舉
-enum SortOption {
-  nameAZ('Name (A-Z)'),
-  nameZA('Name (Z-A)'),
-  brandAZ('Brand (A-Z)'),
-  brandZA('Brand (Z-A)'),
-  dateNewest('Date Added (Newest)'),
-  dateOldest('Date Added (Oldest)'),
-  gamesUsedMost('Games Used (Most)'),
-  gamesUsedLeast('Games Used (Least)');
-
-  const SortOption(this.displayName);
-  final String displayName;
-}
 
 /// New Arsenal repository provider
 @riverpod
@@ -114,113 +100,21 @@ class NewArsenalController extends _$NewArsenalController {
 
   /// Get filtered instances based on selected bag, category, search text, and filters
   List<UserArsenalInstance> get filteredInstances {
-    var instances = state.allInstances;
+    // 使用 ArsenalFilterService 進行過濾
+    final filteredInstances = ArsenalFilterService.filterInstances(
+      instances: state.allInstances,
+      selectedBagNumber: state.selectedBagNumber,
+      selectedCategory: state.selectedCategory,
+      searchText: state.searchText,
+      filters: state.filters,
+    );
     
-    // Filter by selected bag first
-    if (state.selectedBagNumber != 1) {
-      // 如果不是 "All My Arsenal" (袋子1)，則根據袋子篩選
-      instances = instances
-          .where((instance) => instance.isInBag(state.selectedBagNumber))
-          .toList();
-    }
-    
-    // Filter by category
-    if (state.selectedCategory != null) {
-      instances = instances
-          .where((instance) => instance.belongsToCategory(state.selectedCategory!))
-          .toList();
-    }
-    
-    // Filter by search text
-    if (state.searchText.isNotEmpty) {
-      final searchLower = state.searchText.toLowerCase();
-      instances = instances.where((instance) {
-        final ball = instance.bowlingBall;
-        if (ball == null) return false;
-        final ballName = ball.name.toLowerCase();
-        final ballBrand = ball.brand.toLowerCase();
-        return ballName.contains(searchLower) || ballBrand.contains(searchLower);
-      }).toList();
-    }
-    
-    // Filter by brands
-    if (state.filters.brands.isNotEmpty) {
-      instances = instances.where((instance) {
-        final ball = instance.bowlingBall;
-        return ball != null && state.filters.brands.contains(ball.brand);
-      }).toList();
-    }
-    
-    // Filter by cores
-    if (state.filters.cores.isNotEmpty) {
-      instances = instances.where((instance) {
-        final ball = instance.bowlingBall;
-        if (ball?.coreType == null) return false;
-        // Check if ball's core type is in selected cores
-        final coreType = ball!.coreType!.toLowerCase().contains('asym') ? 'Asymmetric' : 'Symmetric';
-        return state.filters.cores.contains(coreType);
-      }).toList();
-    }
-    
-    // Filter by coverstocks
-    if (state.filters.coverstocks.isNotEmpty) {
-      instances = instances.where((instance) {
-        final ball = instance.bowlingBall;
-        return ball?.coverstockType != null && 
-               state.filters.coverstocks.contains(ball!.coverstockType!);
-      }).toList();
-    }
-    
-    // Apply sorting
-    return _sortInstances(instances);
-  }
-
-  /// 排序球具列表
-  List<UserArsenalInstance> _sortInstances(List<UserArsenalInstance> instances) {
-    final sortedInstances = List<UserArsenalInstance>.from(instances);
-    
-    switch (state.sortOption) {
-      case SortOption.nameAZ:
-        sortedInstances.sort((a, b) => 
-            (a.bowlingBall?.name ?? '').compareTo(b.bowlingBall?.name ?? ''));
-        break;
-      case SortOption.nameZA:
-        sortedInstances.sort((a, b) => 
-            (b.bowlingBall?.name ?? '').compareTo(a.bowlingBall?.name ?? ''));
-        break;
-      case SortOption.brandAZ:
-        sortedInstances.sort((a, b) => 
-            (a.bowlingBall?.brand ?? '').compareTo(b.bowlingBall?.brand ?? ''));
-        break;
-      case SortOption.brandZA:
-        sortedInstances.sort((a, b) => 
-            (b.bowlingBall?.brand ?? '').compareTo(a.bowlingBall?.brand ?? ''));
-        break;
-      case SortOption.dateNewest:
-        sortedInstances.sort((a, b) {
-          if (a.addedDate == null && b.addedDate == null) return 0;
-          if (a.addedDate == null) return 1;
-          if (b.addedDate == null) return -1;
-          return b.addedDate!.compareTo(a.addedDate!);
-        });
-        break;
-      case SortOption.dateOldest:
-        sortedInstances.sort((a, b) {
-          if (a.addedDate == null && b.addedDate == null) return 0;
-          if (a.addedDate == null) return 1;
-          if (b.addedDate == null) return -1;
-          return a.addedDate!.compareTo(b.addedDate!);
-        });
-        break;
-      case SortOption.gamesUsedMost:
-        sortedInstances.sort((a, b) => b.gamesUsed.compareTo(a.gamesUsed));
-        break;
-      case SortOption.gamesUsedLeast:
-        sortedInstances.sort((a, b) => a.gamesUsed.compareTo(b.gamesUsed));
-        break;
-    }
-    
-    return sortedInstances;
+    // 使用 ArsenalSortService 進行排序
+    return ArsenalSortService.sortInstances(
+      instances: filteredInstances,
+      sortOption: state.sortOption,
+      ascending: state.sortAscending,
+    );
   }
 
   /// Get all available categories including virtual "All My Arsenal"
@@ -269,14 +163,26 @@ class NewArsenalController extends _$NewArsenalController {
 
   /// 獲取當前排序狀態的描述
   String get currentSortDescription {
-    return state.sortOption.displayName;
+    return ArsenalSortService.getSortDisplayName(state.sortOption);
   }
 
   /// Clear all filters
   void clearFilters() {
     state = state.copyWith(
+      selectedBagNumber: 1, // 重置到 "All My Arsenal"
+      selectedCategory: null, // 重置類別選擇
       searchText: '',
       filters: const BallFilters(),
+    );
+  }
+
+  /// Check if any filters are currently active
+  bool get hasActiveFilters {
+    return ArsenalFilterService.hasActiveFilters(
+      selectedBagNumber: state.selectedBagNumber,
+      selectedCategory: state.selectedCategory,
+      searchText: state.searchText,
+      filters: state.filters,
     );
   }
 

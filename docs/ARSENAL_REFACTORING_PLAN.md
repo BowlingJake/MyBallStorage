@@ -323,6 +323,73 @@ My Arsenal 頁面目前面臨嚴重的架構問題，主要體現在：
 - **效能**: 過濾和排序邏輯最佳化
 - **新功能開發**: 更容易添加新的過濾、排序選項
 
+### 階段2B-2C: 實作結果
+
+#### ✅ 服務拆分完成
+**ArsenalFilterService** (240行):
+- 靜態方法設計，無狀態純函數
+- 6個專門的過濾方法：袋子、類別、搜尋、品牌、核心、表面材質
+- 3個輔助方法：getAvailable*() 取得動態選項
+- FilterClearInfo 類別提供過濾清除輔助功能
+
+**ArsenalSortService** (163行):
+- 支援8種排序選項的完整實作
+- 智慧 null 值處理 (特別是日期排序)
+- 排序輔助方法：getSortDisplayName(), getReverseSortOption()
+- 分組排序選項支援 UI 顯示
+
+#### ✅ 控制器重構完成
+**new_arsenal_controller.dart**: 
+- **行數縮減**: 621行 → 528行 (**15% 縮減**)
+- **複雜邏輯外移**: 過濾和排序邏輯完全委託給專門服務
+- **新增功能**: hasActiveFilters getter 提供過濾狀態檢查
+- **代碼簡化**: filteredInstances getter 從80行縮減到15行
+
+#### 重構對比分析
+
+**過濾邏輯重構前後對比**:
+```dart
+// 重構前 (60+ 行複雜邏輯)
+List<UserArsenalInstance> get filteredInstances {
+  var instances = state.allInstances;
+  // 袋子過濾邏輯 (8行)
+  if (state.selectedBagNumber != 1) { ... }
+  // 類別過濾邏輯 (6行) 
+  if (state.selectedCategory != null) { ... }
+  // 搜尋過濾邏輯 (10行)
+  if (state.searchText.isNotEmpty) { ... }
+  // 品牌過濾邏輯 (7行)
+  // 核心過濾邏輯 (8行)
+  // 表面材質過濾邏輯 (7行)
+  // 排序邏輯 (45行)
+  return _sortInstances(instances);
+}
+
+// 重構後 (15行清晰邏輯)
+List<UserArsenalInstance> get filteredInstances {
+  final filteredInstances = ArsenalFilterService.filterInstances(
+    instances: state.allInstances,
+    selectedBagNumber: state.selectedBagNumber,
+    selectedCategory: state.selectedCategory,
+    searchText: state.searchText,
+    filters: state.filters,
+  );
+  
+  return ArsenalSortService.sortInstances(
+    instances: filteredInstances,
+    sortOption: state.sortOption,
+    ascending: state.sortAscending,
+  );
+}
+```
+
+#### 技術改進總結
+1. **關注點分離**: 過濾、排序邏輯從控制器中完全分離
+2. **可測試性**: 靜態方法易於單元測試，無需複雜的模擬
+3. **可重用性**: 服務可在其他功能中直接重用
+4. **效能提升**: 專門的服務類別更容易進行效能最佳化
+5. **維護性**: 每個服務職責單一，更容易理解和修改
+
 ---
 
 ## 8. 第一輪重構完成報告 (2025-01-12)
