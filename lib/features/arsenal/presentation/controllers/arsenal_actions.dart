@@ -330,22 +330,24 @@ class ArsenalActions {
     final currentBagNumber = arsenalState.selectedBagNumber ?? 1;
     final selectedInstanceIds = await showAllMyArsenalSelectionDialog(context);
     if (selectedInstanceIds == null || selectedInstanceIds.isEmpty) return;
-    // 映射 instanceId 到 ballId
-    final instances = arsenalState.allInstances;
-    final selectedBallIds = <int>[];
-    for (final id in selectedInstanceIds) {
-      final inst = instances.firstWhere((e) => e.id == id, orElse: () => null as dynamic);
-      if (inst != null) {
-        selectedBallIds.add(inst.ballId);
-      }
+    // 直接以 instanceId 更新 bag 指派，避免複製新增
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      TopNotification.showError(context, 'Please log in to add balls to bag');
+      return;
     }
-    if (selectedBallIds.isEmpty) return;
-    await _addSelectedBallsToSpecificBag(
-      context: context,
-      ref: ref,
-      ballIds: selectedBallIds,
-      targetBagNumber: currentBagNumber,
+    final userId = authState.value!.id;
+    await ref.read(newArsenalControllerProvider.notifier).addExistingInstancesToBag(
+      instanceIds: selectedInstanceIds,
+      bagNumber: currentBagNumber,
+      userId: userId,
     );
+    final userProfileState = ref.read(userProfileControllerProvider);
+    String bagName = 'All My Arsenal';
+    if (userProfileState.profile != null && currentBagNumber != 1) {
+      bagName = userProfileState.profile!.getBagName(currentBagNumber) ?? 'Bag $currentBagNumber';
+    }
+    TopNotification.showSuccess(context, 'Added ${selectedInstanceIds.length} ball${selectedInstanceIds.length != 1 ? 's' : ''} to $bagName');
   }
 
   static Future<void> _addSelectedBallsToSpecificBag({

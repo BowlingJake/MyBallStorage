@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsen
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_data_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_filter_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_sort_service.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_background_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -89,20 +90,17 @@ class NewArsenalController extends _$NewArsenalController {
     }
   }
 
-  /// Get filtered instances based on selected bag, category, search text, and filters
+  /// Get filtered instances based on selected bag, category, search text, and filters (synchronous fallback)
   List<UserArsenalInstance> get filteredInstances {
-    // 使用 ArsenalFilterService 進行過濾
-    final filteredInstances = ArsenalFilterService.filterInstances(
+    final filtered = ArsenalFilterService.filterInstances(
       instances: state.allInstances,
       selectedBagNumber: state.selectedBagNumber,
       selectedCategory: state.selectedCategory,
       searchText: state.searchText,
       filters: state.filters,
     );
-    
-    // 使用 ArsenalSortService 進行排序
     return ArsenalSortService.sortInstances(
-      instances: filteredInstances,
+      instances: filtered,
       sortOption: state.sortOption,
       ascending: state.sortAscending,
     );
@@ -245,6 +243,37 @@ class NewArsenalController extends _$NewArsenalController {
       
     } catch (e) {
       state = state.copyWith(error: 'Failed to add ball to multiple bags: $e');
+      rethrow;
+    }
+  }
+
+  /// Add existing instances (from All My Arsenal) to a specific bag
+  Future<void> addExistingInstancesToBag({
+    required List<int> instanceIds,
+    required int bagNumber,
+    required String userId,
+  }) async {
+    try {
+      if (bagNumber < 1 || bagNumber > 9) {
+        throw ArgumentError('Bag number must be between 1 and 9');
+      }
+      // bag 1 為主球袋，理論上所有紀錄皆為 true，不需額外處理
+      if (bagNumber == 1) {
+        return;
+      }
+
+      for (final instanceId in instanceIds) {
+        await _repository.updateBagAssignment(
+          instanceId: instanceId,
+          bagNumber: bagNumber,
+          isInBag: true,
+        );
+      }
+
+      // 重新載入資料以反映變更
+      await _loadAllInstances(userId);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to add balls to bag: $e');
       rethrow;
     }
   }
@@ -530,10 +559,46 @@ class NewArsenalController extends _$NewArsenalController {
   }
 }
 
-/// Provider to get filtered instances for current category
+/// Provider to get filtered instances using background isolate
 @riverpod
-List<UserArsenalInstance> filteredArsenalInstances(FilteredArsenalInstancesRef ref) {
-  final controller = ref.watch(newArsenalControllerProvider);
+Future<List<UserArsenalInstance>> filteredArsenalInstances(FilteredArsenalInstancesRef ref) async {
+  // 僅監聽與過濾/排序相關的欄位，避免切換選擇模式等無關狀態導致重算
+  final allInstances = ref.watch(
+    newArsenalControllerProvider.select((s) => s.allInstances),
+  );
+  final selectedBagNumber = ref.watch(
+    newArsenalControllerProvider.select((s) => s.selectedBagNumber),
+  );
+  final selectedCategory = ref.watch(
+    newArsenalControllerProvider.select((s) => s.selectedCategory),
+  );
+  final searchText = ref.watch(
+    newArsenalControllerProvider.select((s) => s.searchText),
+  );
+  final filters = ref.watch(
+    newArsenalControllerProvider.select((s) => s.filters),
+  );
+  final sortOption = ref.watch(
+    newArsenalControllerProvider.select((s) => s.sortOption),
+  );
   final notifier = ref.read(newArsenalControllerProvider.notifier);
-  return notifier.filteredInstances;
+
+  // 快速路徑：資料量小時直接同步，避免 Isolate 開銷
+  if (allInstances.length < 80 && searchText.isEmpty &&
+      filters.brands.isEmpty && filters.cores.isEmpty && filters.coverstocks.isEmpty) {
+    return notifier.filteredInstances; // 同步快路徑
+  }
+
+  final ids = await ArsenalBackgroundService.computeFilteredSortedIds(
+    instances: allInstances,
+    selectedBagNumber: selectedBagNumber,
+    selectedCategory: selectedCategory,
+    searchText: searchText,
+    filters: filters,
+    sortOption: sortOption,
+  );
+
+  // 以 id 還原順序後的實例列表
+  final idToInstance = {for (final inst in allInstances) inst.id: inst};
+  return ids.map((id) => idToInstance[id]).whereType<UserArsenalInstance>().toList(growable: false);
 }

@@ -33,6 +33,7 @@ class _AllMyArsenalSelectionDialogState extends ConsumerState<AllMyArsenalSelect
   Widget build(BuildContext context) {
     final arsenalState = ref.watch(newArsenalControllerProvider);
     final instances = arsenalState.allInstances; // All My Arsenal 列表
+    final currentBag = arsenalState.selectedBagNumber;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -83,16 +84,26 @@ class _AllMyArsenalSelectionDialogState extends ConsumerState<AllMyArsenalSelect
                       itemBuilder: (context, index) {
                         final instance = instances[index];
                         final isSelected = _selectedInstanceIds.contains(instance.id);
+                        final isAlreadyInCurrentBag = instance.isInBag(currentBag);
+                        final isDisabled = isAlreadyInCurrentBag;
                         return GestureDetector(
-                          onTap: () => _toggle(instance.id),
+                          onTap: isDisabled ? null : () => _toggle(instance.id),
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: isSelected ? BrandColors.accentColorDark.withOpacity(0.15) : Colors.black.withOpacity(0.6),
+                              color: isDisabled
+                                  ? Colors.black.withOpacity(0.3)
+                                  : isSelected
+                                      ? BrandColors.accentColorDark.withOpacity(0.15)
+                                      : Colors.black.withOpacity(0.6),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: isSelected ? BrandColors.accentColorDark : Colors.grey[600]!,
+                                color: isDisabled
+                                    ? Colors.grey[700]!
+                                    : isSelected
+                                        ? BrandColors.accentColorDark
+                                        : Colors.grey[600]!,
                                 width: isSelected ? 2 : 1,
                               ),
                             ),
@@ -103,13 +114,27 @@ class _AllMyArsenalSelectionDialogState extends ConsumerState<AllMyArsenalSelect
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(instance.displayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                                      Text(
+                                        instance.displayName,
+                                        style: TextStyle(
+                                          color: isDisabled ? Colors.white38 : Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text(instance.brandName, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                                      Text(
+                                        instance.brandName,
+                                        style: TextStyle(
+                                          color: isDisabled ? Colors.white24 : Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                if (isSelected)
+                                if (isDisabled)
+                                  const Icon(Icons.check, color: Colors.white38)
+                                else if (isSelected)
                                   const Icon(Icons.check_circle, color: BrandColors.accentColorDark),
                               ],
                             ),
@@ -139,7 +164,8 @@ class _AllMyArsenalSelectionDialogState extends ConsumerState<AllMyArsenalSelect
                   Expanded(
                     child: AppStandardButton(
                       text: 'Add ${_selectedInstanceIds.length} Ball${_selectedInstanceIds.length != 1 ? 's' : ''}',
-                      onPressed: _selectedInstanceIds.isEmpty ? () {} : _confirm,
+                      enabled: _selectedInstanceIds.isNotEmpty,
+                      onPressed: _confirm,
                       customColor: BrandColors.accentColorDark,
                       isPrimary: true,
                       whiteForeground: true,

@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_bu
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 
@@ -79,19 +80,23 @@ class ArsenalGridCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    // 球名
+                    // 球名（可能超出時自動縮小）
                     SizedBox(
                       width: double.infinity,
-                      child: Text(
-                        instance.displayName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Text(
+                          instance.displayName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          softWrap: false,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -126,24 +131,28 @@ class ArsenalGridCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Notes (if any)
-                    if ((instance.notes ?? '').isNotEmpty) ...[
-                      SizedBox(
-                        width: double.infinity,
+                    // Note（單行，保留標頭，無資料顯示 No Note），高亮顯示（無外框）
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Text(
-                          instance.notes!,
+                          'Note: ' + ((instance.notes ?? '').isNotEmpty ? instance.notes! : 'No Note'),
                           style: const TextStyle(
                             fontSize: 11,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(height: 3),
-                    ],
+                    ),
                     // Layout
                     SizedBox(
                       width: double.infinity,
@@ -160,19 +169,6 @@ class ArsenalGridCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 3),
-                    // Games Used
-                    SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        'Games Used: ${instance.gamesUsed}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey[300],
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -305,37 +301,32 @@ class ArsenalGridCard extends ConsumerWidget {
     final imageUrl = instance.effectiveImageUrl;
     
     if (imageUrl.isNotEmpty && imageUrl != 'https://via.placeholder.com/150') {
-      return Image.network(
-        imageUrl,
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
         width: size,
         height: size,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: size,
-            height: size,
-            color: Colors.grey.withOpacity(0.3),
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white54,
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: size,
-            height: size,
-            color: Colors.grey.withOpacity(0.3),
-            child: const Icon(
-              Icons.sports_baseball,
+        placeholder: (context, url) => Container(
+          width: size,
+          height: size,
+          color: Colors.grey.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
               color: Colors.white54,
-              size: 35,
             ),
-          );
-        },
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          width: size,
+          height: size,
+          color: Colors.grey.withOpacity(0.3),
+          child: const Icon(
+            Icons.sports_baseball,
+            color: Colors.white54,
+            size: 35,
+          ),
+        ),
       );
     } else {
       return Container(

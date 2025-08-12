@@ -50,14 +50,14 @@ final arsenalDataServiceProvider =
 // ignore: unused_element
 typedef ArsenalDataServiceRef = AutoDisposeProviderRef<ArsenalDataService>;
 String _$filteredArsenalInstancesHash() =>
-    r'6adbfdc6f12f37e60f51fb0f7a9fa4fdbd520540';
+    r'268dfb9ab518bc1868f594cf53f3611e94128165';
 
-/// Provider to get filtered instances for current category
+/// Provider to get filtered instances using background isolate
 ///
 /// Copied from [filteredArsenalInstances].
 @ProviderFor(filteredArsenalInstances)
 final filteredArsenalInstancesProvider =
-    AutoDisposeProvider<List<UserArsenalInstance>>.internal(
+    AutoDisposeFutureProvider<List<UserArsenalInstance>>.internal(
   filteredArsenalInstances,
   name: r'filteredArsenalInstancesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -70,9 +70,9 @@ final filteredArsenalInstancesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FilteredArsenalInstancesRef
-    = AutoDisposeProviderRef<List<UserArsenalInstance>>;
+    = AutoDisposeFutureProviderRef<List<UserArsenalInstance>>;
 String _$newArsenalControllerHash() =>
-    r'2e9d79a0faea52aa12d3da0c52eef2ce08039d32';
+    r'e36c1822c2de82c8e9c638ec2cd4f08f6189d964';
 
 /// New Arsenal controller
 ///

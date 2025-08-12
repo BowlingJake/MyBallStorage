@@ -14,13 +14,18 @@ class ArsenalGridView extends ConsumerWidget {
     final arsenalState = ref.watch(newArsenalControllerProvider);
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      child: Builder(
+        builder: (context) {
+          final media = MediaQuery.of(context);
+          final double bottomExtra = media.padding.bottom + kBottomNavigationBarHeight + 48; // actions(≈36)+spacing
+          return GridView.builder(
+            padding: EdgeInsets.fromLTRB(8, 16, 8, bottomExtra),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
-          childAspectRatio: 1,
+          // 稍微增加高度，避免內容溢出
+          childAspectRatio: 0.92,
         ),
         itemCount: instances.length,
         itemBuilder: (context, index) {
@@ -37,6 +42,8 @@ class ArsenalGridView extends ConsumerWidget {
                 : arsenalState.isMoveMode
                     ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id)
                     : null,
+          );
+        },
           );
         },
       ),

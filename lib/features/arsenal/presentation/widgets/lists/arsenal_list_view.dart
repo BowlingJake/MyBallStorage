@@ -15,8 +15,12 @@ class ArsenalListView extends ConsumerWidget {
     final arsenalState = ref.watch(newArsenalControllerProvider);
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 32),
+      child: Builder(
+        builder: (context) {
+          final media = MediaQuery.of(context);
+          final double bottomExtra = media.padding.bottom + kBottomNavigationBarHeight + 48; // actions(≈36)+spacing
+          return ListView.builder(
+            padding: EdgeInsets.only(bottom: bottomExtra),
         itemCount: instances.length,
         itemBuilder: (context, index) {
           final instance = instances[index];
@@ -34,6 +38,8 @@ class ArsenalListView extends ConsumerWidget {
                     ? () => ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id)
                     : null,
             extraInfo: extraInfoBuilder(instance),
+          );
+        },
           );
         },
       ),

@@ -15,7 +15,7 @@ class ArsenalContentSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final arsenalState = ref.watch(newArsenalControllerProvider);
-    final filteredBalls = ref.watch(filteredArsenalInstancesProvider);
+    final filteredBallsAsync = ref.watch(filteredArsenalInstancesProvider);
     
     if (arsenalState.isLoading) {
       return const Center(
@@ -30,7 +30,16 @@ class ArsenalContentSection extends ConsumerWidget {
       );
     }
 
-    return _buildLoadedContent(arsenalState, filteredBalls);
+    return filteredBallsAsync.when(
+      data: (filteredBalls) => _buildLoadedContent(arsenalState, filteredBalls),
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
+      error: (e, st) => ArsenalErrorState(
+        error: e.toString(),
+        onRetry: () => ref.refresh(filteredArsenalInstancesProvider),
+      ),
+    );
   }
 
   Widget _buildLoadedContent(NewArsenalState state, List<UserArsenalInstance> filteredBalls) {

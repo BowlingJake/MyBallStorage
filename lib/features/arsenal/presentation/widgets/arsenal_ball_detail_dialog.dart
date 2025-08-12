@@ -3,6 +3,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_ins
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Arsenal 專用的球詳細資訊對話框，基於 Ball Library 的設計但移除愛心按鈕
@@ -67,19 +68,17 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
                         shape: BoxShape.circle,
                         color: Colors.grey.withOpacity(0.3),
                       ),
-                      child: ClipOval(
+                          child: ClipOval(
                         child: widget.arsenalInstance.effectiveImageUrl.isNotEmpty && 
                                widget.arsenalInstance.effectiveImageUrl != 'https://via.placeholder.com/150'
-                            ? Image.network(
-                                widget.arsenalInstance.effectiveImageUrl,
+                            ? CachedNetworkImage(
+                                imageUrl: widget.arsenalInstance.effectiveImageUrl,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.sports_baseball,
-                                    color: Colors.white54,
-                                    size: 70,
-                                  );
-                                },
+                                errorWidget: (context, url, error) => const Icon(
+                                  Icons.sports_baseball,
+                                  color: Colors.white54,
+                                  size: 70,
+                                ),
                               )
                             : const Icon(
                                 Icons.sports_baseball,
@@ -133,7 +132,44 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
                   const SizedBox(height: 6),
                   // Arsenal 專用資訊：Layout
                   _buildInfoRow('Layout', widget.arsenalInstance.layoutDisplayString),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
+                  // Arsenal 專用資訊：Note（置於 Layout 下方，亮白外框顯示）
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white70, width: 1.2),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Note',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          ((widget.arsenalInstance.notes ?? '').isNotEmpty)
+                              ? widget.arsenalInstance.notes!
+                              : 'No Note',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   // Arsenal 專用資訊：Games Used
                   _buildInfoRow('Games Used', widget.arsenalInstance.gamesUsed.toString()),
                 ],
@@ -141,7 +177,7 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
             ),
             // 底部區域：進度條
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 children: [
                   // RG 進度條
@@ -152,7 +188,7 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
                     2.700,
                     const Color(0xFF4A90E2), // 科技藍
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   // RG DIFF 進度條
                   _buildProgressBar(
                     'RG DIFF',
@@ -161,7 +197,7 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
                     0.060,
                     const Color(0xFF50C878), // 科技綠
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   // MB DIFF 進度條
                   _buildProgressBar(
                     'MB DIFF',

@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/edit_layout_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
@@ -93,22 +94,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                               child: _buildBallImage(),
                             ),
                           ),
-                          if ((arsenalBallInstance.notes ?? '').isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                arsenalBallInstance.notes!,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                           // 移除圖上方 Note；恢復原設計
                           // 移除無意義的 Arsenal indicator
                         ],
                       ),
@@ -168,11 +154,37 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          // Extra info (like games used for arsenal)
-                          if (extraInfo != null) ...[
-                            extraInfo!,
-                            const SizedBox(height: 8),
-                          ],
+                          // Note（恢復資訊區顯示）
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Note: ' + ((arsenalBallInstance.notes ?? '').trim().isNotEmpty ? (arsenalBallInstance.notes ?? '').trim() : 'No Note'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // Layout 行（單行、省略）
+                          Text(
+                            'Layout: ' + arsenalBallInstance.layoutDisplayString,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey[300],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           // 移除 RG, Diff, MB 數據塊顯示
                         ],
                       ),
@@ -214,39 +226,33 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
   }
 
   Widget _buildBallImage() {
-    
     if (imageUrl.isNotEmpty && imageUrl != 'https://via.placeholder.com/150') {
-      return Image.network(
-        imageUrl,
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
         width: 120,
         height: 120,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: 120,
-            height: 120,
-            color: Colors.grey.withOpacity(0.3),
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white54,
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: 120,
-            height: 120,
-            color: Colors.grey.withOpacity(0.3),
-            child: const Icon(
-              Icons.sports_baseball,
+        placeholder: (context, url) => Container(
+          width: 120,
+          height: 120,
+          color: Colors.grey.withOpacity(0.3),
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
               color: Colors.white54,
-              size: 35,
             ),
-          );
-        },
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          width: 120,
+          height: 120,
+          color: Colors.grey.withOpacity(0.3),
+          child: const Icon(
+            Icons.sports_baseball,
+            color: Colors.white54,
+            size: 35,
+          ),
+        ),
       );
     } else {
       return Container(
