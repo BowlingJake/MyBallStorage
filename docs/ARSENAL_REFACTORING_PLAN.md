@@ -223,6 +223,108 @@ My Arsenal 頁面目前面臨嚴重的架構問題，主要體現在：
 
 ---
 
+# 第二輪重構分析報告 (2025-01-12)
+
+## 第二輪重構：程式碼重用與深度最佳化
+
+### 階段2A: new_arsenal_controller.dart 分析結果
+
+#### 檔案規模問題
+- **總行數**: 621 行 - 明顯超出單一責任原則
+- **方法數量**: 26+ 個公開方法
+- **複雜度**: 包含多種不同領域的邏輯
+
+#### 責任邊界分析
+
+**當前控制器職責 (過於廣泛)**:
+1. **狀態管理** - NewArsenalState 管理 (合理)
+2. **資料加載** - initialize(), _loadAllInstances(), _loadUserCategories()
+3. **過濾邏輯** - filteredInstances getter, 複雜的多條件篩選
+4. **排序邏輯** - _sortInstances(), setSortOption(), toggleSortDirection()
+5. **搜尋功能** - updateSearchText(), 文字搜尋過濾
+6. **UI 狀態** - setViewMode(), toggleRemoveMode(), toggleMoveMode()
+7. **球具管理** - addBallFromLibrary(), removeInstance(), updateGamesUsed()
+8. **袋子操作** - updateBagAssignment(), moveSelectedInstancesToBag()
+9. **批量操作** - removeSelectedInstances(), moveSelectedInstancesToBag()
+10. **筆記管理** - updateNotes(), updateLayout()
+
+#### 建議拆分策略
+
+**1. ArsenalDataService (資料管理)**
+```dart
+- initialize()
+- _loadAllInstances() 
+- _loadUserCategories()
+- refresh()
+- addBallFromLibrary()
+- removeInstance()
+- updateGamesUsed()
+```
+
+**2. ArsenalFilterService (過濾和搜尋)**
+```dart
+- filteredInstances getter
+- updateSearchText()
+- updateFilters() 
+- clearFilters()
+- 複雜過濾邏輯拆分為獨立方法
+```
+
+**3. ArsenalSortService (排序管理)**
+```dart
+- _sortInstances()
+- setSortOption()
+- toggleSortDirection()
+- currentSortDescription
+- 排序枚舉和邏輯
+```
+
+**4. ArsenalBagService (袋子操作)**
+```dart
+- selectBag()
+- updateBagAssignment()
+- moveSelectedInstancesToBag()
+- removeSelectedInstancesFromBag()
+- addBallFromLibraryToMultipleBags()
+```
+
+**5. ArsenalSelectionService (選取操作)**
+```dart
+- toggleRemoveMode()
+- toggleMoveMode()
+- toggleInstanceForRemoval()
+- toggleInstanceForMove()
+- removeSelectedInstances()
+```
+
+**6. 簡化後的 NewArsenalController**
+```dart
+- 核心狀態管理
+- 服務協調
+- 錯誤處理
+- UI 模式切換 (setViewMode, selectCategory)
+```
+
+#### 重構優先順序
+
+**高優先級 (即將處理)**:
+1. **ArsenalFilterService** - 過濾邏輯最複雜，影響效能
+2. **ArsenalDataService** - 核心資料操作，最常使用
+3. **ArsenalBagService** - 袋子操作邏輯獨立性強
+
+**中優先級**:
+4. **ArsenalSortService** - 排序邏輯相對獨立
+5. **ArsenalSelectionService** - 選取邏輯複雜但使用頻率較低
+
+#### 預期效益
+- **可維護性**: 每個服務類別行數 < 150 行
+- **可測試性**: 獨立服務更容易單元測試
+- **可重用性**: 服務可在其他功能中重用
+- **效能**: 過濾和排序邏輯最佳化
+- **新功能開發**: 更容易添加新的過濾、排序選項
+
+---
+
 ## 8. 第一輪重構完成報告 (2025-01-12)
 
 ### 8.1 已完成的重構成果
