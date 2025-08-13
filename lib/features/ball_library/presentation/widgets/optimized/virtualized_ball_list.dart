@@ -116,12 +116,12 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
 
     // Build new item
     final ball = widget.state.filteredBalls[index];
-    final widget = _buildBallItem(ball);
+    final ballWidget = _buildBallItem(ball);
     
     // Cache the widget for reuse
-    _itemCache[index] = widget;
+    _itemCache[index] = ballWidget;
     
-    return widget;
+    return ballWidget;
   }
 
   Widget _buildBallItem(BowlingBall ball) {
