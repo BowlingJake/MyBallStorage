@@ -26,7 +26,7 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
         context.go('/training');
         break;
       case 4:
-        context.go('/events');
+        context.go('/tournament');
         break;
     }
   }
@@ -41,7 +41,7 @@ class ScaffoldWithBottomNavBar extends StatelessWidget {
     if (location.startsWith('/training')) {
       return 3;
     }
-    if (location.startsWith('/events')) {
+    if (location.startsWith('/tournament')) {
       return 4;
     }
     return 0;

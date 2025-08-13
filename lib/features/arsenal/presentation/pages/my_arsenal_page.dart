@@ -65,7 +65,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     if (location.startsWith('/library')) return 1;
     if (location.startsWith('/my-arsenal')) return 2;
     if (location.startsWith('/training')) return 3;
-    if (location.startsWith('/events')) return 4;
+    if (location.startsWith('/tournament')) return 4;
     return 0;
   }
 
@@ -84,7 +84,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
         context.go('/training');
         break;
       case 4:
-        context.go('/events');
+        context.go('/tournament');
         break;
     }
   }

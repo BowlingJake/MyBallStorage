@@ -43,6 +43,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
     if (location.startsWith('/library')) return 1;
     if (location.startsWith('/my-arsenal')) return 2;
     if (location.startsWith('/training')) return 3;
+    if (location.startsWith('/tournament')) return 4;
     return 0;
   }
 
@@ -97,6 +98,9 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
                 break;
               case 3:
                 context.go('/training');
+                break;
+              case 4:
+                context.go('/tournament');
                 break;
             }
           },

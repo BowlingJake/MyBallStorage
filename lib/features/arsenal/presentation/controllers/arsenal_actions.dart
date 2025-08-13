@@ -272,7 +272,7 @@ class ArsenalActions {
         context.go('/training');
         return;
       case 4:
-        context.go('/events');
+        context.go('/tournament');
         return;
     }
   }

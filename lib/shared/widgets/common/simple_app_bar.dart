@@ -68,6 +68,21 @@ class AppBarConfigs {
     );
   }
 
+  /// Tournament 風格（與 Ball Library 相同樣式，語義化命名）
+  static SimpleAppBar tournament({
+    required String title,
+    List<Widget>? actions,
+    VoidCallback? onBackPressed,
+  }) {
+    return SimpleAppBar(
+      title: title,
+      actions: actions,
+      onBackPressed: onBackPressed,
+      backgroundColor: Colors.transparent,
+      foregroundColor: Colors.white,
+    );
+  }
+
   /// Arsenal 風格的應用程式欄
   static SimpleAppBar arsenal({
     required String title,

@@ -12,7 +12,7 @@ import 'package:bowlingarsenal_app/features/training/presentation/pages/my_train
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
-import 'package:bowlingarsenal_app/features/events/views/events_page.dart';
+import 'package:bowlingarsenal_app/features/tournament/views/my_tournament_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
@@ -92,9 +92,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const FavoritesPage(),
       ),
       GoRoute(
-        path: '/events',
-        name: 'events',
-        builder: (context, state) => const EventsPage(),
+        path: '/tournament',
+        name: 'tournament',
+        builder: (context, state) => const MyTournamentPage(),
       ),
       GoRoute(
         path: '/settings',
