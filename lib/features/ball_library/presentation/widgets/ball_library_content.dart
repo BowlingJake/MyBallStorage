@@ -89,7 +89,7 @@ class BallLibraryContent extends ConsumerWidget {
 
   /// Build optimized ball list with virtualization
   Widget _buildBallList(BuildContext context, WidgetRef ref, BallLibraryState state) {
-    return VirtualizedBallList(state: state);
+    return const VirtualizedBallList();
   }
 
 }

@@ -14,12 +14,7 @@ import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 /// - Smart scroll performance optimization
 /// - Memory-efficient caching strategy
 class VirtualizedBallList extends ConsumerStatefulWidget {
-  final BallLibraryState state;
-  
-  const VirtualizedBallList({
-    super.key,
-    required this.state,
-  });
+  const VirtualizedBallList({super.key});
 
   @override
   ConsumerState<VirtualizedBallList> createState() => _VirtualizedBallListState();
@@ -31,8 +26,11 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
   // Performance optimization: Cache for frequently accessed items
   final Map<int, Widget> _itemCache = <int, Widget>{};
   
-  // Estimated item height for better performance
-  static const double _estimatedItemHeight = 200.0;
+  // Track current state for cache invalidation
+  BallLibraryState? _previousState;
+  
+  // Estimated item height for better performance  
+  static const double _estimatedItemHeight = 180.0;
   
   @override
   void initState() {
@@ -53,8 +51,12 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
       // Auto-load more when reaching 80% of the scroll
       if (_scrollController.position.pixels >= 
           _scrollController.position.maxScrollExtent * 0.8) {
-        if (widget.state.hasMoreData && !widget.state.isLoadingMore) {
-          ref.read(ballLibraryControllerProvider.notifier).loadMore();
+        final currentState = ref.read(ballLibraryControllerProvider);
+        if (currentState.hasValue) {
+          final state = currentState.value!;
+          if (state.hasMoreData && !state.isLoadingMore) {
+            ref.read(ballLibraryControllerProvider.notifier).loadMore();
+          }
         }
       }
       
@@ -66,6 +68,11 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
   }
 
   void _clearDistantCacheItems() {
+    final currentState = ref.read(ballLibraryControllerProvider);
+    if (!currentState.hasValue) return;
+    
+    final state = currentState.value!;
+    
     // Calculate visible range based on scroll position
     final viewportStart = _scrollController.position.pixels;
     final viewportEnd = viewportStart + _scrollController.position.viewportDimension;
@@ -75,8 +82,8 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
     
     // Keep cache for visible items + buffer
     const bufferSize = 20;
-    final keepStartIndex = (visibleStartIndex - bufferSize).clamp(0, widget.state.filteredBalls.length);
-    final keepEndIndex = (visibleEndIndex + bufferSize).clamp(0, widget.state.filteredBalls.length);
+    final keepStartIndex = (visibleStartIndex - bufferSize).clamp(0, state.filteredBalls.length);
+    final keepEndIndex = (visibleEndIndex + bufferSize).clamp(0, state.filteredBalls.length);
     
     // Remove items outside the keep range
     _itemCache.removeWhere((index, _) => 
@@ -85,69 +92,117 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(
-        scrollbars: false,
-        physics: const BouncingScrollPhysics(), // Better performance than default
-      ),
-      child: ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.only(bottom: 80),
-        itemCount: widget.state.filteredBalls.length + (widget.state.hasMoreData ? 1 : 0),
-        itemExtent: _estimatedItemHeight, // Critical for performance
-        cacheExtent: _estimatedItemHeight * 20, // Cache 20 items ahead/behind
-        addAutomaticKeepAlives: false, // Disable keep alive for better memory
-        addRepaintBoundaries: true, // Enable repaint boundaries for smooth scrolling
-        itemBuilder: (context, index) => _buildOptimizedItem(context, index),
+    final ballLibraryAsync = ref.watch(ballLibraryControllerProvider);
+    
+    return ballLibraryAsync.when(
+      data: (state) {
+        // Clear cache if state has changed (filters, sorting, etc.)
+        if (_previousState != null && _shouldClearCache(state, _previousState!)) {
+          _itemCache.clear();
+        }
+        _previousState = state;
+        
+        return ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            scrollbars: false,
+            physics: const BouncingScrollPhysics(), // Better performance than default
+          ),
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            itemCount: state.filteredBalls.length + (state.hasMoreData ? 1 : 0),
+            itemExtent: _estimatedItemHeight, // Critical for performance
+            cacheExtent: _estimatedItemHeight * 20, // Cache 20 items ahead/behind
+            addAutomaticKeepAlives: false, // Disable keep alive for better memory
+            addRepaintBoundaries: true, // Enable repaint boundaries for smooth scrolling
+            itemBuilder: (context, index) => _buildOptimizedItem(context, index, state),
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 64),
+            const SizedBox(height: 16),
+            Text(
+              'Error loading balls: $error',
+              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => ref.invalidate(ballLibraryControllerProvider),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildOptimizedItem(BuildContext context, int index) {
+  /// Check if cache should be cleared due to state changes
+  bool _shouldClearCache(BallLibraryState current, BallLibraryState previous) {
+    return current.searchText != previous.searchText ||
+           current.filters != previous.filters ||
+           current.sortCriterion != previous.sortCriterion;
+  }
+
+  Widget _buildOptimizedItem(BuildContext context, int index, BallLibraryState state) {
     // Load more indicator
-    if (index >= widget.state.filteredBalls.length) {
-      return _buildLoadMoreFooter();
+    if (index >= state.filteredBalls.length) {
+      return _buildLoadMoreFooter(state);
     }
 
-    // Check cache first for performance
-    if (_itemCache.containsKey(index)) {
-      return _itemCache[index]!;
+    // In selection mode, avoid cache to reflect real-time UI changes (overlay/checkmark)
+    final uiState = ref.watch(ballLibraryUIServiceProvider);
+    final isInSelectionMode = uiState.selectionMode != BallLibrarySelectionMode.none;
+    if (!isInSelectionMode) {
+      // Check cache first for performance when not in selection mode
+      if (_itemCache.containsKey(index)) {
+        return _itemCache[index]!;
+      }
     }
 
     // Build new item
-    final ball = widget.state.filteredBalls[index];
+    final ball = state.filteredBalls[index];
     final ballWidget = _buildBallItem(ball);
     
-    // Cache the widget for reuse
-    _itemCache[index] = ballWidget;
+    // Cache the widget for reuse only when not in selection mode
+    if (!isInSelectionMode) {
+      _itemCache[index] = ballWidget;
+    }
     
     return ballWidget;
   }
 
   Widget _buildBallItem(BowlingBall ball) {
-    final uiService = ref.read(ballLibraryUIServiceProvider.notifier);
-    final isSelected = uiService.isBallSelected(ball.id);
+    final uiServiceNotifier = ref.read(ballLibraryUIServiceProvider.notifier);
+    final uiState = ref.watch(ballLibraryUIServiceProvider);
+    final isSelected = uiState.selectedBallIds.contains(ball.id);
+    final isInSelectionMode = uiState.selectionMode != BallLibrarySelectionMode.none;
     
     return RepaintBoundary( // Optimize repainting
       child: BallCardItem(
         ball: ball,
         theme: Theme.of(context),
-        onTap: () => uiService.handleBallTap(
+        onTap: () => uiServiceNotifier.handleBallTap(
           context: context,
           ball: ball,
         ),
-        isSelectionMode: uiService.isInSelectionMode,
+        isSelectionMode: isInSelectionMode,
         isSelected: isSelected,
       ),
     );
   }
 
-  Widget _buildLoadMoreFooter() {
+  Widget _buildLoadMoreFooter(BallLibraryState state) {
     return Container(
       height: _estimatedItemHeight,
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      child: widget.state.isLoadingMore
+      child: state.isLoadingMore
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -192,7 +247,7 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '(${widget.state.filteredBalls.length}/${widget.state.totalCount})',
+                        '(${state.filteredBalls.length}/${state.totalCount})',
                         style: TextStyle(
                           color: Colors.grey[500],
                           fontSize: 12,
@@ -218,6 +273,10 @@ class VirtualizedBallListDebugInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ballLibraryAsync = ref.watch(ballLibraryControllerProvider);
+    final totalItems = ballLibraryAsync.hasValue ? ballLibraryAsync.value!.filteredBalls.length : 0;
+    final hasMore = ballLibraryAsync.hasValue ? ballLibraryAsync.value!.hasMoreData : false;
+    final isLoadingMore = ballLibraryAsync.hasValue ? ballLibraryAsync.value!.isLoadingMore : false;
     return Container(
       padding: const EdgeInsets.all(8),
       margin: const EdgeInsets.all(8),
@@ -239,15 +298,15 @@ class VirtualizedBallListDebugInfo extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Total Items: ${ballList.state.filteredBalls.length}',
+            'Total Items: $totalItems',
             style: const TextStyle(color: Colors.white, fontSize: 10),
           ),
           Text(
-            'Has More: ${ballList.state.hasMoreData}',
+            'Has More: $hasMore',
             style: const TextStyle(color: Colors.white, fontSize: 10),
           ),
           Text(
-            'Loading: ${ballList.state.isLoadingMore}',
+            'Loading: $isLoadingMore',
             style: const TextStyle(color: Colors.white, fontSize: 10),
           ),
         ],

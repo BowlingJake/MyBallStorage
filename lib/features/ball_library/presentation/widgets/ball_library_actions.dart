@@ -13,10 +13,11 @@ class BallLibraryActions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uiState = ref.watch(ballLibraryUIServiceProvider);
     final uiService = ref.read(ballLibraryUIServiceProvider.notifier);
+    final isInSelectionMode = uiState.selectionMode != BallLibrarySelectionMode.none;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: uiService.isInSelectionMode
+      child: isInSelectionMode
           ? _buildSelectionActionButtons(context, ref, uiState, uiService)
           : _buildModeSelectionButtons(context, ref, uiService),
     );
@@ -28,6 +29,10 @@ class BallLibraryActions extends ConsumerWidget {
     WidgetRef ref,
     BallLibraryUIService uiService,
   ) {
+    final uiState = ref.watch(ballLibraryUIServiceProvider);
+    final isComparisonMode = uiState.selectionMode == BallLibrarySelectionMode.comparison;
+    final isAddToArsenalMode = uiState.selectionMode == BallLibrarySelectionMode.addToArsenal;
+    
     return Row(
       children: [
         Expanded(
@@ -38,7 +43,7 @@ class BallLibraryActions extends ConsumerWidget {
             fontSize: 12,
             onPressed: uiService.toggleComparisonMode,
             customColor: Colors.white,
-            isPrimary: uiService.isComparisonMode,
+            isPrimary: isComparisonMode,
           ),
         ),
         const SizedBox(width: 12),
@@ -50,7 +55,7 @@ class BallLibraryActions extends ConsumerWidget {
             fontSize: 12,
             customColor: Colors.white,
             onPressed: uiService.toggleAddToArsenalMode,
-            isPrimary: uiService.isAddToArsenalMode,
+            isPrimary: isAddToArsenalMode,
           ),
         ),
       ],
@@ -64,9 +69,11 @@ class BallLibraryActions extends ConsumerWidget {
     BallLibraryUIState uiState,
     BallLibraryUIService uiService,
   ) {
-    final selectedCount = uiService.selectedCount;
+    final selectedCount = uiState.selectedBallIds.length;
     final hasSelection = selectedCount > 0;
-    final isComparison = uiService.isComparisonMode;
+    final isComparison = uiState.selectionMode == BallLibrarySelectionMode.comparison;
+    final canCompare = isComparison && selectedCount == 2;
+    final canAddToArsenal = !isComparison && selectedCount > 0;
 
     return Row(
       children: [
@@ -79,7 +86,7 @@ class BallLibraryActions extends ConsumerWidget {
             isPrimary: true,
             customColor: BrandColors.accentColorDark,
             whiteForeground: true,
-            enabled: isComparison ? uiService.canCompare : uiService.canAddToArsenal,
+            enabled: isComparison ? canCompare : canAddToArsenal,
             onPressed: () {
               if (isComparison) {
                 uiService.showComparison(context: context);

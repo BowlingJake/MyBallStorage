@@ -266,7 +266,7 @@ class BallCardItem extends ConsumerWidget {
     final brandColor = brandPalette[400]!;
     
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       child: Stack(
         children: [
           Container(
@@ -277,7 +277,7 @@ class BallCardItem extends ConsumerWidget {
                 color: isSelected 
                     ? theme.primaryColor.withOpacity(0.8)
                     : brandColor.withOpacity(0.6),
-                width: isSelected ? 3.0 : 1.5,
+                width: 1.5,
               ),
               boxShadow: isSelected
                   ? [
@@ -290,8 +290,8 @@ class BallCardItem extends ConsumerWidget {
                   : null,
             ),
             child: InkWell(
-              onTap: isSelectionMode ? onTap : null, // 在選擇模式下允許點擊
-              onLongPress: isSelectionMode ? null : onTap, // 在選擇模式下禁用長按
+              onTap: onTap, // 總是允許點擊
+              onLongPress: isSelectionMode ? null : onLongPress, // 選擇模式下禁用長按
               borderRadius: BorderRadius.circular(14),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -520,57 +520,64 @@ class BallCardItem extends ConsumerWidget {
               ),
             ),
           ),
-          // 選擇模式指示器或愛心按鈕
-          Positioned(
-            top: 8,
-            right: 8,
-            child: isSelectionMode
-                ? (isSelected 
-                    ? Container(
-                        width: 32,
-                        height: 32,
+          // 遮罩與置中勾勾（選擇模式且選中）
+          if (isSelectionMode && isSelected)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: const [
+                      DecoratedBox(
                         decoration: BoxDecoration(
-                          color: theme.primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.8),
-                            width: 2,
-                          ),
+                          color: Color(0x40FFFFFF),
                         ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      )
-                    : const SizedBox.shrink()) // 未選中時不顯示任何icon
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CompactFavoriteButton(ball: ball),
-                      const SizedBox(height: 24),
-                      GestureDetector(
-                        onTap: () => _showAddToArsenalConfirmation(context, ref),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.8),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 16,
-                          ),
+                      ),
+                      Center(
+                        child: Icon(
+                          Icons.check_circle,
+                          color: BrandColors.accentColorDark,
+                          size: 42,
                         ),
                       ),
                     ],
                   ),
-          ),
+                ),
+              ),
+            ),
+          // 非選擇模式：顯示愛心與加入 Arsenal
+          if (!isSelectionMode)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CompactFavoriteButton(ball: ball),
+                  const SizedBox(height: 24),
+                  GestureDetector(
+                    onTap: () => _showAddToArsenalConfirmation(context, ref),
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.8),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
