@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:core_theme/core_theme.dart';
 
+/// 對話框預設樣式常數，統一按鈕尺寸與間距
+class DialogDefaults {
+  static const double buttonHeight = 52;
+  static const double buttonFontSize = 14;
+  static const double spacing = 16;
+}
+
 /// 應用程式統一的基礎對話框組件
 /// 提供一致的樣式和行為，減少重複程式碼
 class AppBaseDialog extends StatelessWidget {
@@ -89,7 +96,7 @@ class AppBaseDialog extends StatelessWidget {
               ),
             ],
             
-            // 內容區域
+            // 內容區域（可滾動，隱藏滾動條）
             Flexible(
               child: Padding(
                 padding: title != null 
@@ -107,7 +114,13 @@ class AppBaseDialog extends StatelessWidget {
                         contentPadding.bottom / 2,
                       )
                     : contentPadding,
-                child: content,
+                child: ScrollConfiguration(
+                  behavior: const _NoScrollbarBehavior(),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: content,
+                  ),
+                ),
               ),
             ),
             
@@ -166,7 +179,7 @@ class AppBaseDialog extends StatelessWidget {
     return Row(
       children: [
         for (int i = 0; i < actions!.length; i++) ...[
-          if (i > 0) const SizedBox(width: 12),
+          if (i > 0) const SizedBox(width: DialogDefaults.spacing),
           Expanded(child: actions![i]),
         ],
       ],
@@ -312,6 +325,21 @@ class AppBaseDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// 隱藏滾動條的行為（保留觸控滾動與回彈）
+class _NoScrollbarBehavior extends ScrollBehavior {
+  const _NoScrollbarBehavior();
+
+  @override
+  Widget buildScrollbar(BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // 不包任何 Scrollbar
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
   }
 }
 

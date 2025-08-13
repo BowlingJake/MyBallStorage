@@ -6,7 +6,7 @@ part of 'move_balls_use_case.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$moveBallsUseCaseHash() => r'00843a3d2b966b3647b842bbb07531eec3021555';
+String _$moveBallsUseCaseHash() => r'9d190bdd408dece637694bfa6ef855e3b35fdb8c';
 
 /// Use case for moving balls between bags
 ///

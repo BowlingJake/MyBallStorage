@@ -55,6 +55,7 @@ class ArsenalBottomActions extends ConsumerWidget {
                 whiteForeground: false,
                 onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showAddToCurrentBag(
                   context: context,
+                  widgetRef: ref,
                 ),
               ),
             ),

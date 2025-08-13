@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/outlined_content_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -13,76 +13,146 @@ Future<int?> showMoveTargetBagDialog({
   List<int> alreadyInBags = const [],
   UserProfile? userProfile,
 }) async {
-  int? selectedTarget;
-  final bool onlyOneSubBag = subBags.length <= 1;
-
-  return showOutlinedContentDialog<int>(
+  return ArsenalDialog.show<int>(
     context: context,
-    title: 'Move $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
-    content: StatefulBuilder(
-      builder: (context, setState) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('Choose target bag:', style: TextStyle(color: Colors.white70, fontSize: 14)),
-            const SizedBox(height: 8),
-            if (alreadyInBags.isNotEmpty) ...[
-              Builder(
-                builder: (context) {
-                  final alsoIn = alreadyInBags
-                      .where((n) => n != currentBagNumber && n != 1)
-                      .toList();
-                  if (alsoIn.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  final names = alsoIn
-                      .map((n) => userProfile?.getBagName(n) ?? 'Bag $n')
-                      .toList();
-                  return Text(
-                    'Also in: ${names.join(', ')}',
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-            const SizedBox(height: 16),
-            // 垂直排列每個子球袋按鈕
-            ...subBags.map((bag) {
-              final disabled = onlyOneSubBag || bag.number == currentBagNumber || alreadyInBags.contains(bag.number);
-              final selected = selectedTarget == bag.number;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _BagButton(
-                  bag: bag,
-                  bagColor: bagColors[bag.number - 1],
-                  disabled: disabled,
-                  selected: selected,
-                  onTap: () {
-                    if (disabled) {
-                      return;
-                    }
-                    setState(() => selectedTarget = bag.number);
-                  },
-                ),
-              );
-            }),
-            const SizedBox(height: 4),
-            AppStandardButton(
-              text: 'Move',
-              onPressed: selectedTarget == null ? () {} : () => Navigator.of(context).pop(selectedTarget),
-              customColor: BrandColors.accentColorDark,
-              isPrimary: true,
-              whiteForeground: true,
-              width: double.infinity,
-              enabled: selectedTarget != null,
-            ),
-          ],
-        );
-      },
+    title: 'Move ' + selectedCount.toString() + ' Ball' + (selectedCount != 1 ? 's' : ''),
+    content: _MoveTargetBagContent(
+      subBags: subBags,
+      bagColors: bagColors,
+      currentBagNumber: currentBagNumber,
+      selectedCount: selectedCount,
+      alreadyInBags: alreadyInBags,
+      userProfile: userProfile,
     ),
+    barrierDismissible: false,
+    actions: [
+      AppStandardButton(
+        text: 'Cancel',
+        height: DialogDefaults.buttonHeight,
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      AppStandardButton(
+        text: 'Move',
+        height: DialogDefaults.buttonHeight,
+        onPressed: () {
+          // 由 content 內部 state 控制是否選擇，這裡觸發回傳選擇值
+          // 若未選擇，保持無動作（outlined 按鈕呈現 disabled 色由上層控制）
+          _MoveTargetBagContentState.maybeSubmitSelected(context);
+        },
+      ),
+    ],
   );
+}
+
+/// Move Target Bag Dialog content with unified style
+class _MoveTargetBagContent extends StatefulWidget {
+  const _MoveTargetBagContent({
+    required this.subBags,
+    required this.bagColors,
+    required this.currentBagNumber,
+    required this.selectedCount,
+    required this.alreadyInBags,
+    required this.userProfile,
+  });
+
+  final List<BagInfo> subBags;
+  final List<Color> bagColors;
+  final int currentBagNumber;
+  final int selectedCount;
+  final List<int> alreadyInBags;
+  final UserProfile? userProfile;
+
+  @override
+  State<_MoveTargetBagContent> createState() => _MoveTargetBagContentState();
+}
+
+class _MoveTargetBagContentState extends State<_MoveTargetBagContent> {
+  static _MoveTargetBagContentState? _lastState;
+  int? selectedTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastState = this;
+  }
+
+  @override
+  void dispose() {
+    if (_lastState == this) {
+      _lastState = null;
+    }
+    super.dispose();
+  }
+
+  static void maybeSubmitSelected(BuildContext context) {
+    final state = _lastState;
+    if (state != null && state.selectedTarget != null) {
+      Navigator.of(context).pop(state.selectedTarget);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool onlyOneSubBag = widget.subBags.length <= 1;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Choose target bag:',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        if (widget.alreadyInBags.isNotEmpty) ...[
+          Builder(
+            builder: (context) {
+              final alsoIn = widget.alreadyInBags
+                  .where((n) => n != widget.currentBagNumber && n != 1)
+                  .toList();
+              if (alsoIn.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              final names = alsoIn
+                  .map((n) => widget.userProfile?.getBagName(n) ?? 'Bag ' + n.toString())
+                  .toList();
+              return Text(
+                'Also in: ' + names.join(', '),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                textAlign: TextAlign.center,
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+        ],
+        const SizedBox(height: 16),
+        ...widget.subBags.map((bag) {
+          final bool disabled = onlyOneSubBag || bag.number == widget.currentBagNumber || widget.alreadyInBags.contains(bag.number);
+          final bool selected = selectedTarget == bag.number;
+          return Padding(
+            padding: EdgeInsets.only(bottom: DialogDefaults.spacing),
+            child: _BagButton(
+              bag: bag,
+              bagColor: widget.bagColors[bag.number - 1],
+              disabled: disabled,
+              selected: selected,
+              onTap: () {
+                if (disabled) {
+                  return;
+                }
+                setState(() => selectedTarget = bag.number);
+              },
+            ),
+          );
+        }).toList(),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
 }
 
 class _BagButton extends StatelessWidget {
@@ -104,15 +174,16 @@ class _BagButton extends StatelessWidget {
     final String label = bag.name;
     return AppStandardButton(
       text: label,
+      height: DialogDefaults.buttonHeight,
       onPressed: onTap,
       enabled: !disabled,
-      customColor: selected ? bagColor : null,
+      customColor: bagColor,
       outlineColor: selected ? bagColor : Colors.white,
-      foregroundColor: selected ? Colors.black : Colors.white,
+      foregroundColor: selected ? Colors.black : Colors.white.withOpacity(0.9),
       backgroundColor: selected ? bagColor : Colors.transparent,
       isPrimary: selected,
       whiteForeground: false,
-      fontSize: 12,
+      fontSize: DialogDefaults.buttonFontSize,
       width: double.infinity,
     );
   }

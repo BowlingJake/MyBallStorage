@@ -83,9 +83,8 @@ class BallLibraryActions extends ConsumerWidget {
             icon: isComparison ? Icons.check : Icons.add,
             height: 36,
             fontSize: 12,
-            isPrimary: true,
-            customColor: BrandColors.accentColorDark,
-            whiteForeground: true,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
             enabled: isComparison ? canCompare : canAddToArsenal,
             onPressed: () {
               if (isComparison) {

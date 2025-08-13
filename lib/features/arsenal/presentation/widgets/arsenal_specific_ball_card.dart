@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/edit_layout_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -299,202 +300,137 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
 
   /// 顯示 Arsenal 操作選擇對話框
   void _showArsenalActionDialog(BuildContext context, UserArsenalInstance arsenalInstance, WidgetRef ref) {
-    showDialog(
+    ArsenalDialog.show<void>(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            constraints: const BoxConstraints(maxWidth: 350),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 球名標題
-                      Text(
-                        arsenalInstance.displayName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // 三個垂直置中按鈕
-                      Column(
-                        children: [
-                          AppStandardButton(
-                            text: 'Edit My Layout',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              final result = await showEditLayoutDialog(context, arsenalInstance);
-                          if (result != null && result['success'] == true) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Layout updated successfully: ${result['layoutType']}'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          AppStandardButton(
-                            text: 'View Details',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
-                              showArsenalBallDetails(context, arsenalInstance);
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          AppStandardButton(
-                            text: 'Add Note',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              await _showEditNoteDialog(context, arsenalInstance, ref);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+      title: arsenalInstance.displayName,
+      barrierDismissible: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppStandardButton(
+            text: 'Edit My Layout',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final result = await showEditLayoutDialog(context, arsenalInstance);
+              if (result != null && result['success'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Layout updated successfully: ${result['layoutType']}'),
+                    backgroundColor: Colors.green,
                   ),
-                ),
-                // 右上角關閉按鈕
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
-                ),
-              ],
-            ),
+                );
+              }
+            },
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          AppStandardButton(
+            text: 'View Details',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () {
+              Navigator.of(context).pop();
+              showArsenalBallDetails(context, arsenalInstance);
+            },
+          ),
+          const SizedBox(height: 12),
+          AppStandardButton(
+            text: 'Add Note',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _showEditNoteDialog(context, arsenalInstance, ref);
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _showEditNoteDialog(BuildContext context, UserArsenalInstance instance, WidgetRef ref) async {
     final controller = TextEditingController(text: instance.notes ?? '');
-    await showDialog<void>(
+    await ArsenalDialog.show<void>(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 380),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: BrandColors.accentColorDark, width: 1.5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Add Note',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  maxLength: 20,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    counterStyle: const TextStyle(color: Colors.grey),
-                    hintText: 'Enter note (max 20 chars)',
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.black.withOpacity(0.6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                      borderSide: BorderSide(color: BrandColors.accentColorDark, width: 2),
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Cancel',
-                        height: 36,
-                        outlineColor: Colors.white,
-                        foregroundColor: Colors.white,
-                        onPressed: () => Navigator.of(ctx).pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Save',
-                        height: 36,
-                        isPrimary: true,
-                        customColor: BrandColors.accentColorDark,
-                        whiteForeground: true,
-                        onPressed: () async {
-                          final text = controller.text.trim();
-                          Navigator.of(ctx).pop();
-                          final auth = ref.read(authControllerProvider);
-                          if (auth.hasValue && auth.value != null) {
-                            final userId = auth.value!.id;
-                            await ref.read(newArsenalControllerProvider.notifier).updateNotes(instance.id, text, userId);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+      title: 'Add Note',
+      barrierDismissible: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: controller,
+            maxLength: 20,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              counterStyle: const TextStyle(color: Colors.grey),
+              hintText: 'Enter note (max 20 chars)',
+              hintStyle: const TextStyle(color: Colors.white54),
+              filled: true,
+              fillColor: Colors.black.withOpacity(0.6),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                borderSide: BorderSide(color: BrandColors.accentColorDark, width: 2),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
-        ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: AppStandardButton(
+                  text: 'Cancel',
+                  height: DialogDefaults.buttonHeight,
+                  outlineColor: Colors.white.withOpacity(0.6),
+                  foregroundColor: Colors.white.withOpacity(0.9),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppStandardButton(
+                  text: 'Save',
+                  height: DialogDefaults.buttonHeight,
+                  isPrimary: true,
+                  customColor: BrandColors.accentColorDark,
+                  whiteForeground: true,
+                  onPressed: () async {
+                    final text = controller.text.trim();
+                    Navigator.of(context).pop();
+                    final auth = ref.read(authControllerProvider);
+                    if (auth.hasValue && auth.value != null) {
+                      final userId = auth.value!.id;
+                      await ref.read(newArsenalControllerProvider.notifier).updateNotes(instance.id, text, userId);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

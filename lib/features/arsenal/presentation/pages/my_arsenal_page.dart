@@ -126,6 +126,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
               bagColors: _bagColors,
               onShowMoreOptions: () => ref.read(arsenalUIServiceProvider.notifier).showMoreOptionsBottomSheet(
                 context: context,
+                widgetRef: ref,
                 arsenalState: arsenalState,
               ),
             ),
@@ -191,6 +192,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
           : IconButton(
               onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showMoreOptionsBottomSheet(
                 context: context,
+                widgetRef: ref,
                 arsenalState: arsenalState,
               ),
               icon: Icon(
@@ -206,6 +208,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   void _showUnlockBagDialog(int index) async {
     await ref.read(arsenalUIServiceProvider.notifier).showUnlockBagDialog(
       context: context,
+      widgetRef: ref,
       bagIndex: index,
       bagColors: _bagColors,
       vsync: this,

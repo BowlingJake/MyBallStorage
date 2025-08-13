@@ -4,7 +4,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_selection_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_dialog_service.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
+import 'package:core_theme/core_theme.dart';
 
 part 'remove_balls_use_case.g.dart';
 
@@ -36,14 +44,36 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
       return;
     }
 
-    // Show confirmation dialog
-    final confirmed = await ArsenalDialogService.showConfirmationDialog(
-      context: context,
-      title: 'Confirm Removal',
-      message: 'Are you sure you want to remove ${instancesToRemove.length} ball${instancesToRemove.length != 1 ? 's' : ''} from your arsenal?',
-      confirmText: 'Remove',
-      cancelText: 'Cancel',
-    );
+    // Check if in main bag or sub bag and show appropriate dialog
+    final currentBag = arsenalState.selectedBagNumber;
+    bool confirmed = false;
+    
+    if (currentBag == 1) {
+      // Main bag - simple confirmation
+      final result = await showAppConfirmationDialog(
+        context: context,
+        title: 'Remove Selected Balls',
+        message: 'Are you sure you want to completely remove ${instancesToRemove.length} ball${instancesToRemove.length != 1 ? 's' : ''} from your arsenal?',
+        confirmText: 'Remove',
+        isDangerous: true,
+      );
+      confirmed = result == true;
+    } else {
+      // Sub bag - show tiered removal dialog
+      final removalType = await _showTieredRemovalDialog(
+        context: context,
+        selectedCount: instancesToRemove.length,
+        currentBag: currentBag,
+      );
+      if (removalType != null) {
+        confirmed = await _confirmRemovalAction(
+          context: context,
+          removalType: removalType,
+          selectedCount: instancesToRemove.length,
+          currentBag: currentBag,
+        );
+      }
+    }
 
     if (!confirmed) {
       return;
@@ -93,39 +123,41 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     int successCount = 0;
     int failCount = 0;
     
-    for (final instanceId in instancesToRemove) {
-      try {
-        switch (removalType) {
-          case RemovalType.bagOnly:
-            await _removeFromBagOnly(instanceId, currentBag);
-            break;
-          case RemovalType.complete:
-            await _removeCompletelyFromArsenal(instanceId);
-            break;
-        }
-        successCount++;
-      } catch (e) {
-        print('Failed to remove instance $instanceId: $e');
-        failCount++;
+    // Get actual user ID from auth controller
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      throw Exception('User not authenticated');
+    }
+    final userId = authState.value!.id;
+    final controller = ref.read(newArsenalControllerProvider.notifier);
+    final arsenalState = ref.read(newArsenalControllerProvider);
+    
+    // Get selected instances for ball names
+    final selectedInstances = arsenalState.allInstances
+        .where((inst) => instancesToRemove.contains(inst.id))
+        .toList();
+    
+    try {
+      switch (removalType) {
+        case RemovalType.bagOnly:
+          // Remove all selected instances from the specific bag
+          await controller.removeSelectedInstancesFromBag(currentBag, userId);
+          successCount = instancesToRemove.length;
+          break;
+        case RemovalType.complete:
+          // Remove all selected instances completely
+          await controller.removeSelectedInstances(userId);
+          successCount = instancesToRemove.length;
+          break;
       }
+    } catch (e) {
+      print('Failed to remove instances: $e');
+      failCount = instancesToRemove.length;
     }
     
-    _showRemovalResult(context, successCount, failCount, removalType);
+    _showRemovalResult(context, successCount, failCount, removalType, currentBag, selectedInstances);
   }
 
-  /// Remove ball from specific bag only
-  Future<void> _removeFromBagOnly(int instanceId, int bagNumber) async {
-    // Use existing controller method for removal
-    final controller = ref.read(newArsenalControllerProvider.notifier);
-    await controller.removeInstance(instanceId, 'current-user-id'); // TODO: Get actual user ID
-  }
-
-  /// Remove ball completely from arsenal
-  Future<void> _removeCompletelyFromArsenal(int instanceId) async {
-    // Use existing controller method for complete removal
-    final controller = ref.read(newArsenalControllerProvider.notifier);
-    await controller.removeInstance(instanceId, 'current-user-id'); // TODO: Get actual user ID
-  }
 
   /// Show removal result to user
   void _showRemovalResult(
@@ -133,16 +165,36 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     int successCount,
     int failCount,
     RemovalType removalType,
+    int currentBag,
+    List<UserArsenalInstance> removedInstances,
   ) {
     if (successCount > 0) {
-      final removalText = removalType == RemovalType.complete 
-          ? 'removed from arsenal'
-          : 'removed from bag';
+      // Get bag name
+      final userProfileState = ref.read(userProfileControllerProvider);
+      String bagName;
       
-      TopNotification.showSuccess(
-        context,
-        'Successfully $removalText $successCount ball${successCount != 1 ? 's' : ''}!',
-      );
+      if (currentBag == 1) {
+        // Main bag - use "My Arsenal"
+        bagName = 'My Arsenal';
+      } else {
+        // Sub bag - use custom bag name or default
+        bagName = 'Bag $currentBag';
+        if (userProfileState.profile != null) {
+          bagName = userProfileState.profile!.getBagName(currentBag) ?? 'Bag $currentBag';
+        }
+      }
+      
+      String message;
+      if (successCount == 1) {
+        // Single ball - show ball name
+        final ballName = removedInstances.first.displayName;
+        message = 'Successful remove $ballName from $bagName';
+      } else {
+        // Multiple balls - show count
+        message = 'Successful remove $successCount balls from $bagName';
+      }
+      
+      TopNotification.showSuccess(context, message);
     }
     
     if (failCount > 0) {
@@ -153,37 +205,60 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     }
   }
 
-  /// Show tiered removal dialog for sub-bags
-  Future<RemovalType?> showTieredRemovalDialog({
+  /// Show tiered removal dialog for sub-bags with unified style
+  Future<RemovalType?> _showTieredRemovalDialog({
     required BuildContext context,
     required int selectedCount,
+    required int currentBag,
   }) async {
-    // Use static ArsenalDialogService since it's no longer a provider
+    final userProfileState = ref.read(userProfileControllerProvider);
+    String bagName = 'Bag $currentBag';
+    if (userProfileState.profile != null) {
+      bagName = userProfileState.profile!.getBagName(currentBag) ?? 'Bag $currentBag';
+    }
     
     return await showDialog<RemovalType>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Options'),
-        content: Text(
-          'How would you like to remove the selected $selectedCount ball${selectedCount != 1 ? 's' : ''}?'
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(RemovalType.bagOnly),
-            child: const Text('Remove from Bag Only'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(RemovalType.complete),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Remove from Arsenal'),
-          ),
-        ],
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.8),
+      builder: (context) => _TieredRemovalDialog(
+        selectedCount: selectedCount,
+        bagName: bagName,
       ),
     );
+  }
+  
+  /// Confirm removal action with unified dialog
+  Future<bool> _confirmRemovalAction({
+    required BuildContext context,
+    required RemovalType removalType,
+    required int selectedCount,
+    required int currentBag,
+  }) async {
+    final userProfileState = ref.read(userProfileControllerProvider);
+    String bagName = 'Bag $currentBag';
+    if (userProfileState.profile != null) {
+      bagName = userProfileState.profile!.getBagName(currentBag) ?? 'Bag $currentBag';
+    }
+    
+    String title, message;
+    if (removalType == RemovalType.bagOnly) {
+      title = 'Confirm Remove from $bagName';
+      message = 'Remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from $bagName only? They will remain in All My Arsenal.';
+    } else {
+      title = 'Confirm Complete Removal';
+      message = 'Completely remove $selectedCount ball${selectedCount != 1 ? 's' : ''} from all bags and your arsenal?';
+    }
+    
+    final result = await showAppConfirmationDialog(
+      context: context,
+      title: title,
+      message: message,
+      confirmText: 'Remove',
+      isDangerous: true,
+    );
+    
+    return result == true;
   }
 }
 
@@ -201,5 +276,96 @@ extension RemovalTypeExtension on RemovalType {
       case RemovalType.complete:
         return 'Remove from Arsenal';
     }
+  }
+}
+
+/// Tiered Removal Dialog with unified style
+class _TieredRemovalDialog extends StatelessWidget {
+  const _TieredRemovalDialog({
+    required this.selectedCount,
+    required this.bagName,
+  });
+
+  final int selectedCount;
+  final String bagName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        constraints: const BoxConstraints(maxWidth: 500),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.red.withOpacity(0.5),
+            width: 2,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+            // Title
+            Text(
+              'Remove $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            // Message
+            const Text(
+              'Choose removal option:',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            // Option buttons (highest risk first)
+            AppStandardButton(
+              text: 'Remove from All Arsenal',
+              height: DialogDefaults.buttonHeight,
+              fontSize: DialogDefaults.buttonFontSize,
+              width: double.infinity,
+              backgroundColor: Colors.red, // 例外：最高位階以填滿表示
+              foregroundColor: Colors.white,
+              outlineColor: Colors.red,
+              onPressed: () => Navigator.of(context).pop(RemovalType.complete),
+            ),
+            const SizedBox(height: 16),
+            AppStandardButton(
+              text: 'Remove from $bagName',
+              height: DialogDefaults.buttonHeight,
+              fontSize: DialogDefaults.buttonFontSize,
+              width: double.infinity,
+              outlineColor: Colors.red.withOpacity(0.8),
+              foregroundColor: Colors.red,
+              onPressed: () => Navigator.of(context).pop(RemovalType.bagOnly),
+            ),
+            const SizedBox(height: 24),
+            // Cancel button
+            AppStandardButton(
+              text: 'Cancel',
+              height: DialogDefaults.buttonHeight,
+              fontSize: DialogDefaults.buttonFontSize,
+              width: double.infinity,
+              outlineColor: Colors.white.withOpacity(0.6),
+              foregroundColor: Colors.white.withOpacity(0.9),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

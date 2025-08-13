@@ -380,29 +380,7 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                                   ),
                                 ),
                               ),
-                              if (_selectedBallIds.isNotEmpty)
-                                GestureDetector(
-                                  onTap: _resetSelection,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.orange.withOpacity(0.6),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Clear',
-                                      style: TextStyle(
-                                        color: Colors.orange,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              // Clear 從這裡移除，改為底部 Reset 按鈕
                             ],
                           ),
                         ],
@@ -461,10 +439,17 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                 children: [
                   Expanded(
                     child: AppStandardButton(
-                      text: 'Cancel',
+                      text: _selectedBallIds.isEmpty ? 'Cancel' : 'Reset',
                       fontSize: 14,
-                      customColor: Colors.grey[400]!,
-                      onPressed: () => Navigator.of(context).pop(),
+                      outlineColor: Colors.white.withOpacity(0.6),
+                      foregroundColor: Colors.white.withOpacity(0.9),
+                      onPressed: () {
+                        if (_selectedBallIds.isEmpty) {
+                          Navigator.of(context).pop();
+                        } else {
+                          _resetSelection();
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -472,8 +457,8 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                     child: AppStandardButton(
                       text: 'Add ${_selectedBallIds.length} Ball${_selectedBallIds.length != 1 ? 's' : ''}',
                       fontSize: 14,
-                      customColor: BrandColors.accentColorDark,
-                      isPrimary: true,
+                      outlineColor: Colors.white.withOpacity(0.6),
+                      foregroundColor: Colors.white.withOpacity(0.9),
                       onPressed: _selectedBallIds.isEmpty ? () {} : _addSelectedBalls,
                     ),
                   ),

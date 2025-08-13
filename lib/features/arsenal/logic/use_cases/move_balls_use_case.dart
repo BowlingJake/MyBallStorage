@@ -4,9 +4,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_selection_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_dialog_service.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
+import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/move_target_bag_dialog.dart';
+import 'package:core_theme/core_theme.dart';
 
 part 'move_balls_use_case.g.dart';
 
@@ -88,6 +93,17 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
     final currentBagNumber = arsenalState.selectedBagNumber;
     final selectedCount = arsenalState.selectedForMove.length;
     
+    // Get selected instances and find which bags they're already in
+    final selectedInstances = arsenalState.allInstances
+        .where((inst) => arsenalState.selectedForMove.contains(inst.id))
+        .toList();
+    
+    // Get all bags that the selected balls are already in (union)
+    final alreadyInBags = <int>{};
+    for (final inst in selectedInstances) {
+      alreadyInBags.addAll(inst.activeBagNumbers);
+    }
+    
     // Get available target bags (exclude main bag and current bag)
     final availableBags = profile.unlockedBags
         .where((bag) => bag.number != 1 && bag.number != currentBagNumber)
@@ -101,32 +117,14 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
       return null;
     }
 
-    return await showDialog<int>(
+    return await showMoveTargetBagDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Move $selectedCount Ball${selectedCount != 1 ? 's' : ''}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Select target bag:'),
-            const SizedBox(height: 16),
-            ...availableBags.map((bag) => ListTile(
-              leading: CircleAvatar(
-                backgroundColor: bagColors[bag.number - 1],
-                child: Text('${bag.number}'),
-              ),
-              title: Text(bag.name),
-              onTap: () => Navigator.of(context).pop(bag.number),
-            )),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
+      subBags: availableBags,
+      bagColors: bagColors,
+      currentBagNumber: currentBagNumber,
+      selectedCount: selectedCount,
+      alreadyInBags: alreadyInBags.toList(),
+      userProfile: profile,
     );
   }
 
@@ -181,38 +179,32 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
     required int sourceBagNumber,
     required int targetBagNumber,
   }) async {
-    int successCount = 0;
-    int failCount = 0;
-    
-    for (final instanceId in instancesToMove) {
-      try {
-        await _moveInstanceBetweenBags(
-          instanceId,
-          sourceBagNumber,
-          targetBagNumber,
-        );
-        successCount++;
-      } catch (e) {
-        print('Failed to move instance $instanceId: $e');
-        failCount++;
+    try {
+      // Get actual user ID from auth controller
+      final authState = ref.read(authControllerProvider);
+      if (!authState.hasValue || authState.value == null) {
+        throw Exception('User not authenticated');
       }
+      final userId = authState.value!.id;
+      
+      // Get selected instances for ball names before moving
+      final arsenalState = ref.read(newArsenalControllerProvider);
+      final selectedInstances = arsenalState.allInstances
+          .where((inst) => instancesToMove.contains(inst.id))
+          .toList();
+      
+      final controller = ref.read(newArsenalControllerProvider.notifier);
+      
+      // Use the existing controller method for moving balls
+      await controller.moveSelectedInstancesToBag(targetBagNumber, userId);
+      
+      _showMoveResult(context, instancesToMove.length, 0, targetBagNumber, selectedInstances);
+    } catch (e) {
+      print('Failed to move balls: $e');
+      _showMoveResult(context, 0, instancesToMove.length, targetBagNumber, []);
     }
-    
-    _showMoveResult(context, successCount, failCount, targetBagNumber);
   }
 
-  /// Move a single instance between bags
-  Future<void> _moveInstanceBetweenBags(
-    int instanceId,
-    int sourceBagNumber,
-    int targetBagNumber,
-  ) async {
-    // TODO: Implement ball movement using existing controller methods
-    // For now, this is a placeholder as the exact move logic needs to be implemented
-    final controller = ref.read(newArsenalControllerProvider.notifier);
-    // This would need custom implementation in the controller
-    throw UnimplementedError('Ball movement between bags not yet implemented');
-  }
 
   /// Show move result to user
   void _showMoveResult(
@@ -220,12 +212,27 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
     int successCount,
     int failCount,
     int targetBagNumber,
+    List<UserArsenalInstance> movedInstances,
   ) {
     if (successCount > 0) {
-      TopNotification.showSuccess(
-        context,
-        'Successfully moved $successCount ball${successCount != 1 ? 's' : ''} to Bag $targetBagNumber!',
-      );
+      // Get target bag name
+      final userProfileState = ref.read(userProfileControllerProvider);
+      String targetBagName = 'Bag $targetBagNumber';
+      if (userProfileState.profile != null) {
+        targetBagName = userProfileState.profile!.getBagName(targetBagNumber) ?? 'Bag $targetBagNumber';
+      }
+      
+      String message;
+      if (successCount == 1) {
+        // Single ball - show ball name
+        final ballName = movedInstances.first.displayName;
+        message = 'Successfully moved $ballName to $targetBagName';
+      } else {
+        // Multiple balls - show count
+        message = 'Successfully moved $successCount balls to $targetBagName';
+      }
+      
+      TopNotification.showSuccess(context, message);
     }
     
     if (failCount > 0) {
@@ -258,3 +265,6 @@ class MoveValidationResult {
     );
   }
 }
+
+/// Move Target Bag Dialog with unified style
+// Reused unified dialog from presentation layer via showMoveTargetBagDialog

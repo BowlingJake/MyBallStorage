@@ -28,6 +28,7 @@ class ArsenalUIService extends _$ArsenalUIService {
   /// Show dialog to unlock a bag
   Future<void> showUnlockBagDialog({
     required BuildContext context,
+    required WidgetRef widgetRef,
     required int bagIndex,
     required List<Color> bagColors,
     required TickerProvider vsync,
@@ -35,7 +36,7 @@ class ArsenalUIService extends _$ArsenalUIService {
   }) async {
     final ok = await ArsenalDialogService.showUnlockBagDialog(
       context: context,
-      ref: ref as WidgetRef,
+      ref: widgetRef,
       bagIndex: bagIndex,
       accentColor: bagColors[bagIndex],
     );
@@ -166,11 +167,12 @@ class ArsenalUIService extends _$ArsenalUIService {
   /// Show more options bottom sheet
   void showMoreOptionsBottomSheet({
     required BuildContext context,
+    required WidgetRef widgetRef,
     required NewArsenalState arsenalState,
   }) {
     ArsenalDialogService.showMoreOptionsBottomSheet(
       context: context,
-      ref: ref as WidgetRef,
+      ref: widgetRef,
       arsenalState: arsenalState,
     );
   }
@@ -178,10 +180,11 @@ class ArsenalUIService extends _$ArsenalUIService {
   /// Show add to current bag dialog
   void showAddToCurrentBag({
     required BuildContext context,
+    required WidgetRef widgetRef,
   }) {
     ArsenalDialogService.showAddToCurrentBag(
       context: context,
-      ref: ref as WidgetRef,
+      ref: widgetRef,
     );
   }
 
@@ -215,10 +218,11 @@ class ArsenalUIService extends _$ArsenalUIService {
   /// Show library selection dialog
   void showLibrarySelection({
     required BuildContext context,
+    required WidgetRef widgetRef,
   }) {
     ArsenalDialogService.showLibrarySelection(
       context: context,
-      ref: ref as WidgetRef,
+      ref: widgetRef,
     );
   }
 
@@ -238,6 +242,7 @@ class ArsenalUIService extends _$ArsenalUIService {
   /// Handle tab controller update with bag unlock
   Future<void> handleBagUnlock({
     required BuildContext context,
+    required WidgetRef widgetRef,
     required int bagIndex,
     required List<Color> bagColors,
     required TickerProvider vsync,
@@ -245,6 +250,7 @@ class ArsenalUIService extends _$ArsenalUIService {
   }) async {
     await showUnlockBagDialog(
       context: context,
+      widgetRef: widgetRef,
       bagIndex: bagIndex,
       bagColors: bagColors,
       vsync: vsync,

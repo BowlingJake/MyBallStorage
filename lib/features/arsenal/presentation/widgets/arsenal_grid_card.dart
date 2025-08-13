@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_ins
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/arsenal_ball_detail_dialog.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/edit_layout_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:core_theme/core_theme.dart';
@@ -372,111 +373,64 @@ class ArsenalGridCard extends ConsumerWidget {
 
   /// 顯示 Arsenal 操作選擇對話框
   void _showArsenalActionDialog(BuildContext context, UserArsenalInstance arsenalInstance, WidgetRef ref) {
-    showDialog(
+    ArsenalDialog.show<void>(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            constraints: const BoxConstraints(maxWidth: 350),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[600]!,
-                width: 1.5,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 球名標題
-                      Text(
-                        arsenalInstance.displayName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // 三個垂直置中按鈕
-                      Column(
-                        children: [
-                          AppStandardButton(
-                            text: 'Edit My Layout',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              final result = await showEditLayoutDialog(context, arsenalInstance);
-                              if (result != null && result['success'] == true) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Layout updated successfully: ${result['layoutType']}'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          AppStandardButton(
-                            text: 'View Details',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () {
-                              Navigator.of(dialogContext).pop();
-                              showArsenalBallDetails(context, arsenalInstance);
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          AppStandardButton(
-                            text: 'Add Note',
-                            height: 36,
-                            fontSize: 14,
-                            customColor: Colors.white,
-                            width: double.infinity,
-                            onPressed: () async {
-                              Navigator.of(dialogContext).pop();
-                              await _showEditNoteDialog(context, arsenalInstance, ref);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+      title: arsenalInstance.displayName,
+      barrierDismissible: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppStandardButton(
+            text: 'Edit My Layout',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final result = await showEditLayoutDialog(context, arsenalInstance);
+              if (result != null && result['success'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Layout updated successfully: ${result['layoutType']}'),
+                    backgroundColor: Colors.green,
                   ),
-                ),
-                // 右上角關閉按鈕
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
-                ),
-              ],
-            ),
+                );
+              }
+            },
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          AppStandardButton(
+            text: 'View Details',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () {
+              Navigator.of(context).pop();
+              showArsenalBallDetails(context, arsenalInstance);
+            },
+          ),
+          const SizedBox(height: 12),
+          AppStandardButton(
+            text: 'Add Note',
+            height: DialogDefaults.buttonHeight,
+            fontSize: DialogDefaults.buttonFontSize,
+            outlineColor: Colors.white.withOpacity(0.6),
+            foregroundColor: Colors.white.withOpacity(0.9),
+            customColor: Colors.white,
+            width: double.infinity,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _showEditNoteDialog(context, arsenalInstance, ref);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

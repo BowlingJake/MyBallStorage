@@ -165,7 +165,7 @@ class BallCardItem extends ConsumerWidget {
                         child: AppStandardButton(
                           text: 'Cancel',
                           height: 36,
-                          outlineColor: Colors.white,
+                          outlineColor: Colors.white.withOpacity(0.6),
                           foregroundColor: Colors.white,
                           onPressed: () => Navigator.of(context).pop(),
                         ),

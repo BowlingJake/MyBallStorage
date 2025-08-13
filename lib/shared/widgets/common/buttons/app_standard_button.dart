@@ -40,16 +40,15 @@ class AppStandardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final buttonColor = customColor ?? theme.colorScheme.primary;
-    final Color effectiveBackground =
-        backgroundColor ?? (isPrimary && enabled ? buttonColor : Colors.transparent);
+    // 預設色改為白色，除非呼叫者指定 customColor/foreground/outline
+    final Color baseColor = customColor ?? Colors.white;
+    // 預設為 outlined；若指定 backgroundColor 則採用填滿
+    final Color effectiveBackground = backgroundColor ?? Colors.transparent;
     final Color effectiveBorder = enabled
-        ? (outlineColor ?? buttonColor.withOpacity(isPrimary ? 0.8 : 0.5))
+        ? (outlineColor ?? baseColor.withOpacity(0.6))
         : (disabledOutlineColor ?? theme.colorScheme.onSurface.withOpacity(0.3));
     final Color effectiveForeground = enabled
-        ? (foregroundColor ?? (isPrimary
-            ? (whiteForeground ? Colors.white : Colors.black)
-            : buttonColor))
+        ? (foregroundColor ?? baseColor)
         : (disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5));
 
     return SizedBox(
@@ -67,9 +66,9 @@ class AppStandardButton extends StatelessWidget {
             onTap: enabled ? onPressed : null,
             borderRadius: BorderRadius.circular(20),
             splashColor:
-                enabled ? buttonColor.withOpacity(0.1) : Colors.transparent,
+                enabled ? baseColor.withOpacity(0.1) : Colors.transparent,
             highlightColor:
-                enabled ? buttonColor.withOpacity(0.05) : Colors.transparent,
+                enabled ? baseColor.withOpacity(0.05) : Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(

@@ -50,6 +50,8 @@ class ArsenalManagementSection extends ConsumerWidget {
           Expanded(
             child: AppStandardButton(
               text: isMove ? 'Confirm Move' : 'Confirm Remove ($count)',
+              outlineColor: isMove ? Colors.white.withOpacity(0.6) : Colors.red,
+              foregroundColor: isMove ? Colors.white.withOpacity(0.9) : Colors.red,
               onPressed: () {
                 if (isMove) {
                   ref.read(arsenalUIServiceProvider.notifier).showMoveSelected(
@@ -62,15 +64,15 @@ class ArsenalManagementSection extends ConsumerWidget {
                   );
                 }
               },
-              customColor: isMove ? Colors.blue : Colors.red,
-              isPrimary: true,
-              whiteForeground: true,
+              isPrimary: false,
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: AppStandardButton(
               text: 'Exit',
+              outlineColor: Colors.white.withOpacity(0.6),
+              foregroundColor: Colors.white.withOpacity(0.9),
               onPressed: () {
                 if (isMove) {
                   ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode();
