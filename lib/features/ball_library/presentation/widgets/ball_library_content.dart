@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
-import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_ui_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
-import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_card_item.dart';
-import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
+import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/optimized/virtualized_ball_list.dart';
 
 /// Ball Library Content Widget
 /// Handles the main content display including ball list and empty states
@@ -89,101 +87,9 @@ class BallLibraryContent extends ConsumerWidget {
     );
   }
 
-  /// Build ball list
+  /// Build optimized ball list with virtualization
   Widget _buildBallList(BuildContext context, WidgetRef ref, BallLibraryState state) {
-    final uiState = ref.watch(ballLibraryUIServiceProvider);
-    final uiService = ref.read(ballLibraryUIServiceProvider.notifier);
-
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 80),
-        itemCount: state.filteredBalls.length + (state.hasMoreData ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= state.filteredBalls.length) {
-            // Load more indicator
-            return _buildLoadMoreFooter(context, ref, state);
-          }
-          
-          final ball = state.filteredBalls[index];
-          final isSelected = uiService.isBallSelected(ball.id);
-          
-          return BallCardItem(
-            ball: ball,
-            theme: Theme.of(context),
-            onTap: () => uiService.handleBallTap(
-              context: context,
-              ball: ball,
-            ),
-            isSelectionMode: uiService.isInSelectionMode,
-            isSelected: isSelected,
-          );
-        },
-      ),
-    );
+    return VirtualizedBallList(state: state);
   }
 
-  /// Build load more footer
-  Widget _buildLoadMoreFooter(BuildContext context, WidgetRef ref, BallLibraryState state) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      child: state.isLoadingMore
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white54),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Loading...',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            )
-          : GestureDetector(
-              onTap: () {
-                ref.read(ballLibraryControllerProvider.notifier).loadMore();
-              },
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[600]!),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Press to load more',
-                        style: TextStyle(
-                          color: Colors.grey[300],
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '(${state.filteredBalls.length}/${state.totalCount})',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-    );
-  }
 }
