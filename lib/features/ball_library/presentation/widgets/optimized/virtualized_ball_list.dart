@@ -32,7 +32,7 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
   final Map<int, Widget> _itemCache = <int, Widget>{};
   
   // Estimated item height for better performance
-  static const double _estimatedItemHeight = 120.0;
+  static const double _estimatedItemHeight = 200.0;
   
   @override
   void initState() {

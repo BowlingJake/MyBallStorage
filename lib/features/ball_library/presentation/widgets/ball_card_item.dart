@@ -299,32 +299,36 @@ class BallCardItem extends ConsumerWidget {
                   children: [
                     // Left: Ball Image (Circular)
                     SizedBox(
-                      width: 120, // Fixed square width
-                      height: 120, // Fixed square height
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
-                        child: ClipOval(
-                          child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
-                              ? Image.network(
-                                  ball.imageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(
+                      width: 120,
+                      height: 120,
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.withOpacity(0.3),
+                            ),
+                            child: ClipOval(
+                              child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
+                                  ? Image.network(
+                                      ball.imageUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons.sports_baseball,
+                                          color: Colors.white54,
+                                          size: 35,
+                                        );
+                                      },
+                                    )
+                                  : const Icon(
                                       Icons.sports_baseball,
                                       color: Colors.white54,
                                       size: 35,
-                                    );
-                                  },
-                                )
-                              : const Icon(
-                                  Icons.sports_baseball,
-                                  color: Colors.white54,
-                                  size: 35,
-                                ),
-                        ),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 16),
