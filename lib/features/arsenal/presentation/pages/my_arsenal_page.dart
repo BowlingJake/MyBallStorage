@@ -8,9 +8,7 @@ import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/component
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/components/arsenal_management_section.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/components/arsenal_content_section.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/components/arsenal_bottom_actions.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/handlers/arsenal_bag_handler.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/handlers/arsenal_selection_handler.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/handlers/arsenal_dialog_handler.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_ui_service.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -120,15 +118,14 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
               tabController: _tabController,
               bagColors: _bagColors,
               onUnlockTap: (index) => _showUnlockBagDialog(index),
-              onBlockedSwitch: () => ArsenalSelectionHandler.exitSelectionMode(ref, arsenalState),
+              onBlockedSwitch: () => ref.read(arsenalUIServiceProvider.notifier).exitSelectionMode(arsenalState),
             ),
             
             // Management Section
             ArsenalManagementSection(
               bagColors: _bagColors,
-              onShowMoreOptions: () => ArsenalDialogHandler.showMoreOptionsBottomSheet(
+              onShowMoreOptions: () => ref.read(arsenalUIServiceProvider.notifier).showMoreOptionsBottomSheet(
                 context: context,
-                ref: ref,
                 arsenalState: arsenalState,
               ),
             ),
@@ -141,8 +138,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: ArsenalBottomActions(
-          onToggleMoveMode: () => ArsenalSelectionHandler.toggleMoveMode(ref),
-          onToggleRemoveMode: () => ArsenalSelectionHandler.toggleRemoveMode(ref),
+          onToggleMoveMode: () => ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode(),
+          onToggleRemoveMode: () => ref.read(arsenalUIServiceProvider.notifier).toggleRemoveMode(),
         ),
         bottomNavigationBar: ModernBottomNavigation(
           currentIndex: _calculateCurrentIndex(location),
@@ -154,7 +151,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
 
   PreferredSizeWidget _buildAppBar() {
     final arsenalState = ref.watch(newArsenalControllerProvider);
-    final selectionMode = ArsenalSelectionHandler.isInSelectionMode(arsenalState);
+    final selectionMode = ref.read(arsenalUIServiceProvider.notifier).isInSelectionMode(arsenalState);
     
     return ArsenalAppBar(
       title: const Text('My Arsenal'),
@@ -192,14 +189,13 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
       moreAction: selectionMode
           ? null
           : IconButton(
-              onPressed: () => ArsenalDialogHandler.showMoreOptionsBottomSheet(
+              onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showMoreOptionsBottomSheet(
                 context: context,
-                ref: ref,
                 arsenalState: arsenalState,
               ),
               icon: Icon(
                 Icons.more_vert,
-                color: ArsenalBagHandler.hasActiveFilters(ref, arsenalState) ? Colors.blue : Colors.white,
+                color: ref.read(arsenalUIServiceProvider.notifier).hasActiveFilters(arsenalState) ? Colors.blue : Colors.white,
                 size: 24,
               ),
               tooltip: 'More Options',
@@ -208,9 +204,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
   }
 
   void _showUnlockBagDialog(int index) async {
-    await ArsenalBagHandler.showUnlockBagDialog(
+    await ref.read(arsenalUIServiceProvider.notifier).showUnlockBagDialog(
       context: context,
-      ref: ref,
       bagIndex: index,
       bagColors: _bagColors,
       vsync: this,

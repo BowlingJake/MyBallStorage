@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_ui_service.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 
 class ArsenalBottomActions extends ConsumerWidget {
@@ -53,9 +53,8 @@ class ArsenalBottomActions extends ConsumerWidget {
                 disabledOutlineColor: Colors.grey,
                 isPrimary: true,
                 whiteForeground: false,
-                onPressed: () => ArsenalActions.showAddToCurrentBag(
+                onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showAddToCurrentBag(
                   context: context,
-                  ref: ref,
                 ),
               ),
             ),

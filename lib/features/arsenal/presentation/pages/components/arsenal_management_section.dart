@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
-import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_ui_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/appbar/management_section.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
@@ -52,15 +52,13 @@ class ArsenalManagementSection extends ConsumerWidget {
               text: isMove ? 'Confirm Move' : 'Confirm Remove ($count)',
               onPressed: () {
                 if (isMove) {
-                  ArsenalActions.showMoveSelected(
+                  ref.read(arsenalUIServiceProvider.notifier).showMoveSelected(
                     context: context,
-                    ref: ref,
                     bagColors: bagColors,
                   );
                 } else {
-                  ArsenalActions.confirmRemoveSelected(
+                  ref.read(arsenalUIServiceProvider.notifier).confirmRemoveSelected(
                     context: context,
-                    ref: ref,
                   );
                 }
               },
@@ -75,9 +73,9 @@ class ArsenalManagementSection extends ConsumerWidget {
               text: 'Exit',
               onPressed: () {
                 if (isMove) {
-                  ref.read(newArsenalControllerProvider.notifier).toggleMoveMode();
+                  ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode();
                 } else {
-                  ref.read(newArsenalControllerProvider.notifier).toggleRemoveMode();
+                  ref.read(arsenalUIServiceProvider.notifier).toggleRemoveMode();
                 }
               },
             ),

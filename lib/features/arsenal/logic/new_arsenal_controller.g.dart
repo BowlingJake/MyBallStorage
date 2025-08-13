@@ -50,7 +50,7 @@ final arsenalDataServiceProvider =
 // ignore: unused_element
 typedef ArsenalDataServiceRef = AutoDisposeProviderRef<ArsenalDataService>;
 String _$filteredArsenalInstancesHash() =>
-    r'268dfb9ab518bc1868f594cf53f3611e94128165';
+    r'8c4fa1eb1dd0fc9993fa0edf4f26bb489013f8ed';
 
 /// Provider to get filtered instances using background isolate
 ///
@@ -72,7 +72,7 @@ final filteredArsenalInstancesProvider =
 typedef FilteredArsenalInstancesRef
     = AutoDisposeFutureProviderRef<List<UserArsenalInstance>>;
 String _$newArsenalControllerHash() =>
-    r'e36c1822c2de82c8e9c638ec2cd4f08f6189d964';
+    r'c34719c6dc7ac34a6233ea0109d7066915e4c45f';
 
 /// New Arsenal controller
 ///
