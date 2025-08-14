@@ -13,6 +13,9 @@ import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 import 'package:bowlingarsenal_app/features/tournament/views/my_tournament_page.dart';
+import 'package:bowlingarsenal_app/features/tournament/presentation/pages/new_tournament_step1_page.dart';
+import 'package:bowlingarsenal_app/features/tournament/presentation/pages/new_tournament_step2_page.dart';
+import 'package:bowlingarsenal_app/features/tournament/presentation/pages/new_tournament_step3_page.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
@@ -95,6 +98,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/tournament',
         name: 'tournament',
         builder: (context, state) => const MyTournamentPage(),
+      ),
+      GoRoute(
+        path: '/tournaments/new/1',
+        name: 'tournaments-new-step1',
+        builder: (context, state) => const NewTournamentStep1Page(),
+      ),
+      GoRoute(
+        path: '/tournaments/new/2',
+        name: 'tournaments-new-step2',
+        builder: (context, state) => const NewTournamentStep2Page(),
+      ),
+      GoRoute(
+        path: '/tournaments/new/3',
+        name: 'tournaments-new-step3',
+        builder: (context, state) => const NewTournamentStep3Page(),
       ),
       GoRoute(
         path: '/settings',

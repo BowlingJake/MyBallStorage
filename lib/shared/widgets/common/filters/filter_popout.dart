@@ -1,6 +1,7 @@
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FilterPopout extends ConsumerStatefulWidget {
@@ -111,22 +112,32 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
 
               // 篩選內容
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Brand 篩選
-                      _buildBrandSection(),
-                      const SizedBox(height: 24),
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    },
+                    scrollbars: false, // 隱藏滾動條，符合手機設計規範
+                  ),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Brand 篩選
+                        _buildBrandSection(),
+                        const SizedBox(height: 24),
 
-                      // Core 篩選
-                      _buildCoreSection(),
-                      const SizedBox(height: 24),
+                        // Core 篩選
+                        _buildCoreSection(),
+                        const SizedBox(height: 24),
 
-                      // Coverstock 篩選
-                      _buildCoverstockSection(),
-                    ],
+                        // Coverstock 篩選
+                        _buildCoverstockSection(),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -52,7 +52,7 @@ class MyTournamentPage extends StatelessWidget {
                 isPrimary: true,
                 whiteForeground: true,
                 onPressed: () {
-                  // TODO: implement add tournament flow
+                  context.go('/tournaments/new/1');
                 },
               ),
             ],

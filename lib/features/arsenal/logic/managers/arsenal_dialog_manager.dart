@@ -126,8 +126,6 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
             _buildDetailRow('Brand', ballInstance.brandName),
             _buildDetailRow('Added Date', _formatDate(ballInstance.addedDate)),
             _buildDetailRow('Games Used', '${ballInstance.gamesUsed}'),
-            if (ballInstance.notes?.isNotEmpty == true)
-              _buildDetailRow('Notes', ballInstance.notes!),
             const SizedBox(height: 16),
             Text(
               'Active in Bags: ${ballInstance.activeBagNumbers.join(', ')}',

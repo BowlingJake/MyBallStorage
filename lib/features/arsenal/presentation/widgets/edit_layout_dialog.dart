@@ -292,7 +292,10 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
           ),
           child: TextField(
             controller: controller,
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+            textInputAction: TextInputAction.next,
+            autocorrect: false,
+            enableSuggestions: false,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,

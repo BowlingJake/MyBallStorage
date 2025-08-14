@@ -8,6 +8,7 @@ import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.d
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up_model;
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_selection_dialog.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
@@ -68,127 +69,11 @@ class BallCardItem extends ConsumerWidget {
 
     final unlockedBags = profile.unlockedBags;
 
-    // 使用統一的袋子顏色服務
-    final bagColors = BagColorService.getAllBagColors();
-
-    // 預設選中第一個球袋 (通常是 "All My Arsenal")
-    final selectedBags = <int>{1}; // 預設選中球袋1
-
-    return await showDialog<List<int>>(
+    return await showBagSelectionDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 380),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: BrandColors.accentColorDark, width: 1.5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 標題區（無 icon）
-                  Text(
-                    'Add to Arsenal',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    ball.name,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Select which bags to add this ball to:',
-                    style: TextStyle(color: Colors.grey[300], fontSize: 14),
-                  ),
-                  const SizedBox(height: 12),
-                  // 垂直袋子按鈕列表
-                  ...unlockedBags.map((bagInfo) {
-                    final isSelected = selectedBags.contains(bagInfo.number);
-                    final bagColor = bagColors[bagInfo.number - 1];
-                    final bagText = bagInfo.number == 1 ? '${bagInfo.name} (Required)' : bagInfo.name;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: AppStandardButton(
-                        text: bagText,
-                        height: 36,
-                        width: double.infinity,
-                        isPrimary: isSelected,
-                        customColor: isSelected ? bagColor : null,
-                        outlineColor: isSelected ? null : Colors.white,
-                        foregroundColor: isSelected ? Colors.black : Colors.white,
-                        onPressed: () {
-                          if (bagInfo.number == 1) {
-                            // 主球袋固定選取
-                            return;
-                          }
-                          setState(() {
-                            if (isSelected) {
-                              selectedBags.remove(bagInfo.number);
-                            } else {
-                              selectedBags.add(bagInfo.number);
-                            }
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                  if (unlockedBags.length == 1) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      'Tip: Unlock more bags in Bag Management to organize your arsenal better!',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  // 底部動作列
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Cancel',
-                          height: 36,
-                          outlineColor: Colors.white.withOpacity(0.6),
-                          foregroundColor: Colors.white,
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: AppStandardButton(
-                          text: 'Add to ${selectedBags.length} bag${selectedBags.length != 1 ? 's' : ''}',
-                          height: 36,
-                          isPrimary: true,
-                          customColor: BrandColors.accentColorDark,
-                          whiteForeground: true,
-                          onPressed: () => Navigator.of(context).pop(selectedBags.toList()),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      profile: profile,
+      title: 'Add to Arsenal',
+      subtitle: ball.name,
     );
   }
 

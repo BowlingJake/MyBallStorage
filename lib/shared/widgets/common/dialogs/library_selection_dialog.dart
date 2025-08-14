@@ -287,6 +287,10 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                                   height: 40, // 減小高度讓搜尋框看起來更細
                                   child: TextField(
                                     controller: _searchController,
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.search,
+                                    autocorrect: false,
+                                    enableSuggestions: true,
                                     style: const TextStyle(color: Colors.white, fontSize: 14),
                                     decoration: const InputDecoration(
                                       hintText: 'Search balls...',

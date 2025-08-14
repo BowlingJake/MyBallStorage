@@ -47,7 +47,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
     final brandColor = brandPalette[400]!;
     
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Stack(
         children: [
           Container(
@@ -77,7 +77,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
               onLongPress: isSelectionMode ? null : onTap,
               borderRadius: BorderRadius.circular(14),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
                     // Left: Ball Image (Circular)
@@ -95,7 +95,6 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                               child: _buildBallImage(),
                             ),
                           ),
-                           // 移除圖上方 Note；恢復原設計
                           // 移除無意義的 Arsenal indicator
                         ],
                       ),
@@ -155,26 +154,6 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          // Note（恢復資訊區顯示）
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              'Note: ' + ((arsenalBallInstance.notes ?? '').trim().isNotEmpty ? (arsenalBallInstance.notes ?? '').trim() : 'No Note'),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
                           // Layout 行（單行、省略）
                           Text(
                             'Layout: ' + arsenalBallInstance.layoutDisplayString,
@@ -342,96 +321,9 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
               showArsenalBallDetails(context, arsenalInstance);
             },
           ),
-          const SizedBox(height: 12),
-          AppStandardButton(
-            text: 'Add Note',
-            height: DialogDefaults.buttonHeight,
-            fontSize: DialogDefaults.buttonFontSize,
-            outlineColor: Colors.white.withOpacity(0.6),
-            foregroundColor: Colors.white.withOpacity(0.9),
-            customColor: Colors.white,
-            width: double.infinity,
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _showEditNoteDialog(context, arsenalInstance, ref);
-            },
-          ),
         ],
       ),
     );
   }
 
-  Future<void> _showEditNoteDialog(BuildContext context, UserArsenalInstance instance, WidgetRef ref) async {
-    final controller = TextEditingController(text: instance.notes ?? '');
-    await ArsenalDialog.show<void>(
-      context: context,
-      title: 'Add Note',
-      barrierDismissible: true,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            controller: controller,
-            maxLength: 20,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              counterStyle: const TextStyle(color: Colors.grey),
-              hintText: 'Enter note (max 20 chars)',
-              hintStyle: const TextStyle(color: Colors.white54),
-              filled: true,
-              fillColor: Colors.black.withOpacity(0.6),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12)),
-                borderSide: BorderSide(color: BrandColors.accentColorDark, width: 2),
-              ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: AppStandardButton(
-                  text: 'Cancel',
-                  height: DialogDefaults.buttonHeight,
-                  outlineColor: Colors.white.withOpacity(0.6),
-                  foregroundColor: Colors.white.withOpacity(0.9),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: AppStandardButton(
-                  text: 'Save',
-                  height: DialogDefaults.buttonHeight,
-                  isPrimary: true,
-                  customColor: BrandColors.accentColorDark,
-                  whiteForeground: true,
-                  onPressed: () async {
-                    final text = controller.text.trim();
-                    Navigator.of(context).pop();
-                    final auth = ref.read(authControllerProvider);
-                    if (auth.hasValue && auth.value != null) {
-                      final userId = auth.value!.id;
-                      await ref.read(newArsenalControllerProvider.notifier).updateNotes(instance.id, text, userId);
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

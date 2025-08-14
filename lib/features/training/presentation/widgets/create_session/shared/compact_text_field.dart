@@ -26,6 +26,11 @@ class CompactTextField extends StatelessWidget {
       ),
       child: TextFormField(
         controller: controller,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.next,
+        textCapitalization: TextCapitalization.words,
+        autocorrect: true,
+        enableSuggestions: true,
         style: theme.textTheme.bodyMedium,
         onChanged: onChanged,
         decoration: InputDecoration(

@@ -63,7 +63,7 @@ class ArsenalGridCard extends ConsumerWidget {
                 : () => _showArsenalActionDialog(context, instance, ref),
             borderRadius: BorderRadius.circular(12),
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -80,7 +80,7 @@ class ArsenalGridCard extends ConsumerWidget {
                         child: _buildBallImage(100),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     // 球名（可能超出時自動縮小）
                     SizedBox(
                       width: double.infinity,
@@ -100,7 +100,7 @@ class ArsenalGridCard extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     // 品牌
                     SizedBox(
                       width: double.infinity,
@@ -116,7 +116,7 @@ class ArsenalGridCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     // Core & Cover
                     SizedBox(
                       width: double.infinity,
@@ -131,29 +131,7 @@ class ArsenalGridCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    // Note（單行，保留標頭，無資料顯示 No Note），高亮顯示（無外框）
-                    SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          'Note: ' + ((instance.notes ?? '').isNotEmpty ? instance.notes! : 'No Note'),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 3),
                     // Layout
                     SizedBox(
                       width: double.infinity,
@@ -169,7 +147,6 @@ class ArsenalGridCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 3),
                   ],
                 ),
               ),
@@ -205,97 +182,6 @@ class ArsenalGridCard extends ConsumerWidget {
     );
   }
 
-  Future<void> _showEditNoteDialog(BuildContext context, UserArsenalInstance instance, WidgetRef ref) async {
-    final controller = TextEditingController(text: instance.notes ?? '');
-    await showDialog<void>(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 380),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: BrandColors.accentColorDark, width: 1.5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Add Note',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  maxLength: 20,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    counterStyle: const TextStyle(color: Colors.grey),
-                    hintText: 'Enter note (max 20 chars)',
-                    hintStyle: const TextStyle(color: Colors.white54),
-                    filled: true,
-                    fillColor: Colors.black.withOpacity(0.6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: BrandColors.accentColorDark, width: 2),
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Cancel',
-                        height: 36,
-                        outlineColor: Colors.white,
-                        foregroundColor: Colors.white,
-                        onPressed: () => Navigator.of(ctx).pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppStandardButton(
-                        text: 'Save',
-                        height: 36,
-                        isPrimary: true,
-                        customColor: BrandColors.accentColorDark,
-                        whiteForeground: true,
-                        onPressed: () async {
-                          final text = controller.text.trim();
-                          Navigator.of(ctx).pop();
-                          final auth = ref.read(authControllerProvider);
-                          if (auth.hasValue && auth.value != null) {
-                            final userId = auth.value!.id;
-                            await ref.read(newArsenalControllerProvider.notifier).updateNotes(instance.id, text, userId);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   /// 建構球圖片
   Widget _buildBallImage(double size) {
@@ -413,20 +299,6 @@ class ArsenalGridCard extends ConsumerWidget {
             onPressed: () {
               Navigator.of(context).pop();
               showArsenalBallDetails(context, arsenalInstance);
-            },
-          ),
-          const SizedBox(height: 12),
-          AppStandardButton(
-            text: 'Add Note',
-            height: DialogDefaults.buttonHeight,
-            fontSize: DialogDefaults.buttonFontSize,
-            outlineColor: Colors.white.withOpacity(0.6),
-            foregroundColor: Colors.white.withOpacity(0.9),
-            customColor: Colors.white,
-            width: double.infinity,
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _showEditNoteDialog(context, arsenalInstance, ref);
             },
           ),
         ],

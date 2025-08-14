@@ -17,6 +17,10 @@ class ArsenalSearchBar extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.search,
+        autocorrect: false,
+        enableSuggestions: true,
         style: const TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
           hintText: 'Search by name or brand...',

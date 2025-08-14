@@ -1,4 +1,5 @@
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showRemovalOptionsDialog({
@@ -6,22 +7,29 @@ Future<String?> showRemovalOptionsDialog({
   required int selectedCount,
   required String currentBagName,
 }) async {
-  return showDialog<String>(
+  return AppBaseDialog.show<String>(
     context: context,
+    title: 'Remove $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
+    borderColor: Colors.red.withOpacity(0.7),
     barrierDismissible: false,
-    barrierColor: Colors.black.withOpacity(0.8),
-    builder: (BuildContext dialogContext) {
-      return _RemovalOptionsDialog(
-        selectedCount: selectedCount,
-        currentBagName: currentBagName,
-      );
-    },
+    content: _RemovalOptionsContent(
+      selectedCount: selectedCount,
+      currentBagName: currentBagName,
+    ),
+    actions: [
+      AppStandardButton(
+        text: 'Cancel',
+        height: DialogDefaults.buttonHeight,
+        fontSize: DialogDefaults.buttonFontSize,
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+    ],
   );
 }
 
-/// Removal Options Dialog with unified style
-class _RemovalOptionsDialog extends StatelessWidget {
-  const _RemovalOptionsDialog({
+/// Removal Options Dialog content with unified style
+class _RemovalOptionsContent extends StatelessWidget {
+  const _RemovalOptionsContent({
     required this.selectedCount,
     required this.currentBagName,
   });
@@ -31,74 +39,47 @@ class _RemovalOptionsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      content: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.red.withOpacity(0.5),
-            width: 2,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Choose removal option:',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 16,
           ),
+          textAlign: TextAlign.center,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title
-            Text(
-              'Remove $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            // Message
-            Text(
-              'Choose removal option:',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            // Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: AppStandardButton(
-                    text: 'Remove from $currentBagName',
-                    height: 32,
-                    fontSize: 12,
-                    customColor: Colors.grey,
-                    onPressed: () => Navigator.of(context).pop('bag_only'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppStandardButton(
-                    text: 'Remove from All Arsenal',
-                    height: 32,
-                    fontSize: 12,
-                    customColor: Colors.red,
-                    isPrimary: true,
-                    onPressed: () => Navigator.of(context).pop('complete'),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        const SizedBox(height: 24),
+        // 使用 Column 替代 Row，符合手機優先設計
+        AppStandardButton(
+          text: 'Remove from $currentBagName Only',
+          height: DialogDefaults.buttonHeight,
+          fontSize: DialogDefaults.buttonFontSize,
+          customColor: Colors.grey,
+          width: double.infinity,
+          onPressed: () => Navigator.of(context).pop('bag_only'),
         ),
-      ),
+        const SizedBox(height: DialogDefaults.spacing),
+        AppStandardButton(
+          text: 'Remove from All Arsenal',
+          height: DialogDefaults.buttonHeight,
+          fontSize: DialogDefaults.buttonFontSize,
+          customColor: Colors.red,
+          isPrimary: true,
+          width: double.infinity,
+          onPressed: () => Navigator.of(context).pop('complete'),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'This action will permanently remove the ball${selectedCount != 1 ? 's' : ''} from your arsenal.',
+          style: TextStyle(
+            color: Colors.red.withOpacity(0.7),
+            fontSize: 12,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

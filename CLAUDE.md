@@ -82,6 +82,40 @@ lib/features/{feature_name}/
 - **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
 - **Notifications**: Always use `TopNotification` from `lib/shared/widgets/common/notifications/top_notification.dart` for all user notifications instead of SnackBar. Use `TopNotification.showSuccess()` for success messages and `TopNotification.showError()` for error messages
 
+### Mobile-First UI/UX Design Principles
+This is a **mobile application** - all UI/UX design decisions must prioritize mobile user experience:
+
+1. **Touch-First Interactions**:
+   - All scrollable content must support touch scrolling with proper physics (`BouncingScrollPhysics`)
+   - Use `ListView.builder` for long lists to ensure smooth scrolling performance
+   - Implement proper touch targets (minimum 44px tap area)
+   - Support swipe gestures where appropriate
+
+2. **Dialog & Modal Design**:
+   - All dialogs must be scrollable when content exceeds screen height
+   - Use `ConstrainedBox` with `maxHeight: MediaQuery.of(context).size.height * 0.6-0.8` for content areas
+   - Implement `ScrollConfiguration` with touch device support for all scrollable areas
+   - Hide scrollbars (`scrollbars: false`) while maintaining scroll functionality
+   - Use `Flexible` widgets in dialogs to prevent overflow
+
+3. **Mobile Layout Patterns**:
+   - Design for portrait orientation first
+   - Use responsive layouts that adapt to different screen sizes
+   - Implement bottom sheets for secondary actions when appropriate
+   - Consider thumb-reachable areas for primary actions
+
+4. **Performance on Mobile**:
+   - Use `ListView.builder` instead of Column with many children
+   - Implement lazy loading for large datasets
+   - Optimize image loading and caching
+   - Minimize unnecessary rebuilds with proper state management
+
+5. **Accessibility**:
+   - Provide semantic labels for screen readers
+   - Ensure sufficient color contrast
+   - Support system font scaling
+   - Test with accessibility features enabled
+
 ### Cursor Rules Integration
 The project has specific Cursor rules that emphasize:
 - Reading `AI_CONTEXT.md` and `docs/TECHNICAL_SPEC.md` before making changes

@@ -454,6 +454,11 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
                   // 名稱輸入框
                   TextField(
                     controller: nameController,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
+                    textCapitalization: TextCapitalization.words,
+                    autocorrect: true,
+                    enableSuggestions: true,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Enter bag name...',
@@ -598,6 +603,11 @@ class _BagManagementDialogState extends ConsumerState<BagManagementDialog> {
                   // 名稱輸入框
                   TextField(
                     controller: nameController,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
+                    textCapitalization: TextCapitalization.words,
+                    autocorrect: true,
+                    enableSuggestions: true,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Enter bag name...',
@@ -732,6 +742,11 @@ Future<String?> _showBagNameInputDialog({
     maxWidth: 350,
     content: TextField(
       controller: nameController,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
+      textCapitalization: TextCapitalization.words,
+      autocorrect: true,
+      enableSuggestions: true,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hintText ?? 'Enter bag name...',

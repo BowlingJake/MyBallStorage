@@ -46,10 +46,11 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
 
     // Check if in main bag or sub bag and show appropriate dialog
     final currentBag = arsenalState.selectedBagNumber;
+    RemovalType? removalType;
     bool confirmed = false;
     
     if (currentBag == 1) {
-      // Main bag - simple confirmation
+      // Main bag - simple confirmation for complete removal
       final result = await showAppConfirmationDialog(
         context: context,
         title: 'Remove Selected Balls',
@@ -57,10 +58,13 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
         confirmText: 'Remove',
         isDangerous: true,
       );
-      confirmed = result == true;
+      if (result == true) {
+        confirmed = true;
+        removalType = RemovalType.complete;
+      }
     } else {
-      // Sub bag - show tiered removal dialog
-      final removalType = await _showTieredRemovalDialog(
+      // Sub bag - show tiered removal dialog and get user's choice
+      removalType = await _showTieredRemovalDialog(
         context: context,
         selectedCount: instancesToRemove.length,
         currentBag: currentBag,
@@ -75,19 +79,15 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
       }
     }
 
-    if (!confirmed) {
+    if (!confirmed || removalType == null) {
       return;
     }
 
     try {
-      // Determine removal type based on current bag
-      final currentBag = arsenalState.selectedBagNumber;
-      final removalType = _determineRemovalType(currentBag);
-      
       await _performRemoval(
         context: context,
         instancesToRemove: instancesToRemove,
-        removalType: removalType,
+        removalType: removalType, // 使用用戶選擇的移除類型
         currentBag: currentBag,
       );
       
@@ -102,16 +102,6 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     }
   }
 
-  /// Determine the type of removal based on current bag
-  RemovalType _determineRemovalType(int currentBag) {
-    if (currentBag == 1) {
-      // Main bag - complete removal from arsenal
-      return RemovalType.complete;
-    } else {
-      // Sub bag - removal from bag only (unless user chooses complete)
-      return RemovalType.bagOnly;
-    }
-  }
 
   /// Perform the actual removal operation
   Future<void> _performRemoval({
@@ -169,29 +159,36 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
     List<UserArsenalInstance> removedInstances,
   ) {
     if (successCount > 0) {
-      // Get bag name
-      final userProfileState = ref.read(userProfileControllerProvider);
-      String bagName;
-      
-      if (currentBag == 1) {
-        // Main bag - use "My Arsenal"
-        bagName = 'My Arsenal';
-      } else {
-        // Sub bag - use custom bag name or default
-        bagName = 'Bag $currentBag';
-        if (userProfileState.profile != null) {
-          bagName = userProfileState.profile!.getBagName(currentBag) ?? 'Bag $currentBag';
-        }
-      }
-      
       String message;
-      if (successCount == 1) {
-        // Single ball - show ball name
-        final ballName = removedInstances.first.displayName;
-        message = 'Successful remove $ballName from $bagName';
+      
+      if (removalType == RemovalType.complete) {
+        // Complete removal - removed from entire arsenal
+        if (successCount == 1) {
+          final ballName = removedInstances.first.displayName;
+          message = 'Successfully removed $ballName from arsenal';
+        } else {
+          message = 'Successfully removed $successCount balls from arsenal';
+        }
       } else {
-        // Multiple balls - show count
-        message = 'Successful remove $successCount balls from $bagName';
+        // Bag-only removal - removed from specific bag
+        final userProfileState = ref.read(userProfileControllerProvider);
+        String bagName;
+        
+        if (currentBag == 1) {
+          bagName = 'All My Arsenal';
+        } else {
+          bagName = 'Bag $currentBag';
+          if (userProfileState.profile != null) {
+            bagName = userProfileState.profile!.getBagName(currentBag) ?? 'Bag $currentBag';
+          }
+        }
+        
+        if (successCount == 1) {
+          final ballName = removedInstances.first.displayName;
+          message = 'Successfully removed $ballName from $bagName';
+        } else {
+          message = 'Successfully removed $successCount balls from $bagName';
+        }
       }
       
       TopNotification.showSuccess(context, message);

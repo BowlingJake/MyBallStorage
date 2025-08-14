@@ -133,43 +133,6 @@ class _ArsenalBallDetailDialogState extends ConsumerState<ArsenalBallDetailDialo
                   // Arsenal 專用資訊：Layout
                   _buildInfoRow('Layout', widget.arsenalInstance.layoutDisplayString),
                   const SizedBox(height: 8),
-                  // Arsenal 專用資訊：Note（置於 Layout 下方，亮白外框顯示）
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.06),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white70, width: 1.2),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Note',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          ((widget.arsenalInstance.notes ?? '').isNotEmpty)
-                              ? widget.arsenalInstance.notes!
-                              : 'No Note',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   // Arsenal 專用資訊：Games Used
                   _buildInfoRow('Games Used', widget.arsenalInstance.gamesUsed.toString()),
                 ],

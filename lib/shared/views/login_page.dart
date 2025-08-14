@@ -244,6 +244,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   TextFormField(
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    autocorrect: false,
+                                    enableSuggestions: true,
                                     style: const TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
                                       labelText: 'Email',
@@ -285,6 +288,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   // Password TextField
                                   TextFormField(
                                     controller: _passwordController,
+                                    keyboardType: TextInputType.visiblePassword,
+                                    textInputAction: TextInputAction.done,
+                                    autocorrect: false,
+                                    enableSuggestions: false,
                                     obscureText: true,
                                     style: const TextStyle(color: Colors.white),
                                     decoration: InputDecoration(

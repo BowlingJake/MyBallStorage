@@ -3,6 +3,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_bu
 import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 Future<int?> showMoveTargetBagDialog({
   required BuildContext context,
@@ -95,62 +96,90 @@ class _MoveTargetBagContentState extends State<_MoveTargetBagContent> {
   Widget build(BuildContext context) {
     final bool onlyOneSubBag = widget.subBags.length <= 1;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'Choose target bag:',
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 16,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        if (widget.alreadyInBags.isNotEmpty) ...[
-          Builder(
-            builder: (context) {
-              final alsoIn = widget.alreadyInBags
-                  .where((n) => n != widget.currentBagNumber && n != 1)
-                  .toList();
-              if (alsoIn.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              final names = alsoIn
-                  .map((n) => widget.userProfile?.getBagName(n) ?? 'Bag ' + n.toString())
-                  .toList();
-              return Text(
-                'Also in: ' + names.join(', '),
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
-                textAlign: TextAlign.center,
-              );
-            },
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Choose target bag:',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-        ],
-        const SizedBox(height: 16),
-        ...widget.subBags.map((bag) {
-          final bool disabled = onlyOneSubBag || bag.number == widget.currentBagNumber || widget.alreadyInBags.contains(bag.number);
-          final bool selected = selectedTarget == bag.number;
-          return Padding(
-            padding: EdgeInsets.only(bottom: DialogDefaults.spacing),
-            child: _BagButton(
-              bag: bag,
-              bagColor: widget.bagColors[bag.number - 1],
-              disabled: disabled,
-              selected: selected,
-              onTap: () {
-                if (disabled) {
-                  return;
+          if (widget.alreadyInBags.isNotEmpty) ...[
+            Builder(
+              builder: (context) {
+                final alsoIn = widget.alreadyInBags
+                    .where((n) => n != widget.currentBagNumber && n != 1)
+                    .toList();
+                if (alsoIn.isEmpty) {
+                  return const SizedBox.shrink();
                 }
-                setState(() => selectedTarget = bag.number);
+                final names = alsoIn
+                    .map((n) => widget.userProfile?.getBagName(n) ?? 'Bag ' + n.toString())
+                    .toList();
+                return Text(
+                  'Also in: ' + names.join(', '),
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  textAlign: TextAlign.center,
+                );
               },
             ),
-          );
-        }).toList(),
-        const SizedBox(height: 4),
-      ],
+            const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 16),
+          // 將袋子列表包裝在可滾動的區域中
+          Flexible(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },
+                scrollbars: false,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: widget.subBags.length,
+                itemBuilder: (context, index) {
+                  final bag = widget.subBags[index];
+                  final bool disabled = onlyOneSubBag || 
+                      bag.number == widget.currentBagNumber || 
+                      widget.alreadyInBags.contains(bag.number);
+                  final bool selected = selectedTarget == bag.number;
+                  
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: index == widget.subBags.length - 1 ? 4 : DialogDefaults.spacing,
+                    ),
+                    child: _BagButton(
+                      bag: bag,
+                      bagColor: widget.bagColors[bag.number - 1],
+                      disabled: disabled,
+                      selected: selected,
+                      onTap: () {
+                        if (disabled) {
+                          return;
+                        }
+                        setState(() => selectedTarget = bag.number);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

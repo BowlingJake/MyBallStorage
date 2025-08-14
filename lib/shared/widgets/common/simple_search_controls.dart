@@ -39,6 +39,10 @@ class SimpleSearchControls extends StatelessWidget {
               height: 36,
               child: TextField(
                 onChanged: onSearchChanged,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.search,
+                autocorrect: false,
+                enableSuggestions: true,
                 decoration: InputDecoration(
                   hintText: searchHint,
                   hintStyle: TextStyle(color: Colors.grey[400]),

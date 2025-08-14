@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
@@ -215,54 +216,65 @@ class BallLibraryUIService extends _$BallLibraryUIService {
                   ],
                 ),
               ),
-              // Sort options
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  children: [
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'ID (Low-High)',
-                      const SortCriterion(field: SortField.id, ascending: true),
-                      Icons.keyboard_arrow_up,
-                    ),
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'ID (High-Low)',
-                      const SortCriterion(field: SortField.id, ascending: false),
-                      Icons.keyboard_arrow_down,
-                    ),
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'Name (A-Z)',
-                      const SortCriterion(field: SortField.name, ascending: true),
-                      Icons.sort_by_alpha,
-                    ),
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'Name (Z-A)',
-                      const SortCriterion(field: SortField.name, ascending: false),
-                      Icons.sort_by_alpha,
-                    ),
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'Brand (A-Z)',
-                      const SortCriterion(field: SortField.brand, ascending: true),
-                      Icons.business,
-                    ),
-                    _buildSortOption(
-                      context,
-                      libraryState,
-                      'Brand (Z-A)',
-                      const SortCriterion(field: SortField.brand, ascending: false),
-                      Icons.business,
-                    ),
-                  ],
+              // Sort options - 可滾動列表
+              Flexible(
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    },
+                    scrollbars: false, // 隱藏滾動條，符合手機設計規範
+                  ),
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    children: [
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'ID (Low-High)',
+                        const SortCriterion(field: SortField.id, ascending: true),
+                        Icons.keyboard_arrow_up,
+                      ),
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'ID (High-Low)',
+                        const SortCriterion(field: SortField.id, ascending: false),
+                        Icons.keyboard_arrow_down,
+                      ),
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'Name (A-Z)',
+                        const SortCriterion(field: SortField.name, ascending: true),
+                        Icons.sort_by_alpha,
+                      ),
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'Name (Z-A)',
+                        const SortCriterion(field: SortField.name, ascending: false),
+                        Icons.sort_by_alpha,
+                      ),
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'Brand (A-Z)',
+                        const SortCriterion(field: SortField.brand, ascending: true),
+                        Icons.business,
+                      ),
+                      _buildSortOption(
+                        context,
+                        libraryState,
+                        'Brand (Z-A)',
+                        const SortCriterion(field: SortField.brand, ascending: false),
+                        Icons.business,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
