@@ -10,6 +10,7 @@ import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart' as up;
@@ -108,6 +109,28 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
               ],
             ),
           ),
+        ),
+        bottomNavigationBar: ModernBottomNavigation(
+          currentIndex: 1,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                context.go('/');
+                break;
+              case 1:
+                context.go('/library');
+                break;
+              case 2:
+                context.go('/my-arsenal');
+                break;
+              case 3:
+                context.go('/training');
+                break;
+              case 4:
+                context.go('/tournament');
+                break;
+            }
+          },
         ),
       ),
     );

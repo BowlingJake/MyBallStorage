@@ -62,7 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const HomePage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: HomePage()),
       ),
       GoRoute(
         path: '/login',
@@ -77,47 +77,47 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/library',
         name: 'library',
-        builder: (context, state) => const BallLibraryPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: BallLibraryPage()),
       ),
       GoRoute(
         path: '/training',
         name: 'training',
-        builder: (context, state) => const MyTrainingPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: MyTrainingPage()),
       ),
       GoRoute(
         path: '/my-arsenal',
         name: 'my-arsenal',
-        builder: (context, state) => const MyArsenalPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: MyArsenalPage()),
       ),
       GoRoute(
         path: '/favorites',
         name: 'favorites',
-        builder: (context, state) => const FavoritesPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: FavoritesPage()),
       ),
       GoRoute(
         path: '/tournament',
         name: 'tournament',
-        builder: (context, state) => const MyTournamentPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: MyTournamentPage()),
       ),
       GoRoute(
         path: '/tournaments/new/1',
         name: 'tournaments-new-step1',
-        builder: (context, state) => const NewTournamentStep1Page(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: NewTournamentStep1Page()),
       ),
       GoRoute(
         path: '/tournaments/new/2',
         name: 'tournaments-new-step2',
-        builder: (context, state) => const NewTournamentStep2Page(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: NewTournamentStep2Page()),
       ),
       GoRoute(
         path: '/tournaments/new/3',
         name: 'tournaments-new-step3',
-        builder: (context, state) => const NewTournamentStep3Page(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: NewTournamentStep3Page()),
       ),
       GoRoute(
         path: '/settings',
         name: 'settings',
-        builder: (context, state) => const SettingsPage(),
+        pageBuilder: (context, state) => const NoTransitionPage(child: SettingsPage()),
       ),
        GoRoute(
         path: '/edit_profile',

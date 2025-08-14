@@ -1,5 +1,6 @@
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,18 @@ class NewTournamentStep2Page extends StatelessWidget {
         appBar: AppBarConfigs.tournament(
           title: 'New Tournament',
           onBackPressed: () => context.go('/tournaments/new/1'),
+        ),
+        bottomNavigationBar: ModernBottomNavigation(
+          currentIndex: 4,
+          onTap: (index) {
+            switch (index) {
+              case 0: context.go('/'); break;
+              case 1: context.go('/library'); break;
+              case 2: context.go('/my-arsenal'); break;
+              case 3: context.go('/training'); break;
+              case 4: context.go('/tournament'); break;
+            }
+          },
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),

@@ -79,8 +79,7 @@ class AppTheme {
 
       // 輸入框
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: BrandColors.darkSurfaceColor,
+        filled: false,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: BrandColors.accentColorDark),
@@ -192,8 +191,7 @@ class AppTheme {
 
       // 輸入框
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: BrandColors.lightSurfaceColor,
+        filled: false,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: BrandColors.accentColorLight),
