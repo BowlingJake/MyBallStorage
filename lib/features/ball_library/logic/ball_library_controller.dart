@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_repository.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/ball_data_service.dart';
@@ -5,6 +6,8 @@ import 'package:bowlingarsenal_app/features/ball_library/data/supabase_ball_repo
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
+import 'package:bowlingarsenal_app/shared/services/local_cache_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,8 +42,55 @@ class BallLibraryController extends _$BallLibraryController {
   @override
   Future<BallLibraryState> build() async {
     _repository = ref.watch(ballRepositoryProvider);
+    final cacheService = ref.read(localCacheServiceProvider);
     
     try {
+      // 確保快取服務已初始化
+      try {
+        await cacheService.initialize();
+      } catch (e) {
+        log('Ball Library: Cache service initialization failed: $e');
+        // 如果快取初始化失敗，直接進行完整初始化
+        return await _fullInitialize();
+      }
+      
+      // 第一層：嘗試載入基本快取數據 (前50個球)
+      final cachedBasicBalls = await cacheService.getCachedBallLibraryBasicData();
+      if (cachedBasicBalls != null && cachedBasicBalls.isNotEmpty) {
+        log('Ball Library: Loading basic data from cache for instant display');
+        
+        // 立即返回基本數據，讓用戶看到內容
+        final initialState = BallLibraryState(
+          allBalls: cachedBasicBalls,
+          filteredBalls: cachedBasicBalls,
+          isLoading: false, // 基本數據已可用
+          totalCount: cachedBasicBalls.length,
+          hasMoreData: true, // 假設有更多數據
+          currentPage: 0,
+        );
+        
+        // 背景載入完整數據
+        _backgroundLoadFullData();
+        
+        return initialState;
+      }
+      
+      // 第二層：無快取時的完整載入
+      return await _fullInitialize();
+    } catch (e) {
+      log('Ball Library initialization failed: $e');
+      return BallLibraryState(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
+  
+  /// 完整初始化 (無快取時使用)
+  Future<BallLibraryState> _fullInitialize() async {
+    try {
+      log('Ball Library: Full initialization from database');
+      
       // 獲取總數量（無篩選條件）
       final totalCount = await _repository.getTotalCount();
       
@@ -51,6 +101,10 @@ class BallLibraryController extends _$BallLibraryController {
         limit: 50,
       );
       
+      // 快取基本數據
+      final cacheService = ref.read(localCacheServiceProvider);
+      await cacheService.cacheBallLibraryBasicData(balls);
+      
       final state = BallLibraryState(
         allBalls: balls,
         filteredBalls: balls,
@@ -59,12 +113,72 @@ class BallLibraryController extends _$BallLibraryController {
         hasMoreData: balls.length < totalCount,
         currentPage: 0,
       );
+      
       return state;
-    } catch (e, stackTrace) {
+    } catch (e) {
       return BallLibraryState(
         isLoading: false,
         error: e.toString(),
       );
+    }
+  }
+  
+  /// 背景載入完整數據 (不影響 UI 載入狀態)
+  Future<void> _backgroundLoadFullData() async {
+    try {
+      log('Ball Library: Background loading full data');
+      
+      final cacheService = ref.read(localCacheServiceProvider);
+      
+      // 檢查是否已有完整快取
+      final cachedFullBalls = await cacheService.getCachedBallLibraryFullData();
+      if (cachedFullBalls != null && cachedFullBalls.length > 50) {
+        log('Ball Library: Full data already cached, updating state');
+        
+        // 取得總數量
+        final totalCount = await _repository.getTotalCount();
+        
+        // 靜默更新狀態
+        final currentState = state.value;
+        if (currentState != null) {
+          final newState = currentState.copyWith(
+            allBalls: cachedFullBalls,
+            filteredBalls: cachedFullBalls,
+            totalCount: totalCount,
+            hasMoreData: false, // 完整數據已載入
+          );
+          state = AsyncValue.data(newState);
+        }
+        return;
+      }
+      
+      // 載入更多數據
+      final totalCount = await _repository.getTotalCount();
+      final allBalls = await _repository.getBallsWithFilters(
+        sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
+        offset: 0,
+        limit: null, // 載入所有數據
+      );
+      
+      // 快取完整數據
+      await cacheService.cacheBallLibraryFullData(allBalls);
+      
+      // 靜默更新狀態
+      final currentState = state.value;
+      if (currentState != null) {
+        final newState = currentState.copyWith(
+          allBalls: allBalls,
+          filteredBalls: allBalls,
+          totalCount: totalCount,
+          hasMoreData: false,
+        );
+        state = AsyncValue.data(newState);
+      }
+      
+      log('Ball Library: Background loading completed (${allBalls.length} balls)');
+    } catch (e) {
+      log('Ball Library: Background loading failed: $e');
+      // 背景載入失敗不影響用戶體驗
     }
   }
 

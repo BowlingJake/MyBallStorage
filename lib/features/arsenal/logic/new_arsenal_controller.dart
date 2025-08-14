@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/supabase_user_arsenal_repository.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/repositories/user_arsenal_repository.dart';
@@ -7,6 +8,8 @@ import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_sort_
 import 'package:bowlingarsenal_app/features/arsenal/logic/services/arsenal_background_service.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
+import 'package:bowlingarsenal_app/shared/services/local_cache_service.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -61,20 +64,67 @@ class NewArsenalController extends _$NewArsenalController {
 
   UserArsenalRepository get _repository => ref.read(userArsenalRepositoryProvider);
   ArsenalDataService get _dataService => ref.read(arsenalDataServiceProvider);
+  LocalCacheService get _cacheService => ref.read(localCacheServiceProvider);
 
-  /// Initialize arsenal data for user
+  /// 分層初始化 Arsenal 數據 - 優化版本
+  /// 
+  /// 第一層：嘗試載入快取數據 (即時顯示)
+  /// 第二層：背景更新最新數據 (如果快取過期或不存在)
   Future<void> initialize(String userId) async {
+    final cacheService = ref.read(localCacheServiceProvider);
+    
+    // 確保快取服務已初始化
+    try {
+      await cacheService.initialize();
+    } catch (e) {
+      log('Arsenal: Cache service initialization failed: $e');
+      // 如果快取初始化失敗，直接進行完整初始化
+      await _fullInitialize(userId);
+      return;
+    }
+    
+    // 第一層：快速載入快取數據
+    final cachedData = await cacheService.getCachedArsenalData(userId);
+    if (cachedData != null) {
+      log('Arsenal: Loading from cache for instant display');
+      state = state.copyWith(
+        allInstances: cachedData.instances,
+        userCategories: cachedData.categories,
+        selectedCategory: null,
+        isLoading: false, // 快取數據已可用，不顯示載入中
+      );
+      
+      // 背景刷新：檢查是否需要更新數據
+      _backgroundRefresh(userId);
+      return;
+    }
+    
+    // 第二層：無快取時的完整載入
+    await _fullInitialize(userId);
+  }
+  
+  /// 完整初始化 (無快取時使用)
+  Future<void> _fullInitialize(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
+      log('Arsenal: Full initialization from database');
       final result = await _dataService.initialize(userId);
       
       if (result.isSuccess) {
         state = state.copyWith(
           allInstances: result.instances!,
           userCategories: result.categories!,
-          selectedCategory: null, // "All My Arsenal" 
+          selectedCategory: null,
           isLoading: false,
+        );
+        
+        // 快取數據供下次使用
+        final cacheService = ref.read(localCacheServiceProvider);
+        await cacheService.cacheArsenalData(
+          userId: userId,
+          instances: result.instances!,
+          categories: result.categories!,
         );
       } else {
         state = state.copyWith(
@@ -87,6 +137,62 @@ class NewArsenalController extends _$NewArsenalController {
         isLoading: false,
         error: 'Failed to initialize arsenal: $e',
       );
+    }
+  }
+  
+  /// 背景刷新數據 (不影響 UI 載入狀態)
+  Future<void> _backgroundRefresh(String userId) async {
+    try {
+      log('Arsenal: Background refresh started');
+      final result = await _dataService.initialize(userId);
+      
+      if (result.isSuccess) {
+        // 比較資料是否有實質變化，避免不必要的 UI 更新
+        final currentInstances = state.allInstances;
+        final newInstances = result.instances!;
+        final currentCategories = state.userCategories;
+        final newCategories = result.categories!;
+        
+        // 檢查是否有實質變化
+        bool hasInstanceChanges = currentInstances.length != newInstances.length;
+        bool hasCategoryChanges = currentCategories.length != newCategories.length;
+        
+        if (!hasInstanceChanges) {
+          // 進一步檢查實例內容是否有變化（比較 ID 和基本資料）
+          for (int i = 0; i < currentInstances.length; i++) {
+            if (currentInstances[i].id != newInstances[i].id ||
+                currentInstances[i].ballId != newInstances[i].ballId ||
+                currentInstances[i].gamesUsed != newInstances[i].gamesUsed) {
+              hasInstanceChanges = true;
+              break;
+            }
+          }
+        }
+        
+        // 只有在有實質變化時才更新狀態
+        if (hasInstanceChanges || hasCategoryChanges) {
+          log('Arsenal: Background refresh detected changes, updating UI');
+          state = state.copyWith(
+            allInstances: newInstances,
+            userCategories: newCategories,
+          );
+        } else {
+          log('Arsenal: Background refresh - no significant changes detected');
+        }
+        
+        // 無論如何都更新快取（確保資料最新）
+        final cacheService = ref.read(localCacheServiceProvider);
+        await cacheService.cacheArsenalData(
+          userId: userId,
+          instances: result.instances!,
+          categories: result.categories!,
+        );
+        
+        log('Arsenal: Background refresh completed');
+      }
+    } catch (e) {
+      log('Arsenal: Background refresh failed: $e');
+      // 背景刷新失敗不影響用戶體驗，只記錄錯誤
     }
   }
 

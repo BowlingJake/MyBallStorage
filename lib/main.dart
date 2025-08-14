@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:bowlingarsenal_app/core/error/error_handler.dart';
 import 'package:bowlingarsenal_app/routing/app_router_config.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
+import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,11 +93,38 @@ class _AppWithPreloadState extends State<AppWithPreload> {
 }
 
 /// The main application widget, now built after assets are pre-warmed.
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
+  
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    
+    // 在應用啟動後立即初始化快取服務
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeCacheService();
+    });
+  }
+  
+  Future<void> _initializeCacheService() async {
+    try {
+      // 初始化快取服務
+      final cacheService = ref.read(localCacheServiceProvider);
+      await cacheService.initialize();
+      
+      print('Cache service initialized successfully');
+    } catch (e) {
+      print('Failed to initialize cache service: $e');
+    }
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(currentThemeModeProvider);
     final lightTheme = ref.watch(lightThemeProvider);
     final darkTheme = ref.watch(darkThemeProvider);

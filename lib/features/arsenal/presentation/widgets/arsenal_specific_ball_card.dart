@@ -5,6 +5,7 @@ import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/edit_la
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
@@ -298,11 +299,9 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
               Navigator.of(context).pop();
               final result = await showEditLayoutDialog(context, arsenalInstance);
               if (result != null && result['success'] == true) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Layout updated successfully: ${result['layoutType']}'),
-                    backgroundColor: Colors.green,
-                  ),
+                TopNotification.showSuccess(
+                  context,
+                  'Layout updated successfully: ${result['layoutType']}',
                 );
               }
             },

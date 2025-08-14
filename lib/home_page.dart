@@ -13,9 +13,60 @@ import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart'; // For Iconsax icons
 
 import 'package:bowlingarsenal_app/shared/providers/providers.dart'; // 引入全局 providers
+import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
+import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+  
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  bool _preloadStarted = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // 應用啟動時開始預載入
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startInitialPreload();
+    });
+    
+    // 首頁停留時開始更深入的預載入
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        _startHomePagePreload();
+      }
+    });
+  }
+  
+  void _startInitialPreload() async {
+    final authState = ref.read(authControllerProvider);
+    if (authState.hasValue && authState.value != null) {
+      final userId = authState.value!.id;
+      final preloadService = ref.read(preloadServiceProvider);
+      
+      // 不等待，讓預載入在背景進行
+      preloadService.startInitialPreload(userId);
+    }
+  }
+  
+  void _startHomePagePreload() async {
+    if (_preloadStarted) return;
+    _preloadStarted = true;
+    
+    final authState = ref.read(authControllerProvider);
+    if (authState.hasValue && authState.value != null) {
+      final userId = authState.value!.id;
+      final preloadService = ref.read(preloadServiceProvider);
+      
+      // 不等待，讓預載入在背景進行
+      preloadService.startHomePagePreload(userId);
+    }
+  }
 
   int _calculateCurrentIndex(String location) {
     if (location.startsWith('/library')) {
@@ -38,7 +89,7 @@ class HomePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
 
     // Page body content

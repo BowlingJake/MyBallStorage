@@ -7,7 +7,7 @@ part of 'remove_balls_use_case.dart';
 // **************************************************************************
 
 String _$removeBallsUseCaseHash() =>
-    r'1af7ab9c509d9f4ac71e6b5612ed99d5b3524412';
+    r'6e2d128c1e7c8a082738725efb0d0342ab632a23';
 
 /// Use case for removing balls from arsenal
 ///

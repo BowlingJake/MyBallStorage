@@ -80,7 +80,20 @@ lib/features/{feature_name}/
 ### UI Components Standards
 - **Buttons**: Always use `AppStandardButton` from `lib/shared/widgets/buttons/app_standard_button.dart` unless explicitly told to use another button
 - **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
-- **Notifications**: Always use `TopNotification` from `lib/shared/widgets/common/notifications/top_notification.dart` for all user notifications instead of SnackBar. Use `TopNotification.showSuccess()` for success messages and `TopNotification.showError()` for error messages
+- **Notifications**: 
+  * **NEVER use SnackBar, ScaffoldMessenger, or any bottom notifications**
+  * Always use `TopNotification` from `lib/shared/widgets/common/notifications/top_notification.dart` for ALL user notifications
+  * Use `TopNotification.showSuccess(context, message)` for success messages (green)
+  * Use `TopNotification.showError(context, message)` for error messages (red)
+  * Examples:
+    ```dart
+    // ✅ 正確 - 使用 TopNotification
+    TopNotification.showSuccess(context, 'Layout updated successfully');
+    TopNotification.showError(context, 'Failed to update layout');
+    
+    // ❌ 錯誤 - 不要使用 SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(...));
+    ```
 
 ### Mobile-First UI/UX Design Principles
 This is a **mobile application** - all UI/UX design decisions must prioritize mobile user experience:

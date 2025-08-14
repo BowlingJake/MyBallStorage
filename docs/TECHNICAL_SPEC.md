@@ -48,6 +48,7 @@ lib/
 │   ├── models/               #   - 共用資料模型
 │   └── ...
 ├── routing/                  # GoRouter 的路由設定
+└── docs/                     # 專案文件
 └── theme/                    # App 的主題與樣式
 ```
 
@@ -122,5 +123,74 @@ lib/
 - **下拉式選單:** 避免傳統下拉式選單，手機使用者不習慣此互動模式，改用底部選單或列表選擇
 - **懸停效果:** 不依賴滑鼠懸停效果，因手機無此互動方式
 - **右鍵選單:** 不使用右鍵選單，改用長按手勢或操作按鈕
+
+---
+
+## 5. 效能優化 (Performance Optimization)
+
+### 5.1. 分層資料載入策略
+
+本應用實施了先進的效能優化策略以解決資料載入延遲問題：
+
+#### 5.1.1. 本地快取機制 (SharedPreferences)
+- **Arsenal 資料:** 30分鐘快取有效期
+- **Ball Library 基本資料:** 24小時快取有效期  
+- **使用者檔案:** 1小時快取有效期
+
+#### 5.1.2. 雙層初始化架構
+1. **第一層:** 立即顯示快取資料 (如果可用)
+2. **第二層:** 背景刷新最新資料庫資料
+
+#### 5.1.3. 背景預載入機制
+- **應用啟動:** 3秒後開始預載入 Arsenal 資料
+- **首頁停留:** 停留5秒後預載入 Ball Library 資料
+- **智慧預載入:** 基於使用者導航模式的策略性預載入
+
+#### 5.1.4. 資料分段載入
+- **Ball Library:** 基本資料 (前50個球) → 完整資料 (所有球)
+- **Arsenal:** 必要資料 → 完整資料含類別
+
+### 5.2. 傳統優化技術
+- 大型資料集的懶載入
+- 圖片快取與優化
+- Riverpod 高效狀態管理
+- 資料庫連線池
+
+---
+
+## 6. 使用者通知標準 (User Notification Standards)
+
+**重要:** 所有使用者通知必須嚴格遵循以下標準：
+
+### 6.1. ✅ 正確用法 - 僅使用 TopNotification
+
+```dart
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+
+// 成功通知 (綠色)
+TopNotification.showSuccess(context, 'Layout updated successfully');
+
+// 錯誤通知 (紅色)
+TopNotification.showError(context, 'Failed to complete operation');
+```
+
+### 6.2. ❌ 禁止使用
+
+```dart
+// 絕對不要使用 SnackBar 或 ScaffoldMessenger
+ScaffoldMessenger.of(context).showSnackBar(SnackBar(...));
+
+// 絕對不要使用底部通知
+showBottomSheet(...);
+
+// 絕對不要使用第三方 toast 庫
+Fluttertoast.showToast(...);
+```
+
+### 6.3. TopNotification 的優勢
+- **一致性 UX:** 所有通知都出現在頂部
+- **手機優化:** 不干擾鍵盤或底部導航
+- **品牌一致:** 符合應用設計語言
+- **無障礙友善:** 對螢幕閱讀器和無障礙功能更友善
 
 ---

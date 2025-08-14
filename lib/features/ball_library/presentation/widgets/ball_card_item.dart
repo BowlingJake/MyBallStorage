@@ -234,9 +234,9 @@ class BallCardItem extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          // Core & Cover Types in one line
+                          // Core & Cover Types in one line - 顯示 Type 而非 Name
                           Text(
-                            '${getCoreCategory(ball.core)} | ${ball.coverstockType ?? ball.coverstock ?? 'Unknown'}',
+                            '${ball.coreType ?? 'Unknown Core'} | ${ball.coverstockType ?? ball.coverstock ?? 'Unknown Cover'}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.white70,

@@ -47,27 +47,27 @@ class BowlingBall with _$BowlingBall {
     }
 
     return BowlingBall(
-      // --- Supabase 欄位對應 ---
+      // --- Supabase 欄位對應 + 快取格式兼容 ---
       id: json['id'] as int? ?? 0,
       name: json['ball_name'] as String? ?? json['name'] as String? ?? json['Ball'] as String? ?? 'Unknown Ball',
       brand: json['brand'] as String? ?? json['Brand'] as String? ?? 'Unknown Brand',
-      coreName: json['core_name'] as String?,
-      coreType: json['core_type'] as String?,
-      coverstockType: json['coverstock_type'] as String? ?? json['coverstock_tpye'] as String?,
-      coverstockName: json['coverstock_name'] as String?,
+      coreName: json['core_name'] as String? ?? json['coreName'] as String?, // 支援快取格式
+      coreType: json['core_type'] as String? ?? json['coreType'] as String?, // 支援快取格式
+      coverstockType: json['coverstock_type'] as String? ?? json['coverstock_tpye'] as String? ?? json['coverstockType'] as String?, // 支援快取格式
+      coverstockName: json['coverstock_name'] as String? ?? json['coverstockName'] as String?, // 支援快取格式
       coverstock: json['coverstock'] as String?,
       imageUrl: json['image_url'] as String? ?? json['imageUrl'] as String? ?? 'https://via.placeholder.com/150',
       rg: tryParseDouble(json['rg'] ?? json['RG']),
       diff: tryParseDouble(json['diff'] ?? json['Diff']),
-      mbDiff: tryParseDouble(json['mb_diff'] ?? json['intDiff'] ?? json['MB Diff']),
+      mbDiff: tryParseDouble(json['mb_diff'] ?? json['mbDiff'] ?? json['intDiff'] ?? json['MB Diff']), // 支援快取格式
       region: json['region'] as String?,
       slug: json['slug'] as String?,
-      createdAt: json['created_at'] as String? ?? json['create_at'] as String?,
+      createdAt: json['created_at'] as String? ?? json['createdAt'] as String? ?? json['create_at'] as String?, // 支援快取格式
 
 
       // --- 舊資料兼容欄位 ---
-      factoryFinish: json['factory_finish'] as String?,
-      releaseDate: json['release_date'] as String?,
+      factoryFinish: json['factory_finish'] as String? ?? json['factoryFinish'] as String?, // 支援快取格式
+      releaseDate: json['release_date'] as String? ?? json['releaseDate'] as String?, // 支援快取格式
       
       // --- 用戶自定義數據 ---
       handType: json['handType'] as String?,
