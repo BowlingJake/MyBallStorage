@@ -42,17 +42,11 @@ class ArsenalBottomActions extends ConsumerWidget {
         child: Row(
           children: [
             Expanded(
+              // 左邊按鈕：主要色實心填滿
               child: AppStandardButton(
                 text: isMainBag ? 'Add from Library' : 'Add to This Bag',
                 height: 36,
                 fontSize: 12,
-                backgroundColor: Colors.black,
-                outlineColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.primary,
-                disabledForegroundColor: Colors.grey,
-                disabledOutlineColor: Colors.grey,
-                isPrimary: true,
-                whiteForeground: false,
                 onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showAddToCurrentBag(
                   context: context,
                   widgetRef: ref,
@@ -61,34 +55,24 @@ class ArsenalBottomActions extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: AppStandardButton(
+              // 中間按鈕：次要色實心填滿
+              child: AppStandardButton.creative(
                 text: 'Move',
                 icon: Icons.swap_horiz,
                 height: 36,
                 fontSize: 12,
-                backgroundColor: Colors.black,
-                outlineColor: Colors.green,
-                foregroundColor: Colors.green,
-                disabledForegroundColor: Colors.grey,
-                disabledOutlineColor: Colors.grey,
-                isPrimary: true,
                 enabled: !isMainBag && hasData,
                 onPressed: onToggleMoveMode,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: AppStandardButton(
+              // 右邊按鈕：紅色實心填滿
+              child: AppStandardButton.destructive(
                 text: 'Remove',
                 icon: Icons.remove_circle_outline,
                 height: 36,
                 fontSize: 12,
-                backgroundColor: Colors.black,
-                outlineColor: Colors.red,
-                foregroundColor: Colors.red,
-                disabledForegroundColor: Colors.grey,
-                disabledOutlineColor: Colors.grey,
-                isPrimary: true,
                 enabled: hasData,
                 onPressed: onToggleRemoveMode,
               ),

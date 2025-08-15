@@ -31,8 +31,10 @@ class ArsenalGridCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final brandPalette = getBrandTonalPalette(instance.brandName, theme);
-    final brandColor = brandPalette[400]!;
+    // 使用主要色替代品牌色作為外框
+    final primaryColor = theme.brightness == Brightness.dark
+        ? BrandColors.accentColorDark
+        : BrandColors.accentColorLight;
     
     return Container(
       decoration: BoxDecoration(
@@ -41,7 +43,7 @@ class ArsenalGridCard extends ConsumerWidget {
         border: Border.all(
           color: isSelected 
               ? theme.primaryColor.withOpacity(0.8)
-              : brandColor.withOpacity(0.6),
+              : primaryColor.withOpacity(0.6), // 使用主要色
           width: isSelected ? 3.0 : 1.5,
         ),
         boxShadow: isSelected
