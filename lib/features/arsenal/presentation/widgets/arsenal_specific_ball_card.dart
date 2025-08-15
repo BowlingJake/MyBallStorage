@@ -44,10 +44,14 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 使用主要色替代品牌色作為外框
+    // 主要色用於外框
     final primaryColor = theme.brightness == Brightness.dark
         ? BrandColors.accentColorDark
         : BrandColors.accentColorLight;
+    
+    // 品牌色仍用於品牌標籤
+    final brandPalette = getBrandTonalPalette(brandName, theme);
+    final brandColor = brandPalette[400]!;
     
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),

@@ -31,10 +31,14 @@ class ArsenalGridCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    // 使用主要色替代品牌色作為外框
+    // 主要色用於外框
     final primaryColor = theme.brightness == Brightness.dark
         ? BrandColors.accentColorDark
         : BrandColors.accentColorLight;
+    
+    // 品牌色仍用於品牌標籤
+    final brandPalette = getBrandTonalPalette(instance.brandName, theme);
+    final brandColor = brandPalette[400]!;
     
     return Container(
       decoration: BoxDecoration(
