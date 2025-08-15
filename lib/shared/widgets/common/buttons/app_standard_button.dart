@@ -33,12 +33,12 @@ class AppStandardButton extends StatelessWidget {
     this.height = 36.0,
     this.enabled = true,
     this.fontSize = 14.0,
-  }) : customColor = null,
+  }) : customColor = Colors.white, // 白色線框和文字
        isPrimary = false,
-       whiteForeground = false,
+       whiteForeground = true, // 透明背景用白色前景
        backgroundColor = Colors.transparent,
-       outlineColor = null, // 將使用白色線框
-       foregroundColor = null, // 將使用白色文字
+       outlineColor = Colors.white, // 白色線框
+       foregroundColor = Colors.white, // 白色文字
        disabledForegroundColor = null,
        disabledOutlineColor = null;
 
@@ -128,9 +128,22 @@ class AppStandardButton extends StatelessWidget {
         : (disabledOutlineColor ?? theme.colorScheme.onSurface.withOpacity(0.3));
     
     // 設定有效的前景顏色
-    final Color effectiveForeground = enabled
-        ? (foregroundColor ?? (whiteForeground ? Colors.white : Colors.black))
-        : (disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5));
+    final Color effectiveForeground;
+    if (!enabled) {
+      effectiveForeground = disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5);
+    } else if (foregroundColor != null) {
+      // 如果明確指定前景色，使用指定的顏色
+      effectiveForeground = foregroundColor!;
+    } else if (effectiveBackground == Colors.transparent) {
+      // 透明背景使用白色前景
+      effectiveForeground = Colors.white;
+    } else if (isCreativeButton || effectiveBackground == BrandColors.errorColor) {
+      // 青色或紅色背景使用白色前景
+      effectiveForeground = Colors.white;
+    } else {
+      // 金色背景使用黑色前景，確保對比度
+      effectiveForeground = Colors.black;
+    }
 
     return SizedBox(
       width: width,
