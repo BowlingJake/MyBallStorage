@@ -42,8 +42,21 @@ class BallLibraryActions extends ConsumerWidget {
             height: 36,
             fontSize: 12,
             onPressed: uiService.toggleComparisonMode,
-            customColor: Colors.white,
-            isPrimary: isComparisonMode,
+            // 移除 customColor: Colors.white，讓按鈕使用金色默認樣式
+            // 當 isComparisonMode 為 true 時，使用金色填滿；否則使用次要顏色
+            customColor: isComparisonMode 
+                ? null // 使用默認金色
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? BrandColors.secondaryColorDark
+                    : BrandColors.secondaryColorLight),
+            backgroundColor: isComparisonMode 
+                ? null // 使用默認金色填滿
+                : Colors.transparent,
+            foregroundColor: isComparisonMode 
+                ? null // 使用默認黑色前景
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? BrandColors.secondaryColorDark
+                    : BrandColors.secondaryColorLight),
           ),
         ),
         const SizedBox(width: 12),
@@ -53,9 +66,21 @@ class BallLibraryActions extends ConsumerWidget {
             icon: Icons.add_circle_outline,
             height: 36,
             fontSize: 12,
-            customColor: Colors.white,
             onPressed: uiService.toggleAddToArsenalMode,
-            isPrimary: isAddToArsenalMode,
+            // 移除 customColor: Colors.white，讓按鈕使用金色默認樣式
+            customColor: isAddToArsenalMode 
+                ? null // 使用默認金色
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? BrandColors.secondaryColorDark
+                    : BrandColors.secondaryColorLight),
+            backgroundColor: isAddToArsenalMode 
+                ? null // 使用默認金色填滿
+                : Colors.transparent,
+            foregroundColor: isAddToArsenalMode 
+                ? null // 使用默認黑色前景
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? BrandColors.secondaryColorDark
+                    : BrandColors.secondaryColorLight),
           ),
         ),
       ],
@@ -83,8 +108,7 @@ class BallLibraryActions extends ConsumerWidget {
             icon: isComparison ? Icons.check : Icons.add,
             height: 36,
             fontSize: 12,
-            outlineColor: Colors.white.withOpacity(0.6),
-            foregroundColor: Colors.white.withOpacity(0.9),
+            // 主要動作按鈕 - 使用默認金色填滿樣式
             enabled: isComparison ? canCompare : canAddToArsenal,
             onPressed: () {
               if (isComparison) {
@@ -102,6 +126,11 @@ class BallLibraryActions extends ConsumerWidget {
             icon: hasSelection ? Icons.refresh : Icons.close,
             height: 36,
             fontSize: 12,
+            // 次要動作按鈕 - 使用次要顏色樣式
+            customColor: Theme.of(context).brightness == Brightness.dark
+                ? BrandColors.secondaryColorDark
+                : BrandColors.secondaryColorLight,
+            backgroundColor: Colors.transparent,
             onPressed: hasSelection 
                 ? uiService.resetSelection 
                 : uiService.exitSelectionMode,

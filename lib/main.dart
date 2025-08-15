@@ -131,7 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'StrikeTrack - 保齡球管理應用',
+      title: 'StrikeTrack',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode,

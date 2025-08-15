@@ -14,6 +14,9 @@ class BrandColors {
   /// 強調色，用於所有可互動的元素和圖表，頂級的鈦金黃色
   static const Color accentColorDark = Color(0xFFFFD700);
 
+  /// 次要顏色，用於浮動按鈕、選擇器等元素，提供視覺對比
+  static const Color secondaryColorDark = Color(0xFF00B2A9);
+
   /// App 的主要背景色，Professional Dark 風格的深色背景
   static const Color darkBackgroundColor = Color(0xFF0F0F0F);
 
@@ -23,6 +26,9 @@ class BrandColors {
   // --- 淺色主題用的顏色 ---
   /// 強調色，在淺色背景上需要更深的金色以保證對比度
   static const Color accentColorLight = Color(0xFFB8860B);
+
+  /// 次要顏色，在淺色模式下通常需要更飽和或稍暗以確保清晰
+  static const Color secondaryColorLight = Color(0xFF00897B);
 
   /// App 的主要背景色
   static const Color lightBackgroundColor = Color(0xFFF5F5F7);
@@ -60,24 +66,30 @@ class BrandColors {
   static ColorScheme get darkColorScheme => const ColorScheme.dark(
         primary: accentColorDark,
         onPrimary: Colors.black,
-        secondary: accentColorDark,
-        onSecondary: Colors.black,
+        secondary: secondaryColorDark,
+        onSecondary: Colors.white,
         surface: darkSurfaceColor,
         onSurface: textPrimaryDark,
         error: errorColor,
         onError: textPrimaryDark,
+        // 確保 background 也被定義，以保持一致性
+        background: darkBackgroundColor,
+        onBackground: textPrimaryDark,
       );
 
   /// 獲取淺色模式的顏色配置
   static ColorScheme get lightColorScheme => const ColorScheme.light(
         primary: accentColorLight,
         onPrimary: textPrimaryLight,
-        secondary: accentColorLight,
-        onSecondary: textPrimaryLight,
+        secondary: secondaryColorLight,
+        onSecondary: Colors.white,
         surface: lightSurfaceColor,
         onSurface: textPrimaryLight,
         error: errorColor,
         onError: textPrimaryLight,
+        // 確保 background 也被定義，以保持一致性
+        background: darkBackgroundColor,
+        onBackground: textPrimaryDark,
       );
 }
 
