@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
@@ -78,9 +79,9 @@ class BallLibraryContent extends ConsumerWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
+          AppStandardButton(
+            text: 'Retry',
             onPressed: () => ref.invalidate(ballLibraryControllerProvider),
-            child: const Text('Retry'),
           ),
         ],
       ),

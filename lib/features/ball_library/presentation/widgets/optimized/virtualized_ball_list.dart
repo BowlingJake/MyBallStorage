@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
@@ -132,9 +133,9 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
+            AppStandardButton(
+              text: 'Retry',
               onPressed: () => ref.invalidate(ballLibraryControllerProvider),
-              child: const Text('Retry'),
             ),
           ],
         ),

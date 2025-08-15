@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -20,7 +21,11 @@ class ArsenalErrorState extends StatelessWidget {
           const SizedBox(height: 8),
           Text(error, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.7)), textAlign: TextAlign.center),
           const SizedBox(height: 24),
-          ElevatedButton.icon(onPressed: onRetry, icon: const Icon(Iconsax.refresh), label: const Text('重新載入')),
+          AppStandardButton(
+            text: '重新載入',
+            icon: Iconsax.refresh,
+            onPressed: onRetry,
+          ),
         ],
       ),
     );

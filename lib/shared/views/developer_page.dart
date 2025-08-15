@@ -1,5 +1,6 @@
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 
 class DeveloperPage extends StatefulWidget {
@@ -25,7 +26,8 @@ class _DeveloperPageState extends State<DeveloperPage> {
         title: const Text('Developer Options'),
       ),
       body: Center(
-        child: ElevatedButton(
+        child: AppStandardButton(
+          text: 'Show Pin Selection Dialog',
           onPressed: () {
             showDialog(
               context: context,
@@ -35,7 +37,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
               },
             );
           },
-          child: const Text('Show Pin Selection Dialog'),
         ),
       ),
     );

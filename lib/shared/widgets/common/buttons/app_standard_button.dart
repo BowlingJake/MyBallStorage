@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_theme/core_theme.dart';
 
 class AppStandardButton extends StatelessWidget {
   // 新增是否為主要按鈕樣式
@@ -40,15 +41,19 @@ class AppStandardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // 預設色改為白色，除非呼叫者指定 customColor/foreground/outline
-    final Color baseColor = customColor ?? Colors.white;
-    // 預設為 outlined；若指定 backgroundColor 則採用填滿
-    final Color effectiveBackground = backgroundColor ?? Colors.transparent;
+    // 預設使用金色背景和黑色前景，符合設計要求的醒目金色按鈕
+    final Color defaultGoldColor = theme.brightness == Brightness.dark
+        ? BrandColors.accentColorDark
+        : BrandColors.accentColorLight;
+    
+    final Color baseColor = customColor ?? defaultGoldColor;
+    // 預設為金色填滿背景（重要交互點必須醒目）
+    final Color effectiveBackground = backgroundColor ?? baseColor;
     final Color effectiveBorder = enabled
-        ? (outlineColor ?? baseColor.withOpacity(0.6))
+        ? (outlineColor ?? baseColor)
         : (disabledOutlineColor ?? theme.colorScheme.onSurface.withOpacity(0.3));
     final Color effectiveForeground = enabled
-        ? (foregroundColor ?? baseColor)
+        ? (foregroundColor ?? Colors.black) // 金色背景用黑色前景更清晰
         : (disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5));
 
     return SizedBox(

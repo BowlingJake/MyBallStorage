@@ -1,3 +1,4 @@
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
 import 'package:core_theme/core_theme.dart';
 
@@ -300,29 +301,17 @@ class AppBaseDialog extends StatelessWidget {
     bool isPrimary = false,
     Color? color,
   }) {
-    return Container(
+    return SizedBox(
       height: 44,
-      child: ElevatedButton(
+      child: AppStandardButton(
+        text: text,
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary ? (color ?? BrandColors.accentColorDark) : Colors.transparent,
-          foregroundColor: isPrimary ? Colors.white : (color ?? Colors.white),
-          side: BorderSide(
-            color: color ?? (isPrimary ? Colors.transparent : Colors.white),
-            width: 1.5,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          elevation: 0,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
+        height: 44,
+        fontSize: 14,
+        // 如果不是主要按鈕且沒有指定顏色，則使用透明背景和白色前景
+        backgroundColor: isPrimary ? (color ?? BrandColors.accentColorDark) : Colors.transparent,
+        foregroundColor: isPrimary ? Colors.black : (color ?? Colors.white),
+        outlineColor: color ?? (isPrimary ? Colors.transparent : Colors.white),
       ),
     );
   }
