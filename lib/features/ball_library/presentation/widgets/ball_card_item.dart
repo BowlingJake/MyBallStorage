@@ -147,6 +147,12 @@ class BallCardItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 主要色用於外框和RG數值標籤
+    final primaryColor = theme.brightness == Brightness.dark
+        ? BrandColors.accentColorDark
+        : BrandColors.accentColorLight;
+    
+    // 品牌色仍用於品牌標籤
     final brandPalette = getBrandTonalPalette(ball.brand, theme);
     final brandColor = brandPalette[400]!;
     
@@ -161,7 +167,7 @@ class BallCardItem extends ConsumerWidget {
               border: Border.all(
                 color: isSelected 
                     ? theme.primaryColor.withOpacity(0.8)
-                    : brandColor.withOpacity(0.6),
+                    : primaryColor.withOpacity(0.6), // 使用主要色
                 width: 1.5,
               ),
               boxShadow: isSelected
@@ -247,14 +253,14 @@ class BallCardItem extends ConsumerWidget {
                           // Brand & Region Tags
                           Row(
                             children: [
-                              // Brand Tag
+                              // Brand Tag - 保持品牌色彩
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: brandColor.withOpacity(0.2),
+                                  color: brandColor.withOpacity(0.2), // 保持品牌色
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: brandColor.withOpacity(0.4),
+                                    color: brandColor.withOpacity(0.4), // 保持品牌色
                                     width: 0.5,
                                   ),
                                 ),
@@ -262,7 +268,7 @@ class BallCardItem extends ConsumerWidget {
                                   ball.brand,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: brandColor,
+                                    color: brandColor, // 保持品牌色
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -311,7 +317,7 @@ class BallCardItem extends ConsumerWidget {
                                         'RG',
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: brandColor,
+                                          color: primaryColor, // 使用主要色
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -344,7 +350,7 @@ class BallCardItem extends ConsumerWidget {
                                         'Diff',
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: brandColor,
+                                          color: primaryColor, // 使用主要色
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -377,7 +383,7 @@ class BallCardItem extends ConsumerWidget {
                                         'MB',
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: brandColor,
+                                          color: primaryColor, // 使用主要色
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
