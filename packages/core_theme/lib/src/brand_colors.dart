@@ -11,8 +11,8 @@ class BrandColors {
   // ===========================================================================
 
   // --- 深色主題用的顏色 ---
-  /// 強調色，用於所有可互動的元素和圖表，柔和的護眼藍綠色
-  static const Color accentColorDark = Color(0xFF4A9EAF);
+  /// 強調色，用於所有可互動的元素和圖表，頂級的鈦金黃色
+  static const Color accentColorDark = Color(0xFFFFD700);
 
   /// App 的主要背景色，Professional Dark 風格的深色背景
   static const Color darkBackgroundColor = Color(0xFF0F0F0F);
@@ -21,8 +21,8 @@ class BrandColors {
   static const Color darkSurfaceColor = Color(0xFF1E1E1E);
 
   // --- 淺色主題用的顏色 ---
-  /// 強調色，沿用深色模式的藍綠色以保持品牌一致性
-  static const Color accentColorLight = Color(0xFF007A8D);
+  /// 強調色，在淺色背景上需要更深的金色以保證對比度
+  static const Color accentColorLight = Color(0xFFB8860B);
 
   /// App 的主要背景色
   static const Color lightBackgroundColor = Color(0xFFF5F5F7);
@@ -34,7 +34,7 @@ class BrandColors {
   static const Color errorColor = Color(0xFFE57373);
   static const Color successColor = Color(0xFF81C784);
   static const Color warningColor = Color(0xFFFFB74D);
-  static const Color infoColor = Color(0xFF64B5F6);
+  static const Color infoColor = Color(0xFF6495ED);
 
   // --- 文字顏色 ---
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
@@ -47,7 +47,7 @@ class BrandColors {
 
   // --- 效果顏色 ---
   /// 發光效果顏色，用於陰影和發光特效
-  static const Color glowColor = Color(0x334A9EAF);
+  static const Color glowColor = Color(0x33FFD700);
 
   // --- 計分模式顏色 ---
   /// 傳統計分模式顏色（青色）
@@ -59,9 +59,9 @@ class BrandColors {
   /// 獲取深色模式的顏色配置
   static ColorScheme get darkColorScheme => const ColorScheme.dark(
         primary: accentColorDark,
-        onPrimary: textPrimaryDark,
+        onPrimary: Colors.black,
         secondary: accentColorDark,
-        onSecondary: textPrimaryDark,
+        onSecondary: Colors.black,
         surface: darkSurfaceColor,
         onSurface: textPrimaryDark,
         error: errorColor,

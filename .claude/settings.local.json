@@ -23,6 +23,7 @@
       "Bash(flutter:*)",
       "Bash(dart:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

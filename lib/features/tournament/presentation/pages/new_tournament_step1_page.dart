@@ -2,27 +2,25 @@ import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_backg
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/features/tournament/logic/tournament_wizard_controller.dart';
+import 'package:bowlingarsenal_app/features/tournament/models/tournament_wizard_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
+ 
 
 /// New Tournament Wizard - Step 1 (Basic Info & Dates)
-class NewTournamentStep1Page extends StatefulWidget {
+class NewTournamentStep1Page extends ConsumerStatefulWidget {
   const NewTournamentStep1Page({super.key});
 
   @override
-  State<NewTournamentStep1Page> createState() => _NewTournamentStep1PageState();
+  ConsumerState<NewTournamentStep1Page> createState() => _NewTournamentStep1PageState();
 }
 
-class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
+class _NewTournamentStep1PageState extends ConsumerState<NewTournamentStep1Page> {
   final TextEditingController tournamentNameController = TextEditingController();
   final TextEditingController customLocationController = TextEditingController();
-
-  bool useCustomLocation = false;
-  _DateMode selectedDateMode = _DateMode.singleDay;
-  DateTime? singleDay;
-  DateTimeRange? continuousRange;
-  final List<DateTime> nonContinuousDays = <DateTime>[];
 
   @override
   void dispose() {
@@ -33,6 +31,17 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
 
   @override
   Widget build(BuildContext context) {
+    final wizardState = ref.watch(tournamentWizardProvider);
+    final wizardNotifier = ref.read(tournamentWizardProvider.notifier);
+
+    // Sync controllers with state
+    if (tournamentNameController.text != wizardState.tournamentName) {
+      tournamentNameController.text = wizardState.tournamentName;
+    }
+    if (customLocationController.text != wizardState.location && wizardState.useCustomLocation) {
+      customLocationController.text = wizardState.location;
+    }
+
     return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -92,9 +101,11 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Tournament Basic Information',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+              const Center(
+                child: Text(
+                  'Tournament Basic Information',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -102,6 +113,7 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
               _OutlinedSection(
                 title: 'Tournament Name',
                 isRequired: true,
+                dense: true,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
@@ -113,11 +125,13 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                     maxLength: 100,
                     buildCounter: (_, {required int currentLength, required bool isFocused, int? maxLength}) => null,
                     style: const TextStyle(color: Colors.white),
+                    onChanged: (value) => wizardNotifier.updateTournamentName(value),
                     decoration: const InputDecoration(
                       hintText: 'Enter tournament name',
                       hintStyle: TextStyle(color: Colors.white70),
                       border: InputBorder.none,
                       filled: false,
+                      isDense: true,
                     ),
                   ),
                 ),
@@ -129,50 +143,11 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
               _OutlinedSection(
                 title: 'Tournament Location',
                 isRequired: true,
-                trailing: Builder(
-                  builder: (context) {
-                    final Color border = Colors.grey[500]!;
-                    final Color fill = Colors.grey[800]!;
-                    return SizedBox(
-                      height: 44,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AppStandardButton(
-                          text: useCustomLocation ? 'Find Nearby' : 'Custom',
-                          height: 22,
-                          outlineColor: border,
-                          foregroundColor: Colors.white,
-                          backgroundColor: fill,
-                          onPressed: () { setState(() { useCustomLocation = !useCustomLocation; }); },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                dense: true,
+                child: Row(
                   children: [
-                    if (!useCustomLocation) ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppStandardButton(
-                              text: 'Find Nearby',
-                              onPressed: () { _showComingSoon(context); },
-                              outlineColor: Colors.white,
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black.withOpacity(0.8),
-                              height: 44,
-                              width: double.infinity,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(child: SizedBox.shrink()),
-                        ],
-                      ),
-                    ] else ...[
-                      const SizedBox(height: 12),
-                      Container(
+                    Expanded(
+                      child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.8),
@@ -183,15 +158,23 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                           maxLength: 100,
                           buildCounter: (_, {required int currentLength, required bool isFocused, int? maxLength}) => null,
                           style: const TextStyle(color: Colors.white),
+                          onChanged: (value) => wizardNotifier.updateLocation(value),
                           decoration: const InputDecoration(
-                            hintText: 'Enter location manually',
+                            hintText: 'Enter location',
                             hintStyle: TextStyle(color: Colors.white70),
                             border: InputBorder.none,
                             filled: false,
+                            isDense: true,
                           ),
                         ),
                       ),
-                    ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.location_on, color: Colors.white70),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                      onPressed: () => _openLocationPicker(wizardNotifier),
+                    ),
                   ],
                 ),
               ),
@@ -202,67 +185,13 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
               _OutlinedSection(
                 title: 'Tournament Date',
                 isRequired: true,
-                trailing: Builder(
-                  builder: (context) {
-                    final Color border = Colors.grey[500]!;
-                    final Color fill = Colors.grey[800]!;
-                    return SizedBox(
-                      height: 44,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AppStandardButton(
-                          text: 'Change Format',
-                          height: 22,
-                          outlineColor: border,
-                          foregroundColor: Colors.white,
-                          backgroundColor: fill,
-                          onPressed: () => _showDateModeDialog(context),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                subtitle: Text(
-                  _dateModeLabel(selectedDateMode),
-                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 4),
-                    if (selectedDateMode == _DateMode.singleDay)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppStandardButton(
-                              text: singleDay == null ? 'Select date' : _fmt(singleDay!),
-                              onPressed: () async {
-                                final DateTime now = DateTime.now();
-                                final DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: singleDay ?? now,
-                                  firstDate: DateTime(now.year - 2),
-                                  lastDate: DateTime(now.year + 5),
-                                  helpText: 'Select date',
-                                );
-                                if (picked != null) {
-                                  setState(() { singleDay = DateTime(picked.year, picked.month, picked.day); });
-                                }
-                              },
-                              outlineColor: Colors.white,
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black.withOpacity(0.8),
-                              height: 44,
-                              width: double.infinity,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(child: SizedBox.shrink()),
-                        ],
-                      ),
-                    if (selectedDateMode == _DateMode.continuous) _buildContinuousPicker(context),
-                    if (selectedDateMode == _DateMode.nonContinuous) _buildNonContinuousPicker(context),
-                  ],
+                dense: true,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.calendar_today_outlined, color: Colors.white70),
+                    onPressed: () {},
+                  ),
                 ),
               ),
 
@@ -275,9 +204,9 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                       child: AppStandardButton(
                         text: 'Cancel',
                         onPressed: () => context.go('/tournament'),
-                        outlineColor: Colors.white,
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.black.withOpacity(0.8),
+                        outlineColor: Colors.redAccent,
+                        foregroundColor: Colors.redAccent,
+                        backgroundColor: Colors.transparent,
                         height: 44,
                         width: double.infinity,
                       ),
@@ -286,7 +215,13 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                     Expanded(
                       child: AppStandardButton(
                         text: 'Next',
-                        onPressed: () => context.go('/tournaments/new/2'),
+                        onPressed: wizardState.isStep1Valid 
+                            ? () {
+                                wizardNotifier.nextStep();
+                                context.go('/tournaments/new/2');
+                              }
+                            : () {},
+                        enabled: wizardState.isStep1Valid,
                         isPrimary: true,
                         whiteForeground: true,
                         height: 44,
@@ -304,57 +239,29 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
     );
   }
 
-  // === Date pickers ===
-  Widget _buildSingleDayPicker(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppStandardButton(
-            text: singleDay == null ? 'Pick a date' : _fmt(singleDay!),
-            onPressed: () async {
-              final DateTime now = DateTime.now();
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: singleDay ?? now,
-                firstDate: DateTime(now.year - 2),
-                lastDate: DateTime(now.year + 5),
-                helpText: 'Select date',
-              );
-              if (picked != null) {
-                setState(() { singleDay = DateTime(picked.year, picked.month, picked.day); });
-              }
-            },
-            outlineColor: Colors.white,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black.withOpacity(0.8),
-            width: double.infinity,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContinuousPicker(BuildContext context) {
+  Widget _buildContinuousPicker(BuildContext context, TournamentWizardState state, TournamentWizard notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AppStandardButton(
-          text: continuousRange == null
+          text: state.startDate == null || state.endDate == null
               ? 'Pick start and end dates'
-              : '${_fmt(continuousRange!.start)}  →  ${_fmt(continuousRange!.end)}',
+              : '${_fmt(state.startDate!)}  →  ${_fmt(state.endDate!)}',
           onPressed: () async {
             final DateTime now = DateTime.now();
             final DateTimeRange? picked = await showDateRangePicker(
               context: context,
               firstDate: DateTime(now.year - 2),
               lastDate: DateTime(now.year + 5),
-              initialDateRange: continuousRange,
+              initialDateRange: state.startDate != null && state.endDate != null 
+                  ? DateTimeRange(start: state.startDate!, end: state.endDate!) 
+                  : null,
               helpText: 'Select date range',
             );
             if (picked != null) {
               final DateTime start = DateTime(picked.start.year, picked.start.month, picked.start.day);
               final DateTime end = DateTime(picked.end.year, picked.end.month, picked.end.day);
-              setState(() { continuousRange = DateTimeRange(start: start, end: end); });
+              notifier.updateDateRange(start, end);
             }
           },
           outlineColor: Colors.white,
@@ -366,7 +273,7 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
     );
   }
 
-  Widget _buildNonContinuousPicker(BuildContext context) {
+  Widget _buildNonContinuousPicker(BuildContext context, TournamentWizardState state, TournamentWizard notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -386,12 +293,7 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
                   );
                   if (picked != null) {
                     final DateTime normalized = DateTime(picked.year, picked.month, picked.day);
-                    setState(() {
-                      if (!nonContinuousDays.any((d) => _isSameDay(d, normalized))) {
-                        nonContinuousDays.add(normalized);
-                        nonContinuousDays.sort((a, b) => a.compareTo(b));
-                      }
-                    });
+                    notifier.addNonContinuousDate(normalized);
                   }
                 },
                 outlineColor: Colors.white,
@@ -406,10 +308,10 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: nonContinuousDays.map((DateTime d) {
+          children: state.nonContinuousDates.map((DateTime d) {
             return InputChip(
               label: Text(_fmt(d)),
-              onDeleted: () { setState(() { nonContinuousDays.remove(d); }); },
+              onDeleted: () => notifier.removeNonContinuousDate(d),
             );
           }).toList(),
         ),
@@ -418,58 +320,22 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
   }
 
   // === Helpers ===
-  String _dateModeLabel(_DateMode mode) {
-    switch (mode) {
-      case _DateMode.singleDay:
-        return 'Single day';
-      case _DateMode.nonContinuous:
-        return 'Multi-session (non-continuous)';
-      case _DateMode.continuous:
-        return 'Multi-day (continuous)';
-    }
-  }
-
-  Future<void> _showDateModeDialog(BuildContext context) async {
-    await AppBaseDialog.show<void>(
+  Future<void> _openLocationPicker(TournamentWizard wizard) async {
+    await showModalBottomSheet<void>(
       context: context,
-      title: 'Select format',
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppStandardButton(
-            text: 'Single day',
-            onPressed: () { setState(() { selectedDateMode = _DateMode.singleDay; }); Navigator.of(context).pop(); },
-            outlineColor: Colors.white,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black.withOpacity(0.8),
-            width: double.infinity,
-          ),
-          const SizedBox(height: 12),
-          AppStandardButton(
-            text: 'Multi-session (non-continuous)',
-            onPressed: () { setState(() { selectedDateMode = _DateMode.nonContinuous; }); Navigator.of(context).pop(); },
-            outlineColor: Colors.white,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black.withOpacity(0.8),
-            width: double.infinity,
-          ),
-          const SizedBox(height: 12),
-          AppStandardButton(
-            text: 'Multi-day (continuous)',
-            onPressed: () { setState(() { selectedDateMode = _DateMode.continuous; }); Navigator.of(context).pop(); },
-            outlineColor: Colors.white,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.black.withOpacity(0.8),
-            width: double.infinity,
-          ),
-        ],
-      ),
-      actions: const [],
-      maxHeight: 420,
-      barrierDismissible: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _LocationBottomSheet(
+          onPick: (place) {
+            wizard.updateLocation(place);
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
   }
+
   void _showComingSoon(BuildContext context) {
     showDialog<void>(
       context: context,
@@ -487,23 +353,112 @@ class _NewTournamentStep1PageState extends State<NewTournamentStep1Page> {
   String _fmt(DateTime d) {
     return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
+}
 
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+class _LocationBottomSheet extends StatefulWidget {
+  const _LocationBottomSheet({required this.onPick});
+  final ValueChanged<String> onPick;
+
+  @override
+  State<_LocationBottomSheet> createState() => _LocationBottomSheetState();
+}
+
+class _LocationBottomSheetState extends State<_LocationBottomSheet> {
+  String query = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final Color outline = Colors.white.withOpacity(0.25);
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(1.0),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        border: Border.all(color: outline),
+      ),
+      child: Column(
+        children: [
+          // Title bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                const SizedBox(width: 40),
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Choose The Alley',
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white70),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+          // Search field (outlined)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search places...',
+                hintStyle: const TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                filled: true,
+                fillColor: Colors.transparent,
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: outline),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+              ),
+              style: const TextStyle(color: Colors.white),
+              onChanged: (v) => setState(() => query = v),
+            ),
+          ),
+          const SizedBox(height: 4),
+          // List
+          Expanded(
+            child: ListView.separated(
+              itemCount: 8,
+              separatorBuilder: (_, __) => Divider(height: 1, color: outline),
+              itemBuilder: (context, index) {
+                final String place = 'Nearby place ${index + 1}';
+                return ListTile(
+                  title: Text(place, style: const TextStyle(color: Colors.white)),
+                  subtitle: const Text('Address...', style: TextStyle(color: Colors.white70)),
+                  onTap: () => widget.onPick(place),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
-enum _DateMode { singleDay, nonContinuous, continuous }
-
 /// Reusable outlined container with 80% black background
 class _OutlinedSection extends StatelessWidget {
-  const _OutlinedSection({required this.title, required this.child, this.trailing, this.isRequired = false, this.subtitle});
+  const _OutlinedSection({required this.title, required this.child, this.trailing, this.isRequired = false, this.subtitle, this.dense = false});
 
   final String title;
   final Widget child;
   final Widget? trailing;
   final bool isRequired;
   final Widget? subtitle;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -543,12 +498,11 @@ class _OutlinedSection extends StatelessWidget {
           ),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: dense ? const EdgeInsets.fromLTRB(12, 4, 12, 12) : const EdgeInsets.all(12),
           child: child,
         ),
       ],
     );
   }
 }
-
-
+ 
