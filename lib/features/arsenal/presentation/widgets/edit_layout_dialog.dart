@@ -201,11 +201,10 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
               Row(
                 children: [
                   Expanded(
-                    child: AppStandardButton(
+                    child: AppStandardButton.secondary(
                       text: 'Exit',
                       height: 36,
                       fontSize: 14,
-                      customColor: Colors.grey[400]!,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -215,8 +214,6 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
                       text: 'Confirm',
                       height: 36,
                       fontSize: 14,
-                      customColor: Colors.white,
-                      isPrimary: true,
                       onPressed: _handleConfirm,
                     ),
                   ),

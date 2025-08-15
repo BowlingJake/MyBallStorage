@@ -48,39 +48,44 @@ class ArsenalManagementSection extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-            child: AppStandardButton(
-              text: isMove ? 'Confirm Move' : 'Confirm Remove ($count)',
-              outlineColor: isMove ? Colors.white.withOpacity(0.6) : Colors.red,
-              foregroundColor: isMove ? Colors.white.withOpacity(0.9) : Colors.red,
-              onPressed: () {
-                if (isMove) {
-                  ref.read(arsenalUIServiceProvider.notifier).showMoveSelected(
-                    context: context,
-                    bagColors: bagColors,
-                  );
-                } else {
-                  ref.read(arsenalUIServiceProvider.notifier).confirmRemoveSelected(
-                    context: context,
-                  );
-                }
-              },
-              isPrimary: false,
-            ),
+            child: (isMove
+                // Move 模式：左邊使用次要色實心
+                ? AppStandardButton.creative(
+                    text: 'Confirm Move',
+                    onPressed: () {
+                      ref.read(arsenalUIServiceProvider.notifier).showMoveSelected(
+                            context: context,
+                            bagColors: bagColors,
+                          );
+                    },
+                  )
+                // Remove 模式：沿用破壞性按鈕
+                : AppStandardButton.destructive(
+                    text: 'Confirm Remove ($count)',
+                    onPressed: () {
+                      ref.read(arsenalUIServiceProvider.notifier).confirmRemoveSelected(
+                            context: context,
+                          );
+                    },
+                  )),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: AppStandardButton(
-              text: 'Exit',
-              outlineColor: Colors.white.withOpacity(0.6),
-              foregroundColor: Colors.white.withOpacity(0.9),
-              onPressed: () {
-                if (isMove) {
-                  ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode();
-                } else {
-                  ref.read(arsenalUIServiceProvider.notifier).toggleRemoveMode();
-                }
-              },
-            ),
+            child: (isMove
+                // Move 模式：Exit 使用次要色線框
+                ? AppStandardButton.secondaryOutlined(
+                    text: 'Exit',
+                    onPressed: () {
+                      ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode();
+                    },
+                  )
+                // Remove 模式：Exit 使用紅色線框
+                : AppStandardButton.destructiveOutlined(
+                    text: 'Exit',
+                    onPressed: () {
+                      ref.read(arsenalUIServiceProvider.notifier).toggleRemoveMode();
+                    },
+                  )),
           ),
         ],
       ),

@@ -19,7 +19,7 @@ Future<bool?> showAppConfirmationDialog({
   bool barrierDismissible = false,
 }) {
   // 改為統一走 AppBaseDialog，以集中樣式控制
-  final Color confirmColor = isDangerous ? Colors.red : Colors.white;
+  final Color confirmColor = isDangerous ? BrandColors.errorColor : BrandColors.accentColorDark;
   return AppBaseDialog.show<bool>(
     context: context,
     title: title,
@@ -39,20 +39,32 @@ Future<bool?> showAppConfirmationDialog({
       ],
     ),
     actions: [
-      AppStandardButton(
-        text: cancelText,
-        height: 44,
-        outlineColor: Colors.white.withOpacity(0.6),
-        foregroundColor: Colors.white.withOpacity(0.9),
-        onPressed: () => Navigator.of(context).pop(false),
-      ),
-      AppStandardButton(
-        text: confirmText,
-        height: 44,
-        outlineColor: confirmColor,
-        foregroundColor: isDangerous ? confirmColor : Colors.white.withOpacity(0.9),
-        onPressed: () => Navigator.of(context).pop(true),
-      ),
+      // 左：紅色線框（danger 情境）或主色線框（非 danger）
+      if (isDangerous)
+        AppStandardButton.destructiveOutlined(
+          text: cancelText,
+          height: 44,
+          onPressed: () => Navigator.of(context).pop(false),
+        )
+      else
+        AppStandardButton.primaryOutlined(
+          text: cancelText,
+          height: 44,
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+      // 右：紅色實心（danger）或主色實心（非 danger）
+      if (isDangerous)
+        AppStandardButton.destructive(
+          text: confirmText,
+          height: 44,
+          onPressed: () => Navigator.of(context).pop(true),
+        )
+      else
+        AppStandardButton(
+          text: confirmText,
+          height: 44,
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
     ],
   );
 }

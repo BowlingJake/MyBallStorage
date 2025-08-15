@@ -37,7 +37,7 @@ class BrandColors {
   static const Color lightSurfaceColor = Color(0xFFFFFFFF);
 
   // --- 語義顏色 ---
-  static const Color errorColor = Color(0xFFE57373);
+  static const Color errorColor = Color(0xFFDC2626); // 更深的鮮紅色
   static const Color successColor = Color(0xFF81C784);
   static const Color warningColor = Color(0xFFFFB74D);
   static const Color infoColor = Color(0xFF6495ED);

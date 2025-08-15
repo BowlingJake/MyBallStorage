@@ -83,9 +83,9 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
           ],
         ),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: 'Cancel',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -134,9 +134,9 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
           ],
         ),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: 'Close',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
           ),
         ],
       ),
@@ -244,15 +244,14 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: cancelText,
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelText),
           ),
           AppStandardButton(
             text: confirmText,
             onPressed: () => Navigator.of(context).pop(true),
             customColor: confirmColor,
-            isPrimary: true,
           ),
         ],
       ),
@@ -297,9 +296,9 @@ class ArsenalDialogManager extends _$ArsenalDialogManager
           ],
         ),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: 'Cancel',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
           ),
         ],
       ),

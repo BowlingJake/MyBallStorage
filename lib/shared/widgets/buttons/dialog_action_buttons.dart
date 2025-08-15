@@ -91,13 +91,21 @@ class DialogActionButtons extends StatelessWidget {
 
   /// 建構主要操作按鈕
   Widget _buildPrimaryButton(Color color) {
+    if (isDestructive) {
+      return AppStandardButton.destructive(
+        text: primaryText,
+        height: buttonHeight,
+        fontSize: fontSize,
+        width: double.infinity,
+        enabled: primaryEnabled,
+        onPressed: primaryEnabled ? onPrimary : () {},
+      );
+    }
     return AppStandardButton(
       text: primaryText,
       height: buttonHeight,
       fontSize: fontSize,
-      isPrimary: true,
       customColor: color,
-      whiteForeground: true,
       width: double.infinity,
       enabled: primaryEnabled,
       onPressed: primaryEnabled ? onPrimary : () {},
@@ -106,14 +114,10 @@ class DialogActionButtons extends StatelessWidget {
 
   /// 建構次要操作按鈕
   Widget _buildSecondaryButton(Color color) {
-    return AppStandardButton(
+    return AppStandardButton.secondary(
       text: secondaryText,
       height: buttonHeight,
       fontSize: fontSize,
-      isPrimary: false,
-      outlineColor: color,
-      foregroundColor: color,
-      backgroundColor: Colors.transparent,
       width: double.infinity,
       enabled: secondaryEnabled,
       onPressed: secondaryEnabled ? onSecondary : () {},
@@ -165,20 +169,36 @@ class DialogSingleActionButton extends StatelessWidget {
     final buttonColor = color ?? 
         (isDestructive ? Colors.red : BrandColors.accentColorDark);
 
-    return AppStandardButton(
-      text: text,
-      height: buttonHeight,
-      fontSize: fontSize,
-      isPrimary: isPrimary,
-      customColor: isPrimary ? buttonColor : null,
-      outlineColor: isPrimary ? null : buttonColor,
-      foregroundColor: isPrimary ? Colors.white : buttonColor,
-      backgroundColor: isPrimary ? buttonColor : Colors.transparent,
-      whiteForeground: isPrimary,
-      width: double.infinity,
-      enabled: enabled,
-      onPressed: enabled ? onPressed : () {},
-    );
+    if (isDestructive) {
+      return AppStandardButton.destructive(
+        text: text,
+        height: buttonHeight,
+        fontSize: fontSize,
+        width: double.infinity,
+        enabled: enabled,
+        onPressed: enabled ? onPressed : () {},
+      );
+    }
+    if (isPrimary) {
+      return AppStandardButton(
+        text: text,
+        height: buttonHeight,
+        fontSize: fontSize,
+        customColor: buttonColor,
+        width: double.infinity,
+        enabled: enabled,
+        onPressed: enabled ? onPressed : () {},
+      );
+    } else {
+      return AppStandardButton.secondary(
+        text: text,
+        height: buttonHeight,
+        fontSize: fontSize,
+        width: double.infinity,
+        enabled: enabled,
+        onPressed: enabled ? onPressed : () {},
+      );
+    }
   }
 }
 
@@ -295,20 +315,26 @@ class DialogTripleActionButtons extends StatelessWidget {
     required Color color,
     required bool isPrimary,
   }) {
-    return AppStandardButton(
-      text: text,
-      height: buttonHeight,
-      fontSize: fontSize,
-      isPrimary: isPrimary,
-      customColor: isPrimary ? color : null,
-      outlineColor: isPrimary ? null : color,
-      foregroundColor: isPrimary ? Colors.white : color,
-      backgroundColor: isPrimary ? color : Colors.transparent,
-      whiteForeground: isPrimary,
-      width: double.infinity,
-      enabled: enabled,
-      onPressed: enabled ? onPressed : () {},
-    );
+    if (isPrimary) {
+      return AppStandardButton(
+        text: text,
+        height: buttonHeight,
+        fontSize: fontSize,
+        customColor: color,
+        width: double.infinity,
+        enabled: enabled,
+        onPressed: enabled ? onPressed : () {},
+      );
+    } else {
+      return AppStandardButton.secondary(
+        text: text,
+        height: buttonHeight,
+        fontSize: fontSize,
+        width: double.infinity,
+        enabled: enabled,
+        onPressed: enabled ? onPressed : () {},
+      );
+    }
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 
 /// Service for handling dialog operations
 class ArsenalDialogService {
@@ -105,13 +106,13 @@ class ArsenalDialogService {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: cancelText,
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelText),
           ),
-          ElevatedButton(
+          AppStandardButton(
+            text: confirmText,
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(confirmText),
           ),
         ],
       ),
@@ -130,9 +131,9 @@ class ArsenalDialogService {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
+          AppStandardButton.secondary(
+            text: 'OK',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
           ),
         ],
       ),
@@ -151,9 +152,9 @@ class ArsenalDialogService {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(
+          AppStandardButton(
+            text: 'OK',
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
           ),
         ],
       ),

@@ -283,8 +283,8 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                           Row(
                             children: [
                               Expanded(
-                                child: Container(
-                                  height: 40, // 減小高度讓搜尋框看起來更細
+                                child: SizedBox(
+                                  height: 40,
                                   child: TextField(
                                     controller: _searchController,
                                     keyboardType: TextInputType.text,
@@ -292,23 +292,28 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                                     autocorrect: false,
                                     enableSuggestions: true,
                                     style: const TextStyle(color: Colors.white, fontSize: 14),
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       hintText: 'Search balls...',
-                                      hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                                      prefixIcon: Icon(Icons.search, color: Colors.grey, size: 20),
-                                      border: InputBorder.none,
-                                      filled: true,
-                                      fillColor: Colors.black,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 0, // 最小化垂直內距
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                                      prefixIcon: const Icon(Icons.search, color: Colors.white, size: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: BrandColors.accentColorDark, width: 1.5),
                                       ),
-                                      isDense: true, // 使TextField更緊湊
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: BrandColors.accentColorDark, width: 1.5),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(color: BrandColors.accentColorDark, width: 2),
+                                      ),
+                                      filled: false,
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                      isDense: true,
                                     ),
                                     onChanged: (text) {
-                                      ref
-                                          .read(ballLibraryControllerProvider.notifier)
-                                          .updateSearchText(text);
+                                      ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
                                     },
                                   ),
                                 ),
@@ -318,12 +323,10 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                               Container(
                                 height: 40, // 與搜尋欄一致的高度
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: state.filters.activeFilterCount > 0
-                                        ? BrandColors.accentColorDark
-                                        : Colors.grey[600]!,
+                                    color: BrandColors.accentColorDark,
                                     width: 1.5,
                                   ),
                                 ),
@@ -354,10 +357,10 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                               Container(
                                 height: 40, // 與搜尋欄一致的高度
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.grey[600]!,
+                                    color: BrandColors.accentColorDark,
                                     width: 1.5,
                                   ),
                                 ),
@@ -442,11 +445,9 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
               child: Row(
                 children: [
                   Expanded(
-                    child: AppStandardButton(
+                    child: AppStandardButton.primaryOutlined(
                       text: _selectedBallIds.isEmpty ? 'Cancel' : 'Reset',
                       fontSize: 14,
-                      outlineColor: Colors.white.withOpacity(0.6),
-                      foregroundColor: Colors.white.withOpacity(0.9),
                       onPressed: () {
                         if (_selectedBallIds.isEmpty) {
                           Navigator.of(context).pop();
@@ -461,9 +462,8 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                     child: AppStandardButton(
                       text: 'Add ${_selectedBallIds.length} Ball${_selectedBallIds.length != 1 ? 's' : ''}',
                       fontSize: 14,
-                      outlineColor: Colors.white.withOpacity(0.6),
-                      foregroundColor: Colors.white.withOpacity(0.9),
                       onPressed: _selectedBallIds.isEmpty ? () {} : _addSelectedBalls,
+                      enabled: _selectedBallIds.isNotEmpty,
                     ),
                   ),
                 ],

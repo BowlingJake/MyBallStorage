@@ -17,7 +17,7 @@ Future<String?> showRemovalOptionsDialog({
       currentBagName: currentBagName,
     ),
     actions: [
-      AppStandardButton(
+      AppStandardButton.neutralOutlined(
         text: 'Cancel',
         height: DialogDefaults.buttonHeight,
         fontSize: DialogDefaults.buttonFontSize,
@@ -52,22 +52,17 @@ class _RemovalOptionsContent extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         // 使用 Column 替代 Row，符合手機優先設計
-        AppStandardButton(
-          text: 'Remove from $currentBagName Only',
+        AppStandardButton.destructiveOutlined(
+          text: 'Remove from $currentBagName',
           height: DialogDefaults.buttonHeight,
           fontSize: DialogDefaults.buttonFontSize,
-          customColor: Colors.grey,
-          width: double.infinity,
           onPressed: () => Navigator.of(context).pop('bag_only'),
         ),
         const SizedBox(height: DialogDefaults.spacing),
-        AppStandardButton(
+        AppStandardButton.destructive(
           text: 'Remove from All Arsenal',
           height: DialogDefaults.buttonHeight,
           fontSize: DialogDefaults.buttonFontSize,
-          customColor: Colors.red,
-          isPrimary: true,
-          width: double.infinity,
           onPressed: () => Navigator.of(context).pop('complete'),
         ),
         const SizedBox(height: 8),
