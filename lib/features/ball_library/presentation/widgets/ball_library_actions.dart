@@ -36,52 +36,43 @@ class BallLibraryActions extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: AppStandardButton(
-            text: 'Ball Comparison',
-            icon: Icons.compare_arrows,
-            height: 36,
-            fontSize: 12,
-            onPressed: uiService.toggleComparisonMode,
-            // 移除 customColor: Colors.white，讓按鈕使用金色默認樣式
-            // 當 isComparisonMode 為 true 時，使用金色填滿；否則使用次要顏色
-            customColor: isComparisonMode 
-                ? null // 使用默認金色
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? BrandColors.secondaryColorDark
-                    : BrandColors.secondaryColorLight),
-            backgroundColor: isComparisonMode 
-                ? null // 使用默認金色填滿
-                : Colors.transparent,
-            foregroundColor: isComparisonMode 
-                ? null // 使用默認黑色前景
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? BrandColors.secondaryColorDark
-                    : BrandColors.secondaryColorLight),
-          ),
+          child: isComparisonMode 
+              // 啟用狀態：主要動作按鈕（金色）
+              ? AppStandardButton(
+                  text: 'Ball Comparison',
+                  icon: Icons.compare_arrows,
+                  height: 36,
+                  fontSize: 12,
+                  onPressed: uiService.toggleComparisonMode,
+                )
+              // 非啟用狀態：創造功能按鈕（青色）
+              : AppStandardButton.creative(
+                  text: 'Ball Comparison',
+                  icon: Icons.compare_arrows,
+                  height: 36,
+                  fontSize: 12,
+                  onPressed: uiService.toggleComparisonMode,
+                ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: AppStandardButton(
-            text: 'Add to Arsenal',
-            icon: Icons.add_circle_outline,
-            height: 36,
-            fontSize: 12,
-            onPressed: uiService.toggleAddToArsenalMode,
-            // 移除 customColor: Colors.white，讓按鈕使用金色默認樣式
-            customColor: isAddToArsenalMode 
-                ? null // 使用默認金色
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? BrandColors.secondaryColorDark
-                    : BrandColors.secondaryColorLight),
-            backgroundColor: isAddToArsenalMode 
-                ? null // 使用默認金色填滿
-                : Colors.transparent,
-            foregroundColor: isAddToArsenalMode 
-                ? null // 使用默認黑色前景
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? BrandColors.secondaryColorDark
-                    : BrandColors.secondaryColorLight),
-          ),
+          child: isAddToArsenalMode
+              // 啟用狀態：主要動作按鈕（金色）
+              ? AppStandardButton(
+                  text: 'Add to Arsenal',
+                  icon: Icons.add_circle_outline,
+                  height: 36,
+                  fontSize: 12,
+                  onPressed: uiService.toggleAddToArsenalMode,
+                )
+              // 非啟用狀態：創造功能按鈕（青色）
+              : AppStandardButton.creative(
+                  text: 'Add to Arsenal',
+                  icon: Icons.add_circle_outline,
+                  height: 36,
+                  fontSize: 12,
+                  onPressed: uiService.toggleAddToArsenalMode,
+                ),
         ),
       ],
     );
@@ -103,12 +94,12 @@ class BallLibraryActions extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
+          // 主要動作按鈕 - 使用默認金色填滿樣式
           child: AppStandardButton(
             text: isComparison ? 'Compare' : 'Add',
             icon: isComparison ? Icons.check : Icons.add,
             height: 36,
             fontSize: 12,
-            // 主要動作按鈕 - 使用默認金色填滿樣式
             enabled: isComparison ? canCompare : canAddToArsenal,
             onPressed: () {
               if (isComparison) {
@@ -121,16 +112,12 @@ class BallLibraryActions extends ConsumerWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: AppStandardButton(
+          // 次要動作按鈕 - 使用次要動作樣式（線框）
+          child: AppStandardButton.secondary(
             text: hasSelection ? 'Reset' : 'Exit',
             icon: hasSelection ? Icons.refresh : Icons.close,
             height: 36,
             fontSize: 12,
-            // 次要動作按鈕 - 使用次要顏色樣式
-            customColor: Theme.of(context).brightness == Brightness.dark
-                ? BrandColors.secondaryColorDark
-                : BrandColors.secondaryColorLight,
-            backgroundColor: Colors.transparent,
             onPressed: hasSelection 
                 ? uiService.resetSelection 
                 : uiService.exitSelectionMode,

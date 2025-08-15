@@ -78,7 +78,11 @@ lib/features/{feature_name}/
 - Prefer `try-catch` for error handling
 
 ### UI Components Standards
-- **Buttons**: Always use `AppStandardButton` from `lib/shared/widgets/buttons/app_standard_button.dart` unless explicitly told to use another button
+- **Buttons**: Always use `AppStandardButton` from `lib/shared/widgets/common/buttons/app_standard_button.dart` following our design system:
+  * **主要動作 (Primary)**: `AppStandardButton()` - 金色實心，用於確認/提交/完成流程
+  * **次要動作 (Secondary)**: `AppStandardButton.secondary()` - 白色線框，用於取消/返回/查看詳情
+  * **創造功能 (Creative)**: `AppStandardButton.creative()` - 青色實心，用於新增/創建/特殊功能
+  * **破壞性動作 (Destructive)**: `AppStandardButton.destructive()` - 紅色實心，用於刪除/清除等不可逆操作
 - **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
 - **Notifications**: 
   * **NEVER use SnackBar, ScaffoldMessenger, or any bottom notifications**
