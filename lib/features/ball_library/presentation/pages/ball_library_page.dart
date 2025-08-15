@@ -63,7 +63,7 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           actions: [
             // Favorites button
             IconButton(
-              icon: const Icon(Icons.favorite, color: Colors.white),
+              icon: const Icon(Icons.favorite, color: Colors.redAccent),
               onPressed: () => context.go('/favorites'),
               tooltip: 'My Favorites',
             ),

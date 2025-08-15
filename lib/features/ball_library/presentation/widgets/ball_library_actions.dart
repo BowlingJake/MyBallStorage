@@ -36,16 +36,16 @@ class BallLibraryActions extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: isComparisonMode 
-              // 啟用狀態：主要動作按鈕（金色）
-              ? AppStandardButton(
+          child: isComparisonMode
+              // 啟用狀態：仍採用主要色線框（保持一致的語意）
+              ? AppStandardButton.primaryOutlined(
                   text: 'Ball Comparison',
                   icon: Icons.compare_arrows,
                   height: 36,
                   fontSize: 12,
                   onPressed: uiService.toggleComparisonMode,
                 )
-              // 非啟用狀態：創造功能按鈕（青色）
+              // 非啟用狀態：維持次要功能（青色實心）
               : AppStandardButton.creative(
                   text: 'Ball Comparison',
                   icon: Icons.compare_arrows,
@@ -56,23 +56,13 @@ class BallLibraryActions extends ConsumerWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: isAddToArsenalMode
-              // 啟用狀態：主要動作按鈕（金色）
-              ? AppStandardButton(
-                  text: 'Add to Arsenal',
-                  icon: Icons.add_circle_outline,
-                  height: 36,
-                  fontSize: 12,
-                  onPressed: uiService.toggleAddToArsenalMode,
-                )
-              // 非啟用狀態：創造功能按鈕（青色）
-              : AppStandardButton.creative(
-                  text: 'Add to Arsenal',
-                  icon: Icons.add_circle_outline,
-                  height: 36,
-                  fontSize: 12,
-                  onPressed: uiService.toggleAddToArsenalMode,
-                ),
+          child: AppStandardButton(
+            text: 'Add to Arsenal',
+            icon: Icons.add_circle_outline,
+            height: 36,
+            fontSize: 12,
+            onPressed: uiService.toggleAddToArsenalMode,
+          ),
         ),
       ],
     );

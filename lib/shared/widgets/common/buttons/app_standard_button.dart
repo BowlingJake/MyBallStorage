@@ -20,6 +20,7 @@ class AppStandardButton extends StatelessWidget {
     this.foregroundColor,
     this.disabledForegroundColor,
     this.disabledOutlineColor,
+    this.primaryOutlined = false,
   });
 
   /// 次要動作按鈕 - 中性色線框樣式
@@ -40,7 +41,8 @@ class AppStandardButton extends StatelessWidget {
        outlineColor = Colors.white, // 白色線框
        foregroundColor = Colors.white, // 白色文字
        disabledForegroundColor = null,
-       disabledOutlineColor = null;
+       disabledOutlineColor = null,
+       primaryOutlined = false;
 
   /// 創造/特殊功能按鈕 - 青色實心樣式
   /// 用於新增、創建、特殊功能入口等操作
@@ -55,12 +57,13 @@ class AppStandardButton extends StatelessWidget {
     this.fontSize = 14.0,
   }) : customColor = null, // 將在build中設定為次要顏色
        isPrimary = false,
-       whiteForeground = true, // 青色背景用白色前景
+       whiteForeground = true, // 標記為次要色樣式（用於選擇底色）
        backgroundColor = null, // 將在build中設定為次要顏色
        outlineColor = null,
-       foregroundColor = Colors.white,
+       foregroundColor = null,
        disabledForegroundColor = null,
-       disabledOutlineColor = null;
+       disabledOutlineColor = null,
+       primaryOutlined = false;
 
   /// 破壞性動作按鈕 - 紅色實心樣式
   /// 用於刪除、清除等不可逆操作
@@ -75,12 +78,33 @@ class AppStandardButton extends StatelessWidget {
     this.fontSize = 14.0,
   }) : customColor = BrandColors.errorColor,
        isPrimary = false,
-       whiteForeground = true, // 紅色背景用白色前景
+       whiteForeground = false, // 紅色背景用黑色前景（更好對比度）
        backgroundColor = BrandColors.errorColor,
        outlineColor = BrandColors.errorColor,
-       foregroundColor = Colors.white,
+       foregroundColor = Colors.black, // 改為黑色前景
        disabledForegroundColor = null,
-       disabledOutlineColor = null;
+       disabledOutlineColor = null,
+       primaryOutlined = false;
+
+  /// 主要色線框樣式（不硬編顏色，使用品牌主色）
+  const AppStandardButton.primaryOutlined({
+    required this.onPressed,
+    super.key,
+    this.text,
+    this.icon,
+    this.width,
+    this.height = 36.0,
+    this.enabled = true,
+    this.fontSize = 14.0,
+  }) : customColor = null,
+       isPrimary = false,
+       whiteForeground = false,
+       backgroundColor = Colors.transparent,
+       outlineColor = null,
+       foregroundColor = null,
+       disabledForegroundColor = null,
+       disabledOutlineColor = null,
+       primaryOutlined = true;
   final String? text;
   final IconData? icon;
   final VoidCallback onPressed;
@@ -96,13 +120,14 @@ class AppStandardButton extends StatelessWidget {
   final Color? foregroundColor;
   final Color? disabledForegroundColor;
   final Color? disabledOutlineColor;
+  final bool primaryOutlined;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // 判斷是否為 creative 按鈕（通過檢查 whiteForeground 和 backgroundColor 為 null）
-    final bool isCreativeButton = whiteForeground && backgroundColor == null && customColor == null;
+    // creative（次要色實心）判斷：沿用 whiteForeground 作為標記，避免誤判主要色
+    final bool isCreativeButton = whiteForeground && backgroundColor == null && customColor == null && !primaryOutlined;
     
     // 設定基礎顏色
     Color baseColor;
@@ -120,26 +145,36 @@ class AppStandardButton extends StatelessWidget {
     }
     
     // 設定有效的背景顏色
-    final Color effectiveBackground = backgroundColor ?? baseColor;
+    final Color effectiveBackground = primaryOutlined ? Colors.transparent : (backgroundColor ?? baseColor);
     
     // 設定有效的邊框顏色
     final Color effectiveBorder = enabled
-        ? (outlineColor ?? baseColor)
+        ? (primaryOutlined ? baseColor : (outlineColor ?? baseColor))
         : (disabledOutlineColor ?? theme.colorScheme.onSurface.withOpacity(0.3));
     
     // 設定有效的前景顏色
     final Color effectiveForeground;
     if (!enabled) {
-      effectiveForeground = disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5);
+      if (primaryOutlined) {
+        effectiveForeground = Colors.black.withOpacity(0.9);
+      } else if (!isCreativeButton && effectiveBackground != Colors.transparent && effectiveBackground != BrandColors.errorColor) {
+        // 主要色實心（或其他非透明、非破壞性背景）在禁用時仍維持黑字但降低透明度
+        effectiveForeground = Colors.black.withOpacity(0.9);
+      } else {
+        effectiveForeground = disabledForegroundColor ?? theme.colorScheme.onSurface.withOpacity(0.5);
+      }
+    } else if (effectiveBackground == Colors.transparent) {
+      // 所有透明背景（線框按鈕）都使用白色前景，因為背景是深色
+      effectiveForeground = Colors.white;
     } else if (foregroundColor != null) {
       // 如果明確指定前景色，使用指定的顏色
       effectiveForeground = foregroundColor!;
-    } else if (effectiveBackground == Colors.transparent) {
-      // 透明背景使用白色前景
-      effectiveForeground = Colors.white;
-    } else if (isCreativeButton || effectiveBackground == BrandColors.errorColor) {
-      // 青色或紅色背景使用白色前景
-      effectiveForeground = Colors.white;
+    } else if (effectiveBackground == BrandColors.errorColor) {
+      // 紅色背景使用黑色字體，確保更好的對比度
+      effectiveForeground = Colors.black;
+    } else if (isCreativeButton) {
+      // 次要色實心：改為黑色字（統一視覺）
+      effectiveForeground = Colors.black;
     } else {
       // 金色背景使用黑色前景，確保對比度
       effectiveForeground = Colors.black;

@@ -45,21 +45,21 @@ class SimpleSearchControls extends StatelessWidget {
                 enableSuggestions: true,
                 decoration: InputDecoration(
                   hintText: searchHint,
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 18),
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 18),
                   filled: true,
-                  fillColor: Colors.black.withOpacity(0.6),
+                  fillColor: Colors.transparent,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[600]!, width: 1.5),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                   isDense: true, // 使TextField更緊湊
@@ -73,6 +73,7 @@ class SimpleSearchControls extends StatelessWidget {
           // 篩選按鈕
           if (onFilterTap != null) ...[
             _buildActionButton(
+              context: context,
               onTap: onFilterTap!,
               icon: Icons.filter_list,
               showBadge: showFilterBadge && filterCount > 0,
@@ -84,6 +85,7 @@ class SimpleSearchControls extends StatelessWidget {
           // 排序按鈕
           if (showSortButton && onSortTap != null)
             _buildActionButton(
+              context: context,
               onTap: onSortTap!,
               icon: Icons.sort,
             ),
@@ -93,6 +95,7 @@ class SimpleSearchControls extends StatelessWidget {
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required VoidCallback onTap,
     required IconData icon,
     bool showBadge = false,
@@ -104,21 +107,17 @@ class SimpleSearchControls extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey[600]!,
+              color: Theme.of(context).colorScheme.primary,
               width: 1.5,
             ),
           ),
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(12),
-            child: Icon(
-              icon,
-              color: Colors.grey,
-              size: 16,
-            ),
+            child: Icon(icon, color: Colors.white, size: 16),
           ),
         ),
         if (showBadge && badgeCount > 0)
