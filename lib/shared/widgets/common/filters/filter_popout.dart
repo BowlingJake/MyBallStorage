@@ -156,26 +156,26 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: AppStandardButton(
+                      // 重置動作 - 使用主要色線框按鈕（重要但次級動作）
+                      child: AppStandardButton.primaryOutlined(
                         onPressed: () {
                           setState(() {
                             _localFilters = const BallFilters();
                           });
                         },
                         text: 'Reset All',
-                        isPrimary: false,
                         height: 48,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
+                      // 確認動作 - 使用主要色實心按鈕（主要動作）
                       child: AppStandardButton(
                         onPressed: () {
                           widget.onFiltersChanged(_localFilters);
                           Navigator.of(context).pop();
                         },
                         text: 'Apply Filters',
-                        isPrimary: true,
                         height: 48,
                       ),
                     ),
