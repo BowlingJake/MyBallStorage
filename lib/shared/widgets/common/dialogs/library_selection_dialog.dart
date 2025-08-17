@@ -387,7 +387,6 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                                   ),
                                 ),
                               ),
-                              // Clear 從這裡移除，改為底部 Reset 按鈕
                             ],
                           ),
                         ],
@@ -460,10 +459,10 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppStandardButton(
-                      text: 'Add ${_selectedBallIds.length} Ball${_selectedBallIds.length != 1 ? 's' : ''}',
+                      text: 'Add',
                       fontSize: 14,
-                      onPressed: _selectedBallIds.isEmpty ? () {} : _addSelectedBalls,
                       enabled: _selectedBallIds.isNotEmpty,
+                      onPressed: _addSelectedBalls,
                     ),
                   ),
                 ],

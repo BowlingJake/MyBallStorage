@@ -7,7 +7,7 @@ part of 'arsenal_dialog_manager.dart';
 // **************************************************************************
 
 String _$arsenalDialogManagerHash() =>
-    r'589cc05aa295a63f26c0adef3629897b8211a32a';
+    r'de0ab20a56cebebbb037ce38531036fc7780ea35';
 
 /// Unified dialog manager for all Arsenal-related dialogs
 ///

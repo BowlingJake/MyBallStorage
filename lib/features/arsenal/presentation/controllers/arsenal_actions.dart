@@ -7,6 +7,7 @@ import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/unified_ball_selection_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/library_selection_dialog.dart';
 import 'package:bowlingarsenal_app/features/arsenal/data/models/user_arsenal_instance.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/add_to_bag_dialog.dart';
@@ -20,7 +21,6 @@ import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_bu
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_management_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/all_my_arsenal_selection_dialog.dart';
 
 class ArsenalActions {
   const ArsenalActions._();
@@ -328,7 +328,11 @@ class ArsenalActions {
   }) async {
     final arsenalState = ref.read(newArsenalControllerProvider);
     final currentBagNumber = arsenalState.selectedBagNumber ?? 1;
-    final selectedInstanceIds = await showAllMyArsenalSelectionDialog(context);
+    final selectedInstanceIds = await showArsenalBallSelectionDialog(
+      context: context,
+      title: 'Select from All My Arsenal',
+      excludeBagNumbers: [currentBagNumber], // Exclude current bag
+    );
     if (selectedInstanceIds == null || selectedInstanceIds.isEmpty) return;
     // 直接以 instanceId 更新 bag 指派，避免複製新增
     final authState = ref.read(authControllerProvider);
