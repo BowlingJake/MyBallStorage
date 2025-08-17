@@ -273,13 +273,10 @@ class ArsenalGridCard extends ConsumerWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppStandardButton(
+          AppStandardButton.primaryOutlined(
             text: 'Edit My Layout',
             height: DialogDefaults.buttonHeight,
             fontSize: DialogDefaults.buttonFontSize,
-            outlineColor: Colors.white.withOpacity(0.6),
-            foregroundColor: Colors.white.withOpacity(0.9),
-            customColor: Colors.white,
             width: double.infinity,
             onPressed: () async {
               Navigator.of(context).pop();
@@ -293,13 +290,10 @@ class ArsenalGridCard extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 12),
-          AppStandardButton(
+          AppStandardButton.primaryOutlined(
             text: 'View Details',
             height: DialogDefaults.buttonHeight,
             fontSize: DialogDefaults.buttonFontSize,
-            outlineColor: Colors.white.withOpacity(0.6),
-            foregroundColor: Colors.white.withOpacity(0.9),
-            customColor: Colors.white,
             width: double.infinity,
             onPressed: () {
               Navigator.of(context).pop();

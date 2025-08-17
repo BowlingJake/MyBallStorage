@@ -71,28 +71,39 @@ Future<List<int>?> showBagSelectionDialog({
                               final bagColor = bagColors[bagInfo.number - 1];
                               final bagText = bagInfo.number == 1 ? '${bagInfo.name} (Required)' : bagInfo.name;
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: AppStandardButton(
-                                  text: bagText,
-                                  height: DialogDefaults.buttonHeight,
-                                  fontSize: DialogDefaults.buttonFontSize,
-                                  width: double.infinity,
-                                  backgroundColor: isSelected ? bagColor : null,
-                                  outlineColor: isSelected ? bagColor : Colors.white.withOpacity(0.6),
-                                  foregroundColor: isSelected ? Colors.black : Colors.white.withOpacity(0.9),
-                                  onPressed: () {
-                                    if (bagInfo.number == 1) {
-                                      return;
-                                    }
-                                    setState(() {
-                                      if (isSelected) {
-                                        selectedBags.remove(bagInfo.number);
-                                      } else {
-                                        selectedBags.add(bagInfo.number);
-                                      }
-                                    });
-                                  },
-                                ),
+                                padding: const EdgeInsets.only(bottom: 14),
+                                child: isSelected
+                                    ? AppStandardButton(
+                                        text: bagText,
+                                        height: DialogDefaults.buttonHeight,
+                                        fontSize: DialogDefaults.buttonFontSize,
+                                        width: double.infinity,
+                                        backgroundColor: bagColor,
+                                        outlineColor: bagColor,
+                                        foregroundColor: Colors.black,
+                                        onPressed: () {
+                                          if (bagInfo.number == 1) {
+                                            return;
+                                          }
+                                          setState(() {
+                                            selectedBags.remove(bagInfo.number);
+                                          });
+                                        },
+                                      )
+                                    : AppStandardButton.primaryOutlined(
+                                        text: bagText,
+                                        height: DialogDefaults.buttonHeight,
+                                        fontSize: DialogDefaults.buttonFontSize,
+                                        width: double.infinity,
+                                        onPressed: () {
+                                          if (bagInfo.number == 1) {
+                                            return;
+                                          }
+                                          setState(() {
+                                            selectedBags.add(bagInfo.number);
+                                          });
+                                        },
+                                      ),
                               );
                             },
                           ),
@@ -102,12 +113,10 @@ Future<List<int>?> showBagSelectionDialog({
                       Row(
                         children: [
                           Expanded(
-                            child: AppStandardButton(
+                            child: AppStandardButton.primaryOutlined(
                               text: 'Cancel',
-                              height: DialogDefaults.buttonHeight,
+                              height: 40,
                               fontSize: DialogDefaults.buttonFontSize,
-                              outlineColor: Colors.white.withOpacity(0.6),
-                              foregroundColor: Colors.white.withOpacity(0.9),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ),
@@ -115,10 +124,8 @@ Future<List<int>?> showBagSelectionDialog({
                           Expanded(
                             child: AppStandardButton(
                               text: 'Add',
-                              height: DialogDefaults.buttonHeight,
+                              height: 40,
                               fontSize: DialogDefaults.buttonFontSize,
-                              outlineColor: Colors.white.withOpacity(0.6),
-                              foregroundColor: Colors.white.withOpacity(0.9),
                               onPressed: () => Navigator.of(context).pop(selectedBags.toList()),
                             ),
                           ),

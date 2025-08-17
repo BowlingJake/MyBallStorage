@@ -310,7 +310,7 @@ class ArsenalSpecificBallCard extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 12),
-          AppStandardButton.secondary(
+          AppStandardButton.primaryOutlined(
             text: 'View Details',
             height: DialogDefaults.buttonHeight,
             fontSize: DialogDefaults.buttonFontSize,

@@ -201,7 +201,7 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
               Row(
                 children: [
                   Expanded(
-                    child: AppStandardButton.secondary(
+                    child: AppStandardButton.primaryOutlined(
                       text: 'Exit',
                       height: 36,
                       fontSize: 14,
@@ -229,6 +229,10 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
   Widget _buildLayoutTypeButton(String layoutType) {
     final isSelected = _selectedLayoutType == layoutType;
     final displayText = layoutType == 'VLS' ? 'VLS(2LS)' : 'Duel Angle';
+    final theme = Theme.of(context);
+    final primaryColor = theme.brightness == Brightness.dark
+        ? const Color(0xFFFFD700) // BrandColors.accentColorDark
+        : const Color(0xFFFFB300); // BrandColors.accentColorLight
     
     return GestureDetector(
       onTap: () {
@@ -239,10 +243,10 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white,
+            color: primaryColor,
             width: 1.5,
           ),
         ),

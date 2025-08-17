@@ -277,7 +277,7 @@ extension RemovalTypeExtension on RemovalType {
 }
 
 /// Tiered Removal Dialog with unified style
-class _TieredRemovalDialog extends StatelessWidget {
+class _TieredRemovalDialog extends StatefulWidget {
   const _TieredRemovalDialog({
     required this.selectedCount,
     required this.bagName,
@@ -285,6 +285,13 @@ class _TieredRemovalDialog extends StatelessWidget {
 
   final int selectedCount;
   final String bagName;
+
+  @override
+  State<_TieredRemovalDialog> createState() => _TieredRemovalDialogState();
+}
+
+class _TieredRemovalDialogState extends State<_TieredRemovalDialog> {
+  RemovalType? selectedOption;
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +315,7 @@ class _TieredRemovalDialog extends StatelessWidget {
             children: [
             // Title
             Text(
-              'Remove $selectedCount Ball${selectedCount != 1 ? 's' : ''}',
+              'Remove ${widget.selectedCount} Ball${widget.selectedCount != 1 ? 's' : ''}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -327,37 +334,98 @@ class _TieredRemovalDialog extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            // Option buttons (highest risk first)
-            AppStandardButton(
-              text: 'Remove from All Arsenal',
-              height: DialogDefaults.buttonHeight,
-              fontSize: DialogDefaults.buttonFontSize,
-              width: double.infinity,
-              backgroundColor: Colors.red, // 例外：最高位階以填滿表示
-              foregroundColor: Colors.white,
-              outlineColor: Colors.red,
-              onPressed: () => Navigator.of(context).pop(RemovalType.complete),
-            ),
-            const SizedBox(height: 16),
-            AppStandardButton(
-              text: 'Remove from $bagName',
-              height: DialogDefaults.buttonHeight,
-              fontSize: DialogDefaults.buttonFontSize,
-              width: double.infinity,
-              outlineColor: Colors.red.withOpacity(0.8),
-              foregroundColor: Colors.red,
-              onPressed: () => Navigator.of(context).pop(RemovalType.bagOnly),
+            // 水平並列的選擇按鈕
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedOption = RemovalType.bagOnly;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: selectedOption == RemovalType.bagOnly ? Colors.red : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.red,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        'From ${widget.bagName}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: selectedOption == RemovalType.bagOnly ? Colors.white : Colors.red,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedOption = RemovalType.complete;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: selectedOption == RemovalType.complete ? Colors.red : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.red,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        'From All Arsenal',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: selectedOption == RemovalType.complete ? Colors.white : Colors.red,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
-            // Cancel button
-            AppStandardButton(
-              text: 'Cancel',
-              height: DialogDefaults.buttonHeight,
-              fontSize: DialogDefaults.buttonFontSize,
-              width: double.infinity,
-              outlineColor: Colors.white.withOpacity(0.6),
-              foregroundColor: Colors.white.withOpacity(0.9),
-              onPressed: () => Navigator.of(context).pop(),
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: AppStandardButton.destructiveOutlined(
+                    text: 'Cancel',
+                    height: 40,
+                    fontSize: DialogDefaults.buttonFontSize,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: AppStandardButton.destructive(
+                    text: 'Confirm',
+                    height: 40,
+                    fontSize: DialogDefaults.buttonFontSize,
+                    onPressed: selectedOption != null
+                        ? () {
+                            if (selectedOption != null) {
+                              Navigator.of(context).pop(selectedOption);
+                            }
+                          }
+                        : () {},
+                  ),
+                ),
+              ],
             ),
             ],
           ),

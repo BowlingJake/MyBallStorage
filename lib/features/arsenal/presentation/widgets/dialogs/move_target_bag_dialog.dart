@@ -27,14 +27,14 @@ Future<int?> showMoveTargetBagDialog({
     ),
     barrierDismissible: false,
     actions: [
-      AppStandardButton(
+      AppStandardButton.primaryOutlined(
         text: 'Cancel',
-        height: DialogDefaults.buttonHeight,
+        height: 40,
         onPressed: () => Navigator.of(context).pop(),
       ),
       AppStandardButton(
         text: 'Move',
-        height: DialogDefaults.buttonHeight,
+        height: 40,
         onPressed: () {
           // 由 content 內部 state 控制是否選擇，這裡觸發回傳選擇值
           // 若未選擇，保持無動作（outlined 按鈕呈現 disabled 色由上層控制）

@@ -164,7 +164,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                           });
                         },
                         text: 'Reset All',
-                        height: 48,
+                        height: 40,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -176,7 +176,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
                           Navigator.of(context).pop();
                         },
                         text: 'Apply Filters',
-                        height: 48,
+                        height: 40,
                       ),
                     ),
                   ],
@@ -316,24 +316,37 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
             ),
             decoration: BoxDecoration(
               color: isSelected 
-                ? Theme.of(context).primaryColor
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFFFFD700) // BrandColors.accentColorDark
+                    : const Color(0xFFFFB300)) // BrandColors.accentColorLight
                 : Colors.transparent,
               border: Border.all(
                 color: isSelected 
-                  ? Theme.of(context).primaryColor
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFFFD700) // BrandColors.accentColorDark
+                      : const Color(0xFFFFB300)) // BrandColors.accentColorLight
                   : Colors.grey.shade600,
-                width: 1.5,
+                width: isSelected ? 2.0 : 1.5,
               ),
               borderRadius: BorderRadius.circular(20),
+              boxShadow: isSelected ? [
+                BoxShadow(
+                  color: (Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFFFD700) // BrandColors.accentColorDark
+                      : const Color(0xFFFFB300)).withOpacity(0.4), // BrandColors.accentColorLight
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
+              ] : null,
             ),
             child: Text(
               item,
               style: TextStyle(
                 color: isSelected 
-                  ? Colors.white
+                  ? Colors.black
                   : Colors.white,
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
