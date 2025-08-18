@@ -77,8 +77,8 @@ class ArsenalGridCard extends ConsumerWidget {
                   children: [
                     // 球的圖片 (圓形) - 放大
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 110,
+                      height: 110,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey.withOpacity(0.3),

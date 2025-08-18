@@ -7,6 +7,23 @@ class SupabaseUserProfileRepository implements UserProfileRepository {
 
   SupabaseUserProfileRepository(this._supabase);
 
+  Map<String, dynamic> _normalizeProfileJson(Map<String, dynamic> json) {
+    final normalized = Map<String, dynamic>.from(json);
+    int? _toInt(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toInt();
+      if (v is String) {
+        return int.tryParse(v);
+      }
+      return null;
+    }
+
+    normalized['PAP_integer'] = _toInt(json['PAP_integer']);
+    normalized['PAP_drift_integer'] = _toInt(json['PAP_drift_integer']);
+    normalized['PAP_direction'] = _toInt(json['PAP_direction']);
+    return normalized;
+  }
+
   @override
   Future<UserProfile?> getUserProfile(String userId) async {
     try {
@@ -20,7 +37,7 @@ class SupabaseUserProfileRepository implements UserProfileRepository {
         return null;
       }
 
-      return UserProfile.fromJson(response);
+      return UserProfile.fromJson(_normalizeProfileJson(response));
     } catch (e) {
       throw Exception('Failed to get user profile: $e');
     }
@@ -39,9 +56,53 @@ class SupabaseUserProfileRepository implements UserProfileRepository {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfile.fromJson(_normalizeProfileJson(response));
     } catch (e) {
       throw Exception('Failed to save user profile: $e');
+    }
+  }
+
+  @override
+  Future<UserProfile> updateProfile({
+    required String userId,
+    String? nickname,
+    String? avatarUrl,
+    String? country,
+    String? city,
+    String? dominateHand,
+    String? style,
+    int? papInteger,
+    String? papFraction,
+    int? papDirection, // 0=none, 1=up, -1=down
+    int? papDriftInteger,
+    String? papDriftFraction,
+  }) async {
+    try {
+      // 建構更新資料，只包含非 null 的欄位
+      final updateData = <String, dynamic>{};
+      
+      if (nickname != null) updateData['nickname'] = nickname;
+      if (avatarUrl != null) updateData['avatar_url'] = avatarUrl;
+      if (country != null) updateData['country'] = country;
+      if (city != null) updateData['city'] = city;
+      if (dominateHand != null) updateData['dominate_hand'] = dominateHand;
+      if (style != null) updateData['style'] = style;
+      if (papInteger != null) updateData['PAP_integer'] = papInteger;
+      if (papFraction != null) updateData['PAP_fraction'] = papFraction;
+      if (papDirection != null) updateData['PAP_direction'] = papDirection;
+      if (papDriftInteger != null) updateData['PAP_drift_integer'] = papDriftInteger;
+      if (papDriftFraction != null) updateData['PAP_drift_fraction'] = papDriftFraction;
+
+      final response = await _supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('user_id', userId)
+          .select()
+          .single();
+
+      return UserProfile.fromJson(_normalizeProfileJson(response));
+    } catch (e) {
+      throw Exception('Failed to update profile: $e');
     }
   }
 

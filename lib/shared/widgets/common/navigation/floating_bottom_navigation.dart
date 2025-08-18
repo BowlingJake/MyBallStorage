@@ -22,6 +22,15 @@ class AnimatedFloatingBottomNavigation extends StatefulWidget {
 
 class _AnimatedFloatingBottomNavigationState
     extends State<AnimatedFloatingBottomNavigation> {
+  
+  final List<String> _navLabels = [
+    'Home',
+    'Library', 
+    'Arsenal',
+    'Training',
+    'Tournament',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -44,11 +53,11 @@ class _AnimatedFloatingBottomNavigationState
           child: Row(
             // **RESTRUCTURED NAV ITEMS**
             children: [
-              _buildNavItem(Iconsax.home_2, 0, theme),       // Home
-              _buildNavItem(MyFlutterApp.search, 1, theme),          // Library
-              _buildNavItem(MyFlutterApp.bowling_ball, 2, theme),  // Arsenal
-              _buildNavItem(MyFlutterApp.bowling_pin, 3, theme),      // Training
-              _buildNavItem(MyFlutterApp.trophy, 4, theme),   // Events
+              _buildNavItem(Iconsax.home_2, 0, _navLabels[0], theme),       // Home
+              _buildNavItem(MyFlutterApp.search, 1, _navLabels[1], theme),          // Library
+              _buildNavItem(MyFlutterApp.bowling_ball, 2, _navLabels[2], theme),  // Arsenal
+              _buildNavItem(MyFlutterApp.bowling_pin, 3, _navLabels[3], theme),      // Training
+              _buildNavItem(MyFlutterApp.trophy, 4, _navLabels[4], theme),   // Tournament
             ],
           ),
         ),
@@ -59,6 +68,7 @@ class _AnimatedFloatingBottomNavigationState
   Widget _buildNavItem(
     IconData icon,
     int index,
+    String label,
     ThemeData theme,
   ) {
     final isSelected = widget.currentIndex == index;
@@ -72,31 +82,56 @@ class _AnimatedFloatingBottomNavigationState
           widget.onTap(index);
         },
         behavior: HitTestBehavior.translucent,
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            padding: const EdgeInsets.all(4), // Give some space for the shadow
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: selectedColor.withOpacity(0.7),
-                        blurRadius: 15,
-                        spreadRadius: 3,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: AnimatedScale(
-              duration: const Duration(milliseconds: 250),
-              scale: isSelected ? 1.2 : 1.0,
-              child: Icon(
-                icon,
-                color: isSelected ? selectedColor : unselectedColor,
-                size: 24, // Standardized size
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.all(2), // Reduced padding for smaller icon
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: selectedColor.withOpacity(0.7),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 250),
+                  scale: isSelected ? 1.1 : 1.0,
+                  child: Icon(
+                    icon,
+                    color: isSelected ? selectedColor : unselectedColor,
+                    size: 20, // Reduced size to make room for text
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 250),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? selectedColor : unselectedColor,
+                  shadows: isSelected
+                      ? [
+                          Shadow(
+                            color: selectedColor.withOpacity(0.7),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Text(label),
+              ),
+            ],
           ),
         ),
       ),

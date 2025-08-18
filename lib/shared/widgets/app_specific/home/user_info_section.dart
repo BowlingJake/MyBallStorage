@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart'; // 2. 導入 GoRouter
 import 'package:iconsax/iconsax.dart';
-import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 
 class UserInfoSection extends ConsumerWidget {
   const UserInfoSection({
@@ -37,8 +38,8 @@ class UserInfoSection extends ConsumerWidget {
   }
 
   String _formatUserInfo(userProfile) {
-    final bowlingStyle = userProfile.bowlingStyle;
-    final hand = userProfile.hand;
+    final bowlingStyle = userProfile.style ?? '';
+    final hand = userProfile.dominateHand ?? '';
     
     if (bowlingStyle.isNotEmpty && hand.isNotEmpty) {
       // 提取手的類型 (Left 或 Right)
@@ -53,19 +54,43 @@ class UserInfoSection extends ConsumerWidget {
     return '';
   }
 
+  String _buildLocationString(userProfile) {
+    if (userProfile == null) return 'Set your location';
+    
+    final country = userProfile.country ?? '';
+    final city = userProfile.city ?? '';
+    
+    if (country.isEmpty && city.isEmpty) return 'Set your location';
+    if (country.isEmpty) return city;
+    if (city.isEmpty) return country;
+    return '$city, $country';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final accentColor = theme.colorScheme.primary;
-    final userProfile = ref.watch(userProfileProvider);
+    final userProfileState = ref.watch(userProfileControllerProvider);
+    final userProfile = userProfileState.profile;
+
+    // 首次載入時讀取用戶資料
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final supabase = ref.read(supabaseClientProvider);
+      final userId = supabase.auth.currentUser?.id;
+      
+      if (userId != null && userProfile == null && !userProfileState.isLoading) {
+        ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
+      }
+    });
 
     // 從 userProfile 取得資料，如果沒有則使用預設值
-    final userName = userProfile?.nickname.isNotEmpty == true 
-        ? userProfile!.nickname 
+    final userName = userProfile?.nickname?.isNotEmpty == true 
+        ? userProfile!.nickname! 
         : 'Tap to set profile';
-    final location = userProfile?.location.isNotEmpty == true 
-        ? userProfile!.location 
-        : 'Set your location';
+    
+    // 組合位置資訊
+    final location = _buildLocationString(userProfile);
+    final userPhotoUrl = userProfile?.avatarUrl;
 
     return InkWell(
       onTap: () => _showProfileActions(context),
@@ -109,8 +134,8 @@ class UserInfoSection extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  // 第三行顯示打球資訊（移除外層括號）
-                  if (userProfile != null && (userProfile.hand.isNotEmpty || userProfile.bowlingStyle.isNotEmpty))
+                  // 第三行顯示打球資訊
+                  if (userProfile != null && ((userProfile.dominateHand?.isNotEmpty == true) || (userProfile.style?.isNotEmpty == true)))
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
@@ -126,15 +151,14 @@ class UserInfoSection extends ConsumerWidget {
                 ],
               ),
             ),
-            _buildUserAvatar(theme, accentColor),
+            _buildUserAvatar(theme, accentColor, userPhotoUrl),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserAvatar(ThemeData theme, Color accentColor) {
-    // ... (此處程式碼保持不變)
+  Widget _buildUserAvatar(ThemeData theme, Color accentColor, String? avatarUrl) {
     return Container(
       width: 52,
       height: 52,
@@ -147,8 +171,8 @@ class UserInfoSection extends ConsumerWidget {
         ),
         border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
       ),
-      child: userPhotoUrl != null
-          ? ClipOval(child: Image.network(userPhotoUrl!, fit: BoxFit.cover, width: 52, height: 52))
+      child: avatarUrl != null && avatarUrl.isNotEmpty
+          ? ClipOval(child: Image.network(avatarUrl, fit: BoxFit.cover, width: 52, height: 52))
           : Center(child: Icon(Iconsax.user, color: Colors.white.withOpacity(0.9), size: 28)),
     );
   }

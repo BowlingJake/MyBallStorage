@@ -66,6 +66,52 @@ class UserProfileController extends _$UserProfileController {
     }
   }
 
+  /// Update user profile information
+  Future<void> updateProfile({
+    required String userId,
+    String? nickname,
+    String? avatarUrl,
+    String? country,
+    String? city,
+    String? dominateHand,
+    String? style,
+    int? papInteger,
+    String? papFraction,
+    int? papDirection, // 0=none, 1=up, -1=down
+    int? papDriftInteger,
+    String? papDriftFraction,
+  }) async {
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+      
+      final updatedProfile = await _repository.updateProfile(
+        userId: userId,
+        nickname: nickname,
+        avatarUrl: avatarUrl,
+        country: country,
+        city: city,
+        dominateHand: dominateHand,
+        style: style,
+        papInteger: papInteger,
+        papFraction: papFraction,
+        papDirection: papDirection,
+        papDriftInteger: papDriftInteger,
+        papDriftFraction: papDriftFraction,
+      );
+      
+      state = state.copyWith(
+        profile: updatedProfile,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to update profile: $e',
+      );
+      rethrow;
+    }
+  }
+
   /// Update bag name
   Future<void> updateBagName({
     required String userId,

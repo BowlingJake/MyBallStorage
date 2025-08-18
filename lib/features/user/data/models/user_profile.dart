@@ -32,6 +32,19 @@ class UserProfile with _$UserProfile {
     @JsonKey(name: 'bag_8_unlocked') @Default(false) bool bag8Unlocked,
     @JsonKey(name: 'bag_9_unlocked') @Default(false) bool bag9Unlocked,
     
+    // 個人資料
+    String? nickname, // bowler's name (display name)
+    @JsonKey(name: 'avatar_url') String? avatarUrl, // 頭像URL
+    String? country,
+    String? city,
+    @JsonKey(name: 'dominate_hand') String? dominateHand,
+    String? style, // bowling style
+    @JsonKey(name: 'PAP_integer') int? papInteger,
+    @JsonKey(name: 'PAP_fraction') String? papFraction,
+    @JsonKey(name: 'PAP_direction') int? papDirection, // 0=none, 1=up, -1=down
+    @JsonKey(name: 'PAP_drift_integer') int? papDriftInteger,
+    @JsonKey(name: 'PAP_drift_fraction') String? papDriftFraction,
+    
     // 其他用戶設定
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
@@ -121,6 +134,16 @@ extension UserProfileExtension on UserProfile {
   String displayNameForBag(int bagNumber) {
     return getBagName(bagNumber) ?? 'Bag $bagNumber';
   }
+
+
+  /// Check if PAP direction is up
+  bool get isPapUp => papDirection == 1;
+
+  /// Check if PAP direction is down
+  bool get isPapDown => papDirection == -1;
+
+  /// Check if PAP has no direction
+  bool get isPapNone => papDirection == null || papDirection == 0;
 }
 
 /// Helper class for bag information

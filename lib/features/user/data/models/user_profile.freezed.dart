@@ -59,7 +59,27 @@ mixin _$UserProfile {
   @JsonKey(name: 'bag_8_unlocked')
   bool get bag8Unlocked => throw _privateConstructorUsedError;
   @JsonKey(name: 'bag_9_unlocked')
-  bool get bag9Unlocked => throw _privateConstructorUsedError; // 其他用戶設定
+  bool get bag9Unlocked => throw _privateConstructorUsedError; // 個人資料
+  String? get nickname =>
+      throw _privateConstructorUsedError; // bowler's name (display name)
+  @JsonKey(name: 'avatar_url')
+  String? get avatarUrl => throw _privateConstructorUsedError; // 頭像URL
+  String? get country => throw _privateConstructorUsedError;
+  String? get city => throw _privateConstructorUsedError;
+  @JsonKey(name: 'dominate_hand')
+  String? get dominateHand => throw _privateConstructorUsedError;
+  String? get style => throw _privateConstructorUsedError; // bowling style
+  @JsonKey(name: 'PAP_integer')
+  int? get papInteger => throw _privateConstructorUsedError;
+  @JsonKey(name: 'PAP_fraction')
+  String? get papFraction => throw _privateConstructorUsedError;
+  @JsonKey(name: 'PAP_direction')
+  int? get papDirection =>
+      throw _privateConstructorUsedError; // 0=none, 1=up, -1=down
+  @JsonKey(name: 'PAP_drift_integer')
+  int? get papDriftInteger => throw _privateConstructorUsedError;
+  @JsonKey(name: 'PAP_drift_fraction')
+  String? get papDriftFraction => throw _privateConstructorUsedError; // 其他用戶設定
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -103,6 +123,17 @@ abstract class $UserProfileCopyWith<$Res> {
       @JsonKey(name: 'bag_7_unlocked') bool bag7Unlocked,
       @JsonKey(name: 'bag_8_unlocked') bool bag8Unlocked,
       @JsonKey(name: 'bag_9_unlocked') bool bag9Unlocked,
+      String? nickname,
+      @JsonKey(name: 'avatar_url') String? avatarUrl,
+      String? country,
+      String? city,
+      @JsonKey(name: 'dominate_hand') String? dominateHand,
+      String? style,
+      @JsonKey(name: 'PAP_integer') int? papInteger,
+      @JsonKey(name: 'PAP_fraction') String? papFraction,
+      @JsonKey(name: 'PAP_direction') int? papDirection,
+      @JsonKey(name: 'PAP_drift_integer') int? papDriftInteger,
+      @JsonKey(name: 'PAP_drift_fraction') String? papDriftFraction,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -143,6 +174,17 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? bag7Unlocked = null,
     Object? bag8Unlocked = null,
     Object? bag9Unlocked = null,
+    Object? nickname = freezed,
+    Object? avatarUrl = freezed,
+    Object? country = freezed,
+    Object? city = freezed,
+    Object? dominateHand = freezed,
+    Object? style = freezed,
+    Object? papInteger = freezed,
+    Object? papFraction = freezed,
+    Object? papDirection = freezed,
+    Object? papDriftInteger = freezed,
+    Object? papDriftFraction = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -231,6 +273,50 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
           ? _value.bag9Unlocked
           : bag9Unlocked // ignore: cast_nullable_to_non_nullable
               as bool,
+      nickname: freezed == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String?,
+      avatarUrl: freezed == avatarUrl
+          ? _value.avatarUrl
+          : avatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      city: freezed == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dominateHand: freezed == dominateHand
+          ? _value.dominateHand
+          : dominateHand // ignore: cast_nullable_to_non_nullable
+              as String?,
+      style: freezed == style
+          ? _value.style
+          : style // ignore: cast_nullable_to_non_nullable
+              as String?,
+      papInteger: freezed == papInteger
+          ? _value.papInteger
+          : papInteger // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papFraction: freezed == papFraction
+          ? _value.papFraction
+          : papFraction // ignore: cast_nullable_to_non_nullable
+              as String?,
+      papDirection: freezed == papDirection
+          ? _value.papDirection
+          : papDirection // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papDriftInteger: freezed == papDriftInteger
+          ? _value.papDriftInteger
+          : papDriftInteger // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papDriftFraction: freezed == papDriftFraction
+          ? _value.papDriftFraction
+          : papDriftFraction // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -273,6 +359,17 @@ abstract class _$$UserProfileImplCopyWith<$Res>
       @JsonKey(name: 'bag_7_unlocked') bool bag7Unlocked,
       @JsonKey(name: 'bag_8_unlocked') bool bag8Unlocked,
       @JsonKey(name: 'bag_9_unlocked') bool bag9Unlocked,
+      String? nickname,
+      @JsonKey(name: 'avatar_url') String? avatarUrl,
+      String? country,
+      String? city,
+      @JsonKey(name: 'dominate_hand') String? dominateHand,
+      String? style,
+      @JsonKey(name: 'PAP_integer') int? papInteger,
+      @JsonKey(name: 'PAP_fraction') String? papFraction,
+      @JsonKey(name: 'PAP_direction') int? papDirection,
+      @JsonKey(name: 'PAP_drift_integer') int? papDriftInteger,
+      @JsonKey(name: 'PAP_drift_fraction') String? papDriftFraction,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -311,6 +408,17 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? bag7Unlocked = null,
     Object? bag8Unlocked = null,
     Object? bag9Unlocked = null,
+    Object? nickname = freezed,
+    Object? avatarUrl = freezed,
+    Object? country = freezed,
+    Object? city = freezed,
+    Object? dominateHand = freezed,
+    Object? style = freezed,
+    Object? papInteger = freezed,
+    Object? papFraction = freezed,
+    Object? papDirection = freezed,
+    Object? papDriftInteger = freezed,
+    Object? papDriftFraction = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -399,6 +507,50 @@ class __$$UserProfileImplCopyWithImpl<$Res>
           ? _value.bag9Unlocked
           : bag9Unlocked // ignore: cast_nullable_to_non_nullable
               as bool,
+      nickname: freezed == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
+              as String?,
+      avatarUrl: freezed == avatarUrl
+          ? _value.avatarUrl
+          : avatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      country: freezed == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String?,
+      city: freezed == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dominateHand: freezed == dominateHand
+          ? _value.dominateHand
+          : dominateHand // ignore: cast_nullable_to_non_nullable
+              as String?,
+      style: freezed == style
+          ? _value.style
+          : style // ignore: cast_nullable_to_non_nullable
+              as String?,
+      papInteger: freezed == papInteger
+          ? _value.papInteger
+          : papInteger // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papFraction: freezed == papFraction
+          ? _value.papFraction
+          : papFraction // ignore: cast_nullable_to_non_nullable
+              as String?,
+      papDirection: freezed == papDirection
+          ? _value.papDirection
+          : papDirection // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papDriftInteger: freezed == papDriftInteger
+          ? _value.papDriftInteger
+          : papDriftInteger // ignore: cast_nullable_to_non_nullable
+              as int?,
+      papDriftFraction: freezed == papDriftFraction
+          ? _value.papDriftFraction
+          : papDriftFraction // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -436,6 +588,17 @@ class _$UserProfileImpl implements _UserProfile {
       @JsonKey(name: 'bag_7_unlocked') this.bag7Unlocked = false,
       @JsonKey(name: 'bag_8_unlocked') this.bag8Unlocked = false,
       @JsonKey(name: 'bag_9_unlocked') this.bag9Unlocked = false,
+      this.nickname,
+      @JsonKey(name: 'avatar_url') this.avatarUrl,
+      this.country,
+      this.city,
+      @JsonKey(name: 'dominate_hand') this.dominateHand,
+      this.style,
+      @JsonKey(name: 'PAP_integer') this.papInteger,
+      @JsonKey(name: 'PAP_fraction') this.papFraction,
+      @JsonKey(name: 'PAP_direction') this.papDirection,
+      @JsonKey(name: 'PAP_drift_integer') this.papDriftInteger,
+      @JsonKey(name: 'PAP_drift_fraction') this.papDriftFraction,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt});
 
@@ -505,6 +668,40 @@ class _$UserProfileImpl implements _UserProfile {
   @override
   @JsonKey(name: 'bag_9_unlocked')
   final bool bag9Unlocked;
+// 個人資料
+  @override
+  final String? nickname;
+// bowler's name (display name)
+  @override
+  @JsonKey(name: 'avatar_url')
+  final String? avatarUrl;
+// 頭像URL
+  @override
+  final String? country;
+  @override
+  final String? city;
+  @override
+  @JsonKey(name: 'dominate_hand')
+  final String? dominateHand;
+  @override
+  final String? style;
+// bowling style
+  @override
+  @JsonKey(name: 'PAP_integer')
+  final int? papInteger;
+  @override
+  @JsonKey(name: 'PAP_fraction')
+  final String? papFraction;
+  @override
+  @JsonKey(name: 'PAP_direction')
+  final int? papDirection;
+// 0=none, 1=up, -1=down
+  @override
+  @JsonKey(name: 'PAP_drift_integer')
+  final int? papDriftInteger;
+  @override
+  @JsonKey(name: 'PAP_drift_fraction')
+  final String? papDriftFraction;
 // 其他用戶設定
   @override
   @JsonKey(name: 'created_at')
@@ -515,7 +712,7 @@ class _$UserProfileImpl implements _UserProfile {
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, userId: $userId, username: $username, bag1Name: $bag1Name, bag2Name: $bag2Name, bag3Name: $bag3Name, bag4Name: $bag4Name, bag5Name: $bag5Name, bag6Name: $bag6Name, bag7Name: $bag7Name, bag8Name: $bag8Name, bag9Name: $bag9Name, bag1Unlocked: $bag1Unlocked, bag2Unlocked: $bag2Unlocked, bag3Unlocked: $bag3Unlocked, bag4Unlocked: $bag4Unlocked, bag5Unlocked: $bag5Unlocked, bag6Unlocked: $bag6Unlocked, bag7Unlocked: $bag7Unlocked, bag8Unlocked: $bag8Unlocked, bag9Unlocked: $bag9Unlocked, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserProfile(id: $id, userId: $userId, username: $username, bag1Name: $bag1Name, bag2Name: $bag2Name, bag3Name: $bag3Name, bag4Name: $bag4Name, bag5Name: $bag5Name, bag6Name: $bag6Name, bag7Name: $bag7Name, bag8Name: $bag8Name, bag9Name: $bag9Name, bag1Unlocked: $bag1Unlocked, bag2Unlocked: $bag2Unlocked, bag3Unlocked: $bag3Unlocked, bag4Unlocked: $bag4Unlocked, bag5Unlocked: $bag5Unlocked, bag6Unlocked: $bag6Unlocked, bag7Unlocked: $bag7Unlocked, bag8Unlocked: $bag8Unlocked, bag9Unlocked: $bag9Unlocked, nickname: $nickname, avatarUrl: $avatarUrl, country: $country, city: $city, dominateHand: $dominateHand, style: $style, papInteger: $papInteger, papFraction: $papFraction, papDirection: $papDirection, papDriftInteger: $papDriftInteger, papDriftFraction: $papDriftFraction, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -563,6 +760,25 @@ class _$UserProfileImpl implements _UserProfile {
                 other.bag8Unlocked == bag8Unlocked) &&
             (identical(other.bag9Unlocked, bag9Unlocked) ||
                 other.bag9Unlocked == bag9Unlocked) &&
+            (identical(other.nickname, nickname) ||
+                other.nickname == nickname) &&
+            (identical(other.avatarUrl, avatarUrl) ||
+                other.avatarUrl == avatarUrl) &&
+            (identical(other.country, country) || other.country == country) &&
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.dominateHand, dominateHand) ||
+                other.dominateHand == dominateHand) &&
+            (identical(other.style, style) || other.style == style) &&
+            (identical(other.papInteger, papInteger) ||
+                other.papInteger == papInteger) &&
+            (identical(other.papFraction, papFraction) ||
+                other.papFraction == papFraction) &&
+            (identical(other.papDirection, papDirection) ||
+                other.papDirection == papDirection) &&
+            (identical(other.papDriftInteger, papDriftInteger) ||
+                other.papDriftInteger == papDriftInteger) &&
+            (identical(other.papDriftFraction, papDriftFraction) ||
+                other.papDriftFraction == papDriftFraction) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -594,6 +810,17 @@ class _$UserProfileImpl implements _UserProfile {
         bag7Unlocked,
         bag8Unlocked,
         bag9Unlocked,
+        nickname,
+        avatarUrl,
+        country,
+        city,
+        dominateHand,
+        style,
+        papInteger,
+        papFraction,
+        papDirection,
+        papDriftInteger,
+        papDriftFraction,
         createdAt,
         updatedAt
       ]);
@@ -637,6 +864,17 @@ abstract class _UserProfile implements UserProfile {
           @JsonKey(name: 'bag_7_unlocked') final bool bag7Unlocked,
           @JsonKey(name: 'bag_8_unlocked') final bool bag8Unlocked,
           @JsonKey(name: 'bag_9_unlocked') final bool bag9Unlocked,
+          final String? nickname,
+          @JsonKey(name: 'avatar_url') final String? avatarUrl,
+          final String? country,
+          final String? city,
+          @JsonKey(name: 'dominate_hand') final String? dominateHand,
+          final String? style,
+          @JsonKey(name: 'PAP_integer') final int? papInteger,
+          @JsonKey(name: 'PAP_fraction') final String? papFraction,
+          @JsonKey(name: 'PAP_direction') final int? papDirection,
+          @JsonKey(name: 'PAP_drift_integer') final int? papDriftInteger,
+          @JsonKey(name: 'PAP_drift_fraction') final String? papDriftFraction,
           @JsonKey(name: 'created_at') final DateTime? createdAt,
           @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
       _$UserProfileImpl;
@@ -704,7 +942,36 @@ abstract class _UserProfile implements UserProfile {
   bool get bag8Unlocked;
   @override
   @JsonKey(name: 'bag_9_unlocked')
-  bool get bag9Unlocked; // 其他用戶設定
+  bool get bag9Unlocked; // 個人資料
+  @override
+  String? get nickname; // bowler's name (display name)
+  @override
+  @JsonKey(name: 'avatar_url')
+  String? get avatarUrl; // 頭像URL
+  @override
+  String? get country;
+  @override
+  String? get city;
+  @override
+  @JsonKey(name: 'dominate_hand')
+  String? get dominateHand;
+  @override
+  String? get style; // bowling style
+  @override
+  @JsonKey(name: 'PAP_integer')
+  int? get papInteger;
+  @override
+  @JsonKey(name: 'PAP_fraction')
+  String? get papFraction;
+  @override
+  @JsonKey(name: 'PAP_direction')
+  int? get papDirection; // 0=none, 1=up, -1=down
+  @override
+  @JsonKey(name: 'PAP_drift_integer')
+  int? get papDriftInteger;
+  @override
+  @JsonKey(name: 'PAP_drift_fraction')
+  String? get papDriftFraction; // 其他用戶設定
   @override
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;

@@ -8,6 +8,22 @@ abstract class UserProfileRepository {
   /// Create or update user profile
   Future<UserProfile> saveUserProfile(UserProfile profile);
   
+  /// Update user profile information
+  Future<UserProfile> updateProfile({
+    required String userId,
+    String? nickname,
+    String? avatarUrl,
+    String? country,
+    String? city,
+    String? dominateHand,
+    String? style,
+    int? papInteger,
+    String? papFraction,
+    int? papDirection, // 0=none, 1=up, -1=down
+    int? papDriftInteger,
+    String? papDriftFraction,
+  });
+  
   /// Update bag name for specific bag number
   Future<void> updateBagName({
     required String userId,

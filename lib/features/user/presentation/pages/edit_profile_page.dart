@@ -3,32 +3,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/buttons/custom_dropdown.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/selection_button.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/selection_bottom_sheet.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/selectors/country_selector_v2.dart';
+import 'package:bowlingarsenal_app/shared/widgets/selectors/pap_selector.dart';
+import 'package:bowlingarsenal_app/shared/models/country_model.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
-import 'package:bowlingarsenal_app/shared/providers/user_profile_provider.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 // --- Enums 定義 ---
 enum DominateHand { left, right }
 enum BowlingStyle { oneHanded, twoHanded, spinner, others }
-
-// 修正：新增 none 選項，並將其設為第一個
-enum PapUpDown {
-  none, // 空白選項
-  up,
-  down;
-
-  String get symbol {
-    switch (this) {
-      case PapUpDown.up:
-        return '↑';
-      case PapUpDown.down:
-        return '↓';
-      case PapUpDown.none:
-        return ' '; // 空白選項顯示為空格
-    }
-  }
-}
 
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
@@ -40,61 +32,106 @@ class EditProfilePage extends ConsumerStatefulWidget {
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   // 狀態變數
   final _nameController = TextEditingController();
-  final _countryController = TextEditingController();
   final _cityController = TextEditingController();
+  Country? _selectedCountry;
   DominateHand? _selectedHand;
   BowlingStyle? _selectedStyle;
   int? _selectedPapInt;
   String? _selectedPapFraction1; // 第一個分數
-  PapUpDown? _selectedPapUpDown = PapUpDown.none; // 預設為空白
+  PapDirection _selectedPapDirection = PapDirection.none; // 預設為空白
   String? _selectedPapFraction2; // 第二個分數
+  
+  // 照片相關
+  final ImagePicker _picker = ImagePicker();
+  XFile? _selectedImage;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserProfile();
+      _initializeProfile();
     });
   }
 
-  void _loadUserProfile() {
-    final userProfile = ref.read(userProfileProvider);
-    if (userProfile != null) {
-      _nameController.text = userProfile.nickname;
-      _countryController.text = userProfile.country;
-      _cityController.text = userProfile.city;
-      
-      // 設定慣用手
-      if (userProfile.hand == 'Left Hand') {
-        _selectedHand = DominateHand.left;
-      } else if (userProfile.hand == 'Right Hand') {
-        _selectedHand = DominateHand.right;
-      }
-      
-      // 設定打球風格
-      switch (userProfile.bowlingStyle) {
-        case 'One-Handed':
-          _selectedStyle = BowlingStyle.oneHanded;
-          break;
-        case 'Two-Handed':
-          _selectedStyle = BowlingStyle.twoHanded;
-          break;
-        case 'Spinner':
-          _selectedStyle = BowlingStyle.spinner;
-          break;
-        case 'Others':
-          _selectedStyle = BowlingStyle.others;
-          break;
-      }
-      
-      setState(() {});
+  Future<void> _initializeProfile() async {
+    // 獲取當前用戶 ID 並載入 profile
+    final supabase = ref.read(supabaseClientProvider);
+    final userId = supabase.auth.currentUser?.id;
+    
+    if (userId != null) {
+      // 先載入用戶資料到 controller
+      await ref.read(userProfileControllerProvider.notifier).loadUserProfile(userId);
+      // 然後將資料載入到頁面控制項
+      _loadUserProfile();
     }
+  }
+
+  void _loadUserProfile() {
+    final userProfileState = ref.read(userProfileControllerProvider);
+    final userProfile = userProfileState.profile;
+    
+    if (userProfile != null) {
+      _applyProfileToFields();
+    }
+  }
+
+  void _applyProfileToFields() {
+    final userProfileState = ref.read(userProfileControllerProvider);
+    final userProfile = userProfileState.profile;
+    if (userProfile == null) {
+      return;
+    }
+    _nameController.text = userProfile.nickname ?? '';
+    _cityController.text = userProfile.city ?? '';
+      
+    // 嘗試从國家名稱找到對應的 Country 物件
+    if (userProfile.country != null && userProfile.country!.isNotEmpty) {
+      _selectedCountry = Countries.findByCode(userProfile.country!);
+      if (_selectedCountry == null) {
+        try {
+          _selectedCountry = Countries.all.firstWhere(
+            (country) => country.name.toLowerCase() == userProfile.country!.toLowerCase(),
+          );
+        } catch (e) {
+          _selectedCountry = null;
+        }
+      }
+    }
+      
+    // 設定慣用手
+    if (userProfile.dominateHand == 'Left Hand') {
+      _selectedHand = DominateHand.left;
+    } else if (userProfile.dominateHand == 'Right Hand') {
+      _selectedHand = DominateHand.right;
+    }
+      
+    // 設定打球風格
+    switch (userProfile.style) {
+      case 'One-Handed':
+        _selectedStyle = BowlingStyle.oneHanded;
+        break;
+      case 'Two-Handed':
+        _selectedStyle = BowlingStyle.twoHanded;
+        break;
+      case 'Spinner':
+        _selectedStyle = BowlingStyle.spinner;
+        break;
+      case 'Others':
+        _selectedStyle = BowlingStyle.others;
+        break;
+    }
+      
+    // 載入 PAP 資料
+    _selectedPapInt = userProfile.papInteger;
+    _selectedPapFraction1 = userProfile.papFraction;
+    _selectedPapDirection = PapDirection.fromValue(userProfile.papDirection);
+    _selectedPapFraction2 = userProfile.papDriftFraction;
+    setState(() {});
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _countryController.dispose();
     _cityController.dispose();
     super.dispose();
   }
@@ -112,51 +149,197 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return hand == DominateHand.left ? 'Left Hand' : 'Right Hand';
   }
 
-  String _constructPapString() {
+  /// 獲取 PAP 顯示文字
+  String _getPapDisplayText() {
+    if (!_hasAnyPapValue()) {
+      return 'Not set';
+    }
+
     final parts = <String>[];
     
+    // 添加整數部分
     if (_selectedPapInt != null) {
       parts.add(_selectedPapInt.toString());
     }
     
+    // 添加第一個分數
     if (_selectedPapFraction1 != null) {
       parts.add(_selectedPapFraction1!);
     }
     
-    if (_selectedPapUpDown != null && _selectedPapUpDown != PapUpDown.none) {
-      parts.add(_selectedPapUpDown!.symbol);
+    // 添加方向和第二個分數
+    if (_selectedPapDirection != PapDirection.none) {
+      parts.add(_selectedPapDirection.symbol);
       if (_selectedPapFraction2 != null) {
         parts.add(_selectedPapFraction2!);
       }
     }
     
-    return parts.join(' ');
+    return parts.isEmpty ? 'Not set' : parts.join(' ');
+  }
+
+  /// 檢查是否有任何 PAP 值設定
+  bool _hasAnyPapValue() {
+    return _selectedPapInt != null || 
+           _selectedPapFraction1 != null || 
+           _selectedPapDirection != PapDirection.none ||
+           _selectedPapFraction2 != null;
+  }
+
+  /// 重置 PAP 所有數值
+  void _resetPapValues() async {
+    // 顯示確認對話框
+    final bool? shouldReset = await AppBaseDialog.showConfirmation(
+      context: context,
+      title: 'Reset PAP Configuration',
+      message: 'Are you sure you want to reset all PAP values? This action cannot be undone.',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      isDestructive: true, // 使用紅色邊框表示危險操作
+    );
+    
+    // 如果用戶確認重置
+    if (shouldReset == true) {
+      setState(() {
+        _selectedPapInt = null;
+        _selectedPapFraction1 = null;
+        _selectedPapDirection = PapDirection.none;
+        _selectedPapFraction2 = null;
+      });
+      
+      TopNotification.showSuccess(context, 'PAP configuration has been reset');
+    }
+  }
+
+  /// 選擇照片
+  Future<void> _pickImage() async {
+    if (kIsWeb) {
+      // 在Chrome環境下，直接使用Gallery並提供更友好的提示
+      try {
+        final XFile? image = await _picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 85,
+        );
+        
+        if (image != null) {
+          setState(() {
+            _selectedImage = image;
+          });
+          
+          TopNotification.showSuccess(context, 'Photo selected successfully!');
+        }
+        return;
+      } catch (e) {
+        TopNotification.showError(context, 'Chrome photo selection has limitations. Feature works perfectly on mobile devices.');
+        return;
+      }
+    }
+
+    // 手機環境下的完整dialog
+    try {
+      final ImageSource? source = await AppBaseDialog.show<ImageSource>(
+        context: context,
+        title: 'Select Photo Source',
+        borderColor: Theme.of(context).colorScheme.primary,
+        content: const Text(
+          'Choose where you want to select your photo from:',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          AppStandardButton.primaryOutlined(
+            onPressed: () => Navigator.pop(context, ImageSource.camera),
+            text: 'Camera',
+            height: 48,
+          ),
+          AppStandardButton.primaryOutlined(
+            onPressed: () => Navigator.pop(context, ImageSource.gallery),
+            text: 'Gallery',
+            height: 48,
+          ),
+        ],
+      );
+
+      if (source != null) {
+        final XFile? image = await _picker.pickImage(
+          source: source,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 85,
+        );
+        
+        if (image != null) {
+          setState(() {
+            _selectedImage = image;
+          });
+          
+          TopNotification.showSuccess(context, 'Photo selected successfully!');
+        }
+      }
+    } catch (e) {
+      TopNotification.showError(context, 'Failed to select photo: $e');
+    }
+  }
+
+  /// 開啟 PAP 滾動選擇器
+  void _openPapSelector() async {
+    final result = await showPapSelector(
+      context,
+      initialInteger: _selectedPapInt,
+      initialFraction1: _selectedPapFraction1,
+      initialDirection: _selectedPapDirection,
+      initialFraction2: _selectedPapFraction2,
+    );
+    
+    if (result != null) {
+      setState(() {
+        _selectedPapInt = result.integer;
+        _selectedPapFraction1 = result.fraction1;
+        _selectedPapDirection = result.direction;
+        _selectedPapFraction2 = result.fraction2;
+      });
+    }
   }
 
   Future<void> _saveProfile() async {
     try {
-      await ref.read(userProfileProvider.notifier).updateProfile(
-        nickname: _nameController.text,
-        country: _countryController.text,
-        city: _cityController.text,
-        hand: _selectedHand != null ? _getHandName(_selectedHand!) : '',
-        bowlingStyle: _selectedStyle != null ? _getBowlingStyleName(_selectedStyle!) : '',
-        pap: _constructPapString(),
-        ballPath: '', // 保持現有值或空字串
+      // 獲取當前用戶 ID
+      final supabase = ref.read(supabaseClientProvider);
+      final userId = supabase.auth.currentUser?.id;
+      
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // 使用新的 controller 更新個人資料
+      await ref.read(userProfileControllerProvider.notifier).updateProfile(
+        userId: userId,
+        nickname: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
+        avatarUrl: _selectedImage?.path, // 傳入選中圖片的路徑
+        country: _selectedCountry?.name,
+        city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
+        dominateHand: _selectedHand != null ? _getHandName(_selectedHand!) : null,
+        style: _selectedStyle != null ? _getBowlingStyleName(_selectedStyle!) : null,
+        papInteger: _selectedPapInt,
+        papFraction: _selectedPapFraction1,
+        papDirection: _selectedPapDirection.value,
+        papDriftInteger: null, // 如果有此欄位的輸入可以加上
+        papDriftFraction: _selectedPapFraction2,
       );
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile saved successfully!')),
-        );
+        TopNotification.showSuccess(context, 'Profile saved successfully!');
         // 儲存成功後跳回主頁面
         context.go('/');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save profile: $e')),
-        );
+        TopNotification.showError(context, 'Failed to save profile: $e');
       }
     }
   }
@@ -168,23 +351,33 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 在 build 內監聽 state 變化（符合 Riverpod 規範）
+    ref.listen<UserProfileState>(
+      userProfileControllerProvider,
+      (previous, next) {
+        if (next.profile != null && previous?.profile != next.profile) {
+          _applyProfileToFields();
+        }
+      },
+    );
     final inputDecorationTheme = InputDecoration(
       filled: true,
-      fillColor: Colors.grey.withOpacity(0.1),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      fillColor: Colors.transparent,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: Theme.of(context).primaryColor),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
       ),
       labelStyle: TextStyle(color: Colors.grey[400]),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
     );
 
     return ProfessionalDarkBackground(
@@ -196,7 +389,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => GoRouter.of(context).pop(),
+            onPressed: () => context.go('/'),
           ),
         ),
         body: Stack(
@@ -208,57 +401,113 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    // 頭像部分 (維持不變)
+                    // 頭像部分
                     Center(
                       child: Column(
                         children: [
-                          CircleAvatar(radius: 50, backgroundColor: Colors.grey.withOpacity(0.2), child: const Icon(Icons.person, size: 50, color: Colors.white70)),
-                          const SizedBox(height: 8),
-                          TextButton.icon(
-                            icon: const Icon(Icons.camera_alt, color: Colors.white70),
-                            label: const Text('Add Photo', style: TextStyle(color: Colors.white70)),
-                            onPressed: () { /* TODO: Image picker logic */ },
+                          // 頭像顯示
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.grey.withOpacity(0.2),
+                            backgroundImage: _selectedImage != null 
+                                ? (kIsWeb 
+                                    ? NetworkImage(_selectedImage!.path) as ImageProvider
+                                    : FileImage(File(_selectedImage!.path)) as ImageProvider)
+                                : (ref.watch(userProfileControllerProvider).profile?.avatarUrl != null
+                                    ? NetworkImage(ref.watch(userProfileControllerProvider).profile!.avatarUrl!) as ImageProvider
+                                    : null),
+                            child: _selectedImage == null && ref.watch(userProfileControllerProvider).profile?.avatarUrl == null
+                                ? const Icon(Icons.person, size: 40, color: Colors.white70)
+                                : null,
+                          ),
+                          const SizedBox(height: 6),
+                          // Add/Change Photo 按鈕
+                          InkWell(
+                            onTap: _pickImage,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _selectedImage != null ? Icons.edit : Icons.camera_alt, 
+                                    color: Theme.of(context).colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _selectedImage != null ? 'Change Photo' : 'Add Photo',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
 
                     // Bowler's Name
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: inputDecorationTheme.copyWith(labelText: "Bowler's Name"),
-                      style: const TextStyle(color: Colors.white),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Bowler's Name", style: TextStyle(color: Colors.white, fontSize: 14)),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: inputDecorationTheme,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-                    // Location Section
-                    const Text('Location', style: TextStyle(color: Colors.white, fontSize: 16)),
-                    const SizedBox(height: 12),
+                    // Country and City Section
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
-                            controller: _countryController,
-                            decoration: inputDecorationTheme.copyWith(labelText: "Country"),
-                            style: const TextStyle(color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Country', style: TextStyle(color: Colors.white, fontSize: 14)),
+                              const SizedBox(height: 6),
+                              CountrySelectorV2(
+                                selectedCountry: _selectedCountry,
+                                onChanged: (country) => setState(() => _selectedCountry = country),
+                                showGroups: false,
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: TextFormField(
-                            controller: _cityController,
-                            decoration: inputDecorationTheme.copyWith(labelText: "City"),
-                            style: const TextStyle(color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('City', style: TextStyle(color: Colors.white, fontSize: 14)),
+                              const SizedBox(height: 6),
+                              TextFormField(
+                                controller: _cityController,
+                                decoration: inputDecorationTheme.copyWith(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
                     // Dominate Hand & Bowling Style
                     Row(
@@ -268,13 +517,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Dominate Hand', style: TextStyle(color: Colors.white, fontSize: 16)),
-                              const SizedBox(height: 12),
-                              CustomDropdown<DominateHand>(
-                                hintText: 'Select Hand',
+                              const Text('Dominate Hand', style: TextStyle(color: Colors.white, fontSize: 14)),
+                              const SizedBox(height: 6),
+                              SelectionButton<DominateHand>(
+                                hint: 'Select Hand',
                                 value: _selectedHand,
-                                isFilled: true,
-                                items: DominateHand.values.map((hand) => DropdownMenuItem(value: hand, child: Text(hand == DominateHand.left ? 'Left Hand' : 'Right Hand', style: const TextStyle(color: Colors.white)))).toList(),
+                                dialogTitle: 'Dominate Hand',
+                                items: DominateHand.values.map((hand) => SelectionItem(
+                                  value: hand,
+                                  displayText: hand == DominateHand.left ? 'Left Hand' : 'Right Hand',
+                                )).toList(),
                                 onChanged: (val) => setState(() => _selectedHand = val),
                               ),
                             ],
@@ -285,13 +537,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Bowling Style', style: TextStyle(color: Colors.white, fontSize: 16)),
-                              const SizedBox(height: 12),
-                              CustomDropdown<BowlingStyle>(
-                                hintText: 'Select Style',
+                              const Text('Bowling Style', style: TextStyle(color: Colors.white, fontSize: 14)),
+                              const SizedBox(height: 6),
+                              SelectionButton<BowlingStyle>(
+                                hint: 'Select Style',
                                 value: _selectedStyle,
-                                isFilled: true,
-                                items: BowlingStyle.values.map((style) => DropdownMenuItem(value: style, child: Text(_getBowlingStyleName(style), style: const TextStyle(color: Colors.white)))).toList(),
+                                dialogTitle: 'Bowling Style',
+                                items: BowlingStyle.values.map((style) => SelectionItem(
+                                  value: style,
+                                  displayText: _getBowlingStyleName(style),
+                                )).toList(),
                                 onChanged: (val) => setState(() => _selectedStyle = val),
                               ),
                             ],
@@ -299,73 +554,72 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-                    // PAP Section Title
-                    const Text('Personal Positive Axis Point (PAP)', style: TextStyle(color: Colors.white, fontSize: 16)),
-                    const SizedBox(height: 12),
-
-                    // *** 關鍵修改：PAP 改為三行式佈局 ***
-                    // 第一行：整數和第一個分數
-                    Row(
+                    // PAP Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: 120,
-                          child: CustomDropdown<int>(
-                            hintText: ' ',
-                            value: _selectedPapInt,
-                            items: List.generate(7, (i) => i).map((val) => DropdownMenuItem(value: val, child: Text(val.toString(), style: const TextStyle(color: Colors.white)))).toList(),
-                            onChanged: (val) => setState(() => _selectedPapInt = val),
+                        const Text('Personal Positive Axis Point (PAP)', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        const SizedBox(height: 6),
+                        
+                        // PAP 顯示和設定區域
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 1.5,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        SizedBox(
-                          width: 135,
-                          child: CustomDropdown<String>(
-                            hintText: ' ',
-                            value: _selectedPapFraction1,
-                            items: ['1/16', '1/8', '3/16', '1/4', '5/16', '3/8', '7/16', '1/2', '9/16', '5/8', '11/16', '3/4', '13/16', '7/8', '15/16']
-                                .map((frac) => DropdownMenuItem(value: frac, child: Text(frac, style: const TextStyle(color: Colors.white)))).toList(),
-                            onChanged: (val) => setState(() => _selectedPapFraction1 = val),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _getPapDisplayText(),
+                                      style: TextStyle(
+                                        color: _hasAnyPapValue() ? Colors.white : Colors.grey[400],
+                                        fontSize: 18, // 從14增大到18
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    // 移除次行說明
+                                  ],
+                                ),
+                              ),
+                              
+                              // Set/Reset 按鈕
+                              InkWell(
+                                onTap: _hasAnyPapValue() ? _resetPapValues : _openPapSelector,
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    // 移除外框
+                                  ),
+                                  child: Text(
+                                    _hasAnyPapValue() ? 'Reset' : 'Set', // 根據是否有資料顯示不同文字
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-
-                    // 第二行：上/下/空白 選項
-                    SizedBox(
-                      width: 100,
-                      child: CustomDropdown<PapUpDown>(
-                        hintText: 'Sign',
-                        value: _selectedPapUpDown,
-                        items: PapUpDown.values.map((dir) => DropdownMenuItem(value: dir, child: Text(dir.symbol, style: const TextStyle(color: Colors.white, fontSize: 18)))).toList(),
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedPapUpDown = val;
-                            // 如果選擇空白，就清空第二個分數的值
-                            if (val == PapUpDown.none) {
-                              _selectedPapFraction2 = null;
-                            }
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // 第三行：條件顯示的第二個分數
-                    // 只有當選擇了 'up' 或 'down' 時才顯示
-                    if (_selectedPapUpDown == PapUpDown.up || _selectedPapUpDown == PapUpDown.down)
-                      SizedBox(
-                        width: 135,
-                        child: CustomDropdown<String>(
-                          hintText: ' ',
-                          value: _selectedPapFraction2,
-                          items: ['1/16', '1/8', '3/16', '1/4', '5/16', '3/8', '7/16', '1/2', '9/16', '5/8', '11/16', '3/4', '13/16', '7/8', '15/16']
-                              .map((frac) => DropdownMenuItem(value: frac, child: Text(frac, style: const TextStyle(color: Colors.white)))).toList(),
-                          onChanged: (val) => setState(() => _selectedPapFraction2 = val),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -373,7 +627,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 
                 // 底部按鈕區域
                 Container(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.3),
                     border: Border(
@@ -383,11 +637,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: AppStandardButton(
+                        child: AppStandardButton.primaryOutlined(
                           onPressed: _exitWithoutSaving,
                           text: 'Exit',
-                          isPrimary: false,
-                          height: 50,
+                          height: 40,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -395,8 +648,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         child: AppStandardButton(
                           onPressed: _saveProfile,
                           text: 'Save',
-                          isPrimary: true,
-                          height: 50,
+                          height: 40,
                         ),
                       ),
                     ],
