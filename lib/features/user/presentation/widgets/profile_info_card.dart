@@ -42,7 +42,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
     final primaryColor = theme.colorScheme.primary;
     
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -62,7 +62,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         ],
       ),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
         child: userProfileState.isLoading
             ? _buildLoadingState()
             : userProfileState.profile != null
@@ -74,7 +74,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
 
   Widget _buildLoadingState() {
     return const SizedBox(
-      height: 120,
+      height: 112,
       child: Center(
         child: CircularProgressIndicator(
           color: Colors.black,
@@ -85,7 +85,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
 
   Widget _buildEmptyState() {
     return const SizedBox(
-      height: 120,
+      height: 112,
       child: Center(
         child: Text(
           'Please complete your profile',
@@ -103,11 +103,11 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       children: [
         // 左側：用戶頭像
         _buildUserAvatar(profile),
-        const SizedBox(width: 20),
+        const SizedBox(width: 24),
         // 右側：用戶信息（四層）
         Expanded(
           child: Container(
-            alignment: Alignment.center,
+            alignment: Alignment.centerLeft,
             child: _buildUserInfo(profile),
           ),
         ),
@@ -123,8 +123,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         profile.avatarUrl!.startsWith('http');
 
     return Container(
-      width: 100,
-      height: 100,
+      width: 96,
+      height: 96,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -144,8 +144,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
             ? Image.network(
                 profile.avatarUrl!,
                 fit: BoxFit.cover,
-                width: 100,
-                height: 100,
+                width: 96,
+                height: 96,
                 errorBuilder: (context, error, stackTrace) {
                   return _buildDefaultAvatar();
                 },
@@ -161,8 +161,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
 
   Widget _buildDefaultAvatar() {
     return Container(
-      width: 100,
-      height: 100,
+      width: 96,
+      height: 96,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.2),
@@ -170,15 +170,15 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       child: const Icon(
         Iconsax.user,
         color: Colors.black,
-        size: 36,
+        size: 32,
       ),
     );
   }
 
   Widget _buildAvatarLoading() {
     return Container(
-      width: 100,
-      height: 100,
+      width: 96,
+      height: 96,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.2),
@@ -203,11 +203,11 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         
         // 第二層：所在位置
         _buildLocation(profile),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         
         // 第三層：慣用手及風格
         _buildHandAndStyle(profile),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         
         // 第四層：球手PAP
         _buildPAP(profile),
@@ -224,7 +224,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       displayName,
       style: const TextStyle(
         color: Colors.black,
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
       maxLines: 1,
@@ -271,7 +271,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       children: [
         if (flagWidget != null) ...[
           flagWidget,
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
         ],
         Expanded(
           child: Text(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
-import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/widgets/profile_info_card.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
@@ -32,7 +31,8 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
     final currentIndex = _calculateCurrentIndex(location);
     final theme = Theme.of(context);
 
-    return ProfessionalDarkBackground(
+    return Container(
+      color: Colors.black,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -67,10 +67,10 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             children: [
               // 頂部用戶信息卡片
               const ProfileInfoCard(),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               // 三個功能區塊
               _buildActionBlocks(context),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               // 下方選單列表
               _buildMenuList(context),
               const SizedBox(height: 20),
@@ -128,7 +128,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
               onTap: () => context.go('/my-arsenal'),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           
           // Training 區塊
           Expanded(
@@ -144,7 +144,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
               },
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           
           // Tournament 區塊
           Expanded(
@@ -177,7 +177,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 120,
+        height: 96,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -197,30 +197,30 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
-                size: 32,
+                size: 22,
                 color: Colors.white,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   color: Colors.white70,
                 ),
                 textAlign: TextAlign.center,
@@ -257,7 +257,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             },
           ),
           
-          const SizedBox(height: 1),
+          const SizedBox(height: 8),
           
           // Favorite Centers & Patterns選項
           _buildMenuTile(
@@ -270,7 +270,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             },
           ),
           
-          const SizedBox(height: 1),
+          const SizedBox(height: 8),
           
           // 預留選項1
           _buildMenuTile(
@@ -282,7 +282,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             },
           ),
           
-          const SizedBox(height: 1),
+          const SizedBox(height: 8),
           
           // 預留選項2
           _buildMenuTile(
@@ -319,7 +319,8 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: effectiveBackgroundColor,
           borderRadius: BorderRadius.circular(0),
@@ -332,20 +333,22 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             // 左側圖示
             Icon(
               icon,
-              size: 24,
+              size: 20,
               color: effectiveIconColor,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             
             // 中間文字內容
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: effectiveTextColor,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             
@@ -353,7 +356,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             Icon(
               Icons.chevron_right,
               color: effectiveTextColor.withOpacity(0.6),
-              size: 24,
+              size: 20,
             ),
           ],
         ),
