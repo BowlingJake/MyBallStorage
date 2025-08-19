@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/data/models/ball_library_state.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/optimized/virtualized_ball_list.dart';
+import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
 
 /// Ball Library Content Widget
 /// Handles the main content display including ball list and empty states
@@ -18,10 +19,36 @@ class BallLibraryContent extends ConsumerWidget {
       data: (state) => state.filteredBalls.isEmpty
           ? _buildEmptyState(state.hasActiveFilters)
           : _buildBallList(context, ref, state),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      loading: () => _buildOptimisticLoadingState(context, ref),
       error: (error, stack) => _buildErrorState(context, ref, error),
+    );
+  }
+
+  /// 樂觀UI載入狀態 - 優先顯示快取內容
+  Widget _buildOptimisticLoadingState(BuildContext context, WidgetRef ref) {
+    return FutureBuilder<List<dynamic>?>(
+      future: ref.read(localCacheServiceProvider).getCachedBallLibraryBasicData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
+          // 有快取數據時顯示快取內容，而非loading圈
+          return Column(
+            children: [
+              // 顯示微妙的載入指示器
+              Container(
+                height: 2,
+                child: const LinearProgressIndicator(),
+              ),
+              Expanded(
+                child: const VirtualizedBallList(), // 使用快取數據
+              ),
+            ],
+          );
+        }
+        // 無快取時才顯示loading圈
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 

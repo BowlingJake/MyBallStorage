@@ -31,6 +31,7 @@ class TrainingController extends _$TrainingController {
 
   @override
   TrainingState build() {
+    ref.keepAlive(); // 保持provider活躍，避免頁面切換時重建
     _repository = ref.watch(trainingRepositoryProvider);
     return TrainingState(
       trainingDays: _repository.trainingDays,

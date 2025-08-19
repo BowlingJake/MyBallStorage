@@ -23,6 +23,7 @@ import 'package:bowlingarsenal_app/features/onboarding/providers/onboarding_prov
 import 'package:bowlingarsenal_app/features/user/presentation/pages/edit_profile_page.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/favorite_centers_oil_patterns_page.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/pages/view_profile_page.dart';
+import 'package:bowlingarsenal_app/features/user/presentation/pages/my_profile_page.dart';
 import 'package:bowlingarsenal_app/features/favorites/presentation/pages/favorites_page.dart';
 
 // 1. 建立 GoRouterRefreshStream
@@ -133,6 +134,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/view_profile',
         name: 'view_profile',
         builder: (context, state) => const ViewProfilePage(),
+      ),
+      GoRoute(
+        path: '/my-profile',
+        name: 'my-profile',
+        pageBuilder: (context, state) => const NoTransitionPage(child: MyProfilePage()),
       ),
       GoRoute(
         path: '/developer',

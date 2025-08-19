@@ -59,6 +59,7 @@ ArsenalDataService arsenalDataService(ArsenalDataServiceRef ref) {
 class NewArsenalController extends _$NewArsenalController {
   @override
   NewArsenalState build() {
+    ref.keepAlive(); // 保持provider活躍，避免頁面切換時重建
     return const NewArsenalState();
   }
 

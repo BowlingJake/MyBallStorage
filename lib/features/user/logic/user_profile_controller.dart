@@ -4,6 +4,7 @@ import 'package:bowlingarsenal_app/features/user/data/repositories/user_profile_
 import 'package:bowlingarsenal_app/features/user/data/repositories/supabase_user_profile_repository.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
+import 'package:bowlingarsenal_app/shared/services/image_upload_service.dart';
 
 part 'user_profile_controller.freezed.dart';
 part 'user_profile_controller.g.dart';
@@ -30,10 +31,12 @@ UserProfileRepository userProfileRepository(UserProfileRepositoryRef ref) {
 class UserProfileController extends _$UserProfileController {
   @override
   UserProfileState build() {
+    ref.keepAlive(); // 保持provider活躍，避免頁面切換時重建
     return const UserProfileState();
   }
 
   UserProfileRepository get _repository => ref.read(userProfileRepositoryProvider);
+  ImageUploadService get _imageUploadService => ref.read(imageUploadServiceProvider);
 
   /// Load user profile
   Future<void> loadUserProfile(String userId) async {
@@ -65,6 +68,7 @@ class UserProfileController extends _$UserProfileController {
       );
     }
   }
+
 
   /// Update user profile information
   Future<void> updateProfile({

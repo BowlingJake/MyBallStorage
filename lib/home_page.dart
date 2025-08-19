@@ -1,7 +1,6 @@
 // lib/home_page.dart
 import 'dart:ui'; // For BackdropFilter
 
-import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
 // import 'package:bowlingarsenal_app/features/arsenal/widgets/arsenal_section.dart'; // Removed - old widget
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
@@ -160,21 +159,12 @@ class _HomePageAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // 只將主題切換按鈕包裹在 Consumer 中
-        Consumer(
-          builder: (context, ref, _) {
-            final themeMode = ref.watch(currentThemeModeProvider);
-            return IconButton(
-              icon: Icon(
-                themeMode == ThemeMode.dark
-                    ? Icons.light_mode_outlined
-                    : Icons.dark_mode_outlined,
-              ),
-              color: theme.colorScheme.onSurface,
-              onPressed: () => ref.read(appThemeProvider.notifier).toggleTheme(),
-              tooltip: 'Toggle Theme',
-            );
-          },
+        // Profile 按鈕
+        IconButton(
+          icon: const Icon(Icons.person_outline),
+          color: theme.colorScheme.onSurface,
+          onPressed: () => context.go('/my-profile'),
+          tooltip: 'My Profile',
         ),
         IconButton(
           icon: const Icon(Icons.developer_mode_outlined),

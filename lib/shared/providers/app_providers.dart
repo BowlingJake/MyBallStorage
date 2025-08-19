@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bowlingarsenal_app/features/auth/data/auth_repository.dart';
+import 'package:bowlingarsenal_app/shared/services/image_upload_service.dart';
 
 /// Provider for the SupabaseClient instance.
 /// This is the foundational provider that other providers will depend on.
@@ -22,4 +23,11 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final authStateChangesProvider = StreamProvider<AuthState>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   return authRepository.authStateChanges;
+});
+
+/// Provider for the ImageUploadService.
+/// It depends on the `supabaseClientProvider` to get the SupabaseClient instance.
+final imageUploadServiceProvider = Provider<ImageUploadService>((ref) {
+  final supabaseClient = ref.watch(supabaseClientProvider);
+  return ImageUploadService(supabaseClient);
 }); 

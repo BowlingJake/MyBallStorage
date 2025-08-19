@@ -41,6 +41,7 @@ class BallLibraryController extends _$BallLibraryController {
 
   @override
   Future<BallLibraryState> build() async {
+    ref.keepAlive(); // 保持provider活躍，避免頁面切換時重建
     _repository = ref.watch(ballRepositoryProvider);
     final cacheService = ref.read(localCacheServiceProvider);
     
