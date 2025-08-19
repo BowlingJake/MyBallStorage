@@ -149,6 +149,23 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return hand == DominateHand.left ? 'Left Hand' : 'Right Hand';
   }
 
+  /// 獲取照片按鈕文字
+  String _getPhotoButtonText() {
+    // 如果當前選擇了新圖片
+    if (_selectedImage != null) {
+      return 'Change Photo';
+    }
+    
+    // 如果用戶已經有頭像
+    final userProfile = ref.watch(userProfileControllerProvider).profile;
+    final hasExistingAvatar = userProfile?.avatarUrl != null && 
+        userProfile!.avatarUrl!.isNotEmpty &&
+        !userProfile.avatarUrl!.contains('localhost') &&
+        userProfile.avatarUrl!.startsWith('http');
+    
+    return hasExistingAvatar ? 'Change Photo' : 'Add Photo';
+  }
+
   /// 獲取 PAP 顯示文字
   String _getPapDisplayText() {
     if (!_hasAnyPapValue()) {
@@ -213,32 +230,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   /// 選擇照片
   Future<void> _pickImage() async {
-    if (kIsWeb) {
-      // 在Chrome環境下，直接使用Gallery並提供更友好的提示
-      try {
-        final XFile? image = await _picker.pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 85,
-        );
-        
-        if (image != null) {
-          setState(() {
-            _selectedImage = image;
-          });
-          
-          TopNotification.showSuccess(context, 'Photo selected successfully!');
-        }
-        return;
-      } catch (e) {
-        TopNotification.showError(context, 'Chrome photo selection has limitations. Feature works perfectly on mobile devices.');
-        return;
-      }
-    }
-
-    // 手機環境下的完整dialog
     try {
+      // 顯示選擇來源對話框
       final ImageSource? source = await AppBaseDialog.show<ImageSource>(
         context: context,
         title: 'Select Photo Source',
@@ -266,6 +259,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       );
 
       if (source != null) {
+        
         final XFile? image = await _picker.pickImage(
           source: source,
           maxWidth: 1024,
@@ -274,11 +268,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         );
         
         if (image != null) {
+          
           setState(() {
             _selectedImage = image;
           });
           
-          TopNotification.showSuccess(context, 'Photo selected successfully!');
+          TopNotification.showSuccess(context, 'Photo selected successfully! Click Save to upload.');
         }
       }
     } catch (e) {
@@ -316,11 +311,57 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         throw Exception('User not authenticated');
       }
 
+      String? avatarUrl;
+      
+      // 如果用戶選擇了新圖片，先上傳到Supabase
+      if (_selectedImage != null) {
+        try {
+          final imageUploadService = ref.read(imageUploadServiceProvider);
+          
+          // 先刪除舊頭像（如果存在）
+          final currentProfile = ref.read(userProfileControllerProvider).profile;
+          if (currentProfile?.avatarUrl != null && currentProfile!.avatarUrl!.isNotEmpty) {
+            try {
+              await imageUploadService.deleteOldAvatar(currentProfile.avatarUrl!);
+            } catch (e) {
+              // 刪除舊頭像失敗不影響新頭像上傳
+            }
+          }
+          
+          // 上傳新圖片
+          avatarUrl = await imageUploadService.uploadUserAvatar(
+            userId: userId,
+            imageFile: _selectedImage!,
+          );
+          
+          // 驗證URL格式
+          if (avatarUrl.contains('localhost') || !avatarUrl.startsWith('http')) {
+            throw Exception('上傳失敗：生成的URL無效 ($avatarUrl)');
+          }
+          
+        } catch (e) {
+          // 提供詳細錯誤信息
+          String errorMessage = e.toString();
+          String helpMessage = '';
+          
+          if (errorMessage.contains('bucket') && errorMessage.contains('不存在')) {
+            helpMessage = '\n\n解決方法：\n1. 登入Supabase Dashboard\n2. 進入Storage\n3. 創建名為"avatars"的bucket\n4. 設定為Public';
+          } else if (errorMessage.contains('權限') || errorMessage.contains('permission')) {
+            helpMessage = '\n\n解決方法：請檢查Supabase storage policies設定';
+          }
+          
+          if (mounted) {
+            TopNotification.showError(context, '圖片上傳失敗: $errorMessage$helpMessage');
+          }
+          return; // 上傳失敗就不繼續保存
+        }
+      }
+
       // 使用新的 controller 更新個人資料
       await ref.read(userProfileControllerProvider.notifier).updateProfile(
         userId: userId,
         nickname: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
-        avatarUrl: _selectedImage?.path, // 傳入選中圖片的路徑
+        avatarUrl: avatarUrl, // 使用上傳後的URL，如果沒有上傳則為null
         country: _selectedCountry?.name,
         city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
         dominateHand: _selectedHand != null ? _getHandName(_selectedHand!) : null,
@@ -441,7 +482,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    _selectedImage != null ? 'Change Photo' : 'Add Photo',
+                                    _getPhotoButtonText(),
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w500,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/features/user/presentation/widgets/profile_info_card.dart';
 
 /// My Profile Page
 /// 用戶個人資料頁面，包含頂部和底部導航
@@ -59,13 +60,13 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
-        body: const Center(
-          child: Text(
-            'Profile content coming soon...',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 18,
-            ),
+        body: const SingleChildScrollView(
+          child: Column(
+            children: [
+              // 頂部用戶信息卡片
+              ProfileInfoCard(),
+              // TODO: 更多個人資料內容
+            ],
           ),
         ),
         bottomNavigationBar: ModernBottomNavigation(

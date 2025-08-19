@@ -1,5 +1,7 @@
 import 'package:bowlingarsenal_app/shared/providers/app_theme_provider.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
+import 'package:bowlingarsenal_app/shared/providers/app_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
@@ -33,10 +35,70 @@ class SettingsPage extends ConsumerWidget {
               subtitle: Text(_getThemeModeDisplayName(themeState)),
               onTap: () => _showThemeDialog(context, ref),
             ),
+            
+            // 開發者工具選項
+            _buildSectionTitle(theme, '開發者工具'),
+            _buildSettingsCard(
+              theme: theme,
+              leadingIcon: Iconsax.code,
+              title: '測試Supabase連接',
+              subtitle: const Text('檢查Supabase配置和權限'),
+              onTap: () => _testSupabaseConnection(context, ref),
+            ),
           ],
         ),
       ),
     );
+  }
+
+
+  Future<void> _testSupabaseConnection(BuildContext context, WidgetRef ref) async {
+    final supabase = ref.read(supabaseClientProvider);
+    final userId = supabase.auth.currentUser?.id;
+    
+    if (userId == null) {
+      TopNotification.showError(context, '❌ 用戶未登入');
+      return;
+    }
+    
+    TopNotification.showSuccess(context, '🧪 開始測試Supabase連接...');
+    
+    try {
+      // 測試Storage buckets
+      final buckets = await supabase.storage.listBuckets();
+      final hasAvatarsBucket = buckets.any((b) => b.name == 'avatars');
+      
+      // 檢查profiles表訪問權限
+      final profileResponse = await supabase
+          .from('profiles')
+          .select('id, avatar_url')
+          .eq('user_id', userId)
+          .maybeSingle();
+      
+      String testResults = 'Supabase連接測試結果:\n';
+      testResults += '- 用戶認證: ✅\n';
+      testResults += '- Storage buckets: ${buckets.length}個可用\n';
+      testResults += '- avatars bucket: ${hasAvatarsBucket ? "✅" : "❌"}\n';
+      
+      if (profileResponse != null) {
+        testResults += '- profiles表訪問: ✅\n';
+      } else {
+        testResults += '- profiles表訪問: ⚠️ 無記錄\n';
+      }
+      
+      if (hasAvatarsBucket) {
+        final testUrl = supabase.storage
+            .from('avatars')
+            .getPublicUrl('test-file.jpg');
+        final isValidUrl = testUrl.startsWith('http') && !testUrl.contains('localhost');
+        testResults += '- URL生成: ${isValidUrl ? "✅" : "❌"}\n';
+      }
+      
+      TopNotification.showSuccess(context, testResults);
+      
+    } catch (e) {
+      TopNotification.showError(context, '❌ Supabase測試失敗: $e');
+    }
   }
 
   void _showThemeDialog(BuildContext context, WidgetRef ref) {

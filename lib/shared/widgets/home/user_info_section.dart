@@ -27,7 +27,7 @@ class UserInfoSection extends StatelessWidget {
       // 移除卡片預設的垂直邊距，因為外部容器會處理
       margin: EdgeInsets.zero,
       // 增加內部 padding 以提供足夠的呼吸空間
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -40,7 +40,7 @@ class UserInfoSection extends StatelessWidget {
                 userName,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -57,7 +57,7 @@ class UserInfoSection extends StatelessWidget {
                   Text(
                     location,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withOpacity(0.8),
                     ),
                   ),
                 ],
@@ -75,12 +75,12 @@ class UserInfoSection extends StatelessWidget {
   Widget _buildUserAvatar(ThemeData theme, Color accentColor) {
     // 保持頭像原有的精緻設計，它與新卡片風格是協調的
     return Container(
-      width: 52,
-      height: 52,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [accentColor.withOpacity(0.6), Colors.white.withOpacity(0.1)],
+          colors: [accentColor.withOpacity(0.5), Colors.white.withOpacity(0.08)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -103,15 +103,15 @@ class UserInfoSection extends StatelessWidget {
                 child: Image.network(
                   userPhotoUrl!,
                   fit: BoxFit.cover,
-                  width: 52,
-                  height: 52,
+                  width: 48,
+                  height: 48,
                 ),
               )
               : Center(
                 child: Icon(
                   Iconsax.user,
                   color: Colors.white.withOpacity(0.9),
-                  size: 28,
+                  size: 26,
                 ),
               ),
     );
