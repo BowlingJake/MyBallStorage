@@ -77,7 +77,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       height: 120,
       child: Center(
         child: CircularProgressIndicator(
-          color: Colors.white,
+          color: Colors.black,
         ),
       ),
     );
@@ -90,7 +90,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         child: Text(
           'Please complete your profile',
           style: TextStyle(
-            color: Colors.white70,
+            color: Colors.black54,
             fontSize: 16,
           ),
         ),
@@ -166,7 +166,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       ),
       child: const Icon(
         Iconsax.user,
-        color: Colors.white,
+        color: Colors.black,
         size: 36,
       ),
     );
@@ -182,7 +182,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       ),
       child: const Center(
         child: CircularProgressIndicator(
-          color: Colors.white,
+          color: Colors.black,
           strokeWidth: 2,
         ),
       ),
@@ -220,7 +220,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
     return Text(
       displayName,
       style: const TextStyle(
-        color: Colors.white,
+        color: Colors.black,
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
@@ -234,7 +234,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'Location not set',
         style: TextStyle(
-          color: Colors.white70,
+          color: Colors.black54,
           fontSize: 14,
         ),
       );
@@ -274,7 +274,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
           child: Text(
             locationText.isNotEmpty ? locationText : 'Location not set',
             style: const TextStyle(
-              color: Colors.white70,
+              color: Colors.black54,
               fontSize: 14,
             ),
             maxLines: 1,
@@ -295,7 +295,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'Hand & Style not set',
         style: TextStyle(
-          color: Colors.white70,
+          color: Colors.black54,
           fontSize: 14,
         ),
       );
@@ -313,7 +313,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
     return Text(
       combinedText,
       style: const TextStyle(
-        color: Colors.white70,
+        color: Colors.black54,
         fontSize: 14,
       ),
       maxLines: 1,
@@ -332,13 +332,13 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'PAP not measured',
         style: TextStyle(
-          color: Colors.white70,
+          color: Colors.black54,
           fontSize: 14,
         ),
       );
     }
 
-    String papText = 'PAP: ';
+    String papText = '';
     
     // 主要PAP
     if (hasMainPAP) {
@@ -352,28 +352,35 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       // PAP方向
       if (profile.papDirection != null) {
         if (profile.papDirection == 1) {
-          papText += ' ↗';
+          papText += ' ↑';
         } else if (profile.papDirection == -1) {
-          papText += ' ↘';
+          papText += ' ↓';
         }
       }
     }
 
-    // Drift PAP
+    // Drift PAP (分數格式)
     if (hasDriftPAP) {
-      papText += ' x ';
-      if (profile.papDriftInteger != null) {
-        papText += '${profile.papDriftInteger}"';
+      if (papText.isNotEmpty) {
+        papText += ' ';
       }
-      if (profile.papDriftFraction?.isNotEmpty == true) {
-        papText += ' ${profile.papDriftFraction!}';
+      if (profile.papDriftInteger != null || profile.papDriftFraction?.isNotEmpty == true) {
+        if (profile.papDriftInteger != null && profile.papDriftInteger! > 0) {
+          papText += '${profile.papDriftInteger!}';
+        }
+        if (profile.papDriftFraction?.isNotEmpty == true) {
+          if (profile.papDriftInteger != null && profile.papDriftInteger! > 0) {
+            papText += ' ';
+          }
+          papText += '${profile.papDriftFraction!}';
+        }
       }
     }
 
     return Text(
-      papText,
+      papText.isNotEmpty ? papText : 'PAP not measured',
       style: const TextStyle(
-        color: Colors.white70,
+        color: Colors.black54,
         fontSize: 14,
         fontFamily: 'monospace', // 使用等寬字體使數字對齊
       ),
