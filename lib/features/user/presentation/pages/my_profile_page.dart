@@ -67,9 +67,12 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             children: [
               // 頂部用戶信息卡片
               const ProfileInfoCard(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               // 三個功能區塊
               _buildActionBlocks(context),
+              const SizedBox(height: 16),
+              // 下方選單列表
+              _buildMenuList(context),
               const SizedBox(height: 20),
             ],
           ),
@@ -226,6 +229,147 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 構建下方選單列表
+  Widget _buildMenuList(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 訂閱管理選項
+          _buildMenuTile(
+            context: context,
+            title: '訂閱管理',
+            subtitle: '管理您的訂閱計劃',
+            icon: Icons.card_membership,
+            onTap: () {
+              // TODO: 顯示訂閱相關Dialog
+              TopNotification.showSuccess(context, '訂閱管理功能開發中');
+            },
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Favorite Centers & Patterns選項
+          _buildMenuTile(
+            context: context,
+            title: 'Favorite Centers & Patterns',
+            subtitle: '管理喜愛的球館和油型',
+            icon: Icons.favorite,
+            onTap: () {
+              // TODO: 導航到Favorite Centers & Oil Patterns頁面
+              TopNotification.showSuccess(context, 'Favorites功能開發中');
+            },
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // 預留選項1
+          _buildMenuTile(
+            context: context,
+            title: '功能選項1',
+            subtitle: '即將推出',
+            icon: Icons.extension,
+            onTap: () {
+              TopNotification.showSuccess(context, '功能開發中');
+            },
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // 預留選項2
+          _buildMenuTile(
+            context: context,
+            title: '功能選項2',
+            subtitle: '即將推出',
+            icon: Icons.settings_applications,
+            onTap: () {
+              TopNotification.showSuccess(context, '功能開發中');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 構建單個選單項目
+  Widget _buildMenuTile({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.outline.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            // 左側圖示
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 16),
+            
+            // 中間文字內容
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // 右側箭頭
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurface.withOpacity(0.4),
+              size: 24,
+            ),
+          ],
         ),
       ),
     );
