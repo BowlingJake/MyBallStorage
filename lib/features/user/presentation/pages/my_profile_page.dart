@@ -248,9 +248,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             context: context,
             title: 'Subscription',
             icon: Icons.workspace_premium,
-            iconColor: Colors.amber,
-            backgroundColor: Colors.deepPurple,
-            textColor: Colors.white,
+            iconColor: Colors.deepPurple,
+            borderColor: Colors.deepPurple,
+            isSpecial: true,
             onTap: () {
               // TODO: 顯示訂閱相關Dialog
               TopNotification.showSuccess(context, 'Subscription feature coming soon');
@@ -307,9 +307,10 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
     Color? backgroundColor,
     Color? textColor,
     Color? iconColor,
+    Color? borderColor,
+    bool isSpecial = false,
   }) {
     final theme = Theme.of(context);
-    final isSpecial = backgroundColor != null;
     
     final effectiveBackgroundColor = backgroundColor ?? Colors.black;
     final effectiveTextColor = textColor ?? Colors.white;
@@ -322,6 +323,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
         decoration: BoxDecoration(
           color: effectiveBackgroundColor,
           borderRadius: BorderRadius.circular(0),
+          border: isSpecial && borderColor != null
+              ? Border.all(color: borderColor, width: 2)
+              : null,
         ),
         child: Row(
           children: [
