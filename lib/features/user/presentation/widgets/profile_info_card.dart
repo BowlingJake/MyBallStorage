@@ -90,7 +90,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         child: Text(
           'Please complete your profile',
           style: TextStyle(
-            color: Colors.black54,
+            color: Colors.black87,
             fontSize: 16,
           ),
         ),
@@ -106,7 +106,10 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         const SizedBox(width: 20),
         // 右側：用戶信息（四層）
         Expanded(
-          child: _buildUserInfo(profile),
+          child: Container(
+            alignment: Alignment.center,
+            child: _buildUserInfo(profile),
+          ),
         ),
       ],
     );
@@ -120,8 +123,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
         profile.avatarUrl!.startsWith('http');
 
     return Container(
-      width: 80,
-      height: 80,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -141,8 +144,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
             ? Image.network(
                 profile.avatarUrl!,
                 fit: BoxFit.cover,
-                width: 80,
-                height: 80,
+                width: 100,
+                height: 100,
                 errorBuilder: (context, error, stackTrace) {
                   return _buildDefaultAvatar();
                 },
@@ -158,8 +161,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
 
   Widget _buildDefaultAvatar() {
     return Container(
-      width: 80,
-      height: 80,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.2),
@@ -174,8 +177,8 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
 
   Widget _buildAvatarLoading() {
     return Container(
-      width: 80,
-      height: 80,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white.withOpacity(0.2),
@@ -234,7 +237,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'Location not set',
         style: TextStyle(
-          color: Colors.black54,
+          color: Colors.black87,
           fontSize: 14,
         ),
       );
@@ -274,7 +277,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
           child: Text(
             locationText.isNotEmpty ? locationText : 'Location not set',
             style: const TextStyle(
-              color: Colors.black54,
+              color: Colors.black87,
               fontSize: 14,
             ),
             maxLines: 1,
@@ -295,7 +298,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'Hand & Style not set',
         style: TextStyle(
-          color: Colors.black54,
+          color: Colors.black87,
           fontSize: 14,
         ),
       );
@@ -313,7 +316,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
     return Text(
       combinedText,
       style: const TextStyle(
-        color: Colors.black54,
+        color: Colors.black87,
         fontSize: 14,
       ),
       maxLines: 1,
@@ -332,7 +335,7 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       return const Text(
         'PAP not measured',
         style: TextStyle(
-          color: Colors.black54,
+          color: Colors.black87,
           fontSize: 14,
         ),
       );
@@ -377,10 +380,14 @@ class _ProfileInfoCardState extends ConsumerState<ProfileInfoCard> {
       }
     }
 
+    final displayText = papText.isNotEmpty 
+        ? 'My PAP: $papText' 
+        : 'My PAP: not measured';
+    
     return Text(
-      papText.isNotEmpty ? papText : 'PAP not measured',
+      displayText,
       style: const TextStyle(
-        color: Colors.black54,
+        color: Colors.black87,
         fontSize: 14,
         fontFamily: 'monospace', // 使用等寬字體使數字對齊
       ),
