@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/features/user/presentation/widgets/profile_info_card.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 
 /// My Profile Page
 /// 用戶個人資料頁面，包含頂部和底部導航
@@ -60,12 +62,15 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
-        body: const SingleChildScrollView(
+        body: SingleChildScrollView(
           child: Column(
             children: [
               // 頂部用戶信息卡片
-              ProfileInfoCard(),
-              // TODO: 更多個人資料內容
+              const ProfileInfoCard(),
+              const SizedBox(height: 20),
+              // 三個功能區塊
+              _buildActionBlocks(context),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -90,6 +95,127 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
                 break;
             }
           },
+        ),
+      ),
+    );
+  }
+
+  /// 構建三個並排的功能區塊
+  Widget _buildActionBlocks(BuildContext context) {
+    final theme = Theme.of(context);
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    
+    // 計算主球袋中的球數
+    final mainBagBallCount = arsenalState.allInstances
+        .where((instance) => instance.bag1 == true)
+        .length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          // My Arsenal 區塊
+          Expanded(
+            child: _buildActionBlock(
+              context: context,
+              title: 'My Arsenal',
+              subtitle: '$mainBagBallCount balls',
+              icon: Icons.sports,
+              color: theme.colorScheme.secondary,
+              onTap: () => context.go('/my-arsenal'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Training 區塊
+          Expanded(
+            child: _buildActionBlock(
+              context: context,
+              title: 'Training',
+              subtitle: 'Coming Soon',
+              icon: Icons.fitness_center,
+              color: theme.colorScheme.secondary,
+              onTap: () {
+                // TODO: 導航到 Training 頁面
+                TopNotification.showSuccess(context, 'Training feature coming soon!');
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Tournament 區塊
+          Expanded(
+            child: _buildActionBlock(
+              context: context,
+              title: 'Tournament',
+              subtitle: 'Coming Soon',
+              icon: Icons.emoji_events,
+              color: theme.colorScheme.secondary,
+              onTap: () {
+                // TODO: 導航到 Tournament 頁面
+                TopNotification.showSuccess(context, 'Tournament feature coming soon!');
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 構建單個功能區塊
+  Widget _buildActionBlock({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 120,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: color,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color.withOpacity(0.7),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
