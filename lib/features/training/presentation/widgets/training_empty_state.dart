@@ -15,35 +15,6 @@ class TrainingEmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 圖示
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: Icon(
-                Icons.sports,
-                size: 60,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // 標題
-            Text(
-              'Start Your Bowling Journey',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 12),
-
             // 描述
             Text(
               'Record your training sessions\nTrack your progress',

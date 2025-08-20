@@ -174,6 +174,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -209,8 +210,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
               const SizedBox(height: 6),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 15,
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -219,8 +219,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 11,
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.white70,
                 ),
                 textAlign: TextAlign.center,
@@ -243,14 +242,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 訂閱管理選項 - 特殊樣式
-          _buildMenuTile(
+          // 訂閱管理選項 - 特殊樣式（皇冠圖示）
+          _buildSubscriptionTile(
             context: context,
-            title: 'Subscription',
-            icon: Icons.workspace_premium,
-            iconColor: Colors.deepPurple,
-            borderColor: Colors.deepPurple,
-            isSpecial: true,
             onTap: () {
               // TODO: 顯示訂閱相關Dialog
               TopNotification.showSuccess(context, 'Subscription feature coming soon');
@@ -260,10 +254,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           const SizedBox(height: 8),
           
           // Favorite Centers & Patterns選項
-          _buildMenuTile(
+          _buildSimpleMenuTile(
             context: context,
             title: 'Favorite Centers & Patterns',
-            icon: Icons.favorite,
             onTap: () {
               // TODO: 導航到Favorite Centers & Oil Patterns頁面
               TopNotification.showSuccess(context, 'Favorites feature coming soon');
@@ -273,10 +266,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           const SizedBox(height: 8),
           
           // 預留選項1
-          _buildMenuTile(
+          _buildSimpleMenuTile(
             context: context,
             title: 'Feature Option 1',
-            icon: Icons.extension,
             onTap: () {
               TopNotification.showSuccess(context, 'Feature coming soon');
             },
@@ -285,10 +277,9 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
           const SizedBox(height: 8),
           
           // 預留選項2
-          _buildMenuTile(
+          _buildSimpleMenuTile(
             context: context,
             title: 'Feature Option 2',
-            icon: Icons.settings_applications,
             onTap: () {
               TopNotification.showSuccess(context, 'Feature coming soon');
             },
@@ -342,8 +333,7 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  fontSize: 15,
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: effectiveTextColor,
                 ),
@@ -356,6 +346,104 @@ class _MyProfilePageState extends ConsumerState<MyProfilePage> {
             Icon(
               Icons.chevron_right,
               color: effectiveTextColor.withOpacity(0.6),
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 構建 Subscription 特殊樣式選單項目（帶皇冠圖示）
+  Widget _buildSubscriptionTile({
+    required BuildContext context,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(0),
+        ),
+        child: Row(
+          children: [
+            // 中間文字內容
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    'Subscription',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(width: 8),
+                  // 皇冠圖示
+                  const Icon(
+                    Icons.military_tech,
+                    size: 18,
+                    color: Colors.amber,
+                  ),
+                ],
+              ),
+            ),
+            
+            // 右側箭頭
+            Icon(
+              Icons.chevron_right,
+              color: Colors.white.withOpacity(0.6),
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 構建簡單選單項目（無左側圖示）
+  Widget _buildSimpleMenuTile({
+    required BuildContext context,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(0),
+        ),
+        child: Row(
+          children: [
+            // 中間文字內容
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            
+            // 右側箭頭
+            Icon(
+              Icons.chevron_right,
+              color: Colors.white.withOpacity(0.6),
               size: 20,
             ),
           ],
