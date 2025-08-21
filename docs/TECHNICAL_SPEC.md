@@ -82,6 +82,7 @@ lib/
     - 變數/函式：使用 `camelCase` (小駝峰命名法)，例如：`fetchBalls()`。
 
     另外，如果要新增按鈕，應優先使用app_standard_button.dart
+- **標籤組件:** 所有標籤/標記相關元件，都**必須**使用 `OvalTag` 組件，路徑：`lib/shared/widgets/common/tags/oval_tag.dart`
 
 ### 4.1. Mobile-First UI/UX 設計原則
 
@@ -158,11 +159,119 @@ lib/
 
 ---
 
-## 6. 使用者通知標準 (User Notification Standards)
+## 6. UI 組件標準 (UI Component Standards)
+
+### 6.1. 標籤組件 (Tag Component) - OvalTag
+
+所有標籤/標記相關的 UI 元件都必須使用統一的 `OvalTag` 組件：
+
+#### 6.1.1. 基本用法
+```dart
+import 'package:bowlingarsenal_app/shared/widgets/common/tags/oval_tag.dart';
+
+// 標準標籤
+OvalTag(
+  text: 'Tag Text',
+  color: theme.colorScheme.secondary,
+)
+
+// 可點擊標籤
+OvalTag(
+  text: 'Add from Favorite',
+  color: theme.colorScheme.secondary,
+  onTap: () {
+    // 點擊處理邏輯
+  },
+)
+```
+
+#### 6.1.2. 自定義參數
+- `fontSize`: 字體大小 (預設: 13)
+- `fontWeight`: 字體粗細 (預設: FontWeight.w600)
+- `horizontalPadding`: 水平內邊距 (預設: 12)
+- `verticalPadding`: 垂直內邊距 (預設: 6)
+- `borderWidth`: 邊框寬度 (預設: 1.5)
+- `backgroundOpacity`: 背景透明度 (預設: 0.1)
+
+#### 6.1.3. 設計規範
+- **圓角半徑:** 20px
+- **邊框寬度:** 1.5px
+- **背景透明度:** 10%
+- **樣式一致性:** 文字與邊框同色，透明背景
+
+#### 6.1.4. 使用場景
+- 功能標籤 (如 "Add from Favorite")
+- 分類標籤 (如球袋名稱)
+- 狀態標籤 (如 "Unlock Bag")
+- 篩選標籤
+
+### 6.2. 文字輸入框組件 (Text Input Component) - CompactTextField
+
+所有文字輸入相關的 UI 元件都必須使用統一的 `CompactTextField` 組件：
+
+#### 6.2.1. 基本用法
+```dart
+import 'package:bowlingarsenal_app/shared/widgets/common/text_fields/compact_text_field.dart';
+
+// 標準輸入框
+CompactTextField(
+  controller: _textController,
+  onChanged: (value) => updateValue(value),
+)
+
+// 帶標籤的輸入框
+CompactTextField(
+  controller: _textController,
+  label: 'Field Label',
+  onChanged: (value) => updateValue(value),
+)
+
+// 帶圖示的輸入框
+CompactTextField(
+  controller: _textController,
+  icon: Icons.search,
+  onChanged: (value) => updateValue(value),
+)
+```
+
+#### 6.2.2. 可用參數
+- `controller`: TextEditingController (必要)
+- `label`: 標籤文字 (可選)
+- `icon`: 前置圖示 (可選)
+- `onChanged`: 文字變更回調 (可選)
+- `hintText`: 提示文字 (可選，盡量避免使用)
+
+#### 6.2.3. 設計規範
+- **圓角半徑:** 12px
+- **邊框顏色:** 主色彩 30% 透明度
+- **背景顏色:** 黑色 80% 透明度
+- **內邊距:** 水平 20px，垂直 20px
+- **自動功能:** 支援文字建議、自動校正、文字首字母大寫
+
+#### 6.2.4. 內建功能
+- **表單驗證:** 自動檢查必填欄位
+- **鍵盤優化:** TextInputAction.next 支援連續輸入
+- **無障礙支援:** 完整的語意標籤支援
+- **主題適應:** 自動適應應用主題顏色
+
+#### 6.2.5. 使用場景
+- 表單輸入 (名稱、地址等)
+- 搜尋欄位
+- 設定輸入
+- 用戶資料編輯
+
+#### 6.2.6. 使用原則
+- **盡量避免 hintText:** 優先使用清楚的標籤 (label) 而非提示文字
+- **統一樣式:** 所有文字輸入都使用此組件確保一致性
+- **效能考量:** 使用 TextEditingController 管理狀態
+
+---
+
+## 7. 使用者通知標準 (User Notification Standards)
 
 **重要:** 所有使用者通知必須嚴格遵循以下標準：
 
-### 6.1. ✅ 正確用法 - 僅使用 TopNotification
+### 7.1. ✅ 正確用法 - 僅使用 TopNotification
 
 ```dart
 import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
@@ -174,7 +283,7 @@ TopNotification.showSuccess(context, 'Layout updated successfully');
 TopNotification.showError(context, 'Failed to complete operation');
 ```
 
-### 6.2. ❌ 禁止使用
+### 7.2. ❌ 禁止使用
 
 ```dart
 // 絕對不要使用 SnackBar 或 ScaffoldMessenger
@@ -187,7 +296,7 @@ showBottomSheet(...);
 Fluttertoast.showToast(...);
 ```
 
-### 6.3. TopNotification 的優勢
+### 7.3. TopNotification 的優勢
 - **一致性 UX:** 所有通知都出現在頂部
 - **手機優化:** 不干擾鍵盤或底部導航
 - **品牌一致:** 符合應用設計語言

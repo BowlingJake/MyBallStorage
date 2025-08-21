@@ -9,6 +9,9 @@ import 'package:bowlingarsenal_app/features/onboarding/views/onboarding_page.dar
 import 'package:bowlingarsenal_app/routing/auth_guard.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/pages/ball_library_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/my_training_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step1_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step2_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step3_page.dart';
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/my_arsenal_page.dart';
 import 'package:bowlingarsenal_app/shared/views/settings_page.dart';
@@ -84,6 +87,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/training',
         name: 'training',
         pageBuilder: (context, state) => const NoTransitionPage(child: MyTrainingPage()),
+      ),
+      GoRoute(
+        path: '/training/create/step-1',
+        name: 'training-create-step1',
+        pageBuilder: (context, state) => const NoTransitionPage(child: CreateTrainingStep1Page()),
+      ),
+      GoRoute(
+        path: '/training/create/step-2',
+        name: 'training-create-step2',
+        pageBuilder: (context, state) => const NoTransitionPage(child: CreateTrainingStep2Page()),
+      ),
+      GoRoute(
+        path: '/training/create/step-3',
+        name: 'training-create-step3',
+        pageBuilder: (context, state) => const NoTransitionPage(child: CreateTrainingStep3Page()),
       ),
       GoRoute(
         path: '/my-arsenal',

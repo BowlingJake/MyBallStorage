@@ -1,7 +1,7 @@
 import 'package:bowlingarsenal_app/features/training/logic/training_form_controller.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_form_state.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_session/shared/compact_text_field.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/text_fields/compact_text_field.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_session/shared/option_toggle_button.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_session/shared/step_header.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +64,6 @@ class _Step2OilPatternState extends ConsumerState<Step2OilPattern> {
         ),
         const SizedBox(height: 16),
         _buildOilPatternSelector(context, formState, formNotifier),
-        const Spacer(),
       ],
     );
   }

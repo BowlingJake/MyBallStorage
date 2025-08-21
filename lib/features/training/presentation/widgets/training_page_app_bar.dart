@@ -94,7 +94,7 @@ class TrainingPageAppBar extends ConsumerWidget {
 
   void _showCreateRecordDialog(BuildContext context, WidgetRef ref) {
     final uiActions = ref.read(trainingUIActionsProvider);
-    uiActions.showCreateRecordDialogFromEmptyState(context);
+    uiActions.navigateToCreateRecordFromEmptyState(context);
   }
 
   void _showDeleteConfirmationDialog(BuildContext context, WidgetRef ref) {

@@ -22,10 +22,8 @@ class TrainingForm extends _$TrainingForm {
         isStep1Valid: true, // Assume valid if editing
       );
     } else {
-      // Create mode: Default state
-      return TrainingFormState(
-        date: DateTime.now(),
-      );
+      // Create mode: Default state with no date selected
+      return TrainingFormState();
     }
   }
 
@@ -83,6 +81,10 @@ class TrainingForm extends _$TrainingForm {
   void _validateStep1() {
     final isValid = state.title.isNotEmpty && state.centerName.isNotEmpty && state.date != null;
     state = state.copyWith(isStep1Valid: isValid);
+  }
+  
+  void reset() {
+    state = TrainingFormState();
   }
   
   TrainingFormState? submit() {

@@ -2,7 +2,6 @@ import 'package:bowlingarsenal_app/features/training/logic/training_controller.d
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_recap.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/training_recap_page.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_training_record_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/delete_confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/edit_training_record_dialog.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/interactive_scoring_dialog.dart';
@@ -18,24 +17,9 @@ class TrainingUIActions {
   
   final ProviderRef ref;
 
-  /// 從空狀態顯示創建訓練記錄對話框
-  void showCreateRecordDialogFromEmptyState(BuildContext context) {
-    showCreateTrainingRecordDialog(
-      context,
-      onRecordCreated: (formState) async {
-        final controller = ref.read(trainingControllerProvider.notifier);
-        await controller.createTrainingRecord(
-          title: formState.title,
-          date: formState.date!,
-          center: formState.centerName,
-          oilPatternName: formState.oilPatternName.isEmpty ? null : formState.oilPatternName,
-          oilPatternLength: formState.oilPatternLength.isEmpty ? null : formState.oilPatternLength,
-          isHousePattern: formState.isHousePattern,
-          scoringMethod: formState.selectedScoringMethod,
-          inputMethod: formState.selectedInputMethod,
-        );
-      },
-    );
+  /// 從空狀態導航到創建訓練記錄頁面
+  void navigateToCreateRecordFromEmptyState(BuildContext context) {
+    context.go('/training/create/step-1');
   }
 
   /// 顯示編輯訓練記錄對話框

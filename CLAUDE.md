@@ -83,7 +83,18 @@ lib/features/{feature_name}/
   * **次要動作 (Secondary)**: `AppStandardButton.secondary()` - 白色線框，用於取消/返回/查看詳情
   * **創造功能 (Creative)**: `AppStandardButton.creative()` - 青色實心，用於新增/創建/特殊功能
   * **破壞性動作 (Destructive)**: `AppStandardButton.destructive()` - 紅色實心，用於刪除/清除等不可逆操作
+- **Text Input Fields**: Always use `CompactTextField` from `lib/shared/widgets/common/text_fields/compact_text_field.dart` for all text input components:
+  * **標準用法**: `CompactTextField(controller: _controller, onChanged: (value) => updateValue(value))`
+  * **帶標籤**: 添加 `label` 參數而非使用 `hintText`
+  * **帶圖示**: 添加 `icon` 參數用於前置圖示
+  * **避免 hintText**: 優先使用清楚的標籤而非提示文字
+  * 統一的深色主題樣式：12px圓角、透明黑色背景、主色彩邊框
 - **Dropdowns**: Always use `CustomDropdownButton` from `lib/shared/widgets/dropdowns/custom_dropdown_button.dart` unless explicitly told to use another dropdown
+- **Tags**: Always use `OvalTag` from `lib/shared/widgets/common/tags/oval_tag.dart` for all tag/label components:
+  * **標準用法**: `OvalTag(text: 'Tag Text', color: theme.colorScheme.secondary)`
+  * **可點擊標籤**: 添加 `onTap` 回調函數
+  * **自定義樣式**: 可調整 `fontSize`, `fontWeight`, `horizontalPadding`, `verticalPadding`, `borderWidth`, `backgroundOpacity`
+  * 遵循 arsenal scrollable bar 標籤的視覺規範：20圓角、1.5寬度邊框、10%透明度背景、文字與邊框同色
 - **Notifications**: 
   * **NEVER use SnackBar, ScaffoldMessenger, or any bottom notifications**
   * Always use `TopNotification` from `lib/shared/widgets/common/notifications/top_notification.dart` for ALL user notifications

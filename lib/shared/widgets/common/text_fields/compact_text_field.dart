@@ -4,15 +4,17 @@ class CompactTextField extends StatelessWidget {
   const CompactTextField({
     super.key,
     required this.controller,
-    required this.label,
-    required this.icon,
+    this.label,
+    this.icon,
     this.onChanged,
+    this.hintText,
   });
 
   final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  final Function(String)? onChanged;
+  final String? label;
+  final IconData? icon;
+  final void Function(String)? onChanged;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class CompactTextField extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
-        color: theme.colorScheme.surface.withOpacity(0.1),
+        color: Colors.black.withOpacity(0.8),
       ),
       child: TextFormField(
         controller: controller,
@@ -35,23 +37,27 @@ class CompactTextField extends StatelessWidget {
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(
+          hintText: hintText,
+          prefixIcon: icon != null ? Icon(
             icon,
             color: theme.colorScheme.primary.withOpacity(0.7),
             size: 18,
-          ),
+          ) : null,
           labelStyle: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.primary.withOpacity(0.8),
+          ),
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 12,
+            horizontal: 20,
+            vertical: 20,
           ),
-          isDense: true,
+          isDense: false,
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -62,4 +68,4 @@ class CompactTextField extends StatelessWidget {
       ),
     );
   }
-} 
+}

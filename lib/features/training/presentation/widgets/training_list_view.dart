@@ -18,7 +18,7 @@ class TrainingListView extends ConsumerWidget {
       return SliverFillRemaining(
         child: Center(
           child: TrainingEmptyState(
-            onAddRecord: () => uiActions.showCreateRecordDialogFromEmptyState(context),
+            onAddRecord: () => uiActions.navigateToCreateRecordFromEmptyState(context),
           ),
         ),
       );

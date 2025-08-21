@@ -63,7 +63,6 @@ class Step3ScoringSetup extends ConsumerWidget {
             ],
           ),
         ),
-        const Spacer(),
       ],
     );
   }
