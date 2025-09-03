@@ -63,11 +63,17 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
             // 表單內容
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Step3ScoringSetup(
-                    initialData: widget.initialData,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.5,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Step3ScoringSetup(
+                      initialData: widget.initialData,
+                    ),
                   ),
                 ),
               ),
@@ -98,7 +104,9 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
                 height: 3,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(2),
-                  color: theme.colorScheme.primary, // 所有步驟都完成
+                  color: i <= 2
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withOpacity(0.2),
                 ),
               ),
             ),
@@ -113,73 +121,47 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
     final theme = Theme.of(context);
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.3),
-              ),
-            ),
-            child: Icon(
-              Icons.score,
-              color: theme.colorScheme.primary,
-              size: 16,
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Center(
+        child: Text(
+          'Scoring Preferences & Methods',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Step 3 of 3',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-              Text(
-                'Scoring Preferences',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildFooter() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          // 上一步按鈕
-          Expanded(
-            child: AppStandardButton.secondary(
-              text: 'Previous',
-              icon: Icons.arrow_back,
-              onPressed: () => context.go('/training/create/step-2'),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: SafeArea(
+        child: Row(
+          children: [
+            // 上一步按鈕
+            Expanded(
+              child: AppStandardButton.secondary(
+                text: 'Previous',
+                icon: Icons.arrow_back,
+                onPressed: () => context.go('/training/create/step-2'),
+                height: 40,
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          
-          // 完成按鈕
-          Expanded(
-            child: AppStandardButton(
-              text: widget.initialData != null ? 'Update Session' : 'Create Session',
-              icon: Icons.check,
-              onPressed: _handleComplete,
+            const SizedBox(width: 16),
+            
+            // 完成按鈕
+            Expanded(
+              child: AppStandardButton(
+                text: widget.initialData != null ? 'Update Session' : 'Create Session',
+                icon: Icons.check,
+                onPressed: _handleComplete,
+                height: 40,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

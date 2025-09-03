@@ -61,11 +61,17 @@ class _CreateTrainingStep2PageState extends ConsumerState<CreateTrainingStep2Pag
             // 表單內容
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Step2OilPattern(
-                    initialData: widget.initialData,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.5,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Step2OilPattern(
+                      initialData: widget.initialData,
+                    ),
                   ),
                 ),
               ),
@@ -113,73 +119,50 @@ class _CreateTrainingStep2PageState extends ConsumerState<CreateTrainingStep2Pag
     final theme = Theme.of(context);
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.3),
-              ),
-            ),
-            child: Icon(
-              Icons.opacity,
-              color: theme.colorScheme.primary,
-              size: 16,
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Center(
+        child: Text(
+          'Oil Pattern Settings',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Step 2 of 3',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-              Text(
-                'Oil Pattern Settings',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildFooter() {
+    final state = ref.watch(trainingFormProvider(widget.initialData));
+    
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          // 上一步按鈕
-          Expanded(
-            child: AppStandardButton.secondary(
-              text: 'Previous',
-              icon: Icons.arrow_back,
-              onPressed: () => context.go('/training/create/step-1'),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: SafeArea(
+        child: Row(
+          children: [
+            // 上一步按鈕
+            Expanded(
+              child: AppStandardButton.secondary(
+                text: 'Previous',
+                icon: Icons.arrow_back,
+                onPressed: () => context.go('/training/create/step-1'),
+                height: 40,
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          
-          // 下一步按鈕
-          Expanded(
-            child: AppStandardButton.creative(
-              text: 'Next',
-              icon: Icons.arrow_forward,
-              onPressed: _handleNext,
+            const SizedBox(width: 16),
+            
+            // 下一步按鈕
+            Expanded(
+              child: AppStandardButton(
+                text: 'Next',
+                icon: Icons.arrow_forward,
+                onPressed: _handleNext,
+                enabled: state.isStep2Valid,
+                height: 40,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

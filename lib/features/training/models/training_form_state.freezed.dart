@@ -29,6 +29,7 @@ mixin _$TrainingFormState {
       throw _privateConstructorUsedError; // UI State
   int get currentStep => throw _privateConstructorUsedError;
   bool get isStep1Valid => throw _privateConstructorUsedError;
+  bool get isStep2Valid => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainingFormState
   /// with the given fields replaced by the non-null parameter values.
@@ -53,7 +54,8 @@ abstract class $TrainingFormStateCopyWith<$Res> {
       String selectedScoringMethod,
       String selectedInputMethod,
       int currentStep,
-      bool isStep1Valid});
+      bool isStep1Valid,
+      bool isStep2Valid});
 }
 
 /// @nodoc
@@ -81,6 +83,7 @@ class _$TrainingFormStateCopyWithImpl<$Res, $Val extends TrainingFormState>
     Object? selectedInputMethod = null,
     Object? currentStep = null,
     Object? isStep1Valid = null,
+    Object? isStep2Valid = null,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -123,6 +126,10 @@ class _$TrainingFormStateCopyWithImpl<$Res, $Val extends TrainingFormState>
           ? _value.isStep1Valid
           : isStep1Valid // ignore: cast_nullable_to_non_nullable
               as bool,
+      isStep2Valid: null == isStep2Valid
+          ? _value.isStep2Valid
+          : isStep2Valid // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -145,7 +152,8 @@ abstract class _$$TrainingFormStateImplCopyWith<$Res>
       String selectedScoringMethod,
       String selectedInputMethod,
       int currentStep,
-      bool isStep1Valid});
+      bool isStep1Valid,
+      bool isStep2Valid});
 }
 
 /// @nodoc
@@ -171,6 +179,7 @@ class __$$TrainingFormStateImplCopyWithImpl<$Res>
     Object? selectedInputMethod = null,
     Object? currentStep = null,
     Object? isStep1Valid = null,
+    Object? isStep2Valid = null,
   }) {
     return _then(_$TrainingFormStateImpl(
       title: null == title
@@ -213,6 +222,10 @@ class __$$TrainingFormStateImplCopyWithImpl<$Res>
           ? _value.isStep1Valid
           : isStep1Valid // ignore: cast_nullable_to_non_nullable
               as bool,
+      isStep2Valid: null == isStep2Valid
+          ? _value.isStep2Valid
+          : isStep2Valid // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -230,7 +243,8 @@ class _$TrainingFormStateImpl implements _TrainingFormState {
       this.selectedScoringMethod = 'traditional',
       this.selectedInputMethod = 'quick',
       this.currentStep = 0,
-      this.isStep1Valid = false});
+      this.isStep1Valid = false,
+      this.isStep2Valid = false});
 
 // Step 1 Data
   @override
@@ -265,10 +279,13 @@ class _$TrainingFormStateImpl implements _TrainingFormState {
   @override
   @JsonKey()
   final bool isStep1Valid;
+  @override
+  @JsonKey()
+  final bool isStep2Valid;
 
   @override
   String toString() {
-    return 'TrainingFormState(title: $title, date: $date, centerName: $centerName, isHousePattern: $isHousePattern, oilPatternName: $oilPatternName, oilPatternLength: $oilPatternLength, selectedScoringMethod: $selectedScoringMethod, selectedInputMethod: $selectedInputMethod, currentStep: $currentStep, isStep1Valid: $isStep1Valid)';
+    return 'TrainingFormState(title: $title, date: $date, centerName: $centerName, isHousePattern: $isHousePattern, oilPatternName: $oilPatternName, oilPatternLength: $oilPatternLength, selectedScoringMethod: $selectedScoringMethod, selectedInputMethod: $selectedInputMethod, currentStep: $currentStep, isStep1Valid: $isStep1Valid, isStep2Valid: $isStep2Valid)';
   }
 
   @override
@@ -293,7 +310,9 @@ class _$TrainingFormStateImpl implements _TrainingFormState {
             (identical(other.currentStep, currentStep) ||
                 other.currentStep == currentStep) &&
             (identical(other.isStep1Valid, isStep1Valid) ||
-                other.isStep1Valid == isStep1Valid));
+                other.isStep1Valid == isStep1Valid) &&
+            (identical(other.isStep2Valid, isStep2Valid) ||
+                other.isStep2Valid == isStep2Valid));
   }
 
   @override
@@ -308,7 +327,8 @@ class _$TrainingFormStateImpl implements _TrainingFormState {
       selectedScoringMethod,
       selectedInputMethod,
       currentStep,
-      isStep1Valid);
+      isStep1Valid,
+      isStep2Valid);
 
   /// Create a copy of TrainingFormState
   /// with the given fields replaced by the non-null parameter values.
@@ -331,7 +351,8 @@ abstract class _TrainingFormState implements TrainingFormState {
       final String selectedScoringMethod,
       final String selectedInputMethod,
       final int currentStep,
-      final bool isStep1Valid}) = _$TrainingFormStateImpl;
+      final bool isStep1Valid,
+      final bool isStep2Valid}) = _$TrainingFormStateImpl;
 
 // Step 1 Data
   @override
@@ -354,6 +375,8 @@ abstract class _TrainingFormState implements TrainingFormState {
   int get currentStep;
   @override
   bool get isStep1Valid;
+  @override
+  bool get isStep2Valid;
 
   /// Create a copy of TrainingFormState
   /// with the given fields replaced by the non-null parameter values.

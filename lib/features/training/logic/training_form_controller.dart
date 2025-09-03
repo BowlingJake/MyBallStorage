@@ -20,10 +20,13 @@ class TrainingForm extends _$TrainingForm {
         selectedScoringMethod: initialData.scoringMethod,
         selectedInputMethod: initialData.inputMethod,
         isStep1Valid: true, // Assume valid if editing
+        isStep2Valid: true, // Assume valid if editing
       );
     } else {
       // Create mode: Default state with no date selected
-      return TrainingFormState();
+      final defaultState = TrainingFormState();
+      // Validate Step 2 for house pattern (default)
+      return defaultState.copyWith(isStep2Valid: true); // House pattern is valid by default
     }
   }
 
@@ -44,14 +47,17 @@ class TrainingForm extends _$TrainingForm {
 
   void onPatternTypeChanged(bool isHouse) {
     state = state.copyWith(isHousePattern: isHouse);
+    _validateStep2();
   }
 
   void updateOilPatternName(String name) {
     state = state.copyWith(oilPatternName: name);
+    _validateStep2();
   }
 
   void updateOilPatternLength(String length) {
     state = state.copyWith(oilPatternLength: length);
+    _validateStep2();
   }
   
   void updateScoringMethod(String method) {
@@ -81,6 +87,22 @@ class TrainingForm extends _$TrainingForm {
   void _validateStep1() {
     final isValid = state.title.isNotEmpty && state.centerName.isNotEmpty && state.date != null;
     state = state.copyWith(isStep1Valid: isValid);
+  }
+  
+  void _validateStep2() {
+    bool isValid;
+    if (state.isHousePattern) {
+      // House pattern: no additional fields required
+      isValid = true;
+    } else {
+      // Sport pattern: pattern name and valid length (20-60) required
+      final lengthValue = int.tryParse(state.oilPatternLength);
+      isValid = state.oilPatternName.isNotEmpty && 
+                lengthValue != null && 
+                lengthValue >= 20 && 
+                lengthValue <= 60;
+    }
+    state = state.copyWith(isStep2Valid: isValid);
   }
   
   void reset() {

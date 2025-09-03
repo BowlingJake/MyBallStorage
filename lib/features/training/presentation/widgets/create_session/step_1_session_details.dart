@@ -169,6 +169,6 @@ class _Step1SessionDetailsState extends ConsumerState<Step1SessionDetails> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.month}/${date.day}/${date.year}';
+    return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
   }
 } 

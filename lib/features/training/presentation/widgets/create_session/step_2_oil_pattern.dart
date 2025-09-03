@@ -2,9 +2,9 @@ import 'package:bowlingarsenal_app/features/training/logic/training_form_control
 import 'package:bowlingarsenal_app/features/training/models/training_form_state.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/text_fields/compact_text_field.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_session/shared/option_toggle_button.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/widgets/create_session/shared/step_header.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Step2OilPattern extends ConsumerStatefulWidget {
@@ -22,6 +22,7 @@ class Step2OilPattern extends ConsumerStatefulWidget {
 class _Step2OilPatternState extends ConsumerState<Step2OilPattern> {
   late final TextEditingController _patternNameController;
   late final TextEditingController _patternLengthController;
+  String? _lengthError;
 
   @override
   void initState() {
@@ -57,12 +58,6 @@ class _Step2OilPatternState extends ConsumerState<Step2OilPattern> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        const StepHeader(
-          icon: Icons.water_drop,
-          title: 'Oil Pattern',
-          subtitle: 'Lane conditions',
-        ),
-        const SizedBox(height: 16),
         _buildOilPatternSelector(context, formState, formNotifier),
       ],
     );
@@ -77,62 +72,170 @@ class _Step2OilPatternState extends ConsumerState<Step2OilPattern> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Oil Pattern header with favorite button when sport pattern is selected
         Row(
           children: [
-            Icon(Icons.water_drop, color: theme.colorScheme.primary, size: 16),
-            const SizedBox(width: 8),
             Text(
               'Oil Pattern',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
+            if (!formState.isHousePattern) ...[
+              const SizedBox(width: 8),
+              AppStandardButton(
+                text: 'Favorite',
+                height: 28,
+                fontSize: 11,
+                onPressed: () {
+                  // TODO: Implement favorite pattern selection
+                },
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 12),
+        // House/Sport pattern buttons
         Row(
           children: [
             Expanded(
-              child: OptionToggleButton(
-                text: 'House Pattern',
-                isSelected: formState.isHousePattern,
-                onTap: () => formNotifier.onPatternTypeChanged(true),
-              ),
+              child: formState.isHousePattern
+                  ? AppStandardButton(
+                      text: 'House Pattern',
+                      onPressed: () => formNotifier.onPatternTypeChanged(true),
+                      height: 40,
+                    )
+                  : AppStandardButton.secondary(
+                      text: 'House Pattern',
+                      onPressed: () => formNotifier.onPatternTypeChanged(true),
+                      height: 40,
+                    ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: OptionToggleButton(
-                text: 'Sport Pattern',
-                isSelected: !formState.isHousePattern,
-                onTap: () => formNotifier.onPatternTypeChanged(false),
-              ),
+              child: !formState.isHousePattern
+                  ? AppStandardButton(
+                      text: 'Sport Pattern',
+                      onPressed: () => formNotifier.onPatternTypeChanged(false),
+                      height: 40,
+                    )
+                  : AppStandardButton.secondary(
+                      text: 'Sport Pattern',
+                      onPressed: () => formNotifier.onPatternTypeChanged(false),
+                      height: 40,
+                    ),
             ),
           ],
         ),
         const SizedBox(height: 16),
+        // Sport pattern input fields
         if (!formState.isHousePattern) ...[
           Row(
             children: [
               Expanded(
-                flex: 2,
-                child: CompactTextField(
-                  controller: _patternNameController,
-                  label: 'Pattern Name',
-                  icon: Icons.label,
-                  onChanged: (value) => formNotifier.updateOilPatternName(value),
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pattern Name',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    CompactTextField(
+                      controller: _patternNameController,
+                      onChanged: (value) => formNotifier.updateOilPatternName(value),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
-                child: CompactTextField(
-                  controller: _patternLengthController,
-                  label: 'Length',
-                  icon: Icons.straighten,
-                  onChanged: (value) => formNotifier.updateOilPatternLength(value),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Length',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+                        color: Colors.black.withOpacity(0.8),
+                      ),
+                      child: TextFormField(
+                        controller: _patternLengthController,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        style: theme.textTheme.bodyMedium,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(2),
+                        ],
+                        onChanged: (value) {
+                          // Always allow the input to proceed
+                          formNotifier.updateOilPatternLength(value);
+                          
+                          setState(() {
+                            if (value.isEmpty) {
+                              _lengthError = null;
+                            } else {
+                              final numValue = int.tryParse(value);
+                              if (numValue != null && numValue >= 20 && numValue <= 60) {
+                                _lengthError = null;
+                              } else {
+                                _lengthError = 'Length must be between 20-60';
+                              }
+                            }
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: '20-60',
+                          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 20,
+                          ),
+                          isDense: false,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return null;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+          if (_lengthError != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _lengthError!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ],
     );

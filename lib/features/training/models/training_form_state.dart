@@ -22,5 +22,6 @@ class TrainingFormState with _$TrainingFormState {
     // UI State
     @Default(0) int currentStep,
     @Default(false) bool isStep1Valid,
+    @Default(false) bool isStep2Valid,
   }) = _TrainingFormState;
 } 
