@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:bowlingarsenal_app/features/training/logic/scoring_controller.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
+import 'package:bowlingarsenal_app/features/training/logic/training_controller.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
+import 'package:bowlingarsenal_app/features/training/models/roll_record.dart';
+import 'package:bowlingarsenal_app/features/training/data/models/frame_data.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_content.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_footer.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_header.dart';
@@ -36,22 +39,56 @@ class InteractiveScoringDialog extends ConsumerStatefulWidget {
 
 class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDialog> {
   late List<BallInfo> _selectedBalls;
-  late final PinSelectionController _pinController; // Add controller
+  late final PinSelectionController _pinController;
+  List<RollRecord>? _initialRolls;
+  bool _isLoadingRolls = true;
 
   @override
   void initState() {
     super.initState();
     _selectedBalls = widget.game.ballsUsed ?? (widget.game.ballUsed != null ? [widget.game.ballUsed!] : []);
-    _pinController = PinSelectionController(); // Initialize controller
+    _pinController = PinSelectionController();
+    
+    // 非同步載入 rolls
+    _loadInitialRolls();
+  }
+
+  Future<void> _loadInitialRolls() async {
+    try {
+      _initialRolls = await _reconstructRollsFromGameAsync(widget.game, ref);
+    } catch (e) {
+      print('Error loading initial rolls: $e');
+      _initialRolls = null;
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingRolls = false;
+        });
+      }
+    }
   }
   
   @override
   Widget build(BuildContext context) {
-    final initialRolls = _reconstructRollsFromGame(widget.game);
+    if (_isLoadingRolls) {
+      return const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('載入遊戲資料...'),
+            ],
+          ),
+        ),
+      );
+    }
     
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: initialRolls,
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     
@@ -135,22 +172,103 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
   }
 
   List<int>? _reconstructRollsFromGame(GameRecord game) {
-    if (game.score == 0 || game.frameScores.isEmpty) {
+    // 這個方法需要從 TrainingController 獲取完整的 Game 資料
+    // 因為 GameRecord 沒有個別 frame 欄位
+    // 我們暫時返回 null，讓對話框從空白開始，稍後會修復
+    return null;
+  }
+
+  Future<List<RollRecord>?> _reconstructRollsFromGameAsync(GameRecord game, WidgetRef ref) async {
+    try {
+      // 從 TrainingController 獲取完整的 Game 資料
+      final trainingController = ref.read(trainingControllerProvider.notifier);
+      final fullGame = await trainingController.getGameById(game.id);
+      
+      if (fullGame == null) return null;
+
+      // 從個別 frame 欄位重建 RollRecord 列表
+      final rolls = <RollRecord>[];
+      
+      for (int frameNumber = 1; frameNumber <= 10; frameNumber++) {
+        final frameData = fullGame.getFrame(frameNumber);
+        
+        if (frameData.ball1 == 0 && frameData.ball2 == 0 && frameData.ball3 == null) {
+          // 這一格沒有資料，停止重建
+          break;
+        }
+
+        if (frameNumber < 10) {
+          // 前 9 格
+          if (frameData.ball1 == 10) {
+            // Strike
+            rolls.add(RollRecord(
+              pinsDown: List.generate(10, (i) => true), // 所有球瓶都倒
+            ));
+          } else {
+            // 第一球
+            rolls.add(RollRecord(
+              pinsDown: List.generate(10, (i) => i < frameData.ball1),
+            ));
+            
+            // 第二球（如果有的話）
+            if (frameData.ball2 > 0) {
+              // 第二球只顯示新擊倒的球瓶數量
+              // 簡單的方法：創建一個只有 frameData.ball2 個 true 的陣列
+              rolls.add(RollRecord(
+                pinsDown: List.generate(10, (i) => i < frameData.ball2),
+              ));
+            }
+          }
+        } else {
+          // 第 10 格
+          // 第一球
+          rolls.add(RollRecord(
+            pinsDown: List.generate(10, (i) => i < frameData.ball1),
+          ));
+          
+          // 第二球
+          if (frameData.ball2 > 0) {
+            // 第10格的第二球邏輯
+            if (frameData.ball1 == 10) {
+              // 第一球是 strike，第二球重新開始（新的一組10個球瓶）
+              rolls.add(RollRecord(
+                pinsDown: List.generate(10, (i) => i < frameData.ball2),
+              ));
+            } else {
+              // 第一球不是 strike，第二球是同一組球瓶的剩餘部分
+              rolls.add(RollRecord(
+                pinsDown: List.generate(10, (i) => i < frameData.ball2),
+              ));
+            }
+          }
+          
+          // 第三球
+          if (frameData.ball3 != null && frameData.ball3! > 0) {
+            rolls.add(RollRecord(
+              pinsDown: List.generate(10, (i) => i < frameData.ball3!),
+            ));
+          }
+        }
+      }
+      
+      return rolls.isEmpty ? null : rolls;
+    } catch (e) {
+      print('Error reconstructing rolls: $e');
       return null;
     }
+  }
+
+  /// 將 RollRecord 列表轉換為 int 列表 (for ScoringController)
+  List<int>? _convertRollRecordsToInts(List<RollRecord>? rollRecords) {
+    if (rollRecords == null || rollRecords.isEmpty) return null;
     
-    if (DateTime.now().difference(game.timestamp).inMinutes < 5) {
-      if (game.score == 0) {
-        return null;
-      }
-    }
-    return null;
+    return rollRecords.map((roll) => roll.pinsDown.where((p) => p).length).toList();
   }
 
   Future<void> _onFrameTapped(BuildContext context, WidgetRef ref, int frameIndex) async {
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: _reconstructRollsFromGame(widget.game),
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     
@@ -214,7 +332,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
   void _onUndo(WidgetRef ref) {
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: _reconstructRollsFromGame(widget.game),
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     
@@ -223,37 +341,328 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
     HapticFeedback.selectionClick();
   }
 
-  void _onSave(BuildContext context, WidgetRef ref) {
+  Future<void> _onSave(BuildContext context, WidgetRef ref) async {
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: _reconstructRollsFromGame(widget.game),
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     
     final scoringController = ref.read(scoringControllerProvider(controllerParams).notifier);
     final scoringState = ref.read(scoringControllerProvider(controllerParams));
 
-    final updatedGame = GameRecord(
-      id: widget.game.id,
-      gameNumber: widget.game.gameNumber,
-      score: scoringController.finalScore,
-      frameScores: scoringState.frames.map((f) => f.cumulativeScore ?? 0).toList(),
-      strikes: scoringController.countStrikes(),
-      spares: scoringController.countSpares(),
-      notes: widget.game.notes,
-      timestamp: widget.game.timestamp,
-      ballUsed: _selectedBalls.isNotEmpty ? _selectedBalls.first : null,
-      ballsUsed: _selectedBalls.isNotEmpty ? _selectedBalls : null,
-    );
+    // 提取 frame 資料
+    final frameData = _extractFrameDataFromRolls(scoringState.rolls);
+    
+    try {
+      // 直接使用 TrainingController 更新遊戲，包括 frame 資料
+      final trainingController = ref.read(trainingControllerProvider.notifier);
+      
+      // 計算當前的 frame 和完成狀態
+      final currentFrame = _calculateCurrentFrame(frameData);
+      final isCompleted = _isGameCompleted(frameData, scoringState);
+      
+      final success = await trainingController.updateGameWithFrameData(
+        gameId: widget.game.id,
+        totalScore: scoringController.finalScore,
+        frameScores: scoringState.frames.map((f) => f.cumulativeScore ?? 0).toList(),
+        strikes: scoringController.countStrikes(),
+        spares: scoringController.countSpares(),
+        notes: widget.game.notes,
+        ballsUsed: _selectedBalls.map((ball) => {
+          'id': ball.id,
+          'name': ball.name,
+          'brand': ball.brand,
+          'brandColor': ball.brandColor,
+          'imagePath': ball.imagePath,
+        }).toList(),
+        frameData: frameData,
+        currentFrame: currentFrame,
+        isCompleted: isCompleted,
+        scoringMode: widget.scoringMethod,
+      );
+      
+      if (success) {
+        // 創建更新的 GameRecord 以供回調使用
+        final updatedGame = GameRecord(
+          id: widget.game.id,
+          gameNumber: widget.game.gameNumber,
+          score: scoringController.finalScore,
+          frameScores: scoringState.frames.map((f) => f.cumulativeScore ?? 0).toList(),
+          strikes: scoringController.countStrikes(),
+          spares: scoringController.countSpares(),
+          notes: widget.game.notes,
+          timestamp: widget.game.timestamp,
+          ballUsed: _selectedBalls.isNotEmpty ? _selectedBalls.first : null,
+          ballsUsed: _selectedBalls.isNotEmpty ? _selectedBalls : null,
+        );
+        
+        widget.onGameSaved?.call(updatedGame);
+        Navigator.of(context).pop();
+      } else {
+        // 顯示錯誤訊息
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('儲存失敗，請稍後再試'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // 顯示錯誤訊息
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('儲存錯誤: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
-    widget.onGameSaved?.call(updatedGame);
-    Navigator.of(context).pop();
+  /// 從 rolls 中提取個別 frame 的球數資料
+  Map<String, int> _extractFrameDataFromRolls(List<RollRecord> rolls) {
+    final frameData = <String, int>{};
+    var rollIndex = 0;
+
+    for (var frameNumber = 1; frameNumber <= 10; frameNumber++) {
+      if (rollIndex >= rolls.length) break;
+
+      final ball1Key = 'frame${frameNumber}Ball1';
+      final ball2Key = 'frame${frameNumber}Ball2';
+      final ball3Key = 'frame${frameNumber}Ball3';
+
+      if (frameNumber < 10) {
+        // 前 9 格
+        final roll1 = rolls[rollIndex];
+        frameData[ball1Key] = roll1.pinsDown.where((p) => p).length;
+        rollIndex++;
+
+        if (roll1.pinsDown.where((p) => p).length < 10 && rollIndex < rolls.length) {
+          final roll2 = rolls[rollIndex];
+          final roll2Pins = roll2.pinsDown.where((p) => p).length;
+          final ball1Pins = frameData[ball1Key]!;
+          
+          // 計算第二球的分數，確保在合理範圍內
+          if (roll2Pins >= ball1Pins) {
+            // roll2 是累加的情況
+            frameData[ball2Key] = roll2Pins - ball1Pins;
+          } else {
+            // roll2 是單獨的情況，直接使用
+            frameData[ball2Key] = roll2Pins;
+          }
+          
+          // 確保第二球分數不超過剩餘球瓶數
+          final maxBall2 = 10 - ball1Pins;
+          if (frameData[ball2Key]! > maxBall2) {
+            frameData[ball2Key] = maxBall2;
+          }
+          
+          // 確保不為負數
+          if (frameData[ball2Key]! < 0) {
+            frameData[ball2Key] = 0;
+          }
+          
+          rollIndex++;
+        } else {
+          frameData[ball2Key] = 0;
+        }
+      } else {
+        // 第 10 格
+        final roll1 = rolls[rollIndex];
+        frameData[ball1Key] = roll1.pinsDown.where((p) => p).length;
+        rollIndex++;
+
+        if (rollIndex < rolls.length) {
+          final roll2 = rolls[rollIndex];
+          if (frameData[ball1Key]! == 10) {
+            // 第一球是 strike，第二球重新計算
+            frameData[ball2Key] = roll2.pinsDown.where((p) => p).length;
+          } else {
+            // 第一球不是 strike，第二球是新擊倒的
+            final roll2Pins = roll2.pinsDown.where((p) => p).length;
+            final ball1Pins = frameData[ball1Key]!;
+            
+            if (roll2Pins >= ball1Pins) {
+              // roll2 是累加的情況
+              frameData[ball2Key] = roll2Pins - ball1Pins;
+            } else {
+              // roll2 是單獨的情況，直接使用
+              frameData[ball2Key] = roll2Pins;
+            }
+            
+            // 第10格第二球的特殊邏輯：如果第一球不是strike，總和不能超過10
+            final maxBall2 = 10 - ball1Pins;
+            if (frameData[ball2Key]! > maxBall2) {
+              frameData[ball2Key] = maxBall2;
+            }
+            
+            // 確保不為負數
+            if (frameData[ball2Key]! < 0) {
+              frameData[ball2Key] = 0;
+            }
+          }
+          rollIndex++;
+
+          if (rollIndex < rolls.length) {
+            final roll3 = rolls[rollIndex];
+            if (frameData[ball1Key]! == 10 || (frameData[ball1Key]! + frameData[ball2Key]!) == 10) {
+              frameData[ball3Key] = roll3.pinsDown.where((p) => p).length;
+              rollIndex++;
+            }
+          }
+        }
+      }
+    }
+
+    // 添加調試資訊
+    print('Extracted frame data: $frameData');
+    
+    // 驗證所有 frame 資料的合理性
+    for (int frame = 1; frame <= 10; frame++) {
+      final ball1Key = 'frame${frame}Ball1';
+      final ball2Key = 'frame${frame}Ball2';
+      final ball3Key = 'frame${frame}Ball3';
+      
+      final ball1 = frameData[ball1Key] ?? 0;
+      final ball2 = frameData[ball2Key] ?? 0;
+      final ball3 = frameData[ball3Key];
+      
+      // 檢查第1和第2球
+      if (ball1 < 0 || ball1 > 10) {
+        print('⚠️ Frame $frame Ball1 out of range: $ball1');
+        frameData[ball1Key] = ball1.clamp(0, 10);
+      }
+      
+      if (ball2 < 0 || ball2 > 10) {
+        print('⚠️ Frame $frame Ball2 out of range: $ball2');
+        frameData[ball2Key] = ball2.clamp(0, 10);
+      }
+      
+      // 檢查前9格的總和
+      if (frame < 10 && ball1 < 10 && (ball1 + ball2) > 10) {
+        print('⚠️ Frame $frame total exceeds 10: ball1=$ball1, ball2=$ball2');
+        frameData[ball2Key] = 10 - ball1;
+      }
+      
+      // 檢查第10格的第3球
+      if (frame == 10 && ball3 != null) {
+        if (ball3 < 0 || ball3 > 10) {
+          print('⚠️ Frame 10 Ball3 out of range: $ball3');
+          frameData[ball3Key] = ball3.clamp(0, 10);
+        }
+      }
+    }
+    
+    print('Validated frame data: $frameData');
+    return frameData;
+  }
+
+  /// 計算當前的 frame（下一個要填的 frame）
+  int _calculateCurrentFrame(Map<String, int> frameData) {
+    for (int frame = 1; frame <= 10; frame++) {
+      final ball1Key = 'frame${frame}Ball1';
+      final ball2Key = 'frame${frame}Ball2';
+      
+      final ball1 = frameData[ball1Key] ?? 0;
+      final ball2 = frameData[ball2Key] ?? 0;
+      
+      if (frame < 10) {
+        // 前9格：如果第一球為0或者（不是strike且第二球為0），則這是當前格
+        if (ball1 == 0) {
+          return frame;
+        } else if (ball1 < 10 && ball2 == 0) {
+          return frame;
+        }
+      } else {
+        // 第10格：複雜的邏輯
+        final ball3Key = 'frame10Ball3';
+        final ball3 = frameData[ball3Key];
+        
+        if (ball1 == 0) {
+          return 10;
+        } else if (ball1 == 10) {
+          // 第一球是strike，需要兩個獎勵球
+          if (ball2 == 0) return 10;
+          if (ball3 == null) return 10;
+          // 如果三球都有了，遊戲結束，返回10
+          return 10;
+        } else {
+          // 第一球不是strike
+          if (ball2 == 0) return 10;
+          if (ball1 + ball2 == 10) {
+            // Spare，需要獎勵球
+            if (ball3 == null) return 10;
+          }
+          // 遊戲完成，返回10
+          return 10;
+        }
+      }
+    }
+    
+    return 10; // 預設最後一格
+  }
+
+  /// 判斷遊戲是否完成
+  bool _isGameCompleted(Map<String, int> frameData, ScoringState scoringState) {
+    // 首先檢查ScoringController的判斷
+    if (scoringState.isGameComplete) {
+      return true;
+    }
+    
+    // 手動檢查第10格是否完成
+    final frame10Ball1 = frameData['frame10Ball1'] ?? 0;
+    final frame10Ball2 = frameData['frame10Ball2'] ?? 0;
+    
+    // 檢查前9格是否都有資料
+    bool allPreviousFramesComplete = true;
+    for (int frame = 1; frame <= 9; frame++) {
+      final ball1 = frameData['frame${frame}Ball1'] ?? 0;
+      final ball2 = frameData['frame${frame}Ball2'] ?? 0;
+      
+      if (ball1 == 0 && ball2 == 0) {
+        allPreviousFramesComplete = false;
+        break;
+      }
+      
+      // 如果第一球不是strike且第二球為0，表示這格未完成
+      if (ball1 < 10 && ball2 == 0) {
+        allPreviousFramesComplete = false;
+        break;
+      }
+    }
+    
+    // 如果前9格未完成，整個遊戲未完成
+    if (!allPreviousFramesComplete) {
+      return false;
+    }
+    
+    // 檢查第10格的完成狀態 (Current 計分模式：沒有獎勵球)
+    if (frame10Ball1 == 0) {
+      // 第10格還沒開始
+      return false;
+    } else if (frame10Ball1 == 10) {
+      // Current 模式：第10格Strike，遊戲直接結束，不需要獎勵球
+      return true;
+    } else {
+      // 第一球不是strike，需要第二球
+      if (frame10Ball2 == 0) {
+        // 第二球還沒投
+        return false;
+      } else {
+        // Current 模式：第10格有兩球（無論是否Spare），遊戲結束
+        return true;
+      }
+    }
   }
 
   void _onToggleEdit(BuildContext context, WidgetRef ref) {
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: _reconstructRollsFromGame(widget.game),
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     
@@ -263,7 +672,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
   Future<void> _editFrame(BuildContext context, WidgetRef ref, int frameIndex) async {
     final controllerParams = ScoringControllerParams(
       scoringMethod: widget.scoringMethod,
-      initialRolls: _reconstructRollsFromGame(widget.game),
+      initialRolls: _convertRollRecordsToInts(_initialRolls),
       gameId: widget.game.id,
     );
     

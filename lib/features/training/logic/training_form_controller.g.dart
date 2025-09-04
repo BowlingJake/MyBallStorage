@@ -6,7 +6,7 @@ part of 'training_form_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$trainingFormHash() => r'50d76f6c29ada69fe34774c0a34e8bb94478b8d6';
+String _$trainingFormHash() => r'a7facec699d6ba59baee7a7ff1973ec687b7abb6';
 
 /// Copied from Dart SDK
 class _SystemHash {

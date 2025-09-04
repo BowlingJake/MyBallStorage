@@ -164,7 +164,7 @@ class TrainingDaySummary {
       date: DateTime.parse(json['date']),
       center: json['center'] ?? '',
       oilPatternName: json['oilPatternName'],
-      oilPatternLength: json['oilPatternLength'],
+      oilPatternLength: json['oilPatternLength'] is String ? int.tryParse(json['oilPatternLength']) : json['oilPatternLength'],
       isHousePattern: json['isHousePattern'] ?? true,
       scoringMethod: json['scoringMethod'] ?? 'Standard',
       inputMethod: json['inputMethod'] ?? 'simple', // 預設為 simple
@@ -181,7 +181,7 @@ class TrainingDaySummary {
   final DateTime date;
   final String center;
   final String? oilPatternName;
-  final String? oilPatternLength;
+  final int? oilPatternLength;
   final bool isHousePattern;
   final String scoringMethod;
   final String inputMethod; // 新增：輸入方式 (simple/advanced)
@@ -194,7 +194,7 @@ class TrainingDaySummary {
     DateTime? date,
     String? center,
     String? oilPatternName,
-    String? oilPatternLength,
+    int? oilPatternLength,
     bool? isHousePattern,
     String? scoringMethod,
     String? inputMethod,
@@ -282,14 +282,14 @@ class TrainingDaySummary {
     if (isHousePattern) {
       return 'House Pattern';
     } else if (oilPatternName?.isNotEmpty == true ||
-        oilPatternLength?.isNotEmpty == true) {
+        oilPatternLength != null) {
       final name = oilPatternName ?? '';
-      final length = oilPatternLength ?? '';
-      if (name.isNotEmpty && length.isNotEmpty) {
+      final length = oilPatternLength;
+      if (name.isNotEmpty && length != null) {
         return '$name (${length}ft)';
       } else if (name.isNotEmpty) {
         return name;
-      } else if (length.isNotEmpty) {
+      } else if (length != null) {
         return '${length}ft';
       }
     }

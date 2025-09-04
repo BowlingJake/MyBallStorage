@@ -358,6 +358,37 @@ class ScoringController extends StateNotifier<ScoringState> {
     
     // Add the new rolls for the edited frame
     newPinCounts.addAll(newRollsForFrame);
+    
+    // 重要修復：保留被編輯 frame 之後的所有 rolls
+    // 首先跳過被編輯 frame 的原始 rolls
+    if (frameIndex < 9) {
+      // 跳過被編輯 frame 的原始 rolls
+      if (rollIndex < originalPinCounts.length && originalPinCounts[rollIndex] == 10) {
+        rollIndex++; // Strike: 跳過1球
+      } else {
+        rollIndex += 2; // 非Strike: 跳過2球
+      }
+    } else {
+      // 第10格：Current模式最多2球，無獎勵球概念
+      if (rollIndex < originalPinCounts.length) {
+        final frame10Ball1 = originalPinCounts[rollIndex];
+        rollIndex++;
+        
+        if (frame10Ball1 < 10 && rollIndex < originalPinCounts.length) {
+          // 非Strike，需要第二球
+          rollIndex++; // 跳過第二球
+        }
+        
+        // Current模式：不處理第三球，即使原始數據有獎勵球也要忽略
+        // 這確保重建的數據符合Current模式規則
+      }
+    }
+    
+    // 現在複製剩餘的所有 rolls（被編輯 frame 之後的）
+    while (rollIndex < originalPinCounts.length) {
+      newPinCounts.add(originalPinCounts[rollIndex]);
+      rollIndex++;
+    }
 
     // This reconstruction of RollRecord is naive. It assumes pin layout which is what we are trying to fix.
     // However, editing is complex. For now, we accept this limitation.

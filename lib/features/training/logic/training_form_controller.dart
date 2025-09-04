@@ -16,7 +16,7 @@ class TrainingForm extends _$TrainingForm {
         centerName: initialData.center,
         isHousePattern: initialData.isHousePattern,
         oilPatternName: initialData.oilPatternName ?? '',
-        oilPatternLength: initialData.oilPatternLength ?? '',
+        oilPatternLength: initialData.oilPatternLength?.toString() ?? '',
         selectedScoringMethod: initialData.scoringMethod,
         selectedInputMethod: initialData.inputMethod,
         isStep1Valid: true, // Assume valid if editing
@@ -58,6 +58,11 @@ class TrainingForm extends _$TrainingForm {
   void updateOilPatternLength(String length) {
     state = state.copyWith(oilPatternLength: length);
     _validateStep2();
+  }
+  
+  // 新增：轉換為整數給後端使用
+  int? get oilPatternLengthAsInt {
+    return int.tryParse(state.oilPatternLength);
   }
   
   void updateScoringMethod(String method) {

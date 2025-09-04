@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bowlingarsenal_app/features/training/logic/training_controller.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/training_list_view.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 
-class MyTrainingPage extends ConsumerWidget {
+class MyTrainingPage extends ConsumerStatefulWidget {
   const MyTrainingPage({super.key});
+  
+  @override
+  ConsumerState<MyTrainingPage> createState() => _MyTrainingPageState();
+}
+
+class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 頁面載入時重新整理資料
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(trainingControllerProvider.notifier).refreshTrainingData();
+    });
+  }
 
   int _calculateCurrentIndex(String location) {
     if (location.startsWith('/library')) return 1;
@@ -37,7 +52,7 @@ class MyTrainingPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final currentIndex = _calculateCurrentIndex(location);
     final theme = Theme.of(context);

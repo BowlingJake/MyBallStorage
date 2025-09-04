@@ -49,7 +49,7 @@ final trainingRepositoryProvider =
 // ignore: unused_element
 typedef TrainingRepositoryRef = AutoDisposeProviderRef<TrainingRepository>;
 String _$trainingControllerHash() =>
-    r'656ba2d8099d9c74d855c91ac2b6372c705502ed';
+    r'ccff0fdd721a7b3a9a07ef9efeeadef7d0564e84';
 
 /// 訓練頁面控制器
 /// 專注於訓練數據相關的業務邏輯和狀態管理

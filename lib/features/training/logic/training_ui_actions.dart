@@ -39,7 +39,7 @@ class TrainingUIActions {
           date: formState.date!,
           center: formState.centerName,
           oilPatternName: formState.oilPatternName.isEmpty ? null : formState.oilPatternName,
-          oilPatternLength: formState.oilPatternLength.isEmpty ? null : formState.oilPatternLength,
+          oilPatternLength: formState.oilPatternLength.isEmpty ? null : int.tryParse(formState.oilPatternLength),
           isHousePattern: formState.isHousePattern,
           scoringMethod: formState.selectedScoringMethod,
           inputMethod: formState.selectedInputMethod,

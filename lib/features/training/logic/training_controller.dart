@@ -1,4 +1,7 @@
 import 'package:bowlingarsenal_app/features/training/data/training_repository.dart';
+import 'package:bowlingarsenal_app/features/training/data/models/training_session.dart';
+import 'package:bowlingarsenal_app/features/training/data/models/game.dart';
+import 'package:bowlingarsenal_app/features/training/data/converters/training_data_converter.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_state.dart';
 import 'package:bowlingarsenal_app/services/training_data_service.dart';
@@ -33,13 +36,37 @@ class TrainingController extends _$TrainingController {
   TrainingState build() {
     ref.keepAlive(); // 保持provider活躍，避免頁面切換時重建
     _repository = ref.watch(trainingRepositoryProvider);
+    
+    // 非同步初始化，避免阻塞UI
+    Future.microtask(() => _loadTrainingData());
+    
     return TrainingState(
-      trainingDays: _repository.trainingDays,
+      trainingDays: _repository.trainingDays, // 初始為空，待 _loadTrainingData 更新
     );
   }
+  
+  /// 從 Supabase 載入資料並更新狀態
+  Future<void> _loadTrainingData() async {
+    try {
+      final sessions = await _repository.getTrainingSessionsDirect();
+      final summaries = await TrainingDataConverter.sessionsToSummaries(
+        sessions,
+        (sessionId) => _repository.getGamesForSessionDirect(sessionId),
+      );
+      
+      state = state.copyWith(trainingDays: summaries);
+    } catch (e) {
+      print('Error loading training data: $e');
+    }
+  }
+  
+  /// 手動重新載入資料
+  Future<void> refreshTrainingData() async {
+    await _loadTrainingData();
+  }
 
-  /// 創建新的訓練記錄
-  Future<String> createTrainingRecord({
+  /// 創建新的訓練記錄 (使用新的 Supabase 整合)
+  Future<TrainingSession> createTrainingSession({
     required String title,
     required DateTime date,
     required String center,
@@ -47,25 +74,22 @@ class TrainingController extends _$TrainingController {
     required String scoringMethod,
     required String inputMethod,
     String? oilPatternName,
-    String? oilPatternLength,
+    int? oilPatternLength,
   }) async {
-    // 模擬網路延遲，為未來資料庫操作做準備
-    await Future.delayed(Duration.zero);
-
-    final id = _repository.createTrainingDay(
+    final session = await _repository.createTrainingSessionDirect(
       title: title,
       date: date,
       center: center,
+      isHousePattern: isHousePattern,
       oilPatternName: oilPatternName,
       oilPatternLength: oilPatternLength,
-      isHousePattern: isHousePattern,
       scoringMethod: scoringMethod,
       inputMethod: inputMethod,
     );
     
-    // 更新狀態
-    state = state.copyWith(trainingDays: _repository.trainingDays);
-    return id;
+    // 重新載入資料以反映變更
+    await refreshTrainingData();
+    return session;
   }
 
   /// 更新訓練記錄
@@ -78,7 +102,7 @@ class TrainingController extends _$TrainingController {
     required String scoringMethod,
     required String inputMethod,
     String? oilPatternName,
-    String? oilPatternLength,
+    int? oilPatternLength,
   }) async {
     // 模擬網路延遲
     await Future.delayed(Duration.zero);
@@ -101,22 +125,23 @@ class TrainingController extends _$TrainingController {
     return success;
   }
 
-  /// 刪除訓練日
+  /// 刪除訓練日 (使用 Supabase)
   Future<bool> deleteTrainingDay(String dayId) async {
-    // 模擬網路延遲
-    await Future.delayed(Duration.zero);
-
-    final success = _repository.deleteTrainingDay(dayId);
-    if (success) {
+    try {
+      await _repository.deleteTrainingSessionDirect(dayId);
+      
+      // 重新載入資料並更新選擇狀態
+      await refreshTrainingData();
+      
       final newSelectedDayIds = Set<String>.from(state.selectedDayIds);
       newSelectedDayIds.remove(dayId);
+      state = state.copyWith(selectedDayIds: newSelectedDayIds);
       
-      state = state.copyWith(
-        trainingDays: _repository.trainingDays,
-        selectedDayIds: newSelectedDayIds,
-      );
+      return true;
+    } catch (e) {
+      print('Delete training session error: $e');
+      return false;
     }
-    return success;
   }
 
   /// 切換選擇模式
@@ -179,20 +204,42 @@ class TrainingController extends _$TrainingController {
     return deletedCount;
   }
 
-  /// 新增遊戲到指定訓練日
+  /// 新增遊戲到指定訓練日 (使用 Supabase)
   Future<bool> addGameToDay(String dayId) async {
-    // 模擬網路延遲
-    await Future.delayed(Duration.zero);
-
-    final nextGameNumber = _repository.getNextGameNumber(dayId);
-    final newGame = GameGenerator.createDefaultGame(dayId, nextGameNumber);
-
-    final success = _repository.addGameToDay(dayId, newGame);
-    
-    if (success) {
-      state = state.copyWith(trainingDays: _repository.trainingDays);
+    try {
+      // 獲取當前 session 的遊戲數量來決定下一個遊戲編號
+      final currentGames = await _repository.getGamesForSessionDirect(dayId);
+      final nextGameNumber = currentGames.length + 1;
+      
+      // 建立預設遊戲 (0分，所有 frame 球數都為 0)
+      await _repository.createGameDirect(
+        trainingSessionId: dayId,
+        gameNumber: nextGameNumber,
+        totalScore: 0,
+        frameScores: List.filled(10, 0),
+        strikes: 0,
+        spares: 0,
+        // 新的個別 frame 欄位，全部設為 0
+        frame1Ball1: 0, frame1Ball2: 0,
+        frame2Ball1: 0, frame2Ball2: 0,
+        frame3Ball1: 0, frame3Ball2: 0,
+        frame4Ball1: 0, frame4Ball2: 0,
+        frame5Ball1: 0, frame5Ball2: 0,
+        frame6Ball1: 0, frame6Ball2: 0,
+        frame7Ball1: 0, frame7Ball2: 0,
+        frame8Ball1: 0, frame8Ball2: 0,
+        frame9Ball1: 0, frame9Ball2: 0,
+        frame10Ball1: 0, frame10Ball2: 0,
+        frame10Ball3: null,
+      );
+      
+      // 重新載入資料
+      await refreshTrainingData();
+      return true;
+    } catch (e) {
+      print('Add game error: $e');
+      return false;
     }
-    return success;
   }
 
   /// 新增指定遊戲記錄到訓練日
@@ -208,17 +255,160 @@ class TrainingController extends _$TrainingController {
     return success;
   }
 
-  /// 更新遊戲記錄
+  /// 更新遊戲記錄 (使用 Supabase)
   Future<bool> updateGame(String dayId, GameRecord updatedGame) async {
-    // 模擬網路延遲
-    await Future.delayed(Duration.zero);
-
-    final success = _repository.updateGameInDay(dayId, updatedGame);
-    
-    if (success) {
-      state = state.copyWith(trainingDays: _repository.trainingDays);
+    try {
+      // 將 GameRecord 轉換為 Game 模型並更新到 Supabase
+      final gameToUpdate = await _convertGameRecordToGame(updatedGame, dayId);
+      await _repository.updateGameDirect(gameToUpdate);
+      
+      // 重新載入資料以反映變更
+      await refreshTrainingData();
+      return true;
+    } catch (e) {
+      print('Update game error: $e');
+      return false;
     }
-    return success;
+  }
+
+  /// 將 GameRecord 轉換為 Game 模型的輔助方法
+  Future<Game> _convertGameRecordToGame(GameRecord gameRecord, String sessionId) async {
+    // 如果需要，先從後端獲取現有的 Game 資料來保留其他欄位
+    final existingGames = await _repository.getGamesForSessionDirect(sessionId);
+    final existingGame = existingGames.firstWhere(
+      (g) => g.id == gameRecord.id,
+      orElse: () => Game(
+        id: gameRecord.id,
+        trainingSessionId: sessionId,
+        gameNumber: gameRecord.gameNumber,
+        totalScore: gameRecord.score,
+        timestamp: gameRecord.timestamp,
+      ),
+    );
+
+    // 更新基本資料，但保留現有的 frame 欄位（因為 GameRecord 沒有個別 frame 資訊）
+    return existingGame.copyWith(
+      totalScore: gameRecord.score,
+      frameScores: gameRecord.frameScores,
+      strikes: gameRecord.strikes,
+      spares: gameRecord.spares,
+      notes: gameRecord.notes,
+      ballsUsed: gameRecord.ballsUsed?.map((ball) => {
+        'id': ball.id,
+        'name': ball.name,
+        'brand': ball.brand,
+        'brandColor': ball.brandColor,
+        'imagePath': ball.imagePath,
+      }).toList() ?? [],
+    );
+  }
+
+  /// 更新遊戲記錄並包含 frame 資料 (直接使用 Supabase)
+  Future<bool> updateGameWithFrameData({
+    required String gameId,
+    required int totalScore,
+    required List<int> frameScores,
+    required int strikes,
+    required int spares,
+    String? notes,
+    List<Map<String, dynamic>>? ballsUsed,
+    required Map<String, int> frameData,
+    int? currentFrame,
+    bool? isCompleted,
+    String? scoringMode,
+  }) async {
+    try {
+      // 先獲取現有的遊戲資料
+      final sessions = await _repository.getTrainingSessionsDirect();
+      Game? existingGame;
+      String? sessionId;
+      
+      for (final session in sessions) {
+        final games = await _repository.getGamesForSessionDirect(session.id);
+        final game = games.cast<Game?>().firstWhere(
+          (g) => g?.id == gameId,
+          orElse: () => null,
+        );
+        if (game != null) {
+          existingGame = game;
+          sessionId = session.id;
+          break;
+        }
+      }
+      
+      if (existingGame == null) {
+        print('Game not found: $gameId');
+        return false;
+      }
+
+      // 合併 frame 資料到現有遊戲
+      final updatedGame = existingGame.copyWith(
+        totalScore: totalScore,
+        frameScores: frameScores,
+        strikes: strikes,
+        spares: spares,
+        notes: notes,
+        ballsUsed: ballsUsed ?? [],
+        currentFrame: currentFrame ?? existingGame.currentFrame,
+        isCompleted: isCompleted ?? existingGame.isCompleted,
+        scoringMode: scoringMode ?? existingGame.scoringMode,
+        // 更新個別 frame 欄位
+        frame1Ball1: frameData['frame1Ball1'] ?? existingGame.frame1Ball1,
+        frame1Ball2: frameData['frame1Ball2'] ?? existingGame.frame1Ball2,
+        frame2Ball1: frameData['frame2Ball1'] ?? existingGame.frame2Ball1,
+        frame2Ball2: frameData['frame2Ball2'] ?? existingGame.frame2Ball2,
+        frame3Ball1: frameData['frame3Ball1'] ?? existingGame.frame3Ball1,
+        frame3Ball2: frameData['frame3Ball2'] ?? existingGame.frame3Ball2,
+        frame4Ball1: frameData['frame4Ball1'] ?? existingGame.frame4Ball1,
+        frame4Ball2: frameData['frame4Ball2'] ?? existingGame.frame4Ball2,
+        frame5Ball1: frameData['frame5Ball1'] ?? existingGame.frame5Ball1,
+        frame5Ball2: frameData['frame5Ball2'] ?? existingGame.frame5Ball2,
+        frame6Ball1: frameData['frame6Ball1'] ?? existingGame.frame6Ball1,
+        frame6Ball2: frameData['frame6Ball2'] ?? existingGame.frame6Ball2,
+        frame7Ball1: frameData['frame7Ball1'] ?? existingGame.frame7Ball1,
+        frame7Ball2: frameData['frame7Ball2'] ?? existingGame.frame7Ball2,
+        frame8Ball1: frameData['frame8Ball1'] ?? existingGame.frame8Ball1,
+        frame8Ball2: frameData['frame8Ball2'] ?? existingGame.frame8Ball2,
+        frame9Ball1: frameData['frame9Ball1'] ?? existingGame.frame9Ball1,
+        frame9Ball2: frameData['frame9Ball2'] ?? existingGame.frame9Ball2,
+        frame10Ball1: frameData['frame10Ball1'] ?? existingGame.frame10Ball1,
+        frame10Ball2: frameData['frame10Ball2'] ?? existingGame.frame10Ball2,
+        frame10Ball3: frameData['frame10Ball3'],
+      );
+
+      // 更新到 Supabase
+      await _repository.updateGameDirect(updatedGame);
+      
+      // 重新載入資料
+      await refreshTrainingData();
+      return true;
+    } catch (e) {
+      print('Update game with frame data error: $e');
+      return false;
+    }
+  }
+
+  /// 根據 ID 獲取完整的 Game 資料
+  Future<Game?> getGameById(String gameId) async {
+    try {
+      final sessions = await _repository.getTrainingSessionsDirect();
+      
+      for (final session in sessions) {
+        final games = await _repository.getGamesForSessionDirect(session.id);
+        final game = games.cast<Game?>().firstWhere(
+          (g) => g?.id == gameId,
+          orElse: () => null,
+        );
+        if (game != null) {
+          return game;
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      print('Error getting game by ID: $e');
+      return null;
+    }
   }
 
   /// 刪除遊戲記錄

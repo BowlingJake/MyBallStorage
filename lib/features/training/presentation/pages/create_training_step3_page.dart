@@ -191,7 +191,7 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
           date: formState.date!,
           center: formState.centerName,
           oilPatternName: formState.oilPatternName.isEmpty ? null : formState.oilPatternName,
-          oilPatternLength: formState.oilPatternLength.isEmpty ? null : formState.oilPatternLength,
+          oilPatternLength: formState.oilPatternLength.isEmpty ? null : int.tryParse(formState.oilPatternLength),
           isHousePattern: formState.isHousePattern,
           scoringMethod: formState.selectedScoringMethod,
           inputMethod: formState.selectedInputMethod,
@@ -199,12 +199,12 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
         TopNotification.showSuccess(context, 'Training session updated successfully!');
       } else {
         // 創建新記錄
-        await trainingController.createTrainingRecord(
+        await trainingController.createTrainingSession(
           title: formState.title,
           date: formState.date!,
           center: formState.centerName,
           oilPatternName: formState.oilPatternName.isEmpty ? null : formState.oilPatternName,
-          oilPatternLength: formState.oilPatternLength.isEmpty ? null : formState.oilPatternLength,
+          oilPatternLength: formState.oilPatternLength.isEmpty ? null : int.tryParse(formState.oilPatternLength),
           isHousePattern: formState.isHousePattern,
           scoringMethod: formState.selectedScoringMethod,
           inputMethod: formState.selectedInputMethod,
@@ -215,7 +215,8 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
       // 返回到訓練頁面
       context.go('/training');
     } catch (e) {
-      TopNotification.showError(context, 'Failed to save training session. Please try again.');
+      print('Create training session error: $e'); // Debug 資訊
+      TopNotification.showError(context, 'Failed to save training session: ${e.toString()}');
     }
   }
 

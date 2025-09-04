@@ -20,7 +20,7 @@ class TrainingDataService {
     required String scoringMethod,
     required String inputMethod,
     String? oilPatternName,
-    String? oilPatternLength,
+    int? oilPatternLength,
   }) {
     final id = 'day_${DateTime.now().millisecondsSinceEpoch}';
     final newDay = TrainingDaySummary(
@@ -51,7 +51,7 @@ class TrainingDataService {
     required String scoringMethod,
     required String inputMethod,
     String? oilPatternName,
-    String? oilPatternLength,
+    int? oilPatternLength,
   }) {
     final dayIndex = _trainingDays.indexWhere((d) => d.id == dayId);
     if (dayIndex == -1) return false;
