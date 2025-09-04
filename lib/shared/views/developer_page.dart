@@ -4,6 +4,14 @@ import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_bu
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/frame_10_calculator.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/current_frame_10_calculator.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/traditional_frame_10_calculator.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/scoring_board.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/components/frames_1_9_calculator.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/current_scoring_strategy.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/traditional_scoring_strategy.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/scoring_engine.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/pin_state_policy.dart';
 import 'package:flutter/material.dart';
 
 class DeveloperPage extends StatefulWidget {
@@ -20,12 +28,27 @@ class _DeveloperPageState extends State<DeveloperPage> {
   String _selectedMode = 'Current';
   Frame10Calculator? _calculator;
   Frame10Result? _result;
+  // 前1-9格測試
+  final List<int> _rolls19 = [];
+  final List<List<bool>> _rollStates19 = [];
+  ScoringStrategy? _strategy; // legacy, will be delegated to engine
+  ScoringEngine? _engine;
+  List<BowlingFrame> _frames19 = const [
+    BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+    BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+  ];
+  // 合併顯示（1-9 + 第10格）
+  List<BowlingFrame> _framesMerged = const [
+    BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+    BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+  ];
 
   @override
   void initState() {
     super.initState();
     _pinController = PinSelectionController();
     _updateCalculator();
+    _updateStrategy();
   }
 
   void _updateCalculator() {
@@ -33,6 +56,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
         ? CurrentFrame10Calculator()
         : TraditionalFrame10Calculator();
     _calculateResult();
+  }
+
+  void _updateStrategy() {
+    final mode = _selectedMode == 'Current' ? ScoringMode.current : ScoringMode.traditional;
+    _engine ??= ScoringEngine(mode: mode);
+    _engine!.updateMode(mode);
+    _strategy = _engine!.strategy;
+    _recalculateFrames19();
+    _recalculateMergedFrames();
   }
 
   void _calculateResult() {
@@ -44,7 +76,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
   }
 
   void _addRoll() async {
-    // 檢查是否還能繼續投球
     if (!_canAddMoreRolls()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -55,9 +86,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
       return;
     }
 
-    // 計算當前應該顯示的球瓶狀態
-    final List<bool>? initialPinState = _getInitialPinState();
-    final bool isLogicalFirstRoll = _isLogicalFirstRoll(initialPinState);
+    final List<bool>? initialPinState = _selectedMode == 'Current'
+        ? PinStatePolicy.initialStateForFrame10Current(_rolls, _rollStates)
+        : PinStatePolicy.initialStateForFrame10Traditional(_rolls, _rollStates);
+    final bool isLogicalFirstRoll = PinStatePolicy.isLogicalFirst(initialPinState);
     
     final List<bool>? result = await showDialog<List<bool>>(
       context: context,
@@ -77,97 +109,57 @@ class _DeveloperPageState extends State<DeveloperPage> {
         _rolls.add(pinsDown);
         _rollStates.add(result);
         _calculateResult();
+        _recalculateMergedFrames();
       });
     }
   }
 
-  /// 計算到第 index 球後的累積球瓶狀態
-  List<bool> _calculateCumulativeState(int index) {
-    if (index < 0 || index >= _rollStates.length) {
-      return List.generate(10, (_) => false); // 全部站著
+  /// 1-9格：新增投球
+  void _addRoll19() async {
+    if (!_canAddMoreRolls19()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('前1-9格已完成，無法再投球'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
     }
 
-    // 對於第10格Traditional模式的邏輯
-    if (_selectedMode == 'Traditional') {
-      return _calculateTraditionalCumulativeState(index);
-    } else {
-      return _calculateCurrentCumulativeState(index);
+    final List<bool>? initialPinState = PinStatePolicy.initialStateForFrames1to9(_rolls19, _rollStates19);
+    final bool isLogicalFirstRoll = PinStatePolicy.isLogicalFirst(initialPinState);
+
+    final List<bool>? result = await showDialog<List<bool>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return PinSelectionDialog(
+          controller: _pinController,
+          initialPinState: initialPinState,
+          isFirstRoll: isLogicalFirstRoll,
+        );
+      },
+    );
+
+    if (result != null) {
+      final pinsDown = result.where((pin) => pin).length;
+      setState(() {
+        _rolls19.add(pinsDown);
+        _rollStates19.add(result);
+        _recalculateFrames19();
+        _recalculateMergedFrames();
+      });
     }
   }
 
-  List<bool> _calculateTraditionalCumulativeState(int index) {
-    // 第一球：直接返回狀態
-    if (index == 0) {
-      return _rollStates[0];
-    }
-    
-    // 第二球
-    if (index == 1) {
-      final firstRoll = _rolls[0];
-      if (firstRoll == 10) {
-        // 第一球Strike：第二球是新開始，直接返回第二球狀態
-        return _rollStates[1];
-      } else {
-        // 第一球非Strike：第二球累積到第一球
-        return _combineStates(_rollStates[0], _rollStates[1]);
-      }
-    }
-    
-    // 第三球
-    if (index == 2) {
-      final firstRoll = _rolls[0];
-      final secondRoll = _rolls[1];
-      
-      if (firstRoll == 10) {
-        // 第一球Strike的情況
-        if (secondRoll == 10) {
-          // 第二球也Strike：第三球新開始
-          return _rollStates[2];
-        } else {
-          // 第二球非Strike：第三球累積到第二球
-          return _combineStates(_rollStates[1], _rollStates[2]);
-        }
-      } else if (firstRoll + secondRoll == 10) {
-        // 第一二球Spare：第三球新開始
-        return _rollStates[2];
-      } else {
-        // Open：不應該有第三球
-        return _rollStates[2];
-      }
-    }
-    
-    return List.generate(10, (_) => false);
-  }
-
-  List<bool> _calculateCurrentCumulativeState(int index) {
-    // Current模式邏輯簡單：第二球總是累積到第一球
-    if (index == 0) {
-      return _rollStates[0];
-    } else if (index == 1) {
-      return _combineStates(_rollStates[0], _rollStates[1]);
-    }
-    
-    return List.generate(10, (_) => false);
-  }
+  // 第10格的累積狀態顯示不再於此處使用（已移除 UI 區塊），保留通用合併運算在 1-9。
 
   /// 合併兩個球瓶狀態（OR運算）
   List<bool> _combineStates(List<bool> state1, List<bool> state2) {
     return List.generate(10, (i) => state1[i] || state2[i]);
   }
 
-  /// 判斷這一球在邏輯上是否為「第一球」
-  bool _isLogicalFirstRoll(List<bool>? initialPinState) {
-    // 如果沒有初始狀態，肯定是第一球
-    if (initialPinState == null) return true;
-    
-    // 如果所有球瓶都站著，在邏輯上就是第一球
-    // 這包括：真正的第一球、Strike後的重新開始、Spare後的重新開始
-    final allStanding = initialPinState.every((pin) => !pin);
-    if (allStanding) return true;
-    
-    // 其他情況（有部分球瓶倒下）是第二球
-    return false;
-  }
+  // 判斷邏輯第一球改由 PinStatePolicy.isLogicalFirst
 
   /// 檢查是否還能繼續投球
   bool _canAddMoreRolls() {
@@ -183,88 +175,194 @@ class _DeveloperPageState extends State<DeveloperPage> {
     return _rolls.length < maxRolls;
   }
 
-  /// 根據當前投球狀況計算初始球瓶狀態
-  List<bool>? _getInitialPinState() {
-    if (_rolls.isEmpty) {
-      // 第一球：所有球瓶都站著
-      return null;
-    }
-
-    // 根據第10格的規則來決定
-    if (_selectedMode == 'Current') {
-      return _getCurrentModeInitialState();
-    } else {
-      return _getTraditionalModeInitialState();
-    }
+  /// 1-9格：檢查是否還能繼續投球
+  bool _canAddMoreRolls19() {
+    final pos = _advanceToNextInputForFrames1to9(_rolls19);
+    return pos.currentFrameIndex < 9;
   }
 
-  List<bool>? _getCurrentModeInitialState() {
-    if (_rolls.length == 1) {
-      final firstRoll = _rolls[0];
-      if (firstRoll == 10) {
-        // Strike：遊戲結束，不需要第二球
-        return null;
-      } else {
-        // 非Strike：根據第一球的狀態設置第二球
-        return _rollStates[0];
-      }
-    }
-    // Current模式最多2球
-    return null;
-  }
-
-  List<bool>? _getTraditionalModeInitialState() {
-    if (_rolls.length == 1) {
-      final firstRoll = _rolls[0];
-      if (firstRoll == 10) {
-        // Strike：第二球重新開始（所有球瓶重設）
-        return List.generate(10, (index) => false);
-      } else {
-        // 非Strike：根據第一球的狀態設置第二球
-        return _rollStates[0];
-      }
-    } else if (_rolls.length == 2) {
-      final firstRoll = _rolls[0];
-      final secondRoll = _rolls[1];
-      
-      if (firstRoll == 10) {
-        // 第一球是Strike，第二球的結果決定第三球
-        if (secondRoll == 10) {
-          // 第二球也是Strike：第三球重新開始
-          return List.generate(10, (index) => false);
-        } else {
-          // 第二球不是Strike：第三球根據第二球狀態
-          return _rollStates[1];
-        }
-      } else if (firstRoll + secondRoll == 10) {
-        // Spare：第三球重新開始
-        return List.generate(10, (index) => false);
-      } else {
-        // Open：遊戲結束，不需要第三球
-        return null;
-      }
-    }
-    
-    return null;
-  }
+  // 初始狀態計算邏輯已移至 PinStatePolicy
 
   void _clearRolls() {
     setState(() {
       _rolls.clear();
       _rollStates.clear();
       _result = null;
+      _recalculateMergedFrames();
     });
+  }
+
+  /// 1-9格：清除
+  void _clearRolls19() {
+    setState(() {
+      _rolls19.clear();
+      _rollStates19.clear();
+      _recalculateFrames19();
+      _recalculateMergedFrames();
+    });
+  }
+
+  void _recalculateFrames19() {
+    if (_strategy == null) {
+      _frames19 = const [
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+      ];
+      return;
+    }
+
+    try {
+      _frames19 = Frames1To9Calculator.calculate(_rolls19, _strategy!);
+    } catch (_) {
+      _frames19 = const [
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+      ];
+    }
+  }
+
+  void _recalculateMergedFrames() {
+    if (_engine == null) {
+      _framesMerged = const [
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+      ];
+      return;
+    }
+    try {
+      _framesMerged = _engine!.calculateMergedFrames(_rolls19, _rolls);
+    } catch (_) {
+      _framesMerged = const [
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+        BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
+      ];
+    }
+  }
+
+  /// 1-9格：計算到第 index 球後的累積球瓶狀態
+  List<bool> _calculateCumulativeState19(int index) {
+    if (index < 0 || index >= _rollStates19.length) {
+      return List.generate(10, (_) => false);
+    }
+    final firstRollIndex = _firstRollIndexOfCurrentFrameAt(index);
+    if (firstRollIndex == index) {
+      return _rollStates19[index];
+    }
+    return _combineStates(_rollStates19[firstRollIndex], _rollStates19[index]);
+  }
+
+  int _firstRollIndexOfCurrentFrameAt(int rollIndex) {
+    int i = 0;
+    while (i < rollIndex) {
+      if (_rolls19[i] == 10) {
+        i += 1;
+      } else {
+        i += 2;
+      }
+    }
+    return i == rollIndex ? rollIndex : rollIndex - 1;
+  }
+
+  ({int currentFrameIndex, int currentRollInFrame}) _advanceToNextInputForFrames1to9(List<int> rolls) {
+    int currentFrameIndex = 0;
+    int currentRollInFrame = 0;
+    int rollIndex = 0;
+    while (rollIndex < rolls.length && currentFrameIndex < 9) {
+      if (currentRollInFrame == 0) {
+        if (rolls[rollIndex] == 10) {
+          currentFrameIndex++;
+          currentRollInFrame = 0;
+        } else {
+          currentRollInFrame = 1;
+        }
+        rollIndex++;
+      } else {
+        currentFrameIndex++;
+        currentRollInFrame = 0;
+        rollIndex++;
+      }
+    }
+    return (currentFrameIndex: currentFrameIndex, currentRollInFrame: currentRollInFrame);
+  }
+
+  /// 取得目前可輸入的欄位（0-based）。回傳 -1 代表已完成不可再輸入。
+  int _getCurrentFrameIndex() {
+    if (_engine == null) return 0;
+    return _engine!.getCurrentFrameIndex(_rolls19, _rolls);
+  }
+
+  void _onMergedFrameTapped(int frameIndex) async {
+    final currentIdx = _getCurrentFrameIndex();
+    if (currentIdx == -1 || frameIndex != currentIdx) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('只能在目前欄位輸入')),
+      );
+      return;
+    }
+
+    if (frameIndex < 9) {
+      final List<bool>? initialPinState = PinStatePolicy.initialStateForFrames1to9(_rolls19, _rollStates19);
+      final bool isFirst = PinStatePolicy.isLogicalFirst(initialPinState);
+      final List<bool>? result = await showDialog<List<bool>>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return PinSelectionDialog(
+            controller: _pinController,
+            initialPinState: initialPinState,
+            isFirstRoll: isFirst,
+          );
+        },
+      );
+      if (result != null) {
+        final pinsDown = result.where((pin) => pin).length;
+        setState(() {
+          _rolls19.add(pinsDown);
+          _rollStates19.add(result);
+          _recalculateFrames19();
+          _recalculateMergedFrames();
+        });
+      }
+    } else {
+      final List<bool>? initialPinState = _selectedMode == 'Current'
+          ? PinStatePolicy.initialStateForFrame10Current(_rolls, _rollStates)
+          : PinStatePolicy.initialStateForFrame10Traditional(_rolls, _rollStates);
+      final bool isFirst = PinStatePolicy.isLogicalFirst(initialPinState);
+      final List<bool>? result = await showDialog<List<bool>>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return PinSelectionDialog(
+            controller: _pinController,
+            initialPinState: initialPinState,
+            isFirstRoll: isFirst,
+          );
+        },
+      );
+      if (result != null) {
+        final pinsDown = result.where((pin) => pin).length;
+    setState(() {
+          _rolls.add(pinsDown);
+          _rollStates.add(result);
+          _calculateResult();
+          _recalculateMergedFrames();
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('第10格計分測試'),
+        title: const Text('計分開發測試'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -291,6 +389,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                               setState(() {
                                 _selectedMode = value!;
                                 _updateCalculator();
+                                _updateStrategy();
                               });
                             },
                           ),
@@ -304,6 +403,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                               setState(() {
                                 _selectedMode = value!;
                                 _updateCalculator();
+                                _updateStrategy();
                               });
                             },
                           ),
@@ -314,88 +414,58 @@ class _DeveloperPageState extends State<DeveloperPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // 投球記錄
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '投球記錄',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+            // 已精簡：只保留模式切換 + 合併顯示
                     const SizedBox(height: 8),
-                    Text(
-                      _rolls.isEmpty ? '無記錄' : _rolls.join(', '),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    if (_rollStates.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      const Text(
-                        '球瓶狀態：',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      ..._rollStates.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final cumulativeState = _calculateCumulativeState(index);
-                        final standingPins = <int>[];
-                        for (int i = 0; i < cumulativeState.length; i++) {
-                          if (!cumulativeState[i]) standingPins.add(i + 1);
-                        }
-                        return Text(
-                          '第${index + 1}球後: 剩餘球瓶 ${standingPins.isEmpty ? "無" : standingPins.join(", ")}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        );
-                      }),
-                    ],
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        AppStandardButton.creative(
-                          text: '新增投球',
-                          onPressed: _addRoll,
-                        ),
-                        const SizedBox(width: 8),
-                        AppStandardButton.destructive(
-                          text: '清除',
-                          onPressed: _clearRolls,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            ScoringBoard(
+              title: null,
+              frames: _framesMerged,
+              onFrameTapped: _onMergedFrameTapped,
+              showThirdBallInTenthFrame: _selectedMode != 'Current',
+              singleRow: true,
+              frameAspectRatio: 0.78,
+              removeOuterContainer: true,
+              useGlowText: false,
+              frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
+              frameBorderWidth: 1.0,
+              frameBorderRadius: 4.0,
+              showFrameShadow: false,
+              showHeaderNumbers: true,
+              headerBarHeight: 0.0,
+              headerBarColor: null,
+              tenthFrameFlex: 1,
+              accentColor: Theme.of(context).colorScheme.primary,
+              // 壓到邊界
+              // 下層 widget 已支援 suppressEdgeMargins，讓首尾貼齊
               ),
+            const SizedBox(height: 16),
+            ScoringBoard(
+              title: null,
+              frames: _framesMerged,
+              onFrameTapped: _onMergedFrameTapped,
+              showThirdBallInTenthFrame: _selectedMode != 'Current',
+              singleRow: true,
+              frameAspectRatio: 0.76,
+              removeOuterContainer: true,
+              useGlowText: false,
+              frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
+              frameBorderWidth: 1.1,
+              frameBorderRadius: 5.0,
+              showFrameShadow: false,
+              showHeaderNumbers: true,
+              headerBarHeight: 0.0,
+              headerBarColor: null,
+              tenthFrameFlex: 1,
+              accentColor: Theme.of(context).colorScheme.primary,
+              innerBorderWidth: 1.0,
+              innerBorderColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+              frameFillGradient: LinearGradient(colors: [Color(0xFF0B0B0C), Color(0xFF111112)]),
+              useCumulativePill: true,
+              cumulativeBackgroundColor: Color(0xFF2A2A2C),
+              cumulativeTextStyle: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
+              showSeparatorLine: true,
             ),
-            const SizedBox(height: 16),
-
-            // 計算結果
-            if (_result != null)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '第10格結果 (${_calculator!.modeName} 模式)',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildFrameDisplay(),
-                      const SizedBox(height: 16),
-                      Text('分數: ${_result!.score}'),
-                      Text('使用球數: ${_result!.rollsUsed}'),
-                      Text('是否完成: ${_result!.isComplete ? "是" : "否"}'),
-                      if (_calculator != null)
-                        Text('需要球數: ${_calculator!.getRequiredRollsCount(_rolls, 0)}'),
-                    ],
-                  ),
-                ),
-              ),
           ],
+        ),
         ),
       ),
     );

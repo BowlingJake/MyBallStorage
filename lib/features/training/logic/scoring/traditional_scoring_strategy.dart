@@ -150,10 +150,18 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       final secondRoll = rolls[rollIndex + 1];
       final thirdRoll = rolls[rollIndex + 2];
       
+      // 顯示第三球：若第二球非Strike且第二+第三為10，第三球應顯示'/'
+      String thirdDisplay;
+      if (secondRoll != 10 && (secondRoll + thirdRoll == 10)) {
+        thirdDisplay = '/';
+      } else {
+        thirdDisplay = _formatBall(thirdRoll);
+      }
+      
       return _Frame10Result(
         firstBall: 'X',
         secondBall: _formatBall(secondRoll),
-        thirdBall: secondRoll == 10 ? 'X' : (thirdRoll == 10 ? 'X' : _formatBall(thirdRoll)),
+        thirdBall: thirdDisplay,
         score: firstRoll + secondRoll + thirdRoll,
       );
     }
@@ -182,10 +190,12 @@ class TraditionalScoringStrategy implements ScoringStrategy {
       }
       
       final thirdRoll = rolls[rollIndex + 2];
+      // 第10格 Spare 後的第三球，顯示實際倒瓶（X 表示10）
+      final thirdDisplay = _formatBall(thirdRoll);
       return _Frame10Result(
         firstBall: firstRoll.toString(),
         secondBall: '/',
-        thirdBall: _formatBall(thirdRoll),
+        thirdBall: thirdDisplay,
         score: 10 + thirdRoll,
       );
     }

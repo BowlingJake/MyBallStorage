@@ -21,6 +21,28 @@ class BowlingScoreCardWidget extends StatelessWidget {
   final Color accentColor;
   final TextStyle? textStyle;
   final Function(int frameIndex)? onFrameTapped; // 新增點擊回調
+  final bool showThirdBallInTenthFrame;
+  final bool singleRow; // 單行顯示1~10格
+  final double frameAspectRatio; // 每個frame的寬高比，預設1.0，可調小變更扁
+  final bool useGlowText; // 是否使用發光字體
+  final double frameBorderWidth; // 外框線寬
+  final double frameBorderRadius; // 外框圓角
+  final EdgeInsets frameMargin; // 每格外距
+  final bool showFrameShadow; // 是否顯示外框陰影
+  final bool useCumulativePill; // 底部分數以膠囊方式顯示
+  final Color cumulativeBackgroundColor;
+  final EdgeInsets cumulativePadding;
+  final double cumulativeBorderRadius;
+  final TextStyle? cumulativeTextStyle;
+  final bool showSeparatorLine;
+  final Color? headerBarColor; // 單行模式下，頂部編號行的背景色
+  final bool suppressEdgeMargins; // 首尾格子移除外側邊距，貼齊邊界
+  final bool showHeaderNumbers; // 單行模式：顯示數字還是細條
+  final double headerBarHeight; // 單行模式：細條高度
+  final int tenthFrameFlex; // 第10格的寬度比例（單行時）
+  final double? innerBorderWidth; // 內層描邊寬度
+  final Color? innerBorderColor; // 內層描邊顏色
+  final LinearGradient? frameFillGradient; // 格子內部細膩漸層
   
   const BowlingScoreCardWidget({
     super.key,
@@ -28,6 +50,28 @@ class BowlingScoreCardWidget extends StatelessWidget {
     this.accentColor = const Color(0xFF00B2A9),
     this.textStyle,
     this.onFrameTapped, // 新增參數
+    this.showThirdBallInTenthFrame = true,
+    this.singleRow = false,
+    this.frameAspectRatio = 1.0,
+    this.useGlowText = true,
+    this.frameBorderWidth = 2.0,
+    this.frameBorderRadius = 8.0,
+    this.frameMargin = const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+    this.showFrameShadow = true,
+    this.useCumulativePill = false,
+    this.cumulativeBackgroundColor = const Color(0xFF6B7280),
+    this.cumulativePadding = const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    this.cumulativeBorderRadius = 6.0,
+    this.cumulativeTextStyle,
+    this.showSeparatorLine = true,
+    this.headerBarColor,
+    this.suppressEdgeMargins = false,
+    this.showHeaderNumbers = true,
+    this.headerBarHeight = 6.0,
+    this.tenthFrameFlex = 1,
+    this.innerBorderWidth,
+    this.innerBorderColor,
+    this.frameFillGradient,
   });
 
   @override
@@ -38,91 +82,199 @@ class BowlingScoreCardWidget extends StatelessWidget {
       paddedFrames.add(const BowlingFrame());
     }
 
-    final glowingTextStyle = textStyle ?? TextStyle(
+    final baseTextStyle = textStyle ?? const TextStyle(
       color: Colors.white,
       fontFamily: 'Electrolize',
-      shadows: [
-        for (double i = 1; i < 3; i++) 
-          Shadow(color: accentColor, blurRadius: 2 * i),
-      ],
       fontWeight: FontWeight.bold,
     );
+    final glowingTextStyle = useGlowText
+        ? baseTextStyle.copyWith(shadows: [for (double i = 1; i < 3; i++) Shadow(color: accentColor, blurRadius: 2 * i)])
+        : baseTextStyle;
 
-    return Column(
-      children: [
-        // --- 第一排編號 (1-5) ---
-        Row(
-          children: List.generate(5, (index) {
-            return Expanded(
-              child: Text(
-                (index + 1).toString(),
-                textAlign: TextAlign.center,
-                style: glowingTextStyle.copyWith(fontSize: 14),
+    if (singleRow) {
+      // 單行顯示所有10格
+      return Column(
+        children: [
+          if (showHeaderNumbers)
+            Container(
+              color: headerBarColor,
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: List.generate(10, (index) {
+                  return Expanded(
+                    child: Text(
+                      (index + 1).toString(),
+                      textAlign: TextAlign.center,
+                      style: glowingTextStyle.copyWith(fontSize: 12),
+                    ),
+                  );
+                }),
               ),
-            );
-          }),
-        ),
-        const SizedBox(height: 4),
-        
-        // --- 第一排計分格 (1-5) ---
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (index) => 
-            Expanded(child: _buildFrame(context, index + 1, paddedFrames[index], glowingTextStyle))
+            )
+          else
+            Container(
+              height: headerBarHeight,
+              color: headerBarColor ?? Colors.green,
+            ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(10, (index) {
+              final EdgeInsets customMargin = suppressEdgeMargins
+                  ? EdgeInsets.only(
+                      left: index == 0 ? 0 : frameMargin.left,
+                      right: index == 9 ? 0 : frameMargin.right,
+                      top: frameMargin.top,
+                      bottom: frameMargin.bottom,
+                    )
+                  : frameMargin;
+              final int flexValue = index == 9 ? (tenthFrameFlex <= 0 ? 1 : tenthFrameFlex) : 1;
+              return Expanded(
+                flex: flexValue,
+                child: _buildFrame(
+                  context,
+                  index + 1,
+                  paddedFrames[index],
+                  glowingTextStyle,
+                  margin: customMargin,
+                ),
+              );
+            }),
           ),
-        ),
-        const SizedBox(height: 12),
-        
-        // --- 第二排編號 (6-10) ---
-        Row(
-          children: List.generate(5, (index) {
-            return Expanded(
-              child: Text(
-                (index + 6).toString(),
-                textAlign: TextAlign.center,
-                style: glowingTextStyle.copyWith(fontSize: 14),
-              ),
-            );
-          }),
-        ),
-        const SizedBox(height: 4),
-        
-        // --- 第二排計分格 (6-10) ---
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (index) => 
-            Expanded(child: _buildFrame(context, index + 6, paddedFrames[index + 5], glowingTextStyle))
+        ],
+      );
+    } else {
+      // 兩行顯示（原樣）
+      return Column(
+        children: [
+          // --- 第一排編號 (1-5) ---
+          Row(
+            children: List.generate(5, (index) {
+              return Expanded(
+                child: Text(
+                  (index + 1).toString(),
+                  textAlign: TextAlign.center,
+                  style: glowingTextStyle.copyWith(fontSize: 14),
+                ),
+              );
+            }),
           ),
-        ),
-      ],
-    );
+          const SizedBox(height: 4),
+          
+          // --- 第一排計分格 (1-5) ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(5, (index) {
+              final EdgeInsets customMargin = suppressEdgeMargins
+                  ? EdgeInsets.only(
+                      left: index == 0 ? 0 : frameMargin.left,
+                      right: index == 4 ? 0 : frameMargin.right,
+                      top: frameMargin.top,
+                      bottom: frameMargin.bottom,
+                    )
+                  : frameMargin;
+              return Expanded(
+                child: _buildFrame(
+                  context,
+                  index + 1,
+                  paddedFrames[index],
+                  glowingTextStyle,
+                  margin: customMargin,
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 12),
+          
+          // --- 第二排編號 (6-10) ---
+          Row(
+            children: List.generate(5, (index) {
+              return Expanded(
+                child: Text(
+                  (index + 6).toString(),
+                  textAlign: TextAlign.center,
+                  style: glowingTextStyle.copyWith(fontSize: 14),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 4),
+          
+          // --- 第二排計分格 (6-10) ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(5, (index) {
+              final EdgeInsets customMargin = suppressEdgeMargins
+                  ? EdgeInsets.only(
+                      left: index == 0 ? 0 : frameMargin.left,
+                      right: index == 4 ? 0 : frameMargin.right,
+                      top: frameMargin.top,
+                      bottom: frameMargin.bottom,
+                    )
+                  : frameMargin;
+              return Expanded(
+                child: _buildFrame(
+                  context,
+                  index + 6,
+                  paddedFrames[index + 5],
+                  glowingTextStyle,
+                  margin: customMargin,
+                ),
+              );
+            }),
+          ),
+        ],
+      );
+    }
   }
 
-  Widget _buildFrame(BuildContext context, int frameNumber, BowlingFrame frameData, TextStyle glowingTextStyle) {
+  Widget _buildFrame(BuildContext context, int frameNumber, BowlingFrame frameData, TextStyle glowingTextStyle, {EdgeInsets? margin}) {
     return AspectRatio(
-      aspectRatio: 1.0,
+      aspectRatio: frameAspectRatio,
       child: GestureDetector(
         onTap: onFrameTapped != null ? () => onFrameTapped!(frameNumber - 1) : null, // 轉換為0-based index
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+          margin: margin ?? frameMargin,
           decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(8.0),
+            color: frameFillGradient == null ? Colors.black : null,
+            gradient: frameFillGradient,
+            borderRadius: BorderRadius.circular(frameBorderRadius),
             border: Border.all(
               color: accentColor,
-              width: 2.0,
+              width: frameBorderWidth,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: accentColor.withOpacity(0.3),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+            boxShadow: showFrameShadow
+                ? [
+                    BoxShadow(
+                      color: accentColor.withOpacity(0.18),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Stack(
+            children: [
+              if (innerBorderWidth != null && innerBorderWidth! > 0)
+                Positioned.fill(
+                  child: Container(
+                    margin: EdgeInsets.all(innerBorderWidth!),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        (frameBorderRadius - innerBorderWidth!).clamp(0, frameBorderRadius),
+                      ),
+                      border: Border.all(
+                        color: innerBorderColor ?? accentColor.withOpacity(0.4),
+                        width: innerBorderWidth!,
+                      ),
+                    ),
+                  ),
+                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular((frameBorderRadius - 2).clamp(0, frameBorderRadius)),
+                child: _buildFrameBody(context, frameNumber, frameData, glowingTextStyle),
               ),
             ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6.0),
-            child: _buildFrameBody(context, frameNumber, frameData, glowingTextStyle),
           ),
         ),
       ),
@@ -134,7 +286,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
     
     Widget scoreArea;
 
-    if (isTenthFrame) {
+    if (isTenthFrame && showThirdBallInTenthFrame) {
       // 第10格可以有3球
       scoreArea = Row(
         children: [
@@ -153,30 +305,37 @@ class BowlingScoreCardWidget extends StatelessWidget {
       );
     }
 
+    final bool hasScore = frameData.cumulativeScore != null;
     return Column(
       children: [
         Expanded(flex: 2, child: scoreArea),
-        Container(
-          height: 2,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                accentColor.withOpacity(0.2),
-                accentColor,
-                accentColor.withOpacity(0.2),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(1),
+        if (showSeparatorLine)
+          Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            color: accentColor, // 實線，無漸層/光暈
           ),
-        ),
         Expanded(
           flex: 3,
           child: Center(
-            child: Text(
-              frameData.cumulativeScore?.toString() ?? '',
-              style: glowingTextStyle.copyWith(fontSize: 22),
-            ),
+            child: hasScore
+                ? (useCumulativePill
+                    ? Container(
+                        padding: cumulativePadding,
+                        decoration: BoxDecoration(
+                          color: cumulativeBackgroundColor,
+                          borderRadius: BorderRadius.circular(cumulativeBorderRadius),
+                        ),
+                        child: Text(
+                          frameData.cumulativeScore!.toString(),
+                          style: (cumulativeTextStyle ?? glowingTextStyle.copyWith(fontSize: 12)),
+                        ),
+                      )
+                    : Text(
+                        frameData.cumulativeScore!.toString(),
+                        style: glowingTextStyle.copyWith(fontSize: 16),
+                      ))
+                : const SizedBox.shrink(),
           ),
         ),
       ],
