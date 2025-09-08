@@ -32,7 +32,7 @@ class PinSelectionWidgetState extends State<PinSelectionWidget> {
   void initState() {
     super.initState();
     // Initialize with initial state if provided, otherwise default to all standing
-    _pinsKnockedDown = widget.initialPinState ?? List.generate(10, (index) => false);
+    _pinsKnockedDown = widget.initialPinState?.toList() ?? List.generate(10, (index) => false);
     // Call the public attach method
     widget.controller?.attach(this);
   }

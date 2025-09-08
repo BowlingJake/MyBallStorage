@@ -1,6 +1,10 @@
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_dialog.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:bowlingarsenal_app/shared/utils/bowling/split_detector.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/frame_10_calculator.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/current_frame_10_calculator.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/components/traditional_frame_10_calculator.dart';
@@ -13,6 +17,7 @@ import 'package:bowlingarsenal_app/features/training/logic/scoring/traditional_s
 import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/scoring_engine.dart';
 import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/pin_state_policy.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
@@ -42,6 +47,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
     BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
     BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
   ];
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -77,12 +83,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
 
   void _addRoll() async {
     if (!_canAddMoreRolls()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('第10格已完成，無法再投球'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      TopNotification.showError(context, '第10格已完成，無法再投球');
       return;
     }
 
@@ -107,7 +108,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
       final pinsDown = result.where((pin) => pin).length;
       setState(() {
         _rolls.add(pinsDown);
-        _rollStates.add(result);
+        _rollStates.add(result.toList());
         _calculateResult();
         _recalculateMergedFrames();
       });
@@ -117,12 +118,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
   /// 1-9格：新增投球
   void _addRoll19() async {
     if (!_canAddMoreRolls19()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('前1-9格已完成，無法再投球'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      TopNotification.showError(context, '前1-9格已完成，無法再投球');
       return;
     }
 
@@ -145,7 +141,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
       final pinsDown = result.where((pin) => pin).length;
       setState(() {
         _rolls19.add(pinsDown);
-        _rollStates19.add(result);
+        _rollStates19.add(result.toList());
+        
+        // Debug: 列印當前的狀態
+        print('Added roll #${_rolls19.length}: $pinsDown pins');
+        print('Roll states length: ${_rollStates19.length}');
+        print('Last added state: $result');
+        
         _recalculateFrames19();
         _recalculateMergedFrames();
       });
@@ -200,6 +202,20 @@ class _DeveloperPageState extends State<DeveloperPage> {
       _recalculateFrames19();
       _recalculateMergedFrames();
     });
+  }
+
+  /// 重置所有輸入記錄
+  void _resetAllData() {
+    setState(() {
+      _rolls.clear();
+      _rollStates.clear();
+      _rolls19.clear();
+      _rollStates19.clear();
+      _result = null;
+      _recalculateFrames19();
+      _recalculateMergedFrames();
+    });
+    TopNotification.showSuccess(context, '已重置所有輸入記錄');
   }
 
   void _recalculateFrames19() {
@@ -291,18 +307,88 @@ class _DeveloperPageState extends State<DeveloperPage> {
     return _engine!.getCurrentFrameIndex(_rolls19, _rolls);
   }
 
-  void _onMergedFrameTapped(int frameIndex) async {
-    final currentIdx = _getCurrentFrameIndex();
-    if (currentIdx == -1 || frameIndex != currentIdx) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('只能在目前欄位輸入')),
+  /// 取得 1-9 格某一格的第一球在 _rolls19 中的起始索引
+  int _rollStartIndexForFrame19(int frameIndex) {
+    int rollIndex = 0;
+    for (int f = 0; f < frameIndex; f++) {
+      if (rollIndex >= _rolls19.length) return _rolls19.length; // 超出
+      if (_rolls19[rollIndex] == 10) {
+        rollIndex += 1;
+      } else {
+        rollIndex += 2;
+      }
+    }
+    return rollIndex;
+  }
+
+  /// 確認 1-9 格該格是否為「已完整」
+  bool _isFrameComplete19(int frameIndex) {
+    final int start = _rollStartIndexForFrame19(frameIndex);
+    if (start >= _rolls19.length) return false;
+    if (_rolls19[start] == 10) return true; // strike 完整
+    return (start + 1) < _rolls19.length; // 需要第二球
+  }
+
+  /// 生成球瓶視覺化組件列表
+  List<Widget> _buildPinVisualizationRow() {
+    final List<Widget> pinVisualizations = [];
+    
+    for (int frameIndex = 0; frameIndex < 10; frameIndex++) {
+      List<bool> pinStates;
+      
+      if (frameIndex < 9) {
+        // 1-9格：使用合併的數據
+        pinStates = PinVisualizationHelper.getFramePinStates(
+          rolls: _rolls19,
+          rollStates: _rollStates19,
+          frameIndex: frameIndex,
+        );
+      } else {
+        // 第10格：使用第10格的數據
+        pinStates = PinVisualizationHelper.getFramePinStates(
+          rolls: _rolls,
+          rollStates: _rollStates,
+          frameIndex: frameIndex,
+        );
+      }
+      
+      pinVisualizations.add(
+        Expanded(
+          flex: frameIndex == 9 ? 1 : 1, // 第10格與其他格相同flex
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 0.5),
+            child: PinVisualizationWidget.withConfig(
+              pinStates: pinStates,
+              width: double.infinity,
+              config: PinVisualizationConfig.dev(),
+            ),
+          ),
+        ),
       );
-      return;
+    }
+    
+    return pinVisualizations;
+  }
+
+  void _onMergedFrameTapped(int frameIndex) async {
+    if (!_isEditMode) {
+      final currentIdx = _getCurrentFrameIndex();
+      if (currentIdx == -1 || frameIndex != currentIdx) {
+        TopNotification.showError(context, '只能在目前欄位輸入');
+        return;
+      }
+    } else {
+      // 編輯模式：僅允許對「已完成」的格進行編輯
+      final bool canEdit = frameIndex < 9 ? _isFrameComplete19(frameIndex) : _rolls.isNotEmpty;
+      if (!canEdit) {
+        TopNotification.showError(context, '僅可編輯已完成的格');
+        return;
+      }
     }
 
     if (frameIndex < 9) {
       final List<bool>? initialPinState = PinStatePolicy.initialStateForFrames1to9(_rolls19, _rollStates19);
-      final bool isFirst = PinStatePolicy.isLogicalFirst(initialPinState);
+      final bool isFirst = _isEditMode ? (initialPinState == null) : PinStatePolicy.isLogicalFirst(initialPinState);
       final List<bool>? result = await showDialog<List<bool>>(
         context: context,
         barrierDismissible: false,
@@ -316,18 +402,98 @@ class _DeveloperPageState extends State<DeveloperPage> {
       );
       if (result != null) {
         final pinsDown = result.where((pin) => pin).length;
-        setState(() {
-          _rolls19.add(pinsDown);
-          _rollStates19.add(result);
-          _recalculateFrames19();
-          _recalculateMergedFrames();
-        });
+        if (_isEditMode) {
+          // 計算欲寫入的第一球索引
+          int writeIndex = 0;
+          for (int f = 0; f < frameIndex; f++) {
+            if (writeIndex < _rolls19.length && _rolls19[writeIndex] == 10) {
+              writeIndex += 1;
+            } else {
+              writeIndex += 2;
+            }
+          }
+
+          // 若非 strike，先取得第二球輸入
+          List<bool>? res2;
+          int? pinsDown2;
+          if (pinsDown != 10) {
+            res2 = await showDialog<List<bool>>(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return PinSelectionDialog(
+                  controller: _pinController,
+                  initialPinState: result,
+                  isFirstRoll: false,
+                );
+              },
+            );
+            if (res2 != null) {
+              pinsDown2 = res2.where((p) => p).length;
+            }
+          }
+
+          setState(() {
+            final bool hadFirst = writeIndex < _rolls19.length;
+            final bool originalWasStrike = hadFirst && _rolls19[writeIndex] == 10;
+
+            // 覆寫/新增第一球
+            if (hadFirst) {
+              _rolls19[writeIndex] = pinsDown;
+              _rollStates19[writeIndex] = result.toList();
+            } else {
+              _rolls19.insert(writeIndex, pinsDown);
+              _rollStates19.insert(writeIndex, result.toList());
+            }
+
+            if (pinsDown == 10) {
+              // 新狀態為 strike：確保移除原第二球（若原本有）
+              if (!originalWasStrike && writeIndex + 1 < _rolls19.length) {
+                _rolls19.removeAt(writeIndex + 1);
+                _rollStates19.removeAt(writeIndex + 1);
+              }
+            } else {
+              // 新狀態為非 strike，須有第二球
+              if (res2 != null && pinsDown2 != null) {
+                if (originalWasStrike) {
+                  // 原本是 strike，現在改為兩球：插入第二球，將後續右移
+                  if (writeIndex + 1 <= _rolls19.length) {
+                    _rolls19.insert(writeIndex + 1, pinsDown2);
+                    _rollStates19.insert(writeIndex + 1, res2.toList());
+                  } else {
+                    _rolls19.add(pinsDown2);
+                    _rollStates19.add(res2.toList());
+                  }
+                } else {
+                  // 原本也是兩球：覆寫第二球
+                  if (writeIndex + 1 < _rolls19.length) {
+                    _rolls19[writeIndex + 1] = pinsDown2;
+                    _rollStates19[writeIndex + 1] = res2.toList();
+                  } else {
+                    _rolls19.add(pinsDown2);
+                    _rollStates19.add(res2.toList());
+                  }
+                }
+              }
+            }
+
+            _recalculateFrames19();
+            _recalculateMergedFrames();
+          });
+        } else {
+          setState(() {
+            _rolls19.add(pinsDown);
+            _rollStates19.add(result);
+            _recalculateFrames19();
+            _recalculateMergedFrames();
+          });
+        }
       }
     } else {
       final List<bool>? initialPinState = _selectedMode == 'Current'
           ? PinStatePolicy.initialStateForFrame10Current(_rolls, _rollStates)
           : PinStatePolicy.initialStateForFrame10Traditional(_rolls, _rollStates);
-      final bool isFirst = PinStatePolicy.isLogicalFirst(initialPinState);
+      final bool isFirst = _isEditMode ? (initialPinState == null) : PinStatePolicy.isLogicalFirst(initialPinState);
       final List<bool>? result = await showDialog<List<bool>>(
         context: context,
         barrierDismissible: false,
@@ -341,12 +507,53 @@ class _DeveloperPageState extends State<DeveloperPage> {
       );
       if (result != null) {
         final pinsDown = result.where((pin) => pin).length;
-    setState(() {
-          _rolls.add(pinsDown);
-          _rollStates.add(result);
-          _calculateResult();
-          _recalculateMergedFrames();
-        });
+        if (_isEditMode) {
+          List<bool>? res2;
+          int? pinsDown2;
+          if (pinsDown != 10) {
+            res2 = await showDialog<List<bool>>(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return PinSelectionDialog(
+                  controller: _pinController,
+                  initialPinState: result,
+                  isFirstRoll: false,
+                );
+              },
+            );
+            if (res2 != null) {
+              pinsDown2 = res2.where((p) => p).length;
+            }
+          }
+          setState(() {
+            if (_rolls.isEmpty) {
+              _rolls.add(pinsDown);
+              _rollStates.add(result.toList());
+            } else {
+              _rolls[0] = pinsDown;
+              _rollStates[0] = result.toList();
+            }
+            if (pinsDown != 10 && res2 != null && pinsDown2 != null) {
+              if (_rolls.length >= 2) {
+                _rolls[1] = pinsDown2;
+                _rollStates[1] = res2.toList();
+              } else {
+                _rolls.add(pinsDown2);
+                _rollStates.add(res2.toList());
+              }
+            }
+            _calculateResult();
+            _recalculateMergedFrames();
+          });
+        } else {
+          setState(() {
+            _rolls.add(pinsDown);
+            _rollStates.add(result);
+            _calculateResult();
+            _recalculateMergedFrames();
+          });
+        }
       }
     }
   }
@@ -356,8 +563,38 @@ class _DeveloperPageState extends State<DeveloperPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/'); // 返回主頁面
+            }
+          },
+        ),
         title: const Text('計分開發測試'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: AppStandardButton.destructive(
+              onPressed: _resetAllData,
+              text: 'Reset',
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: AppStandardButton(
+              onPressed: () {
+                setState(() {
+                  _isEditMode = !_isEditMode;
+                });
+              },
+              text: _isEditMode ? 'Done' : 'Edit',
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -424,6 +661,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
               singleRow: true,
               frameAspectRatio: 0.78,
               removeOuterContainer: true,
+              padding: EdgeInsets.zero, // 與下方球瓶區塊上下無縫貼合
               useGlowText: false,
               frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
               frameBorderWidth: 1.0,
@@ -434,9 +672,23 @@ class _DeveloperPageState extends State<DeveloperPage> {
               headerBarColor: null,
               tenthFrameFlex: 1,
               accentColor: Theme.of(context).colorScheme.primary,
-              // 壓到邊界
-              // 下層 widget 已支援 suppressEdgeMargins，讓首尾貼齊
+              isSplitPerFrame: List<bool>.generate(10, (i) {
+                // 取得第一球的純狀態
+                final List<bool> firstRoll = PinVisualizationHelper.getFramePinStates(
+                  rolls: i < 9 ? _rolls19 : _rolls,
+                  rollStates: i < 9 ? _rollStates19 : _rollStates,
+                  frameIndex: i,
+                );
+                return SplitDetector.isSplit(firstRoll);
+              }),
+            ),
+            // 第一個計分板的球瓶視覺化
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: Row(
+                children: _buildPinVisualizationRow(),
               ),
+            ),
             const SizedBox(height: 16),
             ScoringBoard(
               title: null,
@@ -446,6 +698,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
               singleRow: true,
               frameAspectRatio: 0.76,
               removeOuterContainer: true,
+              padding: EdgeInsets.zero, // 與下方球瓶區塊上下無縫貼合
               useGlowText: false,
               frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
               frameBorderWidth: 1.1,
@@ -463,9 +716,63 @@ class _DeveloperPageState extends State<DeveloperPage> {
               cumulativeBackgroundColor: Color(0xFF2A2A2C),
               cumulativeTextStyle: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
               showSeparatorLine: true,
+              isSplitPerFrame: List<bool>.generate(10, (i) {
+                final List<bool> firstRoll = PinVisualizationHelper.getFramePinStates(
+                  rolls: i < 9 ? _rolls19 : _rolls,
+                  rollStates: i < 9 ? _rollStates19 : _rollStates,
+                  frameIndex: i,
+                );
+                return SplitDetector.isSplit(firstRoll);
+              }),
+            ),
+            // 第二個計分板的球瓶視覺化
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: Row(
+                children: _buildPinVisualizationRow(),
+              ),
             ),
           ],
         ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: AppStandardButton.secondary(
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/'); // 返回主頁面
+                      }
+                    },
+                    text: '返回',
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AppStandardButton.destructive(
+                    onPressed: _resetAllData,
+                    text: '重置所有記錄',
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

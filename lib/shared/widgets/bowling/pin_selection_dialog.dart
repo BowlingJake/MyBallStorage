@@ -113,8 +113,8 @@ class _PinSelectionDialogState extends State<PinSelectionDialog> {
                             // 對於第二球，只返回本球新擊倒的瓶
                             List<bool> resultPinState;
                             if (widget.isFirstRoll || _originalInitialState == null) {
-                              // 第一球：返回完整狀態
-                              resultPinState = widget.controller.pinState;
+                              // 第一球：返回完整狀態（回傳副本避免後續被覆寫）
+                              resultPinState = widget.controller.pinState.toList();
                             } else {
                               // 第二球：只返回本球新擊倒的瓶
                               final currentState = widget.controller.pinState;

@@ -43,6 +43,9 @@ class BowlingScoreCardWidget extends StatelessWidget {
   final double? innerBorderWidth; // 內層描邊寬度
   final Color? innerBorderColor; // 內層描邊顏色
   final LinearGradient? frameFillGradient; // 格子內部細膩漸層
+  // 分瓶標記（第一球）
+  final List<bool>? isSplitPerFrame; // 長度10，true 表示該格第一球為開花
+  
   
   const BowlingScoreCardWidget({
     super.key,
@@ -72,6 +75,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
     this.innerBorderWidth,
     this.innerBorderColor,
     this.frameFillGradient,
+    this.isSplitPerFrame,
   });
 
   @override
@@ -290,7 +294,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
       // 第10格可以有3球
       scoreArea = Row(
         children: [
-          Expanded(child: _buildSmallScoreBox(frameData.firstBall, glowingTextStyle, showRightBorder: true)),
+          Expanded(child: _buildSmallScoreBox(frameData.firstBall, glowingTextStyle, showRightBorder: true, highlightAsSplit: isSplitPerFrame != null && isSplitPerFrame!.length > (frameNumber - 1) && isSplitPerFrame![frameNumber - 1])),
           Expanded(child: _buildSmallScoreBox(frameData.secondBall, glowingTextStyle, showRightBorder: true)),
           Expanded(child: _buildSmallScoreBox(frameData.thirdBall, glowingTextStyle, showRightBorder: false)),
         ],
@@ -299,7 +303,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
       // 第1-9格
       scoreArea = Row(
         children: [
-          Expanded(child: _buildSmallScoreBox(frameData.firstBall, glowingTextStyle, showRightBorder: true)),
+          Expanded(child: _buildSmallScoreBox(frameData.firstBall, glowingTextStyle, showRightBorder: true, highlightAsSplit: isSplitPerFrame != null && isSplitPerFrame!.length > (frameNumber - 1) && isSplitPerFrame![frameNumber - 1])),
           Expanded(child: _buildSmallScoreBox(frameData.secondBall, glowingTextStyle, showRightBorder: false)),
         ],
       );
@@ -313,7 +317,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
           Container(
             height: 2,
             margin: const EdgeInsets.symmetric(horizontal: 4),
-            color: accentColor, // 實線，無漸層/光暈
+            color: accentColor,
           ),
         Expanded(
           flex: 3,
@@ -342,7 +346,7 @@ class BowlingScoreCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSmallScoreBox(String score, TextStyle textStyle, {required bool showRightBorder}) {
+  Widget _buildSmallScoreBox(String score, TextStyle textStyle, {required bool showRightBorder, bool highlightAsSplit = false}) {
     return Container(
       decoration: BoxDecoration(
         border: showRightBorder ? Border(
@@ -352,7 +356,21 @@ class BowlingScoreCardWidget extends StatelessWidget {
           ),
         ) : null,
       ),
-      child: Center(child: Text(score, style: textStyle)),
+      child: Center(
+        child: highlightAsSplit && score.isNotEmpty
+            ? FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: accentColor, width: 1.5),
+                  ),
+                  child: Text(score, style: textStyle),
+                ),
+              )
+            : Text(score, style: textStyle),
+      ),
     );
   }
 } 

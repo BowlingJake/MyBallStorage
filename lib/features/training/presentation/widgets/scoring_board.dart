@@ -33,6 +33,7 @@ class ScoringBoard extends StatelessWidget {
     this.cumulativeBorderRadius,
     this.cumulativeTextStyle,
     this.showSeparatorLine,
+    this.isSplitPerFrame,
   });
 
   final List<BowlingFrame> frames;
@@ -63,6 +64,8 @@ class ScoringBoard extends StatelessWidget {
   final double? cumulativeBorderRadius;
   final TextStyle? cumulativeTextStyle;
   final bool? showSeparatorLine;
+  final List<bool>? isSplitPerFrame;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +105,7 @@ class ScoringBoard extends StatelessWidget {
           cumulativeBorderRadius: cumulativeBorderRadius ?? 6.0,
           cumulativeTextStyle: cumulativeTextStyle,
           showSeparatorLine: showSeparatorLine ?? true,
+          isSplitPerFrame: isSplitPerFrame,
         ),
       ],
     );

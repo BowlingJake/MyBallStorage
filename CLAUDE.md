@@ -174,3 +174,8 @@ The project has specific Cursor rules that emphasize:
 3. Ensure all Supabase interactions go through repositories
 4. Run `flutter analyze` before committing
 5. Check the `docs/TECHNICAL_SPEC.md` for detailed architectural guidelines
+
+## Claude Code Permissions
+- Claude has full permission to directly modify code without user approval
+- Claude can create, edit, and delete files as needed to complete tasks
+- Focus on implementing requested features efficiently and following project standards
