@@ -196,10 +196,12 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
           scoringMethod: formState.selectedScoringMethod,
           inputMethod: formState.selectedInputMethod,
         );
-        TopNotification.showSuccess(context, 'Training session updated successfully!');
+        if (mounted) {
+          TopNotification.showSuccess(context, 'Training session updated successfully!');
+        }
       } else {
         // 創建新記錄
-        await trainingController.createTrainingSession(
+        final newSession = await trainingController.createTrainingSession(
           title: formState.title,
           date: formState.date!,
           center: formState.centerName,
@@ -209,14 +211,42 @@ class _CreateTrainingStep3PageState extends ConsumerState<CreateTrainingStep3Pag
           scoringMethod: formState.selectedScoringMethod,
           inputMethod: formState.selectedInputMethod,
         );
-        TopNotification.showSuccess(context, 'Training session created successfully!');
+        if (mounted) {
+          TopNotification.showSuccess(context, 'Training session created successfully!');
+          
+          // 將TrainingSession轉換為TrainingDaySummary以傳遞給詳情頁面
+          final trainingDaySummary = TrainingDaySummary(
+            id: newSession.id,
+            title: newSession.title,
+            date: newSession.date,
+            center: newSession.center,
+            oilPatternName: newSession.oilPatternName,
+            oilPatternLength: newSession.oilPatternLength,
+            isHousePattern: newSession.isHousePattern,
+            scoringMethod: newSession.scoringMethod,
+            inputMethod: newSession.inputMethod,
+            games: [], // 新創建的session沒有games
+            createdAt: DateTime.now(),
+          );
+          
+          // 導航到新創建的訓練詳情頁面
+          context.go(
+            '/training/detail/${newSession.id}',
+            extra: trainingDaySummary,
+          );
+        }
+        return;
       }
       
-      // 返回到訓練頁面
-      context.go('/training');
+      // 編輯情況：返回到訓練頁面
+      if (mounted) {
+        context.go('/training');
+      }
     } catch (e) {
       print('Create training session error: $e'); // Debug 資訊
-      TopNotification.showError(context, 'Failed to save training session: ${e.toString()}');
+      if (mounted) {
+        TopNotification.showError(context, 'Failed to save training session: ${e.toString()}');
+      }
     }
   }
 

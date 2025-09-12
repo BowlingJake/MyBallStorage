@@ -74,6 +74,14 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
             onPressed: () => context.go('/'),
             tooltip: 'Back to Home',
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              color: theme.colorScheme.onSurface,
+              onPressed: () => context.go('/training/history'),
+              tooltip: 'Training History',
+            ),
+          ],
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
