@@ -14,6 +14,7 @@ class PinVisualizationConfig {
   final double radiusToSpacingMax;
   final Color? knockedDownColor;
   final Color? standingColor;
+  final double? absolutePinRadius;
 
   const PinVisualizationConfig({
     this.height,
@@ -28,31 +29,34 @@ class PinVisualizationConfig {
     this.radiusToSpacingMax = 0.48,
     this.knockedDownColor,
     this.standingColor,
+    this.absolutePinRadius,
   });
 
   factory PinVisualizationConfig.defaultPreset() => const PinVisualizationConfig();
 
-  /// 更緊湊的小型顯示
+  /// 緊湊的小型顯示 - 使用絕對大小確保清晰度
   factory PinVisualizationConfig.compact() => const PinVisualizationConfig(
-        height: 40,
-        contentPadding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-        pinSizeFactor: 0.05,
-        spacingScaleX: 1.05,
-        spacingScaleY: 1.05,
-        radiusToSpacingMax: 0.46,
+        height: 48,
+        contentPadding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
+        pinSizeFactor: 0.08,  
+        spacingScaleX: 3.5, // 增加水平間距避免重疊
+        spacingScaleY: 1.8, // 增加垂直間距
+        radiusToSpacingMax: 0.0, // 禁用相對限制，使用絕對大小
+        absolutePinRadius: 4.0, // 固定4像素半徑，確保可見性
         showFrame: true,
         frameBorderWidth: 1.0,
         frameBorderRadius: 4.0,
       );
 
-  /// 更寬鬆、視覺更清楚的顯示
+  /// 寬鬆顯示 - 使用絕對大小確保優質視覺，控制邊界
   factory PinVisualizationConfig.spacious() => const PinVisualizationConfig(
-        height: 56,
-        contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-        pinSizeFactor: 0.075,
-        spacingScaleX: 1.15,
-        spacingScaleY: 1.15,
-        radiusToSpacingMax: 0.44,
+        height: 54, // 稍微降低高度
+        contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // 減少垂直padding
+        pinSizeFactor: 0.095,  
+        spacingScaleX: 4.0, // 保持水平間距
+        spacingScaleY: 1.6, // 減少垂直間距避免溢出
+        radiusToSpacingMax: 0.0, // 禁用相對限制，使用絕對大小
+        absolutePinRadius: 6.0, // 固定6像素半徑，更好的視覺效果
         showFrame: true,
         frameBorderWidth: 1.0,
         frameBorderRadius: 4.0,
@@ -70,6 +74,39 @@ class PinVisualizationConfig {
         frameBorderWidth: 1.0,
         frameBorderRadius: 4.0,
       );
+
+  /// 創建此配置的副本，可選擇性覆蓋某些屬性
+  PinVisualizationConfig copyWith({
+    double? height,
+    bool? showFrame,
+    Color? frameBorderColor,
+    double? frameBorderWidth,
+    double? frameBorderRadius,
+    EdgeInsetsGeometry? contentPadding,
+    double? pinSizeFactor,
+    double? spacingScaleX,
+    double? spacingScaleY,
+    double? radiusToSpacingMax,
+    Color? knockedDownColor,
+    Color? standingColor,
+    double? absolutePinRadius,
+  }) {
+    return PinVisualizationConfig(
+      height: height ?? this.height,
+      showFrame: showFrame ?? this.showFrame,
+      frameBorderColor: frameBorderColor ?? this.frameBorderColor,
+      frameBorderWidth: frameBorderWidth ?? this.frameBorderWidth,
+      frameBorderRadius: frameBorderRadius ?? this.frameBorderRadius,
+      contentPadding: contentPadding ?? this.contentPadding,
+      pinSizeFactor: pinSizeFactor ?? this.pinSizeFactor,
+      spacingScaleX: spacingScaleX ?? this.spacingScaleX,
+      spacingScaleY: spacingScaleY ?? this.spacingScaleY,
+      radiusToSpacingMax: radiusToSpacingMax ?? this.radiusToSpacingMax,
+      knockedDownColor: knockedDownColor ?? this.knockedDownColor,
+      standingColor: standingColor ?? this.standingColor,
+      absolutePinRadius: absolutePinRadius ?? this.absolutePinRadius,
+    );
+  }
 }
 
 

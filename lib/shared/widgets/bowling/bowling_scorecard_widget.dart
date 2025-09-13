@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
 
 /// 保齡球計分板數據模型
 class BowlingFrame {
@@ -46,6 +48,11 @@ class BowlingScoreCardWidget extends StatelessWidget {
   // 分瓶標記（第一球）
   final List<bool>? isSplitPerFrame; // 長度10，true 表示該格第一球為開花
   
+  // 球瓶視覺化相關
+  final bool showPinVisualization; // 是否顯示球瓶視覺化
+  final List<List<bool>>? pinStatesPerFrame; // 每個frame的球瓶狀態，長度10
+  final PinVisualizationConfig? pinVisualizationConfig; // 球瓶視覺化配置
+  
   
   const BowlingScoreCardWidget({
     super.key,
@@ -76,6 +83,9 @@ class BowlingScoreCardWidget extends StatelessWidget {
     this.innerBorderColor,
     this.frameFillGradient,
     this.isSplitPerFrame,
+    this.showPinVisualization = false, // 預設不顯示
+    this.pinStatesPerFrame,
+    this.pinVisualizationConfig,
   });
 
   @override
@@ -310,17 +320,27 @@ class BowlingScoreCardWidget extends StatelessWidget {
     }
 
     final bool hasScore = frameData.cumulativeScore != null;
+    
+    // 取得該frame的球瓶狀態
+    List<bool> framePinStates = List.generate(10, (_) => false);
+    if (showPinVisualization && 
+        pinStatesPerFrame != null && 
+        pinStatesPerFrame!.length > (frameNumber - 1)) {
+      framePinStates = pinStatesPerFrame![frameNumber - 1];
+    }
+    
     return Column(
       children: [
         Expanded(flex: 2, child: scoreArea),
         if (showSeparatorLine)
           Container(
-            height: 2,
+            height: 1,
             margin: const EdgeInsets.symmetric(horizontal: 4),
             color: accentColor,
           ),
+        // 累積分數區域 - 調整flex
         Expanded(
-          flex: 3,
+          flex: showPinVisualization ? 2 : 3,
           child: Center(
             child: hasScore
                 ? (useCumulativePill
@@ -337,11 +357,30 @@ class BowlingScoreCardWidget extends StatelessWidget {
                       )
                     : Text(
                         frameData.cumulativeScore!.toString(),
-                        style: glowingTextStyle.copyWith(fontSize: 16),
+                        style: glowingTextStyle.copyWith(fontSize: 20),
                       ))
                 : const SizedBox.shrink(),
           ),
         ),
+        // 球瓶視覺化區域
+        if (showPinVisualization)
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: PinVisualizationWidget.withConfig(
+                pinStates: framePinStates,
+                width: double.infinity,
+                config: pinVisualizationConfig ?? PinVisualizationConfig(
+                  absolutePinRadius: 3.0, // 內嵌模式使用較小的固定大小
+                  spacingScaleX: 2.0,
+                  spacingScaleY: 1.2,
+                  radiusToSpacingMax: 0.0,
+                  showFrame: false, // 不顯示外框，因為已經在計分板frame內
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
