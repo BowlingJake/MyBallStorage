@@ -37,12 +37,12 @@ class PinVisualizationConfig {
   /// 緊湊的小型顯示 - 使用絕對大小確保清晰度
   factory PinVisualizationConfig.compact() => const PinVisualizationConfig(
         height: 48,
-        contentPadding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
-        pinSizeFactor: 0.08,  
-        spacingScaleX: 3.5, // 增加水平間距避免重疊
-        spacingScaleY: 1.8, // 增加垂直間距
-        radiusToSpacingMax: 0.0, // 禁用相對限制，使用絕對大小
-        absolutePinRadius: 4.0, // 固定4像素半徑，確保可見性
+        contentPadding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+        pinSizeFactor: 0.08,
+        spacingScaleX: 3.2,
+        spacingScaleY: 1.25,
+        radiusToSpacingMax: 0.0,
+        absolutePinRadius: 3.4,
         showFrame: true,
         frameBorderWidth: 1.0,
         frameBorderRadius: 4.0,

@@ -319,6 +319,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
         controller: _pinController,
         isFirstRoll: isFirstRoll,
         initialPinState: initialPinStateForSecondRoll,
+        frameNumber: frameIndex + 1, // Convert 0-based to 1-based
       ),
     );
 
@@ -687,6 +688,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
       builder: (dialogContext) => PinSelectionDialog(
         controller: _pinController,
         isFirstRoll: true,
+        frameNumber: frameIndex + 1, // Convert 0-based to 1-based
       ),
     );
 
@@ -703,6 +705,7 @@ class _InteractiveScoringDialogState extends ConsumerState<InteractiveScoringDia
           controller: _pinController,
           initialPinState: firstBallState,
           isFirstRoll: false,
+          frameNumber: frameIndex + 1, // Convert 0-based to 1-based
         ),
       );
       

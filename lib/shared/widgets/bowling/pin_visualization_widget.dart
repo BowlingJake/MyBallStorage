@@ -132,7 +132,10 @@ class PinVisualizationWidget extends StatelessWidget {
           border: Border.all(color: borderColor, width: borderWidth),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        child: content,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: content,
+        ),
       );
     }
 
@@ -164,42 +167,47 @@ class _PinVisualizationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 計算球瓶位置 - 標準三角排列
+    // 統一半徑策略：
+    // 1) 依據 pinSizeFactor/absolutePinRadius 計一個基礎半徑
+    // 2) 依 spacing 限制避免彼此重疊
+    // 3) 依容器四邊距離計算全局可用半徑，確保所有圓點都不會越界
+    final double hSpace = (size.width / 12) * spacingScaleX;
+    final double vSpace = (size.height / 5) * spacingScaleY;
     final positions = _calculatePinPositions(size);
-    
-    // 繪製每個球瓶
+
+    // 1) 基礎半徑
+    final double rawRadius = absolutePinRadius ?? (math.min(size.width, size.height) * pinSizeFactor);
+
+    // 2) 由 spacing 決定的上限（0.48 約等於讓相鄰兩點留出明顯間距）
+    final double spacingLimited = 0.48 * math.min(hSpace, vSpace);
+
+    // 3) 由邊界決定的上限（對所有點取最小）
+    const double edgePadding = 1.0;
+    double edgeLimited = double.infinity;
+    for (final p in positions) {
+      final dx = math.min(p.dx, size.width - p.dx);
+      final dy = math.min(p.dy, size.height - p.dy);
+      edgeLimited = math.min(edgeLimited, math.max(0.0, math.min(dx, dy) - edgePadding));
+    }
+
+    final double uniformRadius = math.max(0.0, math.min(rawRadius, math.min(spacingLimited, edgeLimited)));
+
+    // 繪製每個球瓶（使用統一半徑）
     for (int i = 0; i < 10; i++) {
       final position = positions[i];
       final isKnockedDown = pinStates[i];
-      
-      // 計算球瓶半徑 - 優先使用絕對大小
-      final double radius;
-      if (absolutePinRadius != null) {
-        // 使用絕對像素大小，不受容器大小影響
-        radius = absolutePinRadius!;
-      } else {
-        // 使用原來的相對計算
-        final double baseRadius = math.min(size.width, size.height) * pinSizeFactor;
-        final double hSpace = (size.width / 12) * spacingScaleX;
-        final double vSpace = (size.height / 5) * spacingScaleY;
-        radius = radiusToSpacingMax <= 0
-            ? baseRadius
-            : math.min(baseRadius, radiusToSpacingMax * math.min(hSpace, vSpace));
-      }
 
       if (isKnockedDown) {
-        // 擊倒：實心主要色
         final fillPaint = Paint()
           ..color = knockedDownColor
           ..style = PaintingStyle.fill;
-        canvas.drawCircle(position, radius, fillPaint);
+        canvas.drawCircle(position, uniformRadius, fillPaint);
       } else {
-        // 站立：僅外框主要色（移除灰色底）
         final borderPaint = Paint()
           ..color = knockedDownColor
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.2;
-        canvas.drawCircle(position, radius, borderPaint);
+        canvas.drawCircle(position, uniformRadius, borderPaint);
       }
     }
   }
@@ -213,11 +221,20 @@ class _PinVisualizationPainter extends CustomPainter {
   List<Offset> _calculatePinPositions(Size size) {
     final centerX = size.width / 2;
     final centerY = size.height / 2;
-    
-    // 計算間距
-    final horizontalSpacing = (size.width / 12) * spacingScaleX;
-    final verticalSpacing = (size.height / 5) * spacingScaleY;
-    
+
+    // 安全邊界，避免點貼到外框
+    const double margin = 2.0;
+
+    // 基礎間距
+    final double baseHS = (size.width / 12) * spacingScaleX;
+    final double baseVS = (size.height / 5) * spacingScaleY;
+
+    // 依容器大小夾取安全間距，確保最外層 7/10 排與頂/底部不會超出
+    final double maxHS = math.max(0.0, (centerX - margin) / 1.5);
+    final double maxVS = math.max(0.0, (centerY - margin) / 1.5);
+    final horizontalSpacing = math.min(baseHS, maxHS);
+    final verticalSpacing = math.min(baseVS, maxVS);
+
     return [
       // 第1排（最前面）- Pin 1
       Offset(centerX, centerY + verticalSpacing * 1.5),

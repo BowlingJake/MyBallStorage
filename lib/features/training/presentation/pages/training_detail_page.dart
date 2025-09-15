@@ -12,6 +12,9 @@ import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.d
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
 import 'package:bowlingarsenal_app/shared/utils/bowling/split_detector.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/pin_state_policy.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/engine/scoring_engine.dart';
+import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strategy.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/tags/oval_tag.dart';
@@ -42,6 +45,21 @@ class _GameUIState {
   final List<BowlingFrame> frames;
   final List<int> rolls; // 每球擊倒球數
   final List<List<bool>> rollStates; // 每球對應的球瓶狀態（第一球/第二球/第十格第三球）
+  ScoringEngine? _engine;
+
+  void updateFrames(String scoringMethod) {
+    _engine ??= ScoringEngine(mode: scoringMethod.toLowerCase() == 'current' ? ScoringMode.current : ScoringMode.traditional);
+    
+    try {
+      frames.clear();
+      final calculatedFrames = _engine!.calculateMergedFrames(rolls.take(rolls.length).toList(), []);
+      frames.addAll(calculatedFrames);
+    } catch (e) {
+      // 如果計算失敗，保持空白frames
+      frames.clear();
+      frames.addAll(List<BowlingFrame>.generate(10, (_) => const BowlingFrame()));
+    }
+  }
 }
 
 class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
@@ -50,6 +68,8 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   final List<_GameUIState> _addedGames = [];
+  bool _isEditMode = false;
+  bool _showPinVisualization = true;
 
   @override
   void initState() {
@@ -100,7 +120,168 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   Future<void> _onGameFrameTapped(int gameIndex, int frameIndex) async {
     if (gameIndex < 0 || gameIndex >= _addedGames.length) return;
     final game = _addedGames[gameIndex];
+    
+    // Edit模式檢查：只能編輯已有資料的格子
+    if (_isEditMode) {
+      if (!_hasDataInFrame(game, frameIndex)) {
+        return; // 不允許編輯空白格子
+      }
+    }
+    
+    if (_isEditMode) {
+      await _handleEditMode(game, frameIndex);
+    } else {
+      await _handleInputMode(game, frameIndex);
+    }
+  }
+
+  /// 檢查某個frame是否有數據
+  bool _hasDataInFrame(_GameUIState game, int frameIndex) {
+    // 計算到此frame為止應該有多少個roll
+    int expectedRolls = 0;
+    for (int i = 0; i <= frameIndex && i < 9; i++) {
+      if (i * 2 + 1 < game.rolls.length && game.rolls[i * 2] == 10) {
+        expectedRolls += 1; // strike只有一球
+      } else {
+        expectedRolls += 2; // 其他情況兩球
+      }
+    }
+    
+    // 第10格特殊處理
+    if (frameIndex == 9) {
+      expectedRolls = game.rolls.length; // 第10格可能有1-3球
+      return expectedRolls > 0;
+    }
+    
+    return game.rolls.length >= expectedRolls;
+  }
+
+  /// 處理編輯模式（重新輸入整個frame的資料）
+  Future<void> _handleEditMode(_GameUIState game, int frameIndex) async {
+    // 1) 計算此 frame 在 rolls/rollStates 的範圍
+    final range = _getFrameRollRange(game, frameIndex);
+    final int start = range.$1;
+    final int endExclusive = range.$2;
+
+    // 2) 保存後續 frames 的尾端資料
+    final List<int> tailRolls = endExclusive < game.rolls.length
+        ? game.rolls.sublist(endExclusive)
+        : <int>[];
+    final List<List<bool>> tailStates = endExclusive < game.rollStates.length
+        ? game.rollStates.sublist(endExclusive)
+        : <List<bool>>[];
+
+    // 3) 先移除本 frame 與之後的資料（暫存後續資料，稍後再接回）
+    if (start < game.rolls.length) {
+      game.rolls.removeRange(start, game.rolls.length);
+    }
+    if (start < game.rollStates.length) {
+      game.rollStates.removeRange(start, game.rollStates.length);
+    }
+
+    // 4) 重新輸入完整的 frame 資料（會 append 到結尾）
+    await _inputCompleteFrame(game, frameIndex);
+
+    // 5) 把先前的尾端資料接回來，保留後面既有的 8/9/10 格
+    if (tailRolls.isNotEmpty || tailStates.isNotEmpty) {
+      setState(() {
+        game.rolls.addAll(tailRolls);
+        game.rollStates.addAll(tailStates);
+        game.updateFrames(widget.trainingSession.scoringMethod);
+      });
+    }
+  }
+
+  /// 處理輸入模式（可以單球輸入，不強制完成frame）
+  Future<void> _handleInputMode(_GameUIState game, int frameIndex) async {
+    // 檢查是否應該從下一個可用位置開始輸入
+    final nextInputFrame = _getNextInputFrame(game);
+    if (nextInputFrame != frameIndex) {
+      // 只允許點擊下一個應該輸入的frame
+      return;
+    }
+    
+    await _inputNextRoll(game, frameIndex);
+  }
+
+  /// 獲取下一個應該輸入的frame索引
+  int _getNextInputFrame(_GameUIState game) {
+    if (game.rolls.isEmpty) return 0;
+    
+    int currentFrame = 0;
+    int rollIndex = 0;
+    
+    while (rollIndex < game.rolls.length && currentFrame < 9) {
+      if (game.rolls[rollIndex] == 10) {
+        // Strike，移到下一frame
+        rollIndex += 1;
+        currentFrame += 1;
+      } else if (rollIndex + 1 < game.rolls.length) {
+        // 有第二球，檢查是否完成frame
+        rollIndex += 2;
+        currentFrame += 1;
+      } else {
+        // 只有第一球，還需要第二球
+        return currentFrame;
+      }
+    }
+    
+    // 到達第10格或所有格子都完成
+    return currentFrame;
+  }
+
+  /// 輸入下一球
+  Future<void> _inputNextRoll(_GameUIState game, int frameIndex) async {
     final controller = PinSelectionController();
+    
+    // 依據開發者頁面策略計算本格是否為邏輯第一球，並決定初始狀態
+    bool isFirstRollOfFrame;
+    List<bool>? initialPinState;
+    if (frameIndex < 9) {
+      isFirstRollOfFrame = _isFirstRollOfFrame(game, frameIndex);
+      if (!isFirstRollOfFrame) {
+        final firstRollIndex = _getFirstRollIndexOfFrame(game, frameIndex);
+        if (firstRollIndex >= 0 && firstRollIndex < game.rollStates.length) {
+          initialPinState = game.rollStates[firstRollIndex];
+        }
+      }
+    } else {
+      // 第10格：使用 PinStatePolicy 與現有 rolls/rollStates 的切片
+      final start10 = _getFirstRollIndexOfFrame(game, 9);
+      final rolls10 = start10 < game.rolls.length ? game.rolls.sublist(start10) : <int>[];
+      final states10 = start10 < game.rollStates.length ? game.rollStates.sublist(start10) : <List<bool>>[];
+      if (widget.trainingSession.scoringMethod.toLowerCase() == 'current') {
+        initialPinState = PinStatePolicy.initialStateForFrame10Current(rolls10, states10);
+      } else {
+        initialPinState = PinStatePolicy.initialStateForFrame10Traditional(rolls10, states10);
+      }
+      isFirstRollOfFrame = PinStatePolicy.isLogicalFirst(initialPinState);
+    }
+    
+    final result = await showDialog<List<bool>>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => PinSelectionDialog(
+        controller: controller,
+        isFirstRoll: isFirstRollOfFrame,
+        frameNumber: frameIndex + 1,
+        initialPinState: initialPinState,
+      ),
+    );
+    
+    if (result != null) {
+      setState(() {
+        game.rolls.add(result.where((b) => b).length);
+        game.rollStates.add(result);
+        game.updateFrames(widget.trainingSession.scoringMethod);
+      });
+    }
+  }
+
+  /// 輸入完整frame（用於編輯模式）
+  Future<void> _inputCompleteFrame(_GameUIState game, int frameIndex) async {
+    final controller = PinSelectionController();
+    
     // 第一球
     final first = await showDialog<List<bool>>(
       context: context,
@@ -108,12 +289,13 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       builder: (context) => PinSelectionDialog(
         controller: controller,
         isFirstRoll: true,
+        frameNumber: frameIndex + 1,
       ),
     );
     if (first == null) return;
     final firstKnocked = first.where((b) => b).length;
 
-    // 若非 strike，第二球
+    // 第二球（如果需要）
     List<bool>? second;
     if (firstKnocked < 10 || frameIndex == 9) {
       final secondController = PinSelectionController();
@@ -124,11 +306,12 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
           controller: secondController,
           initialPinState: first,
           isFirstRoll: false,
+          frameNumber: frameIndex + 1,
         ),
       );
     }
 
-    // 第三球（第十格 且 前兩球為spare或strike）
+    // 第三球（第十格專用）
     List<bool>? third;
     if (frameIndex == 9) {
       final totalFirstTwo = firstKnocked + (second?.where((b) => b).length ?? 0);
@@ -141,13 +324,13 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
           builder: (context) => PinSelectionDialog(
             controller: thirdController,
             isFirstRoll: true,
+            frameNumber: frameIndex + 1,
           ),
         );
       }
     }
 
     setState(() {
-      // 僅記錄每球擊倒數量與狀態
       game.rolls.add(firstKnocked);
       game.rollStates.add(first);
       if (second != null) {
@@ -158,7 +341,90 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         game.rolls.add(third.where((b) => b).length);
         game.rollStates.add(third);
       }
+      game.updateFrames(widget.trainingSession.scoringMethod);
     });
+  }
+
+  /// 清除指定frame的資料
+  void _clearFrameData(_GameUIState game, int frameIndex) {
+    // 僅移除此 frame 已有的投球，不影響後續 frames
+    final (int start, int endExclusive) = _getFrameRollRange(game, frameIndex);
+    if (start < endExclusive) {
+      game.rolls.removeRange(start, endExclusive);
+      game.rollStates.removeRange(start, endExclusive);
+    }
+  }
+
+  /// 回傳某一 frame 在 rolls/rollStates 中的 [start, endExclusive]
+  (int, int) _getFrameRollRange(_GameUIState game, int frameIndex) {
+    final int start = _getFirstRollIndexOfFrame(game, frameIndex);
+    int endExclusive = start;
+
+    if (frameIndex < 9) {
+      if (start >= game.rolls.length) {
+        endExclusive = start; // 該格尚無資料
+      } else if (game.rolls[start] == 10) {
+        endExclusive = start + 1; // strike 只有一球
+      } else {
+        endExclusive = (start + 1 < game.rolls.length) ? start + 2 : start + 1; // 可能只有1或2球
+      }
+    } else {
+      // 第10格：從起點到陣列結尾（1~3 球）
+      endExclusive = game.rolls.length;
+    }
+
+    // 對 rollStates 同樣適用（兩個長度應一致）
+    endExclusive = endExclusive.clamp(start, game.rollStates.length);
+    return (start, endExclusive);
+  }
+
+  /// 判斷是否是frame的第一球
+  bool _isFirstRollOfFrame(_GameUIState game, int frameIndex) {
+    // 1-9格：模擬走訪前面各格以取得當格第一球索引
+    if (frameIndex < 9) {
+      final firstIndex = _getFirstRollIndexOfFrame(game, frameIndex);
+      // 還沒有任何球：第一球
+      if (firstIndex >= game.rolls.length) {
+        return true;
+      }
+      // 已有第一球
+      final firstScore = game.rolls[firstIndex];
+      if (firstScore == 10) {
+        // 該格 strike 視為已完成；若再次開啟輸入視窗，仍視為第一球以保留 Strike 按鈕可用
+        return true;
+      }
+      // 若第二球尚未存在，則不是第一球
+      if (firstIndex + 1 >= game.rolls.length) {
+        return false;
+      }
+      // 已有兩球，當作重新編輯，視為第一球
+      return true;
+    }
+    
+    // 第10格：使用 PinStatePolicy 判斷
+    final start10 = _getFirstRollIndexOfFrame(game, 9);
+    final rolls10 = start10 < game.rolls.length ? game.rolls.sublist(start10) : <int>[];
+    final states10 = start10 < game.rollStates.length ? game.rollStates.sublist(start10) : <List<bool>>[];
+    final initial = widget.trainingSession.scoringMethod.toLowerCase() == 'current'
+        ? PinStatePolicy.initialStateForFrame10Current(rolls10, states10)
+        : PinStatePolicy.initialStateForFrame10Traditional(rolls10, states10);
+    return PinStatePolicy.isLogicalFirst(initial);
+  }
+
+  /// 獲取frame第一球在rolls array中的索引
+  int _getFirstRollIndexOfFrame(_GameUIState game, int frameIndex) {
+    if (frameIndex == 0) return 0;
+    
+    int rollIndex = 0;
+    for (int i = 0; i < frameIndex && i < 9; i++) {
+      if (rollIndex < game.rolls.length && game.rolls[rollIndex] == 10) {
+        rollIndex += 1;
+      } else {
+        rollIndex += 2;
+      }
+    }
+    
+    return rollIndex;
   }
 
   int _calculateCurrentIndex(String location) {
@@ -219,7 +485,7 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     return AppBar(
       centerTitle: true,
       title: Text(
-        'Training Details',
+        '${widget.trainingSession.title} - Details',
         style: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w600,
           color: theme.colorScheme.onSurface,
@@ -249,17 +515,6 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 標題置中
-          Center(
-            child: Text(
-              widget.trainingSession.title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           // 資訊區 - 地點與日期（等寬，純文字）
           Row(
             children: [
@@ -308,7 +563,7 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           
           // 等寬的 Oil Pattern 與 Scoring Type
           Row(
@@ -472,6 +727,36 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                     Colors.purple,
                   ),
                 ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(
+                    _showPinVisualization ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _showPinVisualization = !_showPinVisualization;
+                    });
+                  },
+                  tooltip: _showPinVisualization ? 'Hide Pin Visualization' : 'Show Pin Visualization',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(
+                    Icons.fullscreen,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    // TODO: 實現全螢幕功能
+                  },
+                  tooltip: 'Fullscreen',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                ),
               ],
             ),
           ),
@@ -499,7 +784,7 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       onTap: () => _onTabChanged(tab),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
@@ -533,73 +818,42 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: _deleteLastGame,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: Colors.red.withOpacity(0.5), width: 1),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '- Delete Games',
-                        style: theme.textTheme.labelSmall?.copyWith(color: Colors.red, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: _addEmptyGame,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '+ Add Games',
-                        style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           Expanded(
             child: _addedGames.isEmpty
-                ? _buildEmptyState(
-                    theme,
-                    Icons.sports,
-                    'No games recorded',
-                    'Games will appear here once recorded',
-                  )
+                ? _buildEmptyStateWithAddButton(theme)
                 : ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 0),
-                    reverse: true,
+                    reverse: false,
                     itemCount: _addedGames.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
-                      final displayIndex = _addedGames.length - 1 - index;
+                      final displayIndex = index;
                       final game = _addedGames[displayIndex];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 6, bottom: 6),
-                            child: Text('Game ${displayIndex + 1}', style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600)),
+                            padding: const EdgeInsets.only(left: 6, bottom: 6, right: 6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Game ${displayIndex + 1}', style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600)),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _isEditMode = !_isEditMode;
+                                    });
+                                  },
+                                  child: Text(
+                                    _isEditMode ? 'Done' : 'Edit',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           LayoutBuilder(
                             builder: (context, constraints) {
@@ -639,9 +893,10 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                               );
                             },
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 0),
                           // 倒瓶視覺列：顯示每格第一球的倒瓶
-                          LayoutBuilder(
+                          if (_showPinVisualization)
+                            LayoutBuilder(
                             builder: (context, constraints) {
                               return Row(
                                 children: List.generate(10, (f) {
@@ -676,45 +931,8 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                             },
                           ),
                           const SizedBox(height: 12),
-                          if (displayIndex == _addedGames.length - 1)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(999),
-                                    onTap: _deleteLastGame,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.withOpacity(0.12),
-                                        borderRadius: BorderRadius.circular(999),
-                                        border: Border.all(color: Colors.red.withOpacity(0.5), width: 1),
-                                      ),
-                                      child: Center(
-                                        child: Text('- Delete Games', style: theme.textTheme.labelSmall?.copyWith(color: Colors.red, fontWeight: FontWeight.w700)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(999),
-                                    onTap: _addEmptyGame,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary,
-                                        borderRadius: BorderRadius.circular(999),
-                                      ),
-                                      child: Center(
-                                        child: Text('+ Add Games', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w700)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          if (index == _addedGames.length - 1)
+                            _buildGameActionButtons(theme),
                         ],
                       );
                     },
@@ -797,6 +1015,81 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildEmptyStateWithAddButton(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.sports,
+            size: 64,
+            color: theme.colorScheme.primary.withOpacity(0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No games recorded',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Games will appear here once recorded',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: _addEmptyGame,
+            child: Text(
+              'Add Games',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameActionButtons(ThemeData theme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: _deleteLastGame,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Delete Games',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 32),
+        GestureDetector(
+          onTap: _addEmptyGame,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Add Games',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

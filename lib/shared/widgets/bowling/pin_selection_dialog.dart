@@ -6,10 +6,12 @@ class PinSelectionDialog extends StatefulWidget {
   final PinSelectionController controller;
   final List<bool>? initialPinState; // Add initial state parameter
   final bool isFirstRoll; // Add this parameter
+  final int frameNumber; // Add frame number parameter
 
   const PinSelectionDialog({
     super.key,
     required this.controller,
+    required this.frameNumber, // Required frame number
     this.initialPinState,
     this.isFirstRoll = true, // Default to true
   });
@@ -44,9 +46,9 @@ class _PinSelectionDialogState extends State<PinSelectionDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Select Pins',
-                  style: TextStyle(
+                Text(
+                  'Frame ${widget.frameNumber}',
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -63,13 +65,13 @@ class _PinSelectionDialogState extends State<PinSelectionDialog> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    AppStandardButton(
+                    AppStandardButton.primaryOutlined(
                       text: 'Left 10',
                       onPressed: () => widget.controller.leave(10),
                       width: 120,
                       enabled: widget.isFirstRoll, // Control enabled state
                     ),
-                    AppStandardButton(
+                    AppStandardButton.primaryOutlined(
                       text: 'Left 7',
                       onPressed: () => widget.controller.leave(7),
                       width: 120,
@@ -99,7 +101,7 @@ class _PinSelectionDialogState extends State<PinSelectionDialog> {
                                   Row(
                     children: [
                       Expanded(
-                        child: AppStandardButton(
+                        child: AppStandardButton.destructiveOutlined(
                           text: 'Reset',
                           onPressed: () => widget.controller.clear(),
                         ),
@@ -135,19 +137,14 @@ class _PinSelectionDialogState extends State<PinSelectionDialog> {
           ),
           // Close Button
           Positioned(
-            top: -10,
-            right: -10,
+            top: 16,
+            right: 16,
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 24,
               ),
             ),
           ),

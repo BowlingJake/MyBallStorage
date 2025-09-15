@@ -165,10 +165,11 @@ class PinSelectionWidgetState extends State<PinSelectionWidget> {
   }
 
   Widget _buildPin(int pinIndex) {
+    final theme = Theme.of(context);
     final isKnockedDown = _pinsKnockedDown[pinIndex];
     // Check if the pin was down from the start (for disabling interaction)
     final wasInitiallyDown = widget.initialPinState?[pinIndex] ?? false;
-    final pinColor = isKnockedDown ? Colors.grey[800] : Colors.teal;
+    final pinColor = isKnockedDown ? Colors.grey[800] : theme.colorScheme.primary;
 
     return GestureDetector(
       key: _pinKeys[pinIndex], // Assign key here

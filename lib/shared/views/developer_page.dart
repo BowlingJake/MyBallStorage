@@ -102,6 +102,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           controller: _pinController,
           initialPinState: initialPinState,
           isFirstRoll: isLogicalFirstRoll,
+          frameNumber: 1, // Testing frame
         );
       },
     );
@@ -135,6 +136,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           controller: _pinController,
           initialPinState: initialPinState,
           isFirstRoll: isLogicalFirstRoll,
+          frameNumber: 1, // Testing frame
         );
       },
     );
@@ -399,6 +401,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
             controller: _pinController,
             initialPinState: initialPinState,
             isFirstRoll: isFirst,
+            frameNumber: frameIndex + 1, // Convert 0-based to 1-based
           );
         },
       );
@@ -427,6 +430,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   controller: _pinController,
                   initialPinState: result,
                   isFirstRoll: false,
+                  frameNumber: frameIndex + 1, // Convert 0-based to 1-based
                 );
               },
             );
@@ -504,6 +508,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
             controller: _pinController,
             initialPinState: initialPinState,
             isFirstRoll: isFirst,
+            frameNumber: frameIndex + 1, // Convert 0-based to 1-based
           );
         },
       );
@@ -521,6 +526,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                   controller: _pinController,
                   initialPinState: result,
                   isFirstRoll: false,
+                  frameNumber: frameIndex + 1, // Convert 0-based to 1-based
                 );
               },
             );
