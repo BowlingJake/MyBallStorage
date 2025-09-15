@@ -179,7 +179,7 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
         const SizedBox(width: 12),
         Expanded(
           child: AppStandardButton.secondary(
-            text: 'View History',
+            text: 'View All Training',
             onPressed: () => context.go('/training/history'),
           ),
         ),
@@ -206,35 +206,6 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
-              ),
-            ),
-            InkWell(
-              borderRadius: BorderRadius.circular(999),
-              onTap: () => context.go('/training/history'),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'View All',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 12,
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
