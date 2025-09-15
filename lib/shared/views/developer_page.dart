@@ -1,6 +1,7 @@
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_selection_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/scoring_board.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/shared/utils/bowling/split_detector.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
@@ -48,6 +49,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
     BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(), BowlingFrame(),
   ];
   bool _isEditMode = false;
+  bool _showPinVisualization = true;
 
   @override
   void initState() {
@@ -578,6 +580,17 @@ class _DeveloperPageState extends State<DeveloperPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
+            child: AppStandardButton.secondary(
+              onPressed: () {
+                setState(() {
+                  _showPinVisualization = !_showPinVisualization;
+                });
+              },
+              text: _showPinVisualization ? 'Hide Pins' : 'Show Pins',
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
             child: AppStandardButton.destructive(
               onPressed: _resetAllData,
               text: 'Reset',
@@ -651,8 +664,8 @@ class _DeveloperPageState extends State<DeveloperPage> {
                 ),
               ),
             ),
-            // 已精簡：只保留模式切換 + 合併顯示
-                    const SizedBox(height: 8),
+            // 回到原本的分離式設計
+            const SizedBox(height: 8),
             ScoringBoard(
               title: null,
               frames: _framesMerged,
@@ -661,7 +674,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
               singleRow: true,
               frameAspectRatio: 0.78,
               removeOuterContainer: true,
-              padding: EdgeInsets.zero, // 與下方球瓶區塊上下無縫貼合
+              padding: EdgeInsets.zero,
               useGlowText: false,
               frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
               frameBorderWidth: 1.0,
@@ -673,7 +686,6 @@ class _DeveloperPageState extends State<DeveloperPage> {
               tenthFrameFlex: 1,
               accentColor: Theme.of(context).colorScheme.primary,
               isSplitPerFrame: List<bool>.generate(10, (i) {
-                // 取得第一球的純狀態
                 final List<bool> firstRoll = PinVisualizationHelper.getFramePinStates(
                   rolls: i < 9 ? _rolls19 : _rolls,
                   rollStates: i < 9 ? _rollStates19 : _rollStates,
@@ -682,56 +694,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
                 return SplitDetector.isSplit(firstRoll);
               }),
             ),
-            // 第一個計分板的球瓶視覺化
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: Row(
-                children: _buildPinVisualizationRow(),
+            // 原本的球瓶視覺化組件
+            if (_showPinVisualization)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: Row(
+                  children: _buildPinVisualizationRow(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ScoringBoard(
-              title: null,
-              frames: _framesMerged,
-              onFrameTapped: _onMergedFrameTapped,
-              showThirdBallInTenthFrame: _selectedMode != 'Current',
-              singleRow: true,
-              frameAspectRatio: 0.76,
-              removeOuterContainer: true,
-              padding: EdgeInsets.zero, // 與下方球瓶區塊上下無縫貼合
-              useGlowText: false,
-              frameMargin: const EdgeInsets.symmetric(horizontal: 0.5, vertical: 0.0),
-              frameBorderWidth: 1.1,
-              frameBorderRadius: 5.0,
-              showFrameShadow: false,
-              showHeaderNumbers: true,
-              headerBarHeight: 0.0,
-              headerBarColor: null,
-              tenthFrameFlex: 1,
-              accentColor: Theme.of(context).colorScheme.primary,
-              innerBorderWidth: 1.0,
-              innerBorderColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
-              frameFillGradient: LinearGradient(colors: [Color(0xFF0B0B0C), Color(0xFF111112)]),
-              useCumulativePill: true,
-              cumulativeBackgroundColor: Color(0xFF2A2A2C),
-              cumulativeTextStyle: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
-              showSeparatorLine: true,
-              isSplitPerFrame: List<bool>.generate(10, (i) {
-                final List<bool> firstRoll = PinVisualizationHelper.getFramePinStates(
-                  rolls: i < 9 ? _rolls19 : _rolls,
-                  rollStates: i < 9 ? _rollStates19 : _rollStates,
-                  frameIndex: i,
-                );
-                return SplitDetector.isSplit(firstRoll);
-              }),
-            ),
-            // 第二個計分板的球瓶視覺化
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: Row(
-                children: _buildPinVisualizationRow(),
-              ),
-            ),
+            
           ],
         ),
         ),

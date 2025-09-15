@@ -39,7 +39,8 @@
       "Read(/C:\\Users\\mcaa-mcah143\\bowlingarsenal_app\\lib\\shared\\widgets\\bowling/**)",
       "Read(/C:\\Users\\mcaa-mcah143\\bowlingarsenal_app\\lib\\shared\\widgets\\bowling/**)",
       "Read(/C:\\Users\\mcaa-mcah143\\bowlingarsenal_app\\lib\\shared\\widgets\\bowling/**)",
-      "Read(/C:\\Users\\mcaa-mcah143\\bowlingarsenal_app\\lib\\shared\\views/**)"
+      "Read(/C:\\Users\\mcaa-mcah143\\bowlingarsenal_app\\lib\\shared\\views/**)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

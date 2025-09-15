@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
 
 /// 受控的計分板組件：不持有業務邏輯，只渲染與回傳事件
 class ScoringBoard extends StatelessWidget {
@@ -34,6 +36,9 @@ class ScoringBoard extends StatelessWidget {
     this.cumulativeTextStyle,
     this.showSeparatorLine,
     this.isSplitPerFrame,
+    this.showPinVisualization = false, // 是否顯示內嵌球瓶視覺化
+    this.pinStatesPerFrame, // 每個frame的球瓶狀態
+    this.pinVisualizationConfig, // 球瓶視覺化配置
   });
 
   final List<BowlingFrame> frames;
@@ -65,6 +70,10 @@ class ScoringBoard extends StatelessWidget {
   final TextStyle? cumulativeTextStyle;
   final bool? showSeparatorLine;
   final List<bool>? isSplitPerFrame;
+  // 新增：內嵌球瓶視覺化相關參數
+  final bool showPinVisualization;
+  final List<List<bool>>? pinStatesPerFrame;
+  final PinVisualizationConfig? pinVisualizationConfig;
   
 
   @override
@@ -106,6 +115,10 @@ class ScoringBoard extends StatelessWidget {
           cumulativeTextStyle: cumulativeTextStyle,
           showSeparatorLine: showSeparatorLine ?? true,
           isSplitPerFrame: isSplitPerFrame,
+          // 新增：內嵌球瓶視覺化參數
+          showPinVisualization: showPinVisualization,
+          pinStatesPerFrame: pinStatesPerFrame,
+          pinVisualizationConfig: pinVisualizationConfig,
         ),
       ],
     );

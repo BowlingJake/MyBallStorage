@@ -45,6 +45,9 @@ class PinVisualizationWidget extends StatelessWidget {
   /// 半徑相對於行/列間距的上限比例
   final double radiusToSpacingMax;
 
+  /// 絕對球瓶半徑（像素），優先於 pinSizeFactor
+  final double? absolutePinRadius;
+
   const PinVisualizationWidget({
     super.key,
     required this.pinStates,
@@ -61,6 +64,7 @@ class PinVisualizationWidget extends StatelessWidget {
     this.spacingScaleX = 1.0,
     this.spacingScaleY = 1.0,
     this.radiusToSpacingMax = 0.48,
+    this.absolutePinRadius,
   });
 
   /// 使用設定物件的建立函式（單點入口）
@@ -88,6 +92,7 @@ class PinVisualizationWidget extends StatelessWidget {
       spacingScaleX: cfg.spacingScaleX,
       spacingScaleY: cfg.spacingScaleY,
       radiusToSpacingMax: cfg.radiusToSpacingMax,
+      absolutePinRadius: cfg.absolutePinRadius,
     );
   }
 
@@ -115,6 +120,7 @@ class PinVisualizationWidget extends StatelessWidget {
           spacingScaleX: spacingScaleX,
           spacingScaleY: spacingScaleY,
           radiusToSpacingMax: radiusToSpacingMax,
+          absolutePinRadius: absolutePinRadius,
         ),
       ),
     );
@@ -143,6 +149,7 @@ class _PinVisualizationPainter extends CustomPainter {
   final double spacingScaleX;
   final double spacingScaleY;
   final double radiusToSpacingMax;
+  final double? absolutePinRadius;
 
   _PinVisualizationPainter({
     required this.pinStates,
@@ -152,6 +159,7 @@ class _PinVisualizationPainter extends CustomPainter {
     required this.spacingScaleX,
     required this.spacingScaleY,
     required this.radiusToSpacingMax,
+    this.absolutePinRadius,
   });
 
   @override
@@ -164,13 +172,20 @@ class _PinVisualizationPainter extends CustomPainter {
       final position = positions[i];
       final isKnockedDown = pinStates[i];
       
-      // 計算球瓶半徑（可調整，並避免重疊）
-      final double baseRadius = math.min(size.width, size.height) * pinSizeFactor;
-      final double hSpace = (size.width / 12) * spacingScaleX;
-      final double vSpace = (size.height / 5) * spacingScaleY;
-      final double radius = radiusToSpacingMax <= 0
-          ? baseRadius
-          : math.min(baseRadius, radiusToSpacingMax * math.min(hSpace, vSpace));
+      // 計算球瓶半徑 - 優先使用絕對大小
+      final double radius;
+      if (absolutePinRadius != null) {
+        // 使用絕對像素大小，不受容器大小影響
+        radius = absolutePinRadius!;
+      } else {
+        // 使用原來的相對計算
+        final double baseRadius = math.min(size.width, size.height) * pinSizeFactor;
+        final double hSpace = (size.width / 12) * spacingScaleX;
+        final double vSpace = (size.height / 5) * spacingScaleY;
+        radius = radiusToSpacingMax <= 0
+            ? baseRadius
+            : math.min(baseRadius, radiusToSpacingMax * math.min(hSpace, vSpace));
+      }
 
       if (isKnockedDown) {
         // 擊倒：實心主要色
