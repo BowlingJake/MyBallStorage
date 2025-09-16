@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/training_day_stats.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/enhanced_training_stats.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/training_day_equipment.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/enhanced_training_equipment.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/enhanced_game_item.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/bowling_scorecard_widget.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/scoring_board.dart';
@@ -637,6 +639,11 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     return rollIndex;
   }
 
+  void _navigateToEditSession(BuildContext context) {
+    // 導航到編輯頁面，傳入當前 session 資料
+    context.go('/training/edit/step-1', extra: widget.trainingSession);
+  }
+
   int _calculateCurrentIndex(String location) {
     if (location.startsWith('/library')) return 1;
     if (location.startsWith('/my-arsenal')) return 2;
@@ -731,6 +738,14 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         },
         tooltip: 'Back',
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          color: theme.colorScheme.onSurface,
+          onPressed: () => _navigateToEditSession(context),
+          tooltip: 'Edit Session',
+        ),
+      ],
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
@@ -1196,10 +1211,10 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TrainingDayEquipment(
-        summary: widget.trainingSession,
-        theme: theme,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: EnhancedTrainingEquipment(
+          summary: widget.trainingSession,
+          theme: theme,
         ),
       ),
     );
@@ -1209,10 +1224,10 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TrainingDayStats(
-        summary: widget.trainingSession,
-        theme: theme,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: EnhancedTrainingStats(
+          summary: widget.trainingSession,
+          theme: theme,
         ),
       ),
     );

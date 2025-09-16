@@ -45,15 +45,17 @@ class _Step1SessionDetailsState extends ConsumerState<Step1SessionDetails> {
     final formState = ref.watch(trainingFormProvider(widget.initialData));
     final formNotifier = ref.read(trainingFormProvider(widget.initialData).notifier);
 
-    // 僅同步 controller 內容，不動日期區塊
-    if (_titleController.text != formState.title) {
-      _titleController.text = formState.title;
-      _titleController.selection = TextSelection.fromPosition(TextPosition(offset: _titleController.text.length));
-    }
-    if (_centerController.text != formState.centerName) {
-      _centerController.text = formState.centerName;
-      _centerController.selection = TextSelection.fromPosition(TextPosition(offset: _centerController.text.length));
-    }
+    // 使用 post-frame callback 來同步 controller 內容，避免在 build 期間調用 setState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_titleController.text != formState.title) {
+        _titleController.text = formState.title;
+        _titleController.selection = TextSelection.fromPosition(TextPosition(offset: _titleController.text.length));
+      }
+      if (_centerController.text != formState.centerName) {
+        _centerController.text = formState.centerName;
+        _centerController.selection = TextSelection.fromPosition(TextPosition(offset: _centerController.text.length));
+      }
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

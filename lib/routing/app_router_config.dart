@@ -12,6 +12,9 @@ import 'package:bowlingarsenal_app/features/training/presentation/pages/my_train
 import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step1_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step2_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/create_training_step3_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/edit_training_step1_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/edit_training_step2_page.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_years_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_months_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_days_page.dart';
@@ -106,6 +109,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/training/create/step-3',
         name: 'training-create-step3',
         pageBuilder: (context, state) => const NoTransitionPage(child: CreateTrainingStep3Page()),
+      ),
+      GoRoute(
+        path: '/training/edit/step-1',
+        name: 'training-edit-step1',
+        pageBuilder: (context, state) {
+          final trainingSession = state.extra as TrainingDaySummary;
+          return NoTransitionPage(child: EditTrainingStep1Page(trainingSession: trainingSession));
+        },
+      ),
+      GoRoute(
+        path: '/training/edit/step-2',
+        name: 'training-edit-step2',
+        pageBuilder: (context, state) {
+          final trainingSession = state.extra as TrainingDaySummary;
+          return NoTransitionPage(child: EditTrainingStep2Page(trainingSession: trainingSession));
+        },
       ),
       // Training History Routes
       GoRoute(
