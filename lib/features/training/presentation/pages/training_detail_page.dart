@@ -19,6 +19,8 @@ import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_backg
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/tags/oval_tag.dart';
 import 'package:intl/intl.dart';
+import 'package:bowlingarsenal_app/repositories/games_repository.dart';
+import 'package:bowlingarsenal_app/features/training/data/converters/game_data_converter.dart';
 
 enum TrainingDetailTab { games, equipment, statistics }
 
@@ -45,6 +47,8 @@ class _GameUIState {
   final List<BowlingFrame> frames;
   final List<int> rolls; // 每球擊倒球數
   final List<List<bool>> rollStates; // 每球對應的球瓶狀態（第一球/第二球/第十格第三球）
+  int? gameNumber; // 與資料庫對應的局號
+  String? gameId; // 資料庫 id
   ScoringEngine? _engine;
 
   void updateFrames(String scoringMethod) {
@@ -70,6 +74,8 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   final List<_GameUIState> _addedGames = [];
   bool _isEditMode = false;
   bool _showPinVisualization = true;
+  bool _isFullscreen = false;
+  final GamesRepository _gamesRepo = GamesRepository();
 
   @override
   void initState() {
@@ -86,6 +92,49 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       curve: Curves.easeInOut,
     ));
     _animationController.forward();
+    _loadExistingGames();
+  }
+
+  /// 載入現有遊戲資料
+  Future<void> _loadExistingGames() async {
+    try {
+      final games = await _gamesRepo.fetchGamesBySession(widget.trainingSession.id);
+      if (games.isNotEmpty) {
+        setState(() {
+          _addedGames.clear();
+          for (final gameData in games) {
+            final game = _GameUIState();
+            game.gameNumber = (gameData['game_number'] as int?) ?? (_addedGames.length + 1);
+            game.gameId = gameData['id'] as String?;
+            _loadGameFromData(game, gameData);
+            _addedGames.add(game);
+          }
+
+          // 依 gameNumber 排序，避免順序錯亂
+          _addedGames.sort((a, b) => (a.gameNumber ?? 0).compareTo(b.gameNumber ?? 0));
+        });
+      }
+    } catch (e) {
+      print('Failed to load games: $e');
+    }
+  }
+
+  /// 從資料庫資料載入到 _GameUIState
+  void _loadGameFromData(_GameUIState game, Map<String, dynamic> data) {
+    try {
+      final framesData = data['frames'] as List<dynamic>? ?? [];
+      game.rolls.clear();
+      game.rollStates.clear();
+      
+      // 使用轉換器從新的 JSON 格式載入資料
+      final gameUIState = GameDataConverter.convertFromFramesJson(framesData);
+      game.rolls.addAll(gameUIState.rolls);
+      game.rollStates.addAll(gameUIState.rollStates);
+      
+      game.updateFrames(widget.trainingSession.scoringMethod);
+    } catch (e) {
+      print('Error loading game data: $e');
+    }
   }
 
   @override
@@ -105,13 +154,48 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   }
 
   void _addEmptyGame() {
+    final newGame = _GameUIState();
+    newGame.gameNumber = (_addedGames.isNotEmpty
+        ? (_addedGames.map((g) => g.gameNumber ?? 0).fold<int>(0, (a, b) => a > b ? a : b))
+        : 0) + 1;
     setState(() {
-      _addedGames.add(_GameUIState());
+      _addedGames.add(newGame);
     });
+    // 立即在後端建立空白紀錄，確保即使未輸入也保留
+    () async {
+      try {
+        await _gamesRepo.upsertGame(
+          trainingSessionId: widget.trainingSession.id,
+          gameNumber: newGame.gameNumber!,
+          scoringMode: widget.trainingSession.scoringMethod.toLowerCase(),
+          frames: const <Map<String, dynamic>>[],
+          equipment: const <Map<String, dynamic>>[],
+          totalScore: 0,
+          strikes: 0,
+          spares: 0,
+          isCompleted: false,
+        );
+      } catch (_) {}
+    }();
   }
 
-  void _deleteLastGame() {
+  Future<void> _deleteLastGame() async {
     if (_addedGames.isEmpty) return;
+    
+    final gameNumber = _addedGames.last.gameNumber ?? _addedGames.length;
+    
+    try {
+      // 從資料庫中刪除遊戲（先取得遊戲ID，然後刪除）
+      final games = await _gamesRepo.fetchGamesBySession(widget.trainingSession.id);
+      final gameToDelete = games.where((g) => g['game_number'] == gameNumber).firstOrNull;
+      
+      if (gameToDelete != null) {
+        await _gamesRepo.deleteGame(gameToDelete['id'] as String);
+      }
+    } catch (e) {
+      print('Failed to delete game from database: $e');
+    }
+    
     setState(() {
       _addedGames.removeLast();
     });
@@ -120,6 +204,10 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   Future<void> _onGameFrameTapped(int gameIndex, int frameIndex) async {
     if (gameIndex < 0 || gameIndex >= _addedGames.length) return;
     final game = _addedGames[gameIndex];
+    // 若該局已完成，禁止再開啟輸入對話框（死狀態）
+    if (_isGameCompleted(game)) {
+      return;
+    }
     
     // Edit模式檢查：只能編輯已有資料的格子
     if (_isEditMode) {
@@ -275,6 +363,8 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         game.rollStates.add(result);
         game.updateFrames(widget.trainingSession.scoringMethod);
       });
+      // 背景同步（不影響 UI）
+      _persistGameSilently(game);
     }
   }
 
@@ -299,13 +389,31 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     List<bool>? second;
     if (firstKnocked < 10 || frameIndex == 9) {
       final secondController = PinSelectionController();
+      
+      // 決定第二球的初始狀態
+      List<bool>? initialStateForSecond;
+      if (frameIndex == 9) {
+        // 第10格：根據計分模式決定
+        final isTraditional = widget.trainingSession.scoringMethod.toLowerCase() == 'traditional';
+        if (isTraditional && firstKnocked == 10) {
+          // 傳統模式下第一球全倒，第二球應該是全新的球瓶
+          initialStateForSecond = null;
+        } else {
+          // 其他情況：第二球基於第一球的結果
+          initialStateForSecond = first;
+        }
+      } else {
+        // 1-9格：第二球基於第一球的結果
+        initialStateForSecond = first;
+      }
+      
       second = await showDialog<List<bool>>(
         context: context,
         barrierDismissible: true,
         builder: (context) => PinSelectionDialog(
           controller: secondController,
-          initialPinState: first,
-          isFirstRoll: false,
+          initialPinState: initialStateForSecond,
+          isFirstRoll: frameIndex == 9 && firstKnocked == 10 && widget.trainingSession.scoringMethod.toLowerCase() == 'traditional',
           frameNumber: frameIndex + 1,
         ),
       );
@@ -318,12 +426,31 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       final needThird = firstKnocked == 10 || totalFirstTwo >= 10;
       if (needThird) {
         final thirdController = PinSelectionController();
+        
+        // 決定第三球的初始狀態
+        List<bool>? initialStateForThird;
+        final isTraditional = widget.trainingSession.scoringMethod.toLowerCase() == 'traditional';
+        
+        if (isTraditional) {
+          if (firstKnocked == 10) {
+            // 第一球全倒：第三球基於第二球的結果
+            initialStateForThird = second;
+          } else if (totalFirstTwo >= 10) {
+            // 第一+二球spare：第三球是全新的球瓶
+            initialStateForThird = null;
+          }
+        } else {
+          // 現代模式：第三球總是全新的球瓶
+          initialStateForThird = null;
+        }
+        
         third = await showDialog<List<bool>>(
           context: context,
           barrierDismissible: true,
           builder: (context) => PinSelectionDialog(
             controller: thirdController,
-            isFirstRoll: true,
+            initialPinState: initialStateForThird,
+            isFirstRoll: initialStateForThird == null,
             frameNumber: frameIndex + 1,
           ),
         );
@@ -343,6 +470,8 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
       }
       game.updateFrames(widget.trainingSession.scoringMethod);
     });
+    // 背景同步（不影響 UI）
+    _persistGameSilently(game);
   }
 
   /// 清除指定frame的資料
@@ -376,6 +505,87 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     // 對 rollStates 同樣適用（兩個長度應一致）
     endExclusive = endExclusive.clamp(start, game.rollStates.length);
     return (start, endExclusive);
+  }
+
+  // 將目前 game 狀態背景寫入 Supabase
+  Future<void> _persistGameSilently(_GameUIState game) async {
+    try {
+      // 找到這個遊戲在列表中的索引，確定正確的遊戲編號
+      final gameIndex = _addedGames.indexOf(game);
+      final gameNumber = game.gameNumber ?? (gameIndex >= 0 ? gameIndex + 1 : 1);
+
+      // 使用轉換器將 UI 狀態轉換為新的 JSON 格式
+      final framesJson = GameDataConverter.convertToFramesJson(
+        rolls: game.rolls,
+        rollStates: game.rollStates,
+        scoringMethod: widget.trainingSession.scoringMethod,
+      );
+
+      // 計算統計與總分/完成狀態
+      final stats = GameDataConverter.calculateStats(framesJson);
+      final int totalScore = _calculateTotalScore(game);
+      final bool isCompleted = _isGameCompleted(game);
+
+      await _gamesRepo.upsertGame(
+        trainingSessionId: widget.trainingSession.id,
+        gameNumber: gameNumber,
+        scoringMode: widget.trainingSession.scoringMethod.toLowerCase(),
+        frames: framesJson,
+        equipment: const <Map<String, dynamic>>[], // 未來會擴展
+        totalScore: totalScore,
+        strikes: stats['strikes']!,
+        spares: stats['spares']!,
+        isCompleted: isCompleted,
+      );
+    } catch (e) {
+      print('Error persisting game: $e');
+      // 靜默失敗
+    }
+  }
+
+  int _calculateTotalScore(_GameUIState game) {
+    int? total;
+    for (final f in game.frames) {
+      if (f.cumulativeScore != null) {
+        total = f.cumulativeScore;
+      }
+    }
+    return total ?? 0;
+  }
+
+  bool _isGameCompleted(_GameUIState last) {
+    // 先判斷前 1-9 格是否完整
+    int frame = 0;
+    int i = 0;
+    while (i < last.rolls.length && frame < 9) {
+      if (last.rolls[i] == 10) {
+        frame++;
+        i += 1;
+      } else {
+        if (i + 1 >= last.rolls.length) return false; // 第二球未投
+        frame++;
+        i += 2;
+      }
+    }
+    if (frame < 9) return false;
+
+    // 第10格完成判斷
+    final remaining = last.rolls.length - i;
+    final mode = widget.trainingSession.scoringMethod.toLowerCase();
+    if (remaining <= 0) return false;
+    if (mode == 'current') {
+      // 現代制：第10格最多2球，第一球即定分（Strike 亦可視為完成）
+      return true;
+    } else {
+      // 傳統制
+      if (remaining < 2) return false; // 至少兩球
+      final first = last.rolls[i];
+      final second = last.rolls[i + 1];
+      if (first == 10 || first + second == 10) {
+        return remaining >= 3; // 需要第三球
+      }
+      return true; // 兩球已完成
+    }
   }
 
   /// 判斷是否是frame的第一球
@@ -461,6 +671,12 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     final currentIndex = _calculateCurrentIndex(location);
     final theme = Theme.of(context);
     
+    // 全螢幕模式
+    if (_isFullscreen) {
+      return _buildFullscreenMode(theme);
+    }
+    
+    // 一般模式
     return ProfessionalDarkBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -476,6 +692,18 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         bottomNavigationBar: ModernBottomNavigation(
           currentIndex: currentIndex,
           onTap: (index) => _navigateToIndex(context, index),
+        ),
+      ),
+    );
+  }
+
+  /// 建立全螢幕模式的UI
+  Widget _buildFullscreenMode(ThemeData theme) {
+    return ProfessionalDarkBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: _buildDataSection(theme),
         ),
       ),
     );
@@ -746,14 +974,16 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                 const SizedBox(width: 4),
                 IconButton(
                   icon: Icon(
-                    Icons.fullscreen,
+                    _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
                     color: Colors.white.withOpacity(0.7),
                     size: 20,
                   ),
                   onPressed: () {
-                    // TODO: 實現全螢幕功能
+                    setState(() {
+                      _isFullscreen = !_isFullscreen;
+                    });
                   },
-                  tooltip: 'Fullscreen',
+                  tooltip: _isFullscreen ? 'Exit Fullscreen' : 'Fullscreen',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 ),
@@ -814,14 +1044,16 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   }
 
   Widget _buildGamesTab(ThemeData theme) {
-    if (widget.trainingSession.games.isEmpty) {
+    // 強制使用計分表格版本，不顯示摘要卡片清單
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: _addedGames.isEmpty
                 ? _buildEmptyStateWithAddButton(theme)
-                : ListView.separated(
+                : ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 0),
                     reverse: false,
                     itemCount: _addedGames.length,
@@ -835,9 +1067,26 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                           Padding(
                             padding: const EdgeInsets.only(left: 6, bottom: 6, right: 6),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Game ${displayIndex + 1}', style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600)),
+                                Text(
+                                  'Game ${displayIndex + 1}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                OvalTag(
+                                  text: _isGameCompleted(game) ? 'Completed' : 'Incompleted',
+                                  color: _isGameCompleted(game) ? Colors.green : Colors.orange,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  horizontalPadding: 6,
+                                  verticalPadding: 2,
+                                  borderWidth: 1.0,
+                                  backgroundOpacity: 0.15,
+                                ),
+                                const Spacer(),
                                 GestureDetector(
                                   onTap: () {
                                     setState(() {
@@ -937,49 +1186,34 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                       );
                     },
                   ),
+                  ),
           ),
         ],
       );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: widget.trainingSession.games.length,
-      itemBuilder: (context, index) {
-        final game = widget.trainingSession.games[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: EnhancedGameItem(
-            game: game,
-            theme: theme,
-            onTap: () {
-              // TODO: Navigate to game detail or scoring dialog
-            },
-            onDelete: () {
-              // TODO: Handle game deletion
-            },
-          ),
-        );
-      },
-    );
   }
 
   Widget _buildEquipmentTab(ThemeData theme) {
-    return SingleChildScrollView(
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TrainingDayEquipment(
         summary: widget.trainingSession,
         theme: theme,
+        ),
       ),
     );
   }
 
   Widget _buildStatisticsTab(ThemeData theme) {
-    return SingleChildScrollView(
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TrainingDayStats(
         summary: widget.trainingSession,
         theme: theme,
+        ),
       ),
     );
   }
@@ -1077,13 +1311,13 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         ),
         const SizedBox(width: 32),
         GestureDetector(
-          onTap: _addEmptyGame,
+          onTap: _canAddNewGame() ? _addEmptyGame : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               'Add Games',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.primary,
+                color: _canAddNewGame() ? theme.colorScheme.primary : theme.colorScheme.primary.withOpacity(0.3),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1091,5 +1325,27 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
         ),
       ],
     );
+  }
+
+  bool _canAddNewGame() {
+    if (_addedGames.isEmpty) return true;
+    final last = _addedGames.last;
+    // 簡單完成條件：已輸入到第10格（rolls 至少包含第10格的第一球）或標記完成
+    // 以本地規則：前9格最多 18 球；第10格至少 1 球 → 長度 >= 19 視為已開始第10格
+    // 這裡更直觀：判斷是否第10格已有兩球（或一球為strike且有第二/第三球）
+    final hasAnyInput = last.rolls.isNotEmpty;
+    if (!hasAnyInput) return true; // 建立後未輸入也可允許再次新增，若要嚴格可改為 false
+
+    // 估算是否已完成10格
+    int frame = 0;
+    int i = 0;
+    while (i < last.rolls.length && frame < 9) {
+      if (last.rolls[i] == 10) { frame++; i += 1; } else { frame++; i += 2; }
+    }
+    // i 目前在第10格的開始（或超過）
+    final rollsInTenth = last.rolls.length - i;
+    final isTenthComplete = rollsInTenth >= 2 || (rollsInTenth >= 1 && last.rolls[i] == 10);
+    final allNineDone = frame >= 9;
+    return allNineDone && isTenthComplete;
   }
 }

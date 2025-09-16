@@ -275,31 +275,30 @@ class TrainingController extends _$TrainingController {
   Future<Game> _convertGameRecordToGame(GameRecord gameRecord, String sessionId) async {
     // 如果需要，先從後端獲取現有的 Game 資料來保留其他欄位
     final existingGames = await _repository.getGamesForSessionDirect(sessionId);
-    final existingGame = existingGames.firstWhere(
-      (g) => g.id == gameRecord.id,
-      orElse: () => Game(
-        id: gameRecord.id,
-        trainingSessionId: sessionId,
-        gameNumber: gameRecord.gameNumber,
-        totalScore: gameRecord.score,
-        timestamp: gameRecord.timestamp,
-      ),
+    Game? existingGame;
+    for (final g in existingGames) {
+      if (g.id == gameRecord.id) {
+        existingGame = g;
+        break;
+      }
+    }
+    existingGame ??= Game(
+      id: gameRecord.id,
+      trainingSessionId: sessionId,
+      gameNumber: gameRecord.gameNumber,
+      totalScore: gameRecord.score,
+      strikes: gameRecord.strikes,
+      spares: gameRecord.spares,
+      createdAt: gameRecord.timestamp,
+      updatedAt: gameRecord.timestamp,
     );
 
     // 更新基本資料，但保留現有的 frame 欄位（因為 GameRecord 沒有個別 frame 資訊）
     return existingGame.copyWith(
       totalScore: gameRecord.score,
-      frameScores: gameRecord.frameScores,
       strikes: gameRecord.strikes,
       spares: gameRecord.spares,
       notes: gameRecord.notes,
-      ballsUsed: gameRecord.ballsUsed?.map((ball) => {
-        'id': ball.id,
-        'name': ball.name,
-        'brand': ball.brand,
-        'brandColor': ball.brandColor,
-        'imagePath': ball.imagePath,
-      }).toList() ?? [],
     );
   }
 
@@ -344,36 +343,11 @@ class TrainingController extends _$TrainingController {
       // 合併 frame 資料到現有遊戲
       final updatedGame = existingGame.copyWith(
         totalScore: totalScore,
-        frameScores: frameScores,
         strikes: strikes,
         spares: spares,
         notes: notes,
-        ballsUsed: ballsUsed ?? [],
-        currentFrame: currentFrame ?? existingGame.currentFrame,
         isCompleted: isCompleted ?? existingGame.isCompleted,
         scoringMode: scoringMode ?? existingGame.scoringMode,
-        // 更新個別 frame 欄位
-        frame1Ball1: frameData['frame1Ball1'] ?? existingGame.frame1Ball1,
-        frame1Ball2: frameData['frame1Ball2'] ?? existingGame.frame1Ball2,
-        frame2Ball1: frameData['frame2Ball1'] ?? existingGame.frame2Ball1,
-        frame2Ball2: frameData['frame2Ball2'] ?? existingGame.frame2Ball2,
-        frame3Ball1: frameData['frame3Ball1'] ?? existingGame.frame3Ball1,
-        frame3Ball2: frameData['frame3Ball2'] ?? existingGame.frame3Ball2,
-        frame4Ball1: frameData['frame4Ball1'] ?? existingGame.frame4Ball1,
-        frame4Ball2: frameData['frame4Ball2'] ?? existingGame.frame4Ball2,
-        frame5Ball1: frameData['frame5Ball1'] ?? existingGame.frame5Ball1,
-        frame5Ball2: frameData['frame5Ball2'] ?? existingGame.frame5Ball2,
-        frame6Ball1: frameData['frame6Ball1'] ?? existingGame.frame6Ball1,
-        frame6Ball2: frameData['frame6Ball2'] ?? existingGame.frame6Ball2,
-        frame7Ball1: frameData['frame7Ball1'] ?? existingGame.frame7Ball1,
-        frame7Ball2: frameData['frame7Ball2'] ?? existingGame.frame7Ball2,
-        frame8Ball1: frameData['frame8Ball1'] ?? existingGame.frame8Ball1,
-        frame8Ball2: frameData['frame8Ball2'] ?? existingGame.frame8Ball2,
-        frame9Ball1: frameData['frame9Ball1'] ?? existingGame.frame9Ball1,
-        frame9Ball2: frameData['frame9Ball2'] ?? existingGame.frame9Ball2,
-        frame10Ball1: frameData['frame10Ball1'] ?? existingGame.frame10Ball1,
-        frame10Ball2: frameData['frame10Ball2'] ?? existingGame.frame10Ball2,
-        frame10Ball3: frameData['frame10Ball3'],
       );
 
       // 更新到 Supabase
@@ -395,10 +369,10 @@ class TrainingController extends _$TrainingController {
       
       for (final session in sessions) {
         final games = await _repository.getGamesForSessionDirect(session.id);
-        final game = games.cast<Game?>().firstWhere(
-          (g) => g?.id == gameId,
-          orElse: () => null,
-        );
+        Game? game;
+        for (final g in games) {
+          if (g.id == gameId) { game = g; break; }
+        }
         if (game != null) {
           return game;
         }

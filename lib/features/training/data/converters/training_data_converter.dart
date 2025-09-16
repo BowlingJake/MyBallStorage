@@ -1,6 +1,6 @@
 import 'package:bowlingarsenal_app/features/training/data/models/training_session.dart';
 import 'package:bowlingarsenal_app/features/training/data/models/game.dart';
-import 'package:bowlingarsenal_app/features/training/data/models/frame_data.dart';
+import 'package:bowlingarsenal_app/features/training/data/models/game_roll.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 
 class TrainingDataConverter {
@@ -43,62 +43,37 @@ class TrainingDataConverter {
 
   /// 將 Game 轉換為 GameRecord
   static GameRecord _gameToGameRecord(Game game) {
-    // 轉換 balls_used JSON 為 BallInfo 列表
-    final ballsUsed = game.ballsUsed.map((ballJson) => BallInfo(
-      id: (ballJson['id'] ?? '').toString(),
-      name: (ballJson['name'] ?? '').toString(),
-      brand: (ballJson['brand'] ?? '').toString(),
-      brandColor: (ballJson['brandColor'] ?? '#000000').toString(),
-      imagePath: ballJson['imagePath']?.toString(),
+    // 新 schema：equipment → BallInfo
+    final ballsUsed = game.equipment.map((e) => BallInfo(
+      id: e.ballId,
+      name: e.ballName,
+      brand: '',
+      brandColor: '#000000',
     )).toList();
 
-    // 將新的個別 frame 欄位轉換為 frameScores 陣列（向後相容）
-    final calculatedFrameScores = _calculateFrameScoresFromIndividualFields(game);
+    final frameScores = _calculateFrameScoresFromFrames(game.frames);
 
     return GameRecord(
       id: game.id,
       gameNumber: game.gameNumber,
       score: game.totalScore,
-      frameScores: calculatedFrameScores.isNotEmpty ? calculatedFrameScores : game.frameScores,
+      frameScores: frameScores,
       strikes: game.strikes,
       spares: game.spares,
       notes: game.notes,
-      timestamp: game.timestamp,
+      timestamp: game.createdAt,
       ballsUsed: ballsUsed.isNotEmpty ? ballsUsed : null,
       ballUsed: ballsUsed.isNotEmpty ? ballsUsed.first : null,
     );
   }
 
-  /// 從個別 frame 欄位計算 frameScores 陣列
-  static List<int> _calculateFrameScoresFromIndividualFields(Game game) {
-    final frameScores = <int>[];
-    
-    // 使用 Game 擴展方法取得 FrameData 列表
-    final frames = game.frames;
-    
-    for (final frame in frames) {
-      int frameScore;
-      
-      if (frame.ball1 == 10) {
-        // Strike
-        frameScore = 10;
-      } else if (frame.ball1 + frame.ball2 == 10) {
-        // Spare
-        frameScore = 10;
-      } else {
-        // Open frame
-        frameScore = frame.ball1 + frame.ball2;
-      }
-      
-      // 第10格可能有第三球
-      if (frame.frameNumber == 10 && frame.ball3 != null) {
-        frameScore += frame.ball3!;
-      }
-      
-      frameScores.add(frameScore);
+  static List<int> _calculateFrameScoresFromFrames(List<GameFrame> frames) {
+    final scores = <int>[];
+    for (final f in frames) {
+      final int s = f.frameScore ?? f.rolls.fold(0, (acc, r) => acc + r.pinsKnocked);
+      scores.add(s);
     }
-    
-    return frameScores;
+    return scores;
   }
 
   /// 將 TrainingDaySummary 轉換回 TrainingSession（用於更新）

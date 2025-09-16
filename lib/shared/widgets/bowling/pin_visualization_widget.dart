@@ -332,8 +332,24 @@ class PinVisualizationHelper {
       return List.generate(10, (_) => false);
     }
     
-    // 第10格只顯示第一球的狀態
-    return rollStates[0];
+    // 計算第10格第一球的索引
+    int rollIndex = 0;
+    for (int frame = 0; frame < 9; frame++) {
+      if (rollIndex >= rolls.length) break;
+      if (rolls[rollIndex] == 10) {
+        rollIndex += 1; // 全倒只有1球
+      } else {
+        rollIndex += 2; // 非全倒有2球
+      }
+    }
+    
+    // 如果第10格還沒有投球，返回空狀態
+    if (rollIndex >= rollStates.length) {
+      return List.generate(10, (_) => false);
+    }
+    
+    // 返回第10格第一球的狀態
+    return rollStates[rollIndex];
   }
   
   /// 合併兩個球瓶狀態（OR運算）
