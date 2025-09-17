@@ -23,7 +23,7 @@ class _FilterPopoutState extends ConsumerState<FilterPopout> {
 
   // 品牌列表
   final List<String> _brands = [
-    'Storm', 'Roto Grip', '900 Global', 'Brunswick', 'Ebonite', 'Track', 
+    'ABS', 'Storm', 'Roto Grip', '900 Global', 'Brunswick', 'Ebonite', 'Track',
     'Columbia 300', 'DV8', 'Radical', 'Motiv', 'Hammer', 'SWAG'
   ];
 
