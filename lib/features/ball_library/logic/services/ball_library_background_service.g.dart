@@ -7,7 +7,7 @@ part of 'ball_library_background_service.dart';
 // **************************************************************************
 
 String _$ballLibraryBackgroundServiceHash() =>
-    r'331b2fb3caa13c48c76a69f0dab2aa254f31ab2a';
+    r'c4054fe75c9f53b0aabdfee1ccc9e0076a821389';
 
 /// Ball Library Background Service - Compute-intensive operations in isolates
 ///

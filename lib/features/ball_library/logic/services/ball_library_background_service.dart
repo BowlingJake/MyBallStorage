@@ -39,7 +39,15 @@ class BallLibraryBackgroundService extends _$BallLibraryBackgroundService {
     required List<BowlingBall> balls,
     required BallFilters filters,
   }) async {
-    if (!filters.hasActiveFilters) return balls;
+    // 無內建 hasActiveFilters，簡單依 activeFilterCount 判斷
+    // BallLibraryState 有 hasActiveFilters，但這裡只有 BallFilters
+    final hasFilters = filters.brands.isNotEmpty ||
+        filters.cores.isNotEmpty ||
+        filters.coverstocks.isNotEmpty ||
+        filters.brand != null ||
+        filters.core != null ||
+        filters.coverstock != null;
+    if (!hasFilters) return balls;
 
     // Use compute for CPU-intensive filter operation
     return await compute(_filterBallsIsolate, FilterParams(
@@ -110,40 +118,40 @@ List<BowlingBall> _filterBallsIsolate(FilterParams params) {
   return params.balls.where((ball) {
     final filters = params.filters;
     
-    // Brand filter
-    if (filters.selectedBrands.isNotEmpty && 
-        !filters.selectedBrands.contains(ball.brand)) {
-      return false;
+    // Brand filter (支援多選與單選)
+    if (filters.brands.isNotEmpty) {
+      if (!filters.brands.contains(ball.brand)) {
+        return false;
+      }
+    } else if (filters.brand != null) {
+      if (!ball.brand.toLowerCase().contains(filters.brand!.toLowerCase())) {
+        return false;
+      }
     }
     
-    // Coverstock filter
-    if (filters.selectedCoverstocks.isNotEmpty && 
-        !filters.selectedCoverstocks.contains(ball.coverstock)) {
-      return false;
+    // Coverstock filter (支援多選與單選)
+    final ballCover = ball.cover.toLowerCase();
+    if (filters.coverstocks.isNotEmpty) {
+      final ok = filters.coverstocks.any((c) => ballCover.contains(c.toLowerCase()));
+      if (!ok) return false;
+    } else if (filters.coverstock != null) {
+      if (!ballCover.contains(filters.coverstock!.toLowerCase())) return false;
     }
     
-    // Core filter
-    if (filters.selectedCores.isNotEmpty && 
-        !filters.selectedCores.contains(ball.core)) {
-      return false;
+    // Core filter (支援多選與單選)
+    final ballCore = ball.core.toLowerCase();
+    if (filters.cores.isNotEmpty) {
+      final ok = filters.cores.any((c) => ballCore.contains(c.toLowerCase()));
+      if (!ok) return false;
+    } else if (filters.core != null) {
+      if (!ballCore.contains(filters.core!.toLowerCase())) return false;
     }
     
     // RG range filter
-    if (filters.rgRange != null && ball.rg != null) {
-      final rg = ball.rg!;
-      if (rg < filters.rgRange!.start || rg > filters.rgRange!.end) {
-        return false;
-      }
-    }
+    // 暫無範圍屬性於 BallFilters，這段忽略
     
     // Differential range filter
-    if (filters.differentialRange != null && ball.differential != null) {
-      final diff = ball.differential!;
-      if (diff < filters.differentialRange!.start || 
-          diff > filters.differentialRange!.end) {
-        return false;
-      }
-    }
+    // 暫無 differential 欄位，忽略
     
     return true;
   }).toList();
@@ -171,10 +179,16 @@ List<BowlingBall> _sortBallsIsolate(SortParams params) {
         final bRg = b.rg ?? 0.0;
         comparison = aRg.compareTo(bRg);
         break;
-      case SortField.differential:
-        final aDiff = a.differential ?? 0.0;
-        final bDiff = b.differential ?? 0.0;
-        comparison = aDiff.compareTo(bDiff);
+      case SortField.releaseYear:
+        // createdAt / releaseDate 皆為字串，盡力比較年份
+        int parseYear(String? s) {
+          if (s == null) return 0;
+          final match = RegExp(r'\\d{4}').firstMatch(s);
+          return match != null ? int.tryParse(match.group(0)!) ?? 0 : 0;
+        }
+        final ay = parseYear(a.releaseDate ?? a.createdAt);
+        final by = parseYear(b.releaseDate ?? b.createdAt);
+        comparison = ay.compareTo(by);
         break;
     }
     
@@ -200,44 +214,45 @@ List<BowlingBall> _processAllBallsIsolate(ProcessAllParams params) {
   }
   
   // Step 2: Filter
-  if (params.filters.hasActiveFilters) {
+  final filters = params.filters;
+  final hasFilters = filters.brands.isNotEmpty ||
+      filters.cores.isNotEmpty ||
+      filters.coverstocks.isNotEmpty ||
+      filters.brand != null ||
+      filters.core != null ||
+      filters.coverstock != null;
+  if (hasFilters) {
     result = result.where((ball) {
       final filters = params.filters;
       
-      // Brand filter
-      if (filters.selectedBrands.isNotEmpty && 
-          !filters.selectedBrands.contains(ball.brand)) {
-        return false;
+      // Brand filter (多選/單選)
+      if (filters.brands.isNotEmpty) {
+        if (!filters.brands.contains(ball.brand)) return false;
+      } else if (filters.brand != null) {
+        if (!ball.brand.toLowerCase().contains(filters.brand!.toLowerCase())) return false;
       }
       
-      // Coverstock filter
-      if (filters.selectedCoverstocks.isNotEmpty && 
-          !filters.selectedCoverstocks.contains(ball.coverstock)) {
-        return false;
+      // Coverstock filter (多選/單選)
+      final cover = ball.cover.toLowerCase();
+      if (filters.coverstocks.isNotEmpty) {
+        final ok = filters.coverstocks.any((c) => cover.contains(c.toLowerCase()));
+        if (!ok) return false;
+      } else if (filters.coverstock != null) {
+        if (!cover.contains(filters.coverstock!.toLowerCase())) return false;
       }
       
-      // Core filter
-      if (filters.selectedCores.isNotEmpty && 
-          !filters.selectedCores.contains(ball.core)) {
-        return false;
+      // Core filter (多選/單選)
+      final core = ball.core.toLowerCase();
+      if (filters.cores.isNotEmpty) {
+        final ok = filters.cores.any((c) => core.contains(c.toLowerCase()));
+        if (!ok) return false;
+      } else if (filters.core != null) {
+        if (!core.contains(filters.core!.toLowerCase())) return false;
       }
       
-      // RG range filter
-      if (filters.rgRange != null && ball.rg != null) {
-        final rg = ball.rg!;
-        if (rg < filters.rgRange!.start || rg > filters.rgRange!.end) {
-          return false;
-        }
-      }
+      // 範圍條件暫無，忽略
       
-      // Differential range filter
-      if (filters.differentialRange != null && ball.differential != null) {
-        final diff = ball.differential!;
-        if (diff < filters.differentialRange!.start || 
-            diff > filters.differentialRange!.end) {
-          return false;
-        }
-      }
+      // Differential 欄位暫無，忽略
       
       return true;
     }).toList();
@@ -262,10 +277,15 @@ List<BowlingBall> _processAllBallsIsolate(ProcessAllParams params) {
         final bRg = b.rg ?? 0.0;
         comparison = aRg.compareTo(bRg);
         break;
-      case SortField.differential:
-        final aDiff = a.differential ?? 0.0;
-        final bDiff = b.differential ?? 0.0;
-        comparison = aDiff.compareTo(bDiff);
+      case SortField.releaseYear:
+        int parseYear(String? s) {
+          if (s == null) return 0;
+          final match = RegExp(r'\\d{4}').firstMatch(s);
+          return match != null ? int.tryParse(match.group(0)!) ?? 0 : 0;
+        }
+        final ay = parseYear(a.releaseDate ?? a.createdAt);
+        final by = parseYear(b.releaseDate ?? b.createdAt);
+        comparison = ay.compareTo(by);
         break;
     }
     

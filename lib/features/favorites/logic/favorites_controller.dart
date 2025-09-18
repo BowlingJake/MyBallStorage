@@ -18,18 +18,18 @@ FavoritesRepository favoritesRepository(FavoritesRepositoryRef ref) {
 class FavoritesController extends _$FavoritesController {
   @override
   Future<FavoritesState> build() async {
-    return await _loadFavorites();
+    return await _loadFavoriteIdsFast();
   }
 
-  /// Load all favorite balls
-  Future<FavoritesState> _loadFavorites() async {
+  /// Fast path: load only favorite IDs for quick UI (e.g., library hearts)
+  Future<FavoritesState> _loadFavoriteIdsFast() async {
     try {
       final repository = ref.read(favoritesRepositoryProvider);
-      final balls = await repository.getFavoriteBalls();
-      final ballIds = balls.map((ball) => ball.id).toSet();
+      final ids = await repository.getFavoriteBallIds();
+      final ballIds = ids.toSet();
 
       return FavoritesState(
-        favoriteBalls: balls,
+        favoriteBalls: const [],
         favoriteBallIds: ballIds,
         isLoading: false,
       );
@@ -41,6 +41,31 @@ class FavoritesController extends _$FavoritesController {
     }
   }
 
+  /// Full load: fetch complete ball objects for favorites page
+  Future<void> loadFavoriteBallsFull() async {
+    try {
+      final repository = ref.read(favoritesRepositoryProvider);
+      final balls = await repository.getFavoriteBalls();
+      final ballIds = balls.map((b) => b.id).toSet();
+      final current = state.value;
+      state = AsyncValue.data(FavoritesState(
+        favoriteBalls: balls,
+        favoriteBallIds: ballIds,
+        isLoading: false,
+        error: current?.error,
+      ));
+    } catch (e) {
+      // keep IDs if available
+      final current = state.value;
+      state = AsyncValue.data(FavoritesState(
+        favoriteBalls: current?.favoriteBalls ?? const [],
+        favoriteBallIds: current?.favoriteBallIds ?? {},
+        isLoading: false,
+        error: e.toString(),
+      ));
+    }
+  }
+
   /// Add ball to favorites
   Future<void> addToFavorites(BowlingBall ball) async {
     final currentState = state.value;
@@ -49,7 +74,6 @@ class FavoritesController extends _$FavoritesController {
     // Optimistic update
     state = AsyncValue.data(currentState.copyWith(
       isUpdating: true,
-      favoriteBalls: [...currentState.favoriteBalls, ball],
       favoriteBallIds: {...currentState.favoriteBallIds, ball.id},
     ));
 
@@ -57,11 +81,10 @@ class FavoritesController extends _$FavoritesController {
       final repository = ref.read(favoritesRepositoryProvider);
       await repository.addToFavorites(ball.id);
 
-      // Update state after successful operation
-      state = AsyncValue.data(currentState.copyWith(
+      // Keep optimistic state, just clear updating
+      final latest = state.value;
+      state = AsyncValue.data((latest ?? currentState).copyWith(
         isUpdating: false,
-        favoriteBalls: [...currentState.favoriteBalls, ball],
-        favoriteBallIds: {...currentState.favoriteBallIds, ball.id},
       ));
     } catch (e) {
       // Revert optimistic update on error
@@ -93,10 +116,10 @@ class FavoritesController extends _$FavoritesController {
       final updatedIds = Set<int>.from(currentState.favoriteBallIds)
         ..remove(ballId);
 
-      state = AsyncValue.data(currentState.copyWith(
+      final latest = state.value;
+      state = AsyncValue.data((latest ?? currentState).copyWith(
         isUpdating: false,
-        favoriteBallIds: updatedIds, // Update IDs for logic
-        // favoriteBalls stays the same for UI display
+        favoriteBallIds: updatedIds,
       ));
     } catch (e) {
       // Revert optimistic update on error
@@ -123,7 +146,7 @@ class FavoritesController extends _$FavoritesController {
   /// Refresh favorites from server
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _loadFavorites());
+    state = await AsyncValue.guard(() => _loadFavoriteIdsFast());
   }
 }
 

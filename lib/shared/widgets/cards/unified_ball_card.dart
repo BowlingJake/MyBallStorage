@@ -5,6 +5,7 @@ import 'package:core_theme/core_theme.dart';
 import 'package:bowlingarsenal_app/utils/color_utils.dart';
 import 'package:bowlingarsenal_app/utils/app_formatters.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 統一的球卡組件，可同時支援 BowlingBall 和 UserArsenalInstance
@@ -362,16 +363,24 @@ class UnifiedBallCard extends ConsumerWidget {
 
   Widget _buildBallImage() {
     return imageUrl.isNotEmpty && imageUrl != 'https://via.placeholder.com/150'
-        ? Image.network(
-            imageUrl,
+        ? CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return const Icon(
-                Icons.sports_baseball,
-                color: Colors.white54,
-                size: 35,
-              );
-            },
+            memCacheWidth: 256,
+            memCacheHeight: 256,
+            maxWidthDiskCache: 512,
+            placeholder: (_, __) => const Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            errorWidget: (_, __, ___) => const Icon(
+              Icons.sports_baseball,
+              color: Colors.white54,
+              size: 35,
+            ),
           )
         : const Icon(
             Icons.sports_baseball,

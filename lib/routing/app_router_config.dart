@@ -15,9 +15,7 @@ import 'package:bowlingarsenal_app/features/training/presentation/pages/create_t
 import 'package:bowlingarsenal_app/features/training/presentation/pages/edit_training_step1_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/edit_training_step2_page.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_years_page.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_months_page.dart';
-import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_days_page.dart';
+import 'package:bowlingarsenal_app/features/training/presentation/pages/training_history_sliding_page.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/pages/training_detail_page.dart';
 import 'package:bowlingarsenal_app/shared/views/developer_page.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/pages/my_arsenal_page.dart';
@@ -126,28 +124,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           return NoTransitionPage(child: EditTrainingStep2Page(trainingSession: trainingSession));
         },
       ),
-      // Training History Routes
+      // Training History Route (Single sliding page)
       GoRoute(
         path: '/training/history',
-        name: 'training-history-years',
-        pageBuilder: (context, state) => const NoTransitionPage(child: TrainingHistoryYearsPage()),
-      ),
-      GoRoute(
-        path: '/training/history/:year',
-        name: 'training-history-months',
-        pageBuilder: (context, state) {
-          final year = int.parse(state.pathParameters['year']!);
-          return NoTransitionPage(child: TrainingHistoryMonthsPage(year: year));
-        },
-      ),
-      GoRoute(
-        path: '/training/history/:year/:month',
-        name: 'training-history-days',
-        pageBuilder: (context, state) {
-          final year = int.parse(state.pathParameters['year']!);
-          final month = int.parse(state.pathParameters['month']!);
-          return NoTransitionPage(child: TrainingHistoryDaysPage(year: year, month: month));
-        },
+        name: 'training-history',
+        pageBuilder: (context, state) => const NoTransitionPage(child: TrainingHistorySlidingPage()),
       ),
       GoRoute(
         path: '/training/detail/:sessionId',

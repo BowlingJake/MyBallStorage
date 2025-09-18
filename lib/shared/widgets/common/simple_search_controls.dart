@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 /// 通用的簡潔搜索控制欄組件
 /// 包含搜索欄、篩選按鈕和排序按鈕，基於Ball Library的設計風格
-class SimpleSearchControls extends StatelessWidget {
+class SimpleSearchControls extends StatefulWidget {
   final String searchText;
   final String searchHint;
   final ValueChanged<String> onSearchChanged;
@@ -25,6 +26,42 @@ class SimpleSearchControls extends StatelessWidget {
   });
 
   @override
+  State<SimpleSearchControls> createState() => _SimpleSearchControlsState();
+}
+
+class _SimpleSearchControlsState extends State<SimpleSearchControls> {
+  late final TextEditingController _controller;
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.searchText);
+  }
+
+  @override
+  void didUpdateWidget(covariant SimpleSearchControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchText != widget.searchText && widget.searchText != _controller.text) {
+      _controller.text = widget.searchText;
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onChanged(String text) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      widget.onSearchChanged(text);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -38,13 +75,14 @@ class SimpleSearchControls extends StatelessWidget {
             child: SizedBox(
               height: 36,
               child: TextField(
-                onChanged: onSearchChanged,
+                controller: _controller,
+                onChanged: _onChanged,
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.search,
                 autocorrect: false,
                 enableSuggestions: true,
                 decoration: InputDecoration(
-                  hintText: searchHint,
+                  hintText: widget.searchHint,
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
                   prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 18),
                   filled: true,
@@ -71,22 +109,22 @@ class SimpleSearchControls extends StatelessWidget {
           const SizedBox(width: 12),
           
           // 篩選按鈕
-          if (onFilterTap != null) ...[
+          if (widget.onFilterTap != null) ...[
             _buildActionButton(
               context: context,
-              onTap: onFilterTap!,
+              onTap: widget.onFilterTap!,
               icon: Icons.filter_list,
-              showBadge: showFilterBadge && filterCount > 0,
-              badgeCount: filterCount,
+              showBadge: widget.showFilterBadge && widget.filterCount > 0,
+              badgeCount: widget.filterCount,
             ),
             const SizedBox(width: 8),
           ],
           
           // 排序按鈕
-          if (showSortButton && onSortTap != null)
+          if (widget.showSortButton && widget.onSortTap != null)
             _buildActionButton(
               context: context,
-              onTap: onSortTap!,
+              onTap: widget.onSortTap!,
               icon: Icons.sort,
             ),
         ],

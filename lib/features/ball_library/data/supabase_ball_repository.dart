@@ -73,10 +73,10 @@ class SupabaseBallRepository implements BallRepository {
     try {
       final response = await _supabase
           .from('ball_data')
-          .select('id')  // 只選擇一個欄位來計數
+          .select('id')
           .count(CountOption.exact);
-      
       return response.count ?? 0;
+      
     } catch (e) {
       throw Exception('Failed to get total count: $e');
     }
@@ -306,8 +306,7 @@ class SupabaseBallRepository implements BallRepository {
     BallFilters? filters,
   }) async {
     try {
-
-      // 建立查詢來取得符合條件的資料並計算數量
+      // 建立查詢（之後串接 count）
       var query = _supabase.from('ball_data').select('id');
 
       // 搜尋條件
@@ -395,10 +394,9 @@ class SupabaseBallRepository implements BallRepository {
         }
       }
 
-      // 執行查詢並計算數量
-      final response = await query;
-      final count = (response as List).length;
-      return count;
+      // 執行查詢並回傳計數
+      final response = await query.count(CountOption.exact);
+      return response.count ?? 0;
     } catch (e, stackTrace) {
       throw Exception('Failed to get total count with filters: $e');
     }

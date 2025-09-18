@@ -10,6 +10,7 @@ import 'package:bowlingarsenal_app/shared/providers/cache_providers.dart';
 import 'package:bowlingarsenal_app/shared/services/local_cache_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:bowlingarsenal_app/features/ball_library/logic/services/ball_library_background_service.dart';
 
 part 'ball_library_controller.g.dart';
 
@@ -189,14 +190,30 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      // 使用新的Repository方法直接從資料庫搜尋
-      final filteredBalls = await _repository.getBallsWithFilters(
-        searchText: searchText.isEmpty ? null : searchText,
-        filters: currentState.filters,
-        sortCriterion: currentState.sortCriterion,
-        offset: 0,
-        limit: null, // 搜尋時取得所有符合條件的資料
-      );
+      // 優先使用完整本地快取 + 背景運算，避免頻繁網路請求
+      final cacheService = ref.read(localCacheServiceProvider);
+      final cachedFullBalls = await cacheService.getCachedBallLibraryFullData();
+
+      List<BowlingBall> filteredBalls;
+      if (cachedFullBalls != null && cachedFullBalls.isNotEmpty) {
+        filteredBalls = await ref
+            .read(ballLibraryBackgroundServiceProvider.notifier)
+            .processAllInBackground(
+              balls: cachedFullBalls,
+              searchText: searchText,
+              filters: currentState.filters,
+              sortCriterion: currentState.sortCriterion,
+            );
+      } else {
+        // 後備：走遠端，但限制回傳筆數，避免過大負載
+        filteredBalls = await _repository.getBallsWithFilters(
+          searchText: searchText.isEmpty ? null : searchText,
+          filters: currentState.filters,
+          sortCriterion: currentState.sortCriterion,
+          offset: 0,
+          limit: 100,
+        );
+      }
       
       final newState = currentState.copyWith(
         searchText: searchText,
@@ -221,12 +238,29 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      // 使用新的Repository方法直接從資料庫篩選
-      final filteredBalls = await _repository.getBallsWithFilters(
-        searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
-        filters: filters,
-        sortCriterion: currentState.sortCriterion,
-      );
+      // 優先本地背景處理，無完整快取時再打遠端
+      final cacheService = ref.read(localCacheServiceProvider);
+      final cachedFullBalls = await cacheService.getCachedBallLibraryFullData();
+
+      List<BowlingBall> filteredBalls;
+      if (cachedFullBalls != null && cachedFullBalls.isNotEmpty) {
+        filteredBalls = await ref
+            .read(ballLibraryBackgroundServiceProvider.notifier)
+            .processAllInBackground(
+              balls: cachedFullBalls,
+              searchText: currentState.searchText,
+              filters: filters,
+              sortCriterion: currentState.sortCriterion,
+            );
+      } else {
+        filteredBalls = await _repository.getBallsWithFilters(
+          searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
+          filters: filters,
+          sortCriterion: currentState.sortCriterion,
+          offset: 0,
+          limit: 100,
+        );
+      }
       
       final newState = currentState.copyWith(
         filters: filters,
@@ -278,12 +312,29 @@ class BallLibraryController extends _$BallLibraryController {
     if (currentState == null) return;
 
     try {
-      // 使用新的Repository方法直接從資料庫排序
-      final filteredBalls = await _repository.getBallsWithFilters(
-        searchText: currentState.searchText.isEmpty ? null : currentState.searchText,
-        filters: currentState.filters,
-        sortCriterion: sortCriterion,
-      );
+      // 優先本地背景處理，無完整快取時再打遠端
+      final cacheService = ref.read(localCacheServiceProvider);
+      final cachedFullBalls = await cacheService.getCachedBallLibraryFullData();
+
+      List<BowlingBall> filteredBalls;
+      if (cachedFullBalls != null && cachedFullBalls.isNotEmpty) {
+        filteredBalls = await ref
+            .read(ballLibraryBackgroundServiceProvider.notifier)
+            .processAllInBackground(
+              balls: cachedFullBalls,
+              searchText: currentState.searchText,
+              filters: currentState.filters,
+              sortCriterion: sortCriterion,
+            );
+      } else {
+        filteredBalls = await _repository.getBallsWithFilters(
+          searchText: currentState.searchText.isNotEmpty ? currentState.searchText : null,
+          filters: currentState.filters,
+          sortCriterion: sortCriterion,
+          offset: 0,
+          limit: 100,
+        );
+      }
       
       final newState = currentState.copyWith(
         sortCriterion: sortCriterion,

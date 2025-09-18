@@ -28,7 +28,7 @@ final favoritesRepositoryProvider =
 // ignore: unused_element
 typedef FavoritesRepositoryRef = AutoDisposeProviderRef<FavoritesRepository>;
 String _$favoritesControllerHash() =>
-    r'c4a4d88ef9a342a754c83ae5cf96a914466c7dfa';
+    r'e158f39fd50c8c5880b0bae549be0df06fa50e34';
 
 /// AsyncNotifier for managing favorites state
 ///

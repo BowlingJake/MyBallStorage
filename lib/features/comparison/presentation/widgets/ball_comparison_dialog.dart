@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:core_theme/core_theme.dart';
 
@@ -141,16 +142,24 @@ class BallComparisonDialog extends StatelessWidget {
       ),
       child: ClipOval(
         child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
-            ? Image.network(
-                ball.imageUrl,
+            ? CachedNetworkImage(
+                imageUrl: ball.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.sports_baseball,
-                    color: brandColor,
-                    size: 40,
-                  );
-                },
+                memCacheWidth: 256,
+                memCacheHeight: 256,
+                maxWidthDiskCache: 512,
+                placeholder: (_, __) => const Center(
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                errorWidget: (_, __, ___) => Icon(
+                  Icons.sports_baseball,
+                  color: brandColor,
+                  size: 40,
+                ),
               )
             : Icon(
                 Icons.sports_baseball,
