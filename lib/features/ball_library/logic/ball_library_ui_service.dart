@@ -81,21 +81,8 @@ class BallLibraryUIService extends _$BallLibraryUIService {
     if (isCurrentlySelected) {
       currentSelection.remove(ballId);
     } else {
-      switch (state.selectionMode) {
-        case BallLibrarySelectionMode.comparison:
-          // Limit to 2 balls for comparison
-          if (currentSelection.length < 2) {
-            currentSelection.add(ballId);
-          }
-          break;
-        case BallLibrarySelectionMode.addToArsenal:
-          // No limit for add to arsenal mode
-          currentSelection.add(ballId);
-          break;
-        case BallLibrarySelectionMode.none:
-          // Should not happen, but handle gracefully
-          break;
-      }
+      // Allow unlimited selection - comparison will just be disabled if not exactly 2
+      currentSelection.add(ballId);
     }
 
     state = state.copyWith(selectedBallIds: currentSelection);
@@ -162,6 +149,50 @@ class BallLibraryUIService extends _$BallLibraryUIService {
       initialFilters: libraryState.filters,
       onFiltersChanged: (newFilters) {
         ref.read(ballLibraryControllerProvider.notifier).updateFilters(newFilters);
+      },
+    );
+  }
+
+  /// Combined entry: show a bottom sheet to choose Filter or Sort
+  void showFilterSortMenu({
+    required BuildContext context,
+    required BallLibraryState libraryState,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: BrandColors.accentColorDark.withOpacity(0.4), width: 1.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.filter_list, color: BrandColors.accentColorDark),
+                title: const Text('Filter', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showFilterDialog(context: context, libraryState: libraryState);
+                },
+              ),
+              const Divider(color: Colors.white24, height: 1),
+              ListTile(
+                leading: const Icon(Icons.sort, color: BrandColors.accentColorDark),
+                title: const Text('Sort', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showSortDialog(context: context, libraryState: libraryState);
+                },
+              ),
+              const SizedBox(height: 6),
+            ],
+          ),
+        );
       },
     );
   }

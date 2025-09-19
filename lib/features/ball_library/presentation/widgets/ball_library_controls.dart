@@ -20,14 +20,10 @@ class BallLibraryControls extends ConsumerWidget {
         onSearchChanged: (text) {
           ref.read(ballLibraryControllerProvider.notifier).updateSearchText(text);
         },
-        onFilterTap: () => uiService.showFilterDialog(
-          context: context,
-          libraryState: state,
-        ),
-        onSortTap: () => uiService.showSortDialog(
-          context: context,
-          libraryState: state,
-        ),
+        // 隱藏本區域的 Filter/Sort，改到 AppBar 動作鍵
+        showSortButton: false,
+        onFilterTap: null,
+        onSortTap: null,
         filterCount: state.filters.activeFilterCount,
       ),
       loading: () => const SizedBox.shrink(),
@@ -35,3 +31,6 @@ class BallLibraryControls extends ConsumerWidget {
     );
   }
 }
+
+// 專用於 const 參數位置的 no-op（轉發在外部使用）
+void _noop(String _) {}

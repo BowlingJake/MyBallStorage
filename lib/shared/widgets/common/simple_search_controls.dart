@@ -37,6 +37,10 @@ class _SimpleSearchControlsState extends State<SimpleSearchControls> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.searchText);
+    _controller.addListener(() {
+      // 只為了觸發 suffixIcon 顯示/隱藏
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -85,22 +89,32 @@ class _SimpleSearchControlsState extends State<SimpleSearchControls> {
                   hintText: widget.searchHint,
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
                   prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.primary, size: 18),
+                  suffixIcon: _controller.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close, size: 16, color: Colors.white70),
+                          splashRadius: 14,
+                          onPressed: () {
+                            _controller.clear();
+                            widget.onSearchChanged('');
+                          },
+                        )
+                      : null,
                   filled: true,
                   fillColor: Colors.transparent,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                    borderSide: const BorderSide(color: Colors.white, width: 1.2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                    borderSide: const BorderSide(color: Colors.white, width: 1.2),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
+                    borderSide: const BorderSide(color: Colors.white, width: 1.6),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                  isDense: true, // 使TextField更緊湊
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  isDense: true,
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
