@@ -6,6 +6,8 @@ import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_botto
 import 'package:bowlingarsenal_app/shared/widgets/common/tags/oval_tag.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
+import 'package:intl/intl.dart';
+import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 
 class MyTrainingPage extends ConsumerStatefulWidget {
   const MyTrainingPage({super.key});
@@ -71,12 +73,12 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
         children: [
           // 總覽卡片
           _buildSummaryCard(theme, state),
-          const SizedBox(height: 12),
-          
+          const SizedBox(height: 28),
+
           // 快速操作區域
-          _buildQuickActions(context, theme),
-          const SizedBox(height: 16),
-          
+          Center(child: _buildQuickActions(context, theme)),
+          const SizedBox(height: 32),
+
           // 歷史記錄入口
           _buildHistorySection(context, theme, state),
         ],
@@ -86,79 +88,193 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
   }
 
   Widget _buildSummaryCard(ThemeData theme, trainingState) {
-    final totalSessions = trainingState.trainingDays.length;
-    final totalGames = trainingState.trainingDays.fold<int>(0, (int sum, dynamic day) => sum + (day.totalGames as int));
-    final avgScore = totalGames > 0 ?
-        trainingState.trainingDays.fold<double>(0.0, (double sum, dynamic day) => sum + (day.averageScore as double)) / trainingState.trainingDays.length : 0.0;
+    // 計算個人榮譽紀錄
+    final achievements = _calculatePersonalRecords(trainingState);
 
-    // 固定三色（深色調），避免受 theme 影響
-    const Color colorSessions = Color(0xFF1E2B3D); // 深藍灰
-    const Color colorGames = Color(0xFF2B1E3D); // 深紫
-    const Color colorAvg = Color(0xFF1E3D2B); // 深綠
-
-    // 移除標題，讓統計三框緊貼頂部
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildColoredStatItem(theme, totalSessions.toString(), 'Total Sessions', colorSessions),
-        const SizedBox(width: 12),
-        _buildColoredStatItem(theme, totalGames.toString(), 'Total Games', colorGames),
-        const SizedBox(width: 12),
-        _buildColoredStatItem(theme, avgScore.toStringAsFixed(1), 'Average Score', colorAvg),
+        // Personal Records 標題
+        Text(
+          'Personal Records',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 12),
+        // 成就卡片
+        Row(
+          children: [
+            _buildAchievementCard(theme, achievements, 'singleGame', 'High Game', Icons.emoji_events),
+            const SizedBox(width: 12),
+            _buildAchievementCard(theme, achievements, 'threeGame', 'High Set', Icons.emoji_events),
+            const SizedBox(width: 12),
+            _buildAchievementCard(theme, achievements, 'sixGame', 'High Series', Icons.emoji_events),
+          ],
+        ),
       ],
     );
   }
 
-  Widget _buildStatItem(ThemeData theme, String value, String label, IconData icon) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
-          ),
-        ],
-      ),
-    );
+  /// 計算個人紀錄（包含分數和日期）
+  Map<String, Map<String, dynamic>> _calculatePersonalRecords(trainingState) {
+    if (trainingState.trainingDays.isEmpty) {
+      return {
+        'singleGame': {'score': 0, 'date': null},
+        'threeGame': {'score': 0, 'date': null},
+        'sixGame': {'score': 0, 'date': null},
+      };
+    }
+
+    // 收集所有遊戲分數和對應日期
+    final List<Map<String, dynamic>> gameData = [];
+    for (final day in trainingState.trainingDays) {
+      for (final game in day.games) {
+        gameData.add({
+          'score': game.score,
+          'date': day.date,
+          'dayId': day.id,
+        });
+      }
+    }
+
+    if (gameData.isEmpty) {
+      return {
+        'singleGame': {'score': 0, 'date': null},
+        'threeGame': {'score': 0, 'date': null},
+        'sixGame': {'score': 0, 'date': null},
+      };
+    }
+
+    // 單局最高分
+    var singleGameRecord = gameData.reduce((a, b) =>
+        (a['score'] as int) > (b['score'] as int) ? a : b);
+
+    // 三局最高分
+    int threeGameHigh = 0;
+    DateTime? threeGameDate;
+    if (gameData.length >= 3) {
+      for (int i = 0; i <= gameData.length - 3; i++) {
+        final threeGameTotal = (gameData[i]['score'] as int) +
+                              (gameData[i + 1]['score'] as int) +
+                              (gameData[i + 2]['score'] as int);
+        if (threeGameTotal > threeGameHigh) {
+          threeGameHigh = threeGameTotal;
+          threeGameDate = gameData[i]['date'] as DateTime;
+        }
+      }
+    }
+
+    // 六局最高分
+    int sixGameHigh = 0;
+    DateTime? sixGameDate;
+    if (gameData.length >= 6) {
+      for (int i = 0; i <= gameData.length - 6; i++) {
+        int sixGameTotal = 0;
+        for (int j = i; j < i + 6; j++) {
+          sixGameTotal += gameData[j]['score'] as int;
+        }
+        if (sixGameTotal > sixGameHigh) {
+          sixGameHigh = sixGameTotal;
+          sixGameDate = gameData[i]['date'] as DateTime;
+        }
+      }
+    }
+
+    return {
+      'singleGame': {
+        'score': singleGameRecord['score'],
+        'date': singleGameRecord['date'],
+      },
+      'threeGame': {
+        'score': threeGameHigh,
+        'date': threeGameDate,
+      },
+      'sixGame': {
+        'score': sixGameHigh,
+        'date': sixGameDate,
+      },
+    };
   }
 
-  Widget _buildColoredStatItem(ThemeData theme, String value, String label, Color baseColor) {
+
+  Widget _buildAchievementCard(ThemeData theme, Map<String, Map<String, dynamic>> achievements, String recordType, String label, IconData trophyIcon) {
+    final recordData = achievements[recordType] ?? {'score': 0, 'date': null};
+    final score = recordData['score']?.toString() ?? '0';
+    final date = recordData['date'] as DateTime?;
+
+    // 格式化日期
+    String dateText = 'No record yet';
+    if (date != null) {
+      dateText = DateFormat('yyyy/MM/dd').format(date);
+    }
+
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          // 外框與光暈：使用雙層陰影，形成柔和發光環
-          border: Border.all(color: baseColor.withOpacity(0.60), width: 1),
+          color: const Color(0xFF1E1E1E), // 深灰色背景
           boxShadow: [
-            // 近距離亮邊
-            BoxShadow(color: baseColor.withOpacity(0.35), blurRadius: 14, spreadRadius: 1, offset: const Offset(0, 4)),
-            // 遠距離柔光
-            BoxShadow(color: baseColor.withOpacity(0.18), blurRadius: 30, spreadRadius: 8, offset: const Offset(0, 8)),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
           ],
-          color: baseColor.withOpacity(0.85),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              value,
-              // 使用專案的字型設定，僅移除任何文字光暈
-              style: theme.textTheme.headlineMedium?.copyWith(shadows: const <Shadow>[]),
+            // 頂部：左上角獎盃圖示
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  trophyIcon,
+                  color: const Color(0xFFFFD700), // 金色獎盃
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[400],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(shadows: const <Shadow>[]),
+            const SizedBox(height: 12),
+            // 中部：大字體數值
+            Center(
+              child: Text(
+                score,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // 底部：日期記錄
+            Center(
+              child: Text(
+                dateText,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -167,22 +283,12 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
   }
 
   Widget _buildQuickActions(BuildContext context, ThemeData theme) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppStandardButton(
-            text: 'Start Training',
-            onPressed: () => context.go('/training/create/step-1'),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: AppStandardButton.secondary(
-            text: 'View All Training',
-            onPressed: () => context.go('/training/history'),
-          ),
-        ),
-      ],
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+      child: AppStandardButton(
+        text: 'Start New Training',
+        onPressed: () => context.go('/training/create/step-1'),
+      ),
     );
   }
 
@@ -210,10 +316,33 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
                     : null,
               ),
             ),
+            // 查看全部連結
+            GestureDetector(
+              onTap: () => context.go('/training/history'),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 12,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 16),
-        ...recentTrainings.map((training) => _buildRecentTrainingCardModern(context, theme, training)),
+        _buildRecentTrainingCarousel(context, theme, recentTrainings),
       ],
     );
   }
@@ -291,6 +420,182 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
     );
   }
 
+  /// 橫向滑動的直式卡片清單
+  Widget _buildRecentTrainingCarousel(BuildContext context, ThemeData theme, List<TrainingDaySummary> trainings) {
+    return SizedBox(
+      height: 280, // 增加高度以容納更多內容
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: trainings.length,
+        padding: const EdgeInsets.only(right: 4),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final t = trainings[index];
+          return _buildTrainingStatCard(context, theme, t);
+        },
+      ),
+    );
+  }
+
+  Widget _buildTrainingStatCard(BuildContext context, ThemeData theme, TrainingDaySummary training) {
+    final dateStr = DateFormat('EEEE, dd MMM yyyy').format(training.date);
+    final totalScore = training.games.fold<int>(0, (acc, g) => acc + g.score);
+    final avg = training.averageScore;
+    final high = training.highestScore;
+    final strike = training.strikePercentage.clamp(0, 100).toDouble();
+    final spare = training.sparePercentage.clamp(0, 100).toDouble();
+    final open = (100 - strike - spare).clamp(0, 100).toDouble();
+
+    // 與上方成就卡一致：無邊框、深灰背景、柔和陰影
+    const Color cardBg = Color(0xFF1E1E1E);
+
+    return InkWell(
+      onTap: () => context.go('/training/detail/${training.id}', extra: training),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 220, // 增加卡片寬度
+        padding: const EdgeInsets.all(18), // 增加內邊距
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: cardBg,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 日期
+            Text(
+              dateStr,
+              style: TextStyle(color: Colors.grey[300], fontSize: 12, fontWeight: FontWeight.w500),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 12), // 增加間距
+            // 標題與分數匯總
+            const Text('Total Score', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4), // 增加間距
+            Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+              columnWidths: const <int, TableColumnWidth>{
+                0: FixedColumnWidth(90),  // Total Score 最多4位數
+                1: FixedColumnWidth(48),  // Avg 最多3位數
+                2: FixedColumnWidth(48),  // High 最多3位數
+              },
+              children: [
+                TableRow(
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        '$totalScore',
+                        style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, height: 1.0),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    _buildMetricColumn('Avg', '$avg'),
+                    _buildMetricColumn('High', '$high'),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16), // 增加間距
+            // 三個指標條 - 移除圖標，添加百分比數字
+            const Text('Strike %', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            const SizedBox(height: 6), // 增加間距
+            Row(
+              children: [
+                Expanded(child: _buildThinProgressBar(theme, strike, activeColor: theme.colorScheme.primary)),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 36),
+                  child: Text(
+                    '${strike.toInt()}%',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12), // 增加間距
+            const Text('Spare %', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            const SizedBox(height: 6), // 增加間距
+            Row(
+              children: [
+                Expanded(child: _buildThinProgressBar(theme, spare, activeColor: theme.colorScheme.primary)),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 36),
+                  child: Text(
+                    '${spare.toInt()}%',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12), // 增加間距
+            const Text('Open %', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            const SizedBox(height: 6), // 增加間距
+            Row(
+              children: [
+                Expanded(child: _buildThinProgressBar(theme, open, activeColor: Colors.redAccent)),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 36),
+                  child: Text(
+                    '${open.toInt()}%',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThinProgressBar(ThemeData theme, double percent, {required Color activeColor}) {
+    final p = percent.clamp(0, 100) / 100.0;
+    return Container(
+      height: 6,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: FractionallySizedBox(
+        alignment: Alignment.centerLeft,
+        widthFactor: p,
+        child: Container(
+          decoration: BoxDecoration(
+            color: activeColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 上方 Avg/High 小欄位，確保等寬避免擠壓
+  Widget _buildMetricColumn(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+
   Widget _buildEmptyState(BuildContext context, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -321,7 +626,7 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
           ),
           const SizedBox(height: 20),
           AppStandardButton(
-            text: 'Start First Training',
+            text: 'Start New Training',
             onPressed: () => context.go('/training/create/step-1'),
           ),
         ],
