@@ -8,27 +8,57 @@ class ProfessionalDarkBackground extends StatelessWidget {
     super.key,
     // *** 請確保這個路徑是您專案中正確的圖片路徑 ***
     this.backgroundImage = 'assets/images/Sport_Tech_Background.webp',
+    this.backgroundColor = const Color(0xFF121212),
+    this.centerLogoAsset,
+    this.logoOpacity = 0.08,
+    this.overlayColor = const Color(0xFF1F1F1F),
+    this.overlayOpacity = 0.0,
   });
   final Widget child;
   final String backgroundImage;
+  final Color backgroundColor;
+  final String? centerLogoAsset;
+  final double logoOpacity;
+  final Color overlayColor;
+  final double overlayOpacity;
 
   @override
   Widget build(BuildContext context) {
-    // 使用 Container 的 decoration 來設定可重複的背景圖
+    // 使用純色深灰背景
     return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(backgroundImage),
-          // 關鍵屬性：讓圖片在垂直和水平方向上重複平鋪
-          repeat: ImageRepeat.repeat,
-          // 你仍然可以使用 fit，但 repeat 通常效果更好
-          // fit: BoxFit.cover,
-        ),
-      ),
+      color: backgroundColor,
       child: Scaffold(
-        // Scaffold 必須是透明的，才能讓 Container 的背景顯示出來
         backgroundColor: Colors.transparent,
-        body: child,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (centerLogoAsset != null) ...[
+              Center(
+                child: Opacity(
+                  opacity: logoOpacity,
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.matrix([
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0, 0, 0, 1, 0,
+                    ]),
+                    child: Image.asset(
+                      centerLogoAsset!,
+                      width: 220,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            if (overlayOpacity > 0)
+              Container(
+                color: overlayColor.withOpacity(overlayOpacity),
+              ),
+            child,
+          ],
+        ),
       ),
     );
   }

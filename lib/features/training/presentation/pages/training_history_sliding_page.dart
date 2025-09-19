@@ -88,7 +88,7 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
   String _getHeaderTitle() {
     switch (_currentLevel) {
       case DateSelectionLevel.year:
-        return 'Training History';
+        return 'All My Training';
       case DateSelectionLevel.month:
         return '$_selectedYear Training History';
       case DateSelectionLevel.day:
@@ -192,40 +192,31 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
                 });
                 _animateToNextLevel();
               },
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    width: 1.5,
+                    color: Colors.white.withOpacity(0.12),
+                    width: 0.5,
                   ),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary.withOpacity(0.05),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.05),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.calendar_month,
-                        color: theme.colorScheme.primary,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,40 +283,31 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
                 });
                 _animateToNextLevel();
               },
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    width: 1.5,
+                    color: Colors.white.withOpacity(0.12),
+                    width: 0.5,
                   ),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary.withOpacity(0.05),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.05),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        _getMonthIcon(monthData.month),
-                        color: theme.colorScheme.primary,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,47 +391,34 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
                 '/training/detail/${dayData.trainingSession.id}',
                 extra: dayData.trainingSession,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    width: 1.5,
+                    color: Colors.white.withOpacity(0.12),
+                    width: 0.5,
                   ),
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary.withOpacity(0.05),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.05),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Text(
-                              dayData.day.toString(),
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,21 +455,18 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
                           theme,
                           '${dayData.trainingSession.totalGames}',
                           'Games',
-                          Icons.sports,
                         ),
                         const SizedBox(width: 12),
                         _buildStatCard(
                           theme,
                           '${dayData.trainingSession.averageScore}',
                           'Avg Score',
-                          Icons.trending_up,
                         ),
                         const SizedBox(width: 12),
                         _buildStatCard(
                           theme,
                           '${dayData.trainingSession.highestScore}',
                           'High Score',
-                          Icons.emoji_events,
                         ),
                       ],
                     ),
@@ -549,7 +515,7 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
     );
   }
 
-  Widget _buildStatCard(ThemeData theme, String value, String label, IconData icon) {
+  Widget _buildStatCard(ThemeData theme, String value, String label) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -563,12 +529,6 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: theme.colorScheme.primary.withOpacity(0.7),
-            ),
-            const SizedBox(height: 4),
             Text(
               value,
               style: theme.textTheme.titleMedium?.copyWith(
@@ -576,6 +536,7 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
                 color: theme.colorScheme.onSurface,
               ),
             ),
+            const SizedBox(height: 4),
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -588,23 +549,6 @@ class _TrainingHistorySlidingPageState extends ConsumerState<TrainingHistorySlid
     );
   }
 
-  IconData _getMonthIcon(int month) {
-    switch (month) {
-      case 1: return Icons.ac_unit;
-      case 2: return Icons.favorite;
-      case 3: return Icons.local_florist;
-      case 4: return Icons.wb_sunny;
-      case 5: return Icons.eco;
-      case 6: return Icons.beach_access;
-      case 7: return Icons.wb_sunny_outlined;
-      case 8: return Icons.wb_sunny;
-      case 9: return Icons.spa;
-      case 10: return Icons.emoji_nature;
-      case 11: return Icons.cloudy_snowing;
-      case 12: return Icons.ac_unit_outlined;
-      default: return Icons.calendar_month;
-    }
-  }
 
   List<YearData> _extractYears(List<TrainingDaySummary> trainingDays) {
     if (trainingDays.isEmpty) return [];
