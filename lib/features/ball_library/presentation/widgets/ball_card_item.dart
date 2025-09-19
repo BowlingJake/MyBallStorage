@@ -158,28 +158,27 @@ class BallCardItem extends ConsumerWidget {
     final brandColor = brandPalette[400]!;
     
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       child: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Colors.black.withOpacity(0.8),
-              border: Border.all(
-                color: isSelected 
-                    ? theme.primaryColor.withOpacity(0.8)
-                    : primaryColor.withOpacity(0.6), // 使用主要色
-                width: 1.5,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: theme.primaryColor.withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : null,
+              color: const Color(0xFF1E1E1E),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+                if (isSelected)
+                  BoxShadow(
+                    color: theme.primaryColor.withOpacity(0.3),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 2),
+                  ),
+              ],
             ),
             child: InkWell(
               onTap: onTap, // 總是允許點擊
@@ -307,107 +306,78 @@ class BallCardItem extends ConsumerWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          // Bottom: RG, Diff, MB Data Blocks
+                          // Bottom: RG, Diff, MB Data - Stacked layout without boxes
                           Row(
                             children: [
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.2),
-                                      width: 0.5,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'RG',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[400],
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'RG',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: primaryColor, // 使用主要色
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      ball.rg?.toStringAsFixed(3) ?? 'N/A',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                        ball.rg?.toStringAsFixed(3) ?? 'N/A',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 4),
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.2),
-                                      width: 0.5,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Diff',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[400],
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Diff',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: primaryColor, // 使用主要色
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      ball.diff?.toStringAsFixed(3) ?? 'N/A',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                        ball.diff?.toStringAsFixed(3) ?? 'N/A',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 4),
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.2),
-                                      width: 0.5,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'MB',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[400],
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'MB',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: primaryColor, // 使用主要色
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      (ball.mbDiff == null || ball.mbDiff == 0)
+                                          ? 'N/A'
+                                          : ball.mbDiff!.toStringAsFixed(3),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                        (ball.mbDiff == null || ball.mbDiff == 0) 
-                                            ? 'N/A' 
-                                            : ball.mbDiff!.toStringAsFixed(3),
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

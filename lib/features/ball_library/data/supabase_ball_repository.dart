@@ -11,15 +11,37 @@ class SupabaseBallRepository implements BallRepository {
   @override
   Future<List<BowlingBall>> getAllBalls() async {
     try {
-      final response = await _supabase
-          .from('ball_data')
-          .select('*')
-          .order('create_at', nullsFirst: false)  // create_at優先，null在後
-          .order('id');  // 次要排序用ID
-      
-      return (response as List<dynamic>)
-          .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
-          .toList();
+      // 分批抓取，避免單次回傳過大導致被截斷
+      const int batchSize = 1000;
+      int offset = 0;
+      final List<BowlingBall> all = [];
+
+      // 先查詢總數，決定需要跑幾批
+      final total = await getTotalCount();
+      if (total <= 0) {
+        return all;
+      }
+
+      while (offset < total) {
+        final response = await _supabase
+            .from('ball_data')
+            .select('*')
+            .order('create_at', nullsFirst: false)
+            .order('id')
+            .range(offset, offset + batchSize - 1);
+
+        final batch = (response as List<dynamic>)
+            .map((json) => BowlingBall.fromJson(json as Map<String, dynamic>))
+            .toList();
+        all.addAll(batch);
+
+        if (batch.isEmpty) {
+          break;
+        }
+        offset += batch.length;
+      }
+
+      return all;
     } catch (e) {
       throw Exception('Failed to fetch balls from database: $e');
     }

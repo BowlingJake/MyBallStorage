@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_ui_service.dart';
+import 'package:bowlingarsenal_app/features/ball_library/logic/ball_library_controller.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_library_controls.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_library_actions.dart';
 import 'package:bowlingarsenal_app/features/ball_library/presentation/widgets/ball_library_content.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/navigation/modern_bottom_navigation.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/professional_dark_background.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/simple_app_bar.dart';
+import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notification.dart';
 
 /// Refactored Ball Library Page - Clean and Component-based Architecture
 /// 
@@ -61,6 +63,20 @@ class _BallLibraryPageState extends ConsumerState<BallLibraryPage> {
           title: uiService.getAppBarTitle(),
           onBackPressed: () => context.go('/'),
           actions: [
+            // Force refresh button (debug)
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.redAccent),
+              onPressed: () async {
+                try {
+                  TopNotification.showSuccess(context, 'Clearing cache and refreshing...');
+                  await ref.read(ballLibraryControllerProvider.notifier).forceRefresh();
+                  TopNotification.showSuccess(context, 'Data refreshed successfully!');
+                } catch (e) {
+                  TopNotification.showError(context, 'Failed to refresh: $e');
+                }
+              },
+              tooltip: 'Force Refresh Data (Clear Cache)',
+            ),
             // Favorites button
             IconButton(
               icon: const Icon(Icons.favorite, color: Colors.redAccent),

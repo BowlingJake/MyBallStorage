@@ -139,6 +139,23 @@ class BallLibraryController extends _$BallLibraryController {
         
         // 取得總數量
         final totalCount = await _repository.getTotalCount();
+        // 若快取筆數落後於總數，直接重抓所有資料
+        if (cachedFullBalls.length < totalCount) {
+          log('Ball Library: Cached full data is stale (${cachedFullBalls.length} < $totalCount). Reloading all...');
+          final allBalls = await _repository.getAllBalls();
+          await cacheService.cacheBallLibraryFullData(allBalls);
+          final currentState = state.value;
+          if (currentState != null) {
+            final newState = currentState.copyWith(
+              allBalls: allBalls,
+              filteredBalls: allBalls,
+              totalCount: totalCount,
+              hasMoreData: false,
+            );
+            state = AsyncValue.data(newState);
+          }
+          return;
+        }
         
         // 靜默更新狀態
         final currentState = state.value;
@@ -156,11 +173,7 @@ class BallLibraryController extends _$BallLibraryController {
       
       // 載入更多數據
       final totalCount = await _repository.getTotalCount();
-      final allBalls = await _repository.getBallsWithFilters(
-        sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
-        offset: 0,
-        limit: null, // 載入所有數據
-      );
+      final allBalls = await _repository.getAllBalls();
       
       // 快取完整數據
       await cacheService.cacheBallLibraryFullData(allBalls);
@@ -435,16 +448,16 @@ class BallLibraryController extends _$BallLibraryController {
   /// 重新載入球庫資料
   Future<void> refresh() async {
     state = const AsyncValue.loading();
-    
+
     try {
       final totalCount = await _repository.getTotalCount();
-      
+
       final balls = await _repository.getBallsWithFilters(
         sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
         offset: 0,
         limit: 50,
       );
-      
+
       state = AsyncValue.data(BallLibraryState(
         allBalls: balls,
         filteredBalls: balls,
@@ -455,6 +468,55 @@ class BallLibraryController extends _$BallLibraryController {
         error: null,
       ));
     } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  /// 強制刷新 - 清除所有缓存並重新載入最新資料
+  Future<void> forceRefresh() async {
+    try {
+      log('Ball Library: Force refresh initiated - clearing all cache');
+
+      // 清除所有Ball Library相關的缓存
+      final cacheService = ref.read(localCacheServiceProvider);
+      await cacheService.clearBallLibraryCache();
+
+      state = const AsyncValue.loading();
+
+      // 直接從後端重新載入最新資料
+      final totalCount = await _repository.getTotalCount();
+      log('Ball Library: Total count from backend: $totalCount');
+
+      final balls = await _repository.getBallsWithFilters(
+        sortCriterion: const SortCriterion(field: SortField.id, ascending: true),
+        offset: 0,
+        limit: 50,
+      );
+
+      log('Ball Library: Loaded ${balls.length} balls from backend');
+      if (balls.isNotEmpty) {
+        log('Ball Library: Latest ball ID: ${balls.map((b) => b.id).reduce((a, b) => a > b ? a : b)}');
+      }
+
+      // 缓存新的資料
+      await cacheService.cacheBallLibraryBasicData(balls);
+
+      // 背景載入完整資料
+      _backgroundLoadFullData();
+
+      state = AsyncValue.data(BallLibraryState(
+        allBalls: balls,
+        filteredBalls: balls,
+        isLoading: false,
+        totalCount: totalCount,
+        hasMoreData: balls.length < totalCount,
+        currentPage: 0,
+        error: null,
+      ));
+
+      log('Ball Library: Force refresh completed');
+    } catch (e) {
+      log('Ball Library: Force refresh failed: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
