@@ -7,7 +7,7 @@ part of 'ball_library_ui_service.dart';
 // **************************************************************************
 
 String _$ballLibraryUIServiceHash() =>
-    r'3686d7d522d2207435d1f18dc938021ffa81d5ff';
+    r'844881493bb4072809370e3326754779045fd2a1';
 
 /// Ball Library UI Service - unified management for all UI operations
 ///

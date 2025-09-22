@@ -361,6 +361,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
           flex: frameIndex == 9 ? 1 : 1, // 第10格與其他格相同flex
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 0.5),
+            // 開發者頁預覽：暫時保留，若需要一致以 SVG 呈現，可改為 PinSvgWidget
             child: PinVisualizationWidget.withConfig(
               pinStates: pinStates,
               width: double.infinity,

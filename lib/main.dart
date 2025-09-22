@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:bowlingarsenal_app/shared/utils/ui_scale.dart';
 
 /// Custom ScrollBehavior to enable touch scrolling on web
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -130,7 +131,13 @@ class _MyAppState extends ConsumerState<MyApp> {
     final darkTheme = ref.watch(darkThemeProvider);
     final router = ref.watch(routerProvider);
 
-    return MaterialApp.router(
+    // 全域文字縮放夾制與滑動行為
+    final mediaQuery = MediaQuery.of(context);
+    final textScaler = UiScale.textScalerFor(context);
+
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: textScaler),
+      child: MaterialApp.router(
       title: 'StrikeTrack',
       theme: lightTheme,
       darkTheme: darkTheme,
@@ -138,6 +145,6 @@ class _MyAppState extends ConsumerState<MyApp> {
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
-    );
+    ));
   }
 }

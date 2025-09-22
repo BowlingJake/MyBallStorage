@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_widget.dart';
+import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_svg_widget.dart';
 import 'package:bowlingarsenal_app/shared/widgets/bowling/pin_visualization_config.dart';
 
 /// 保齡球計分板數據模型
@@ -98,8 +98,9 @@ class BowlingScoreCardWidget extends StatelessWidget {
 
     final baseTextStyle = textStyle ?? const TextStyle(
       color: Colors.white,
-      fontFamily: 'Electrolize',
-      fontWeight: FontWeight.bold,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w700,
+      height: 1.2,
     );
     final glowingTextStyle = useGlowText
         ? baseTextStyle.copyWith(shadows: [for (double i = 1; i < 3; i++) Shadow(color: accentColor, blurRadius: 2 * i)])
@@ -116,10 +117,13 @@ class BowlingScoreCardWidget extends StatelessWidget {
               child: Row(
                 children: List.generate(10, (index) {
                   return Expanded(
-                    child: Text(
-                      (index + 1).toString(),
-                      textAlign: TextAlign.center,
-                      style: glowingTextStyle.copyWith(fontSize: 12),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        (index + 1).toString(),
+                        textAlign: TextAlign.center,
+                        style: glowingTextStyle.copyWith(fontSize: 12),
+                      ),
                     ),
                   );
                 }),
@@ -165,10 +169,13 @@ class BowlingScoreCardWidget extends StatelessWidget {
           Row(
             children: List.generate(5, (index) {
               return Expanded(
-                child: Text(
-                  (index + 1).toString(),
-                  textAlign: TextAlign.center,
-                  style: glowingTextStyle.copyWith(fontSize: 14),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    (index + 1).toString(),
+                    textAlign: TextAlign.center,
+                    style: glowingTextStyle.copyWith(fontSize: 14),
+                  ),
                 ),
               );
             }),
@@ -204,10 +211,13 @@ class BowlingScoreCardWidget extends StatelessWidget {
           Row(
             children: List.generate(5, (index) {
               return Expanded(
-                child: Text(
-                  (index + 6).toString(),
-                  textAlign: TextAlign.center,
-                  style: glowingTextStyle.copyWith(fontSize: 14),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    (index + 6).toString(),
+                    textAlign: TextAlign.center,
+                    style: glowingTextStyle.copyWith(fontSize: 14),
+                  ),
                 ),
               );
             }),
@@ -329,59 +339,54 @@ class BowlingScoreCardWidget extends StatelessWidget {
       framePinStates = pinStatesPerFrame![frameNumber - 1];
     }
     
-    return Column(
-      children: [
-        Expanded(flex: 2, child: scoreArea),
-        if (showSeparatorLine)
-          Container(
-            height: 1,
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            color: accentColor,
-          ),
-        // 累積分數區域 - 調整flex
-        Expanded(
-          flex: showPinVisualization ? 2 : 3,
-          child: Center(
-            child: hasScore
-                ? (useCumulativePill
-                    ? Container(
-                        padding: cumulativePadding,
-                        decoration: BoxDecoration(
-                          color: cumulativeBackgroundColor,
-                          borderRadius: BorderRadius.circular(cumulativeBorderRadius),
-                        ),
-                        child: Text(
-                          frameData.cumulativeScore!.toString(),
-                          style: (cumulativeTextStyle ?? glowingTextStyle.copyWith(fontSize: 12)),
-                        ),
-                      )
-                    : Text(
-                        frameData.cumulativeScore!.toString(),
-                        style: glowingTextStyle.copyWith(fontSize: 20),
-                      ))
-                : const SizedBox.shrink(),
-          ),
-        ),
-        // 球瓶視覺化區域
-        if (showPinVisualization)
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: PinVisualizationWidget.withConfig(
-                pinStates: framePinStates,
-                width: double.infinity,
-                config: pinVisualizationConfig ?? PinVisualizationConfig(
-                  absolutePinRadius: 3.0, // 內嵌模式使用較小的固定大小
-                  spacingScaleX: 2.0,
-                  spacingScaleY: 1.2,
-                  radiusToSpacingMax: 0.0,
-                  showFrame: false, // 不顯示外框，因為已經在計分板frame內
-                ),
+    return LayoutBuilder(
+      builder: (context, box) {
+        final double frameWidth = box.maxWidth;
+        final double dynamicPinHeight = (frameWidth * 0.26).clamp(22.0, 30.0);
+        const double cumulativeHeight = 20.0;
+
+        return Column(
+          children: [
+            Expanded(child: scoreArea),
+            if (showSeparatorLine)
+              Container(height: 1, margin: const EdgeInsets.symmetric(horizontal: 4), color: accentColor),
+            SizedBox(
+              height: cumulativeHeight,
+              child: Center(
+                child: hasScore
+                    ? (useCumulativePill
+                        ? Container(
+                            padding: cumulativePadding,
+                            decoration: BoxDecoration(
+                              color: cumulativeBackgroundColor,
+                              borderRadius: BorderRadius.circular(cumulativeBorderRadius),
+                            ),
+                            child: Text(
+                              frameData.cumulativeScore!.toString(),
+                              style: (cumulativeTextStyle ?? glowingTextStyle.copyWith(fontSize: 12)),
+                            ),
+                          )
+                        : Text(
+                            frameData.cumulativeScore!.toString(),
+                            style: glowingTextStyle.copyWith(fontSize: 16),
+                          ))
+                    : const SizedBox.shrink(),
               ),
             ),
-          ),
-      ],
+            if (showPinVisualization)
+              SizedBox(
+                height: dynamicPinHeight,
+                child: PinSvgWidget(
+                  width: frameWidth,
+                  height: dynamicPinHeight,
+                  color: accentColor,
+                  flipVertical: false,
+                  pinStates: framePinStates,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -396,19 +401,19 @@ class BowlingScoreCardWidget extends StatelessWidget {
         ) : null,
       ),
       child: Center(
-        child: highlightAsSplit && score.isNotEmpty
-            ? FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Container(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: highlightAsSplit && score.isNotEmpty
+              ? Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: accentColor, width: 1.5),
                   ),
-                  child: Text(score, style: textStyle),
-                ),
-              )
-            : Text(score, style: textStyle),
+                  child: Text(score, style: textStyle.copyWith(fontSize: 14)),
+                )
+              : Text(score, style: textStyle.copyWith(fontSize: 14)),
+        ),
       ),
     );
   }

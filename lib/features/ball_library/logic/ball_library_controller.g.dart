@@ -66,7 +66,7 @@ final ballRepositoryProvider = AutoDisposeProvider<BallRepository>.internal(
 // ignore: unused_element
 typedef BallRepositoryRef = AutoDisposeProviderRef<BallRepository>;
 String _$ballLibraryControllerHash() =>
-    r'b6ea749fcb74fa2ee25b1cf32dc75561c71d2717';
+    r'456073056d1d797b5699724fa363ea699cd6eb02';
 
 /// Ball Library 控制器
 /// 專注於球庫相關的業務邏輯和狀態管理

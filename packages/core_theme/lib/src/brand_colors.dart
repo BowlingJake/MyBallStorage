@@ -88,8 +88,8 @@ class BrandColors {
         error: errorColor,
         onError: textPrimaryLight,
         // 確保 background 也被定義，以保持一致性
-        background: darkBackgroundColor,
-        onBackground: textPrimaryDark,
+        background: lightBackgroundColor,
+        onBackground: textPrimaryLight,
       );
 }
 

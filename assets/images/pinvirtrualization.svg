@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" preserveAspectRatio="xMidYMax meet">
+  <g fill="currentColor">
+    <circle cx="50" cy="56" r="6"/>
+    <circle cx="37.5" cy="40" r="6"/><circle cx="62.5" cy="40" r="6"/>
+    <circle cx="25" cy="24" r="6"/><circle cx="50" cy="24" r="6"/><circle cx="75" cy="24" r="6"/>
+    <circle cx="12.5" cy="8" r="6"/><circle cx="37.5" cy="8" r="6"/><circle cx="62.5" cy="8" r="6"/><circle cx="87.5" cy="8" r="6"/>
+  </g>
+</svg>

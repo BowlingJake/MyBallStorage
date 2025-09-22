@@ -207,26 +207,42 @@ class ScoringController extends StateNotifier<ScoringState> {
       } else {
         // 第10格
         if (currentRollInFrame == 0) {
-          currentRollInFrame = 1;
+          // 第10格第一球
+          final firstRoll = rolls[rollIndex];
+
+          if (state.scoringManager.currentMode == ScoringMode.current && firstRoll == 10) {
+            // Current 模式：第10格Strike後遊戲結束
+            currentFrameIndex = 10;
+          } else {
+            // 需要第二球
+            currentRollInFrame = 1;
+          }
           rollIndex++;
         } else if (currentRollInFrame == 1) {
-          // 檢查是否需要第三球
+          // 第10格第二球
           if (rollIndex >= 2) {
             final firstRoll = rolls[rollIndex - 1];
             final secondRoll = rolls[rollIndex];
-            if (firstRoll == 10 || firstRoll + secondRoll == 10) {
-              // Strike 或 Spare，需要第三球
-              currentRollInFrame = 2;
-            } else {
-              // 結束
+
+            if (state.scoringManager.currentMode == ScoringMode.current) {
+              // Current 模式：第10格無獎勵球，第二球後結束
               currentFrameIndex = 10;
+            } else {
+              // Traditional 模式：檢查是否需要第三球
+              if (firstRoll == 10 || firstRoll + secondRoll == 10) {
+                // Strike 或 Spare，需要第三球
+                currentRollInFrame = 2;
+              } else {
+                // 結束
+                currentFrameIndex = 10;
+              }
             }
           } else {
             currentFrameIndex = 10;
           }
           rollIndex++;
         } else {
-          // 第三球
+          // 第三球（僅在Traditional模式下可能到達）
           currentFrameIndex = 10;
           rollIndex++;
         }
@@ -241,17 +257,17 @@ class ScoringController extends StateNotifier<ScoringState> {
     if (currentFrameIndex >= 10) {
       return true;
     }
-    
+
     // 如果不在第10格，遊戲未完成
     if (currentFrameIndex < 9) {
       return false;
     }
-    
+
     // 第10格特殊檢查
     int frame10StartIndex = 0;
     int currentFrameIdx = 0;
     int currentRollIdx = 0;
-    
+
     // 計算到第10格的起始位置
     while (currentFrameIdx < 9 && frame10StartIndex < rolls.length) {
       final roll = rolls[frame10StartIndex];
@@ -271,21 +287,34 @@ class ScoringController extends StateNotifier<ScoringState> {
 
     if (frame10Rolls.isEmpty) return false;
 
-    // 第一球是Strike
-    if (frame10Rolls[0] == 10) {
-      return frame10Rolls.length >= 3;
-    }
-    
-    // 不是Strike
-    if (frame10Rolls.length >= 2) {
-      // Spare
-      if (frame10Rolls[0] + frame10Rolls[1] == 10) {
+    // 根據計分模式檢查第10格完成狀態
+    if (state.scoringManager.currentMode == ScoringMode.current) {
+      // Current 模式：第10格無獎勵球
+      if (frame10Rolls[0] == 10) {
+        // Strike：只需1球就完成
+        return true;
+      }
+
+      // 非Strike：需要2球完成（無論是否Spare）
+      return frame10Rolls.length >= 2;
+    } else {
+      // Traditional 模式：遵循傳統規則
+      // 第一球是Strike
+      if (frame10Rolls[0] == 10) {
         return frame10Rolls.length >= 3;
       }
-      // Open
-      return frame10Rolls.length >= 2;
+
+      // 不是Strike
+      if (frame10Rolls.length >= 2) {
+        // Spare
+        if (frame10Rolls[0] + frame10Rolls[1] == 10) {
+          return frame10Rolls.length >= 3;
+        }
+        // Open
+        return frame10Rolls.length >= 2;
+      }
     }
-    
+
     return false;
   }
   
