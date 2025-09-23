@@ -9,7 +9,6 @@ import 'package:bowlingarsenal_app/features/training/logic/scoring/scoring_strat
 import 'package:bowlingarsenal_app/features/training/logic/training_controller.dart';
 import 'package:bowlingarsenal_app/features/training/models/training_record.dart';
 import 'package:bowlingarsenal_app/features/training/models/roll_record.dart';
-import 'package:bowlingarsenal_app/features/training/data/models/frame_data.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_content.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_footer.dart';
 import 'package:bowlingarsenal_app/features/training/presentation/widgets/components/scoring_dialog_header.dart';

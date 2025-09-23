@@ -75,7 +75,7 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   late Animation<double> _fadeAnimation;
   final List<_GameUIState> _addedGames = [];
   bool _isEditMode = false;
-  bool _showPinVisualization = true; // 僅保留內嵌一層
+  bool _showPinVisualization = true;
   bool _isFullscreen = false;
   final GamesRepository _gamesRepo = GamesRepository();
 
@@ -575,17 +575,11 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
     final remaining = last.rolls.length - i;
     final mode = widget.trainingSession.scoringMethod.toLowerCase();
     if (remaining <= 0) return false;
-
     if (mode == 'current') {
-      // Current 模式：第10格Strike只需1球，非Strike需要2球
-      final first = last.rolls[i];
-      if (first == 10) {
-        return true; // Strike，遊戲完成
-      } else {
-        return remaining >= 2; // 非Strike，需要2球才完成
-      }
+      // 現代制：第10格最多2球，第一球即定分（Strike 亦可視為完成）
+      return true;
     } else {
-      // Traditional 模式
+      // 傳統制
       if (remaining < 2) return false; // 至少兩球
       final first = last.rolls[i];
       final second = last.rolls[i + 1];
@@ -1150,17 +1144,6 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                                   headerBarColor: null,
                                   tenthFrameFlex: 1,
                                   accentColor: theme.colorScheme.primary,
-                                  // 內嵌球瓶視覺化（單層）與比例化配置（svg 將沿用高度比）
-                                  showPinVisualization: true,
-                                  pinVisualizationConfig: PinVisualizationConfig.compact(),
-                                  // 傳入每格的球瓶狀態，以便內嵌 SVG 動態填滿/空心
-                                  pinStatesPerFrame: List<List<bool>>.generate(10, (i) {
-                                    return PinVisualizationHelper.getFramePinStates(
-                                      rolls: game.rolls,
-                                      rollStates: game.rollStates,
-                                      frameIndex: i,
-                                    );
-                                  }),
                                   isSplitPerFrame: List<bool>.generate(10, (i) {
                                     // 取得第一球的純狀態
                                     final List<bool> firstRoll = PinVisualizationHelper.getFramePinStates(
@@ -1176,7 +1159,41 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
                           ),
                           const SizedBox(height: 0),
                           // 倒瓶視覺列：顯示每格第一球的倒瓶
-                          // 移除外層（第二層）球瓶列，避免重複顯示
+                          if (_showPinVisualization)
+                            LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Row(
+                                children: List.generate(10, (f) {
+                                  final pins = PinVisualizationHelper.getFramePinStates(
+                                    rolls: game.rolls,
+                                    rollStates: game.rollStates,
+                                    frameIndex: f,
+                                  );
+                                  final bool isFirst = f == 0;
+                                  final bool isLast = f == 9;
+                                  final EdgeInsets cellMargin = EdgeInsets.only(
+                                    left: isFirst ? 0 : 0.5,
+                                    right: isLast ? 0 : 0.5,
+                                  );
+                                  return Expanded(
+                                    child: Padding(
+                                      padding: cellMargin,
+                                      child: LayoutBuilder(
+                                        builder: (context, box) {
+                                          return PinVisualizationWidget.withConfig(
+                                            pinStates: pins,
+                                            width: box.maxWidth,
+                                            height: 40,
+                                            config: PinVisualizationConfig.compact(),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
+                          ),
                           const SizedBox(height: 12),
                           if (index == _addedGames.length - 1)
                             _buildGameActionButtons(theme),
@@ -1328,8 +1345,22 @@ class _TrainingDetailPageState extends ConsumerState<TrainingDetailPage>
   bool _canAddNewGame() {
     if (_addedGames.isEmpty) return true;
     final last = _addedGames.last;
+    // 簡單完成條件：已輸入到第10格（rolls 至少包含第10格的第一球）或標記完成
+    // 以本地規則：前9格最多 18 球；第10格至少 1 球 → 長度 >= 19 視為已開始第10格
+    // 這裡更直觀：判斷是否第10格已有兩球（或一球為strike且有第二/第三球）
+    final hasAnyInput = last.rolls.isNotEmpty;
+    if (!hasAnyInput) return true; // 建立後未輸入也可允許再次新增，若要嚴格可改為 false
 
-    // 使用統一的完成邏輯
-    return _isGameCompleted(last);
+    // 估算是否已完成10格
+    int frame = 0;
+    int i = 0;
+    while (i < last.rolls.length && frame < 9) {
+      if (last.rolls[i] == 10) { frame++; i += 1; } else { frame++; i += 2; }
+    }
+    // i 目前在第10格的開始（或超過）
+    final rollsInTenth = last.rolls.length - i;
+    final isTenthComplete = rollsInTenth >= 2 || (rollsInTenth >= 1 && last.rolls[i] == 10);
+    final allNineDone = frame >= 9;
+    return allNineDone && isTenthComplete;
   }
 }
