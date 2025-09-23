@@ -75,6 +75,9 @@ class FavoritesController extends _$FavoritesController {
     state = AsyncValue.data(currentState.copyWith(
       isUpdating: true,
       favoriteBallIds: {...currentState.favoriteBallIds, ball.id},
+      favoriteBalls: currentState.favoriteBalls.any((b) => b.id == ball.id)
+          ? currentState.favoriteBalls
+          : [...currentState.favoriteBalls, ball],
     ));
 
     try {
@@ -103,8 +106,10 @@ class FavoritesController extends _$FavoritesController {
     if (currentState == null) return;
 
     // Show updating state but keep the list unchanged
+    final updatedBalls = currentState.favoriteBalls.where((b) => b.id != ballId).toList();
     state = AsyncValue.data(currentState.copyWith(
       isUpdating: true,
+      favoriteBalls: updatedBalls,
     ));
 
     try {
@@ -147,6 +152,8 @@ class FavoritesController extends _$FavoritesController {
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _loadFavoriteIdsFast());
+    // Also load full ball data for favorites page
+    await loadFavoriteBallsFull();
   }
 }
 
@@ -155,6 +162,23 @@ class FavoritesController extends _$FavoritesController {
 class BallFavoriteController extends _$BallFavoriteController {
   @override
   Future<BallFavoriteState> build(int ballId) async {
+    // Listen to the main favorites controller to stay in sync
+    ref.listen(favoritesControllerProvider, (previous, next) {
+      // When favorites list changes, check if this ball's status has changed
+      next.whenData((favoritesState) {
+        final currentState = state.value;
+        if (currentState != null) {
+          final isFavoriteInList = favoritesState.favoriteBallIds.contains(ballId);
+          if (currentState.isFavorite != isFavoriteInList) {
+            // Update state to match the main favorites list
+            state = AsyncValue.data(currentState.copyWith(
+              isFavorite: isFavoriteInList,
+            ));
+          }
+        }
+      });
+    });
+
     return await _checkFavoriteStatus(ballId);
   }
 
@@ -185,12 +209,12 @@ class BallFavoriteController extends _$BallFavoriteController {
       
       if (currentState.isFavorite) {
         await repository.removeFromFavorites(ball.id);
-        // When removing from favorites, don't auto-refresh the main list
-        // Let the user manually refresh or re-enter the page
+        // 同步更新主清單（樂觀）：立即移除
+        await ref.read(favoritesControllerProvider.notifier).removeFromFavorites(ball.id);
       } else {
         await repository.addToFavorites(ball.id);
-        // When adding to favorites, refresh the main list immediately
-        ref.invalidate(favoritesControllerProvider);
+        // 同步更新主清單（樂觀）：立即加入
+        await ref.read(favoritesControllerProvider.notifier).addToFavorites(ball);
       }
 
       // Update state after successful operation

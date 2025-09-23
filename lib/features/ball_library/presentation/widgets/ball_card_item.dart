@@ -21,6 +21,7 @@ class BallCardItem extends ConsumerStatefulWidget {
     this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
+    this.enableSlideActions = true,
     super.key,
   });
 
@@ -30,6 +31,7 @@ class BallCardItem extends ConsumerStatefulWidget {
   final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
+  final bool enableSlideActions;
 
   @override
   ConsumerState<BallCardItem> createState() => _BallCardItemState();
@@ -187,24 +189,24 @@ class _BallCardItemState extends ConsumerState<BallCardItem>
   /// 切換收藏狀態
   Future<void> _toggleFavorite(BuildContext context, WidgetRef ref) async {
     try {
-      await ref
-          .read(ballFavoriteControllerProvider(widget.ball.id).notifier)
-          .toggle(widget.ball);
+      final before = await ref.read(ballFavoriteControllerProvider(widget.ball.id).future);
+      final willAdd = !before.isFavorite;
+      final rootContext = Navigator.of(context, rootNavigator: true).context;
+      _closeSlide();
 
-      final favoriteState = ref.read(ballFavoriteControllerProvider(widget.ball.id));
-      if (favoriteState.hasValue) {
-        final isFavorite = favoriteState.value!.isFavorite;
-        TopNotification.showSuccess(
-          context,
-          isFavorite
-              ? 'Added "${widget.ball.name}" to favorites'
-              : 'Removed "${widget.ball.name}" from favorites',
-        );
-      }
-      _closeSlide(); // 關閉滑動面板
+      await ref.read(ballFavoriteControllerProvider(widget.ball.id).notifier).toggle(widget.ball);
+
+      // 使用 rootContext 以避免目前卡片已卸載導致找不到 Overlay
+      TopNotification.showSuccess(
+        rootContext,
+        willAdd
+            ? 'Added "${widget.ball.name}" to favorites'
+            : 'Removed "${widget.ball.name}" from favorites',
+      );
     } catch (e) {
+      final rootContext = Navigator.of(context, rootNavigator: true).context;
       TopNotification.showError(
-        context,
+        rootContext,
         'Failed to update favorite: $e',
       );
       _closeSlide(); // 即使失敗也關閉滑動面板
@@ -245,17 +247,21 @@ class _BallCardItemState extends ConsumerState<BallCardItem>
       );
 
       final bagCount = selectedBagNumbers.length;
-      TopNotification.showSuccess(
-        context,
-        'Successfully added "${widget.ball.name}" to $bagCount bag${bagCount != 1 ? 's' : ''}!',
-      );
+      if (context.mounted) {
+        TopNotification.showSuccess(
+          context,
+          'Successfully added "${widget.ball.name}" to $bagCount bag${bagCount != 1 ? 's' : ''}!',
+        );
+      }
       _closeSlide(); // 關閉滑動面板
-      
+
     } catch (e) {
-      TopNotification.showError(
-        context,
-        'Failed to add ball to arsenal: $e',
-      );
+      if (context.mounted) {
+        TopNotification.showError(
+          context,
+          'Failed to add ball to arsenal: $e',
+        );
+      }
       _closeSlide(); // 即使失敗也關閉滑動面板
     }
   }
@@ -276,38 +282,97 @@ class _BallCardItemState extends ConsumerState<BallCardItem>
             Positioned.fill(
               child: Row(
                 children: [
-                  Container(
-                    width: _actionButtonWidth,
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () => _toggleFavorite(context, ref),
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.favorite,
-                              color: Colors.white,
-                              size: 24,
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final favoriteAsync = ref.watch(ballFavoriteControllerProvider(widget.ball.id));
+
+                      return favoriteAsync.when(
+                        data: (favoriteState) {
+                          final isFavorite = favoriteState.isFavorite;
+                          return Container(
+                            width: _actionButtonWidth,
+                            decoration: BoxDecoration(
+                              color: isFavorite ? Colors.redAccent : widget.theme.colorScheme.primary,
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Favorite',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: favoriteState.isUpdating
+                                    ? null
+                                    : () => _toggleFavorite(context, ref),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      isFavorite ? 'Remove' : 'Favorite',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ],
+                          );
+                        },
+                        loading: () => Container(
+                          width: _actionButtonWidth,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 2,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                        error: (error, stack) => Container(
+                          width: _actionButtonWidth,
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () => _toggleFavorite(context, ref),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Favorite',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -358,10 +423,10 @@ class _BallCardItemState extends ConsumerState<BallCardItem>
           SlideTransition(
             position: _slideAnimation,
             child: GestureDetector(
-              onHorizontalDragStart: widget.isSelectionMode ? null : (details) {
+              onHorizontalDragStart: (widget.isSelectionMode || !widget.enableSlideActions) ? null : (details) {
                 _dragStartX = details.globalPosition.dx;
               },
-              onHorizontalDragUpdate: widget.isSelectionMode ? null : (details) {
+              onHorizontalDragUpdate: (widget.isSelectionMode || !widget.enableSlideActions) ? null : (details) {
                 final deltaX = details.globalPosition.dx - _dragStartX;
 
                 if (_isSlideOpen) {
@@ -381,7 +446,7 @@ class _BallCardItemState extends ConsumerState<BallCardItem>
                   }
                 }
               },
-              onTap: _isSlideOpen ? _closeSlide : widget.onTap,
+              onTap: (!widget.enableSlideActions || !_isSlideOpen) ? widget.onTap : _closeSlide,
               child: _buildCard(context, brandColor),
             ),
           ),

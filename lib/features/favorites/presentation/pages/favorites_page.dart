@@ -28,9 +28,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   @override
   void initState() {
     super.initState();
-    // Refresh favorites data when entering the page
+    // Load full favorites data when entering the page
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(favoritesControllerProvider.notifier).refresh();
+      ref.read(favoritesControllerProvider.notifier).loadFavoriteBallsFull();
     });
   }
 
@@ -198,6 +198,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
               theme: Theme.of(context),
               onTap: () => _showBallDetail(context, ball),
               onLongPress: () => _showRemoveConfirmation(context, ref, ball),
+              enableSlideActions: true, // 啟用滑動：可直接 Remove
             ),
           );
         },
@@ -238,15 +239,17 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
       ),
     );
 
-    final selectedBagNumbers = await showBagSelectionDialog(
-      context: context,
-      profile: profile,
-      title: 'Add All to Arsenal',
-      subtitle: '$favoriteCount selected',
-    );
+    if (context.mounted) {
+      final selectedBagNumbers = await showBagSelectionDialog(
+        context: context,
+        profile: profile,
+        title: 'Add All to Arsenal',
+        subtitle: '$favoriteCount selected',
+      );
 
-    if (selectedBagNumbers != null && selectedBagNumbers.isNotEmpty) {
-      await _addAllFavoritesToArsenal(context, ref, selectedBagNumbers);
+      if (selectedBagNumbers != null && selectedBagNumbers.isNotEmpty && context.mounted) {
+        await _addAllFavoritesToArsenal(context, ref, selectedBagNumbers);
+      }
     }
   }
 
@@ -294,24 +297,32 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
       }
       
       final favoriteCount = favoriteBalls.length;
-      TopNotification.showSuccess(
-        context,
-        'Successfully added $favoriteCount favorite ball${favoriteCount != 1 ? 's' : ''} to arsenal!',
-      );
-      
+      if (context.mounted) {
+        TopNotification.showSuccess(
+          context,
+          'Successfully added $favoriteCount favorite ball${favoriteCount != 1 ? 's' : ''} to arsenal!',
+        );
+      }
+
     } catch (e) {
-      TopNotification.showError(
-        context,
-        'Failed to add favorite balls to arsenal: $e',
-      );
+      if (context.mounted) {
+        TopNotification.showError(
+          context,
+          'Failed to add favorite balls to arsenal: $e',
+        );
+      }
     }
   }
 
   void _showBallDetail(BuildContext context, BowlingBall ball) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => BowlingBallDetailWidget(ball: ball),
-    );
+    // 使用 addPostFrameCallback 避免在列表 rebuild 與 dialog 打開時機衝突
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (context) => BowlingBallDetailWidget(ball: ball),
+      );
+    });
   }
 
   void _showRemoveConfirmation(BuildContext context, WidgetRef ref, BowlingBall ball) {
@@ -334,9 +345,20 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                ref.read(favoritesControllerProvider.notifier).removeFromFavorites(ball.id);
+                try {
+                  await ref.read(favoritesControllerProvider.notifier).removeFromFavorites(ball.id);
+                  // Force refresh the favorites list to show updated data
+                  await ref.read(favoritesControllerProvider.notifier).loadFavoriteBallsFull();
+                } catch (e) {
+                  if (context.mounted) {
+                    TopNotification.showError(
+                      context,
+                      'Failed to remove "${ball.name}" from favorites: $e',
+                    );
+                  }
+                }
               },
               child: const Text(
                 'Remove',

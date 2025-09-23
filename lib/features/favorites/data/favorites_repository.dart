@@ -89,25 +89,33 @@ class FavoritesRepository {
   /// Get user's favorite balls with full ball information
   Future<List<BowlingBall>> getFavoriteBalls() async {
     final userId = _supabase.auth.currentUser?.id;
-    
+
     if (userId == null) {
       return [];
     }
 
     try {
-      final response = await _supabase
+      // First get favorite ball IDs
+      final favoriteIdsResponse = await _supabase
           .from('favorite_balls')
-          .select('''
-            ball_id,
-            created_at,
-            ball_data!inner(*)
-          ''')
+          .select('ball_id')
           .eq('user_id', userId)
           .order('created_at', ascending: false);
 
-      return response.map<BowlingBall>((item) {
-        final ballData = item['ball_data'] as Map<String, dynamic>;
-        return BowlingBall.fromJson(ballData);
+      if (favoriteIdsResponse.isEmpty) {
+        return [];
+      }
+
+      final ballIds = favoriteIdsResponse.map<int>((item) => item['ball_id'] as int).toList();
+
+      // Then get full ball information using the IDs
+      final ballsResponse = await _supabase
+          .from('ball_data')
+          .select('*')
+          .inFilter('id', ballIds);
+
+      return ballsResponse.map<BowlingBall>((item) {
+        return BowlingBall.fromJson(item);
       }).toList();
     } catch (e) {
       throw Exception('Failed to fetch favorite balls: $e');

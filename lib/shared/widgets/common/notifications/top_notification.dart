@@ -43,7 +43,30 @@ class TopNotification {
     _currentEntry?.remove();
     _currentEntry = null;
 
-    final overlay = Overlay.of(context);
+    // 取得 root overlay，避免在子樹(如對話框、頁籤)找不到 Overlay 的情況
+    final overlay = Overlay.maybeOf(context, rootOverlay: true) ?? Navigator.of(context, rootNavigator: true).overlay;
+    if (overlay == null) {
+      // 若仍取得不到，延遲到下一幀再嘗試（常見於動畫/重建時機）
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final fallback = Overlay.maybeOf(context, rootOverlay: true) ?? Navigator.of(context, rootNavigator: true).overlay;
+        if (fallback == null) return;
+        late OverlayEntry entry2;
+        entry2 = OverlayEntry(
+          builder: (context) => _TopNotificationWidget(
+            message: message,
+            backgroundColor: backgroundColor,
+            onDismiss: () {
+              entry2.remove();
+              _currentEntry = null;
+            },
+          ),
+        );
+        _currentEntry = entry2;
+        fallback.insert(entry2);
+      });
+      return;
+    }
+
     late OverlayEntry entry;
 
     entry = OverlayEntry(
