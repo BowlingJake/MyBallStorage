@@ -342,12 +342,28 @@ class BowlingScoreCardWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final double frameWidth = box.maxWidth;
-        final double dynamicPinHeight = (frameWidth * 0.26).clamp(22.0, 30.0);
-        const double cumulativeHeight = 20.0;
+        final double frameHeight = box.maxHeight;
+        // 區塊高度策略更新：
+        // - 無球瓶視覺：上40% / 下60%
+        // - 有球瓶視覺：先保留原本球瓶高度約 1/3，其餘空間再以上40%/下60% 分配
+        final double separator = showSeparatorLine ? 1.0 : 0.0;
+        double dynamicPinHeight = 0.0;
+        double topHeight;
+        double cumulativeHeight;
+        if (showPinVisualization) {
+          final double third = (frameHeight - separator) / 3.0;
+          dynamicPinHeight = third;
+          final double remain = frameHeight - separator - dynamicPinHeight;
+          topHeight = remain * 0.4;
+          cumulativeHeight = remain * 0.6;
+        } else {
+          topHeight = (frameHeight - separator) * 0.4;
+          cumulativeHeight = (frameHeight - separator) * 0.6;
+        }
 
         return Column(
           children: [
-            Expanded(child: scoreArea),
+            SizedBox(height: topHeight, child: scoreArea),
             if (showSeparatorLine)
               Container(height: 1, margin: const EdgeInsets.symmetric(horizontal: 4), color: accentColor),
             SizedBox(
