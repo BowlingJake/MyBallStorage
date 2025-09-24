@@ -107,11 +107,11 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
         // 成就卡片
         Row(
           children: [
-            _buildAchievementCard(theme, achievements, 'singleGame', 'High Game', Icons.emoji_events),
+            _buildAchievementCard(theme, achievements, 'singleGame', 'High Game'),
             const SizedBox(width: 12),
-            _buildAchievementCard(theme, achievements, 'threeGame', 'High Set', Icons.emoji_events),
+            _buildAchievementCard(theme, achievements, 'threeGame', 'High Set'),
             const SizedBox(width: 12),
-            _buildAchievementCard(theme, achievements, 'sixGame', 'High Series', Icons.emoji_events),
+            _buildAchievementCard(theme, achievements, 'sixGame', 'High Series'),
           ],
         ),
       ],
@@ -200,7 +200,7 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
   }
 
 
-  Widget _buildAchievementCard(ThemeData theme, Map<String, Map<String, dynamic>> achievements, String recordType, String label, IconData trophyIcon) {
+  Widget _buildAchievementCard(ThemeData theme, Map<String, Map<String, dynamic>> achievements, String recordType, String label) {
     final recordData = achievements[recordType] ?? {'score': 0, 'date': null};
     final score = recordData['score']?.toString() ?? '0';
     final date = recordData['date'] as DateTime?;
@@ -229,27 +229,16 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 頂部：左上角獎盃圖示
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  trophyIcon,
-                  color: const Color(0xFFFFD700), // 金色獎盃
-                  size: 20,
+            // 頂部：標籤文字
+            Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[400],
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 12),
             // 中部：大字體數值
@@ -297,8 +286,12 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
       return _buildEmptyState(context, theme);
     }
 
-    // 提取最近的訓練記錄
-    final recentTrainings = trainingState.trainingDays.take(4).toList();
+    // 過濾最近7天的訓練記錄
+    final now = DateTime.now();
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
+    final recentTrainings = trainingState.trainingDays
+        .where((training) => training.date.isAfter(sevenDaysAgo) || training.date.isAtSameMomentAs(sevenDaysAgo))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,8 +335,40 @@ class _MyTrainingPageState extends ConsumerState<MyTrainingPage> {
           ],
         ),
         const SizedBox(height: 16),
-        _buildRecentTrainingCarousel(context, theme, recentTrainings),
+        recentTrainings.isEmpty
+            ? _buildNoRecentRecordMessage(context, theme)
+            : _buildRecentTrainingCarousel(context, theme, recentTrainings),
       ],
+    );
+  }
+
+  Widget _buildNoRecentRecordMessage(BuildContext context, ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      height: 280, // Same height as the carousel
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFF1E1E1E), // Same background as achievement cards
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          'No Recent Record Available',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[400],
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 

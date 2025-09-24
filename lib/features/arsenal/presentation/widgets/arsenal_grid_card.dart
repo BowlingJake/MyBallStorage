@@ -42,23 +42,34 @@ class ArsenalGridCard extends ConsumerWidget {
     
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.black.withOpacity(0.8),
-        border: Border.all(
-          color: isSelected 
-              ? theme.primaryColor.withOpacity(0.8)
-              : primaryColor.withOpacity(0.6), // 使用主要色
-          width: isSelected ? 3.0 : 1.5,
-        ),
+        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFF1E1E1E), // 比主背景稍亮的背景色
+        // 移除所有邊框
         boxShadow: isSelected
             ? [
+                // 選中時的陰影效果
                 BoxShadow(
-                  color: theme.primaryColor.withOpacity(0.5),
-                  blurRadius: 8,
-                  spreadRadius: 1,
+                  color: theme.primaryColor.withOpacity(0.3),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
                 ),
               ]
-            : null,
+            : [
+                // 正常狀態的細微陰影
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                  spreadRadius: 0,
+                ),
+              ],
       ),
       child: Stack(
         children: [
@@ -75,82 +86,88 @@ class ArsenalGridCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // 球的圖片 (圓形) - 放大
+                    // 球的圖片 (圓形) - 縮小
                     Container(
-                      width: 110,
-                      height: 110,
+                      width: 80, // 縮小球的照片
+                      height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey.withOpacity(0.3),
+                        color: Colors.grey.withOpacity(0.1),
                       ),
                       child: ClipOval(
-                        child: _buildBallImage(100),
+                        child: _buildBallImage(80),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    // 球名（可能超出時自動縮小）
+                    const SizedBox(height: 12),
+
+                    // 球名 - 最重要，最亮白色，Semibold
                     SizedBox(
                       width: double.infinity,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.center,
-                        child: Text(
-                          instance.displayName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          softWrap: false,
+                      child: Text(
+                        instance.displayName,
+                        style: const TextStyle(
+                          fontSize: 16, // 主要標題大小
+                          fontWeight: FontWeight.w600, // Semibold
+                          color: Color(0xFFFFFFFF), // 最亮的白色
+                          height: 1.2,
                         ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1, // 限制為單行
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    // 品牌
+                    const SizedBox(height: 8),
+
+                    // 品牌名稱 - 放在球名下方
                     SizedBox(
                       width: double.infinity,
                       child: Text(
                         instance.brandName,
                         style: TextStyle(
                           fontSize: 14,
-                          color: brandColor,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
+                          color: brandColor, // 保持品牌色彩
+                          height: 1.2,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    // Core & Cover
+                    const SizedBox(height: 8),
+
+                    // 球屬性 - 次要描述，淺灰色，小一點
                     SizedBox(
                       width: double.infinity,
                       child: Text(
                         _buildCoreAndCoverText(),
                         style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
+                          fontSize: 12, // 比球名小4pt
+                          fontWeight: FontWeight.w400, // Normal weight
+                          color: Color(0xFF9CA3AF), // 淺灰色，降低視覺優先級
+                          height: 1.3,
                         ),
                         textAlign: TextAlign.center,
-                        maxLines: 2,
+                        maxLines: 1, // 限制為單行
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    // Layout
+                    const SizedBox(height: 6),
+
+                    // Layout - 最小優先級，未設定時顯示紅色
                     SizedBox(
                       width: double.infinity,
                       child: Text(
                         instance.layoutDisplayString,
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[300],
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
+                          color: instance.layoutDisplayString == 'Layout Not Set'
+                              ? const Color(0xFFEF4444) // 紅色提醒
+                              : const Color(0xFFFFFFFF), // 已設定時用亮白色
                         ),
                         textAlign: TextAlign.center,
-                        maxLines: 2,
+                        maxLines: 1, // 限制為單行
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

@@ -24,8 +24,8 @@ class ArsenalGridView extends ConsumerWidget {
           crossAxisCount: 2,
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
-          // 縮短卡片高度，移除底部多餘空白（保留上方可擴充空間）
-          childAspectRatio: 1.06,
+          // 加大卡片高度以避免內容溢出
+          childAspectRatio: 0.85, // 降低比例以增加高度
         ),
         itemCount: instances.length,
         itemBuilder: (context, index) {
