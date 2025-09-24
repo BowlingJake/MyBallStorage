@@ -100,6 +100,8 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
         // Clear cache if state has changed (filters, sorting, etc.)
         if (_previousState != null && _shouldClearCache(state, _previousState!)) {
           _itemCache.clear();
+          // Auto scroll to top after filter/sort operations
+          _scrollToTop();
         }
         _previousState = state;
         
@@ -148,6 +150,17 @@ class _VirtualizedBallListState extends ConsumerState<VirtualizedBallList> {
     return current.searchText != previous.searchText ||
            current.filters != previous.filters ||
            current.sortCriterion != previous.sortCriterion;
+  }
+
+  /// Scroll to top smoothly after filter/sort operations
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+    }
   }
 
   Widget _buildOptimizedItem(BuildContext context, int index, BallLibraryState state) {

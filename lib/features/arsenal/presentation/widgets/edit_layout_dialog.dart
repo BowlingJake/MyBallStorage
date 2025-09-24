@@ -53,7 +53,7 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
   }
 
   String get _firstFieldLabel {
-    return _selectedLayoutType == 'VLS' ? 'Pin to PAP' : 'Duel Angle';
+    return _selectedLayoutType == 'VLS' ? 'Pin to PAP' : 'Drilling';
   }
 
   String get _secondFieldLabel {
@@ -61,7 +61,7 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
   }
 
   String get _thirdFieldLabel {
-    return _selectedLayoutType == 'VLS' ? 'PAP to COG' : 'VAL Angle';
+    return _selectedLayoutType == 'VLS' ? 'PAP to COG' : 'VAL';
   }
 
   String get _firstFieldHint {
@@ -308,7 +308,7 @@ class _EditLayoutDialogState extends ConsumerState<EditLayoutDialog> {
               focusedBorder: InputBorder.none,
               filled: true,
               fillColor: Colors.transparent,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12),
               hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.grey[500],
