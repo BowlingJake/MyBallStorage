@@ -38,19 +38,10 @@ class ArsenalAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: actionsOverride ?? [
-        IconButton(
-          onPressed: onToggleSearch,
-          icon: Icon(
-            isSearching ? Icons.search_off : Icons.search,
-            color: isSearching ? Colors.blue : Colors.white,
-            size: 24,
-          ),
-          tooltip: isSearching ? 'Close Search' : 'Search',
-        ),
         if (onAdd != null)
           IconButton(
             onPressed: onAdd,
-            icon: const Icon(Icons.library_add_outlined, color: Colors.white),
+            icon: const Icon(Icons.add, color: Colors.white),
             tooltip: 'Add',
           ),
         if (moreAction != null) moreAction!,

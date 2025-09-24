@@ -4,7 +4,7 @@ import 'package:core_theme/core_theme.dart';
 
 /// 對話框預設樣式常數，統一按鈕尺寸與間距
 class DialogDefaults {
-  static const double buttonHeight = 52;
+  static const double buttonHeight = 40;
   static const double buttonFontSize = 14;
   static const double spacing = 16;
 }
@@ -302,11 +302,11 @@ class AppBaseDialog extends StatelessWidget {
     Color? color,
   }) {
     return SizedBox(
-      height: 44,
+      height: 40,
       child: AppStandardButton(
         text: text,
         onPressed: onPressed,
-        height: 44,
+        height: 40,
         fontSize: 14,
         // 如果不是主要按鈕且沒有指定顏色，則使用透明背景和白色前景
         backgroundColor: isPrimary ? (color ?? BrandColors.accentColorDark) : Colors.transparent,

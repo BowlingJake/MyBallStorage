@@ -72,9 +72,9 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.95,
-        height: MediaQuery.of(context).size.height * 0.85,
-        constraints: const BoxConstraints(maxWidth: 600, maxHeight: 700),
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.8,
+        constraints: const BoxConstraints(maxWidth: 420, maxHeight: 640),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.9),
           borderRadius: BorderRadius.circular(16),
@@ -88,9 +88,9 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
             // Search and Filter
             _buildSearchAndFilter(),
             
-            // Ball List
+            // Ball List - 使用 ListView（與 Library 一致的列表緊湊呈現）
             Expanded(
-              child: _buildArsenalContent(),
+              child: _buildArsenalList(),
             ),
             
             // Footer Actions
@@ -105,7 +105,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
     final defaultTitle = 'Select from My Arsenal';
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: Colors.grey[600]!, width: 1),
@@ -118,7 +118,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
               widget.title ?? defaultTitle,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -154,7 +154,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
 
   Widget _buildSearchAndFilter() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Row(
         children: [
           Expanded(
@@ -208,16 +208,47 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
     );
   }
 
+  Widget _buildArsenalList() {
+    final arsenalState = ref.watch(newArsenalControllerProvider);
+    var instances = arsenalState.allInstances;
+    if (widget.excludeBagNumbers != null) {
+      instances = instances.where((instance) {
+        return !widget.excludeBagNumbers!.any((bagNum) => instance.activeBagNumbers.contains(bagNum));
+      }).toList();
+    }
+    final filteredInstances = _filterArsenalInstances(instances);
+    if (filteredInstances.isEmpty) {
+      return _buildEmptyState();
+    }
+    final balls = filteredInstances.map((i) => _BallItem.fromArsenal(i)).toList();
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: balls.length,
+        itemBuilder: (context, index) {
+          final ballItem = balls[index];
+          final isSelected = _selectedIds.contains(ballItem.id);
+          return _CompactBallRow(
+            ball: ballItem,
+            isSelected: isSelected,
+            onTap: () => _toggleSelection(ballItem.id),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildBallGrid({required List<_BallItem> balls}) {
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          childAspectRatio: 0.82,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
         itemCount: balls.length,
         itemBuilder: (context, index) {
@@ -269,14 +300,14 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
                   flex: 3,
                   child: Center(
                     child: Container(
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey.withOpacity(0.3),
                       ),
                       child: ClipOval(
-                        child: _buildBallImage(ballItem.imageUrl, 100),
+                        child: _buildBallImage(ballItem.imageUrl, 80),
                       ),
                     ),
                   ),
@@ -286,7 +317,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
                 Expanded(
                   flex: 2,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                    padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -294,7 +325,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
                         Text(
                           ballItem.name,
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
@@ -309,7 +340,7 @@ class _ArsenalBallSelectionDialogState extends ConsumerState<ArsenalBallSelectio
                           child: Text(
                             ballItem.brandName,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               color: brandColor,
                               fontWeight: FontWeight.w500,
                             ),
@@ -518,4 +549,114 @@ Future<List<int>?> showArsenalBallSelectionDialog({
       excludeBagNumbers: excludeBagNumbers,
     ),
   );
+}
+
+/// 緊湊列表列元件（與 Library 對齊）
+class _CompactBallRow extends StatelessWidget {
+  final _BallItem ball;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CompactBallRow({
+    required this.ball,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? BrandColors.accentColorDark : Colors.grey[700]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            ClipOval(
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
+                    ? CachedNetworkImage(
+                        imageUrl: ball.imageUrl,
+                        fit: BoxFit.cover,
+                        memCacheWidth: 160,
+                        memCacheHeight: 160,
+                        placeholder: (_, __) => const Center(
+                          child: SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (_, __, ___) => const Icon(
+                          Icons.sports_baseball,
+                          color: Colors.white54,
+                          size: 24,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.sports_baseball,
+                        color: Colors.white54,
+                        size: 24,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ball.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    ball.brandName,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (ball.additionalInfo != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      ball.additionalInfo!,
+                      style: const TextStyle(color: Colors.white54, fontSize: 11),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isSelected ? BrandColors.accentColorDark : Colors.white38,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -137,11 +137,7 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
             ),
           ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: ArsenalBottomActions(
-          onToggleMoveMode: () => ref.read(arsenalUIServiceProvider.notifier).toggleMoveMode(),
-          onToggleRemoveMode: () => ref.read(arsenalUIServiceProvider.notifier).toggleRemoveMode(),
-        ),
+        // 移除 FAB（功能已由頂部 + 與滑動/選單取代）
         bottomNavigationBar: ModernBottomNavigation(
           currentIndex: _calculateCurrentIndex(location),
           onTap: (index) => _navigateToIndex(context, index),
@@ -156,19 +152,8 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
     
     return ArsenalAppBar(
       title: const Text('My Arsenal'),
-      searchField: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          ref.read(newArsenalControllerProvider.notifier).updateSearchText(value);
-        },
-        decoration: const InputDecoration(
-          hintText: 'Search balls...',
-          border: InputBorder.none,
-          hintStyle: TextStyle(color: Colors.white70),
-        ),
-        style: const TextStyle(color: Colors.white),
-      ),
-      isSearching: _isSearching,
+      searchField: const SizedBox.shrink(),
+      isSearching: false,
       onBack: () {
         final router = GoRouter.of(context);
         if (router.canPop()) {
@@ -177,16 +162,20 @@ class _MyArsenalPageState extends ConsumerState<MyArsenalPage> with TickerProvid
           context.go('/');
         }
       },
-      onToggleSearch: () {
-        setState(() {
-          _isSearching = !_isSearching;
-          if (!_isSearching) {
-            _searchController.clear();
-            ref.read(newArsenalControllerProvider.notifier).updateSearchText('');
-          }
-        });
-      },
-      actionsOverride: selectionMode ? [] : null,
+      onToggleSearch: () {},
+      actionsOverride: selectionMode
+          ? []
+          : [
+              IconButton(
+                onPressed: () => ref.read(arsenalUIServiceProvider.notifier).showAddToCurrentBag(
+                      context: context,
+                      widgetRef: ref,
+                    ),
+                icon: const Icon(Icons.add, color: Colors.white),
+                tooltip: 'Add',
+              ),
+              const SizedBox(width: 8),
+            ],
       moreAction: selectionMode
           ? null
           : IconButton(

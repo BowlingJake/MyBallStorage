@@ -12,6 +12,8 @@ import 'package:core_theme/core_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
 
 /// Grid 專用的 Arsenal 球卡組件
 class ArsenalGridCard extends ConsumerWidget {
@@ -201,8 +203,62 @@ class ArsenalGridCard extends ConsumerWidget {
               ),
             ),
           ],
+          // 右上角更多選單按鈕（放在最上層避免觸發底層 onTap）
+          Positioned(
+            top: 6,
+            right: 6,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showOverflowMenu(context, ref),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(
+                    Icons.more_horiz,
+                    color: Colors.white70,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _showOverflowMenu(BuildContext context, WidgetRef ref) {
+    AppBaseDialog.show<void>(
+      context: context,
+      title: instance.displayName,
+      barrierDismissible: true,
+      content: const SizedBox.shrink(),
+      actions: [
+        AppStandardButton.primaryOutlined(
+          text: 'Remove',
+          height: 40,
+          onPressed: () async {
+            Navigator.of(context).pop();
+            // 選取後開啟移除流程
+            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id);
+            await ArsenalActions.confirmRemoveSelected(context: context, ref: ref);
+            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForRemoval(instance.id);
+          },
+        ),
+        AppStandardButton(
+          text: 'Move',
+          height: 40,
+          onPressed: () async {
+            Navigator.of(context).pop();
+            // 選取後開啟移動流程
+            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
+            final bagColors = BagColorService.getAllBagColors();
+            await ArsenalActions.showMoveSelected(context: context, ref: ref, bagColors: bagColors);
+            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
+          },
+        ),
+      ],
     );
   }
 

@@ -7,6 +7,8 @@ import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.d
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/shared/models/bowling_ball.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bowlingarsenal_app/utils/color_utils.dart';
 
 /// Library Selection Dialog for adding balls to Arsenal
 /// 
@@ -446,6 +448,7 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                   Expanded(
                     child: AppStandardButton.primaryOutlined(
                       text: _selectedBallIds.isEmpty ? 'Cancel' : 'Reset',
+                      height: 40,
                       fontSize: 14,
                       onPressed: () {
                         if (_selectedBallIds.isEmpty) {
@@ -460,6 +463,7 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
                   Expanded(
                     child: AppStandardButton(
                       text: 'Add',
+                      height: 40,
                       fontSize: 14,
                       enabled: _selectedBallIds.isNotEmpty,
                       onPressed: _addSelectedBalls,
@@ -519,12 +523,10 @@ class _LibrarySelectionDialogState extends ConsumerState<LibrarySelectionDialog>
           final ball = state.filteredBalls[index];
           final isSelected = _selectedBallIds.contains(ball.id);
           
-          return BallCardItem(
+          return _CompactBallRow(
             ball: ball,
-            theme: Theme.of(context),
-            onTap: () => _toggleBallSelection(ball.id),
-            isSelectionMode: true,
             isSelected: isSelected,
+            onTap: () => _toggleBallSelection(ball.id),
           );
         },
       ),
@@ -541,4 +543,141 @@ Future<List<int>?> showLibrarySelectionDialog(BuildContext context) {
       return const LibrarySelectionDialog();
     },
   );
+}
+
+/// 更緊湊的清單列，避免圖片過大溢出，並強制文字截斷
+class _CompactBallRow extends StatelessWidget {
+  final BowlingBall ball;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CompactBallRow({
+    required this.ball,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final brandPalette = getBrandTonalPalette(ball.brand, theme);
+    final brandColor = brandPalette[400]!;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? BrandColors.accentColorDark : Colors.grey[700]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            // 圖片：固定為 56x56，避免溢出
+            ClipOval(
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: ball.imageUrl.isNotEmpty && ball.imageUrl != 'https://via.placeholder.com/150'
+                    ? CachedNetworkImage(
+                        imageUrl: ball.imageUrl,
+                        fit: BoxFit.cover,
+                        memCacheWidth: 160,
+                        memCacheHeight: 160,
+                        placeholder: (_, __) => const Center(
+                          child: SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (_, __, ___) => const Icon(
+                          Icons.sports_baseball,
+                          color: Colors.white54,
+                          size: 24,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.sports_baseball,
+                        color: Colors.white54,
+                        size: 24,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // 文字區塊：使用 Expanded + 單行截斷
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ball.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${ball.coreType ?? 'Unknown Core'} | ${ball.coverstockType ?? ball.coverstock ?? 'Unknown Cover'}',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: brandColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: brandColor.withOpacity(0.4), width: 0.5),
+                        ),
+                        child: Text(
+                          ball.brand,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: brandColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (ball.region != null && ball.region!.isNotEmpty)
+                        Text(
+                          ball.region!,
+                          style: const TextStyle(color: Colors.grey, fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // 勾選指示
+            Icon(
+              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isSelected ? BrandColors.accentColorDark : Colors.white38,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

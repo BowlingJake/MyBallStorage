@@ -13,6 +13,7 @@ class ManagementSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final arsenalState = ref.watch(newArsenalControllerProvider);
     final bool selectionMode = arsenalState.isMoveMode || arsenalState.isRemoveMode;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(

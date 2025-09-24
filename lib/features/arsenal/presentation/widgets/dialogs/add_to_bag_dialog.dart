@@ -47,8 +47,8 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
       backgroundColor: Colors.transparent,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 500),
-        padding: const EdgeInsets.all(32),
+        constraints: const BoxConstraints(maxWidth: 380),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
@@ -61,17 +61,27 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-            // Title
-            Text(
-              widget.isMainBag ? 'Add to Arsenal' : 'Add to ${widget.currentBagName}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-              ),
-              textAlign: TextAlign.center,
+            // Header: Title + Close in一列，縮小上方空白
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.isMainBag ? 'Add to Arsenal' : 'Add to ${widget.currentBagName}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white70),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             // Message
             Text(
               widget.isMainBag
@@ -83,7 +93,7 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             // 水平並列的選擇按鈕
             if (widget.isMainBag) 
               // 主球袋只有一個選項
@@ -91,9 +101,8 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
                 width: double.infinity,
                 child: GestureDetector(
                   onTap: () {
-                    setState(() {
-                      selectedOption = 'library';
-                    });
+                    // 主球袋：直接回傳 library 並關閉
+                    Navigator.of(context).pop('library');
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -124,9 +133,8 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        setState(() {
-                          selectedOption = 'library';
-                        });
+                        // 子袋：立即選擇 From Library
+                        Navigator.of(context).pop('library');
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -154,9 +162,8 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        setState(() {
-                          selectedOption = 'main_bag';
-                        });
+                        // 子袋：立即選擇 From My Arsenal (主袋)
+                        Navigator.of(context).pop('main_bag');
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -182,35 +189,7 @@ class _AddToBagDialogState extends State<_AddToBagDialog> {
                   ),
                 ],
               ),
-            const SizedBox(height: 24),
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: AppStandardButton.primaryOutlined(
-                    text: 'Cancel',
-                    height: 40,
-                    fontSize: DialogDefaults.buttonFontSize,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppStandardButton(
-                    text: 'Confirm',
-                    height: 40,
-                    fontSize: DialogDefaults.buttonFontSize,
-                    onPressed: selectedOption != null
-                        ? () {
-                            if (selectedOption != null) {
-                              Navigator.of(context).pop(selectedOption);
-                            }
-                          }
-                        : () {},
-                  ),
-                ),
-              ],
-            ),
+            // 子袋點選即回傳，不需底部按鈕；主袋亦已改為點即回傳
             ],
           ),
         ),

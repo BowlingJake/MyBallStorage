@@ -31,7 +31,7 @@ class ArsenalManagementSection extends ConsumerWidget {
       }
       
       return ManagementSection(
-        getSelectedBagText: (state) => _getSelectedBagDisplayText(ref, state),
+        getSelectedBagText: (state) => '', // Remove redundant viewing text
         onMore: onShowMoreOptions,
       );
     });

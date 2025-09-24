@@ -135,3 +135,11 @@ class AppStandardButton extends StatelessWidget {
 ```
 
 這樣可以讓開發者更直觀地選擇按鈕類型，同時確保設計一致性。
+
+## 尺寸規範
+
+- 標準高度（AppStandardButton.height）: 40px
+- 標準字體大小: 14px
+- 對話框預設按鈕高度: 40px（除非有特殊需求）
+
+說明：專案中所有未特別指定的按鈕，預設高度皆為 40px，以統一觸控可用性與視覺一致性。

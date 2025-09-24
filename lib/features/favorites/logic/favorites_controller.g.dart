@@ -28,7 +28,7 @@ final favoritesRepositoryProvider =
 // ignore: unused_element
 typedef FavoritesRepositoryRef = AutoDisposeProviderRef<FavoritesRepository>;
 String _$favoritesControllerHash() =>
-    r'f5150dc19b0fc0172f5d6aca6a4939a661e42582';
+    r'1ce363fc8eee48c89a2274c846c465c74d54aac3';
 
 /// AsyncNotifier for managing favorites state
 ///
@@ -47,7 +47,7 @@ final favoritesControllerProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$FavoritesController = AutoDisposeAsyncNotifier<FavoritesState>;
 String _$ballFavoriteControllerHash() =>
-    r'50ab51b0f2e121623cc10b525c0513c679e2cf17';
+    r'3945c1e9fbfbf946238a28c1292e1a7f6bd3fec1';
 
 /// Copied from Dart SDK
 class _SystemHash {

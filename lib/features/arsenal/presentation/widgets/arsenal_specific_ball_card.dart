@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 
 /// Arsenal 專用的球卡組件，基於 UnifiedBallCard 但針對 My Arsenal 需求定制
 class ArsenalSpecificBallCard extends ConsumerStatefulWidget {
@@ -180,8 +181,8 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
                           children: [
                             Transform.rotate(
                               angle: 1.5708, // 90度 (π/2 弧度)
-                              child: const Icon(
-                                Iconsax.convert,
+                              child: Icon(
+                                isInMainBag ? Icons.add : Iconsax.convert,
                                 color: Colors.white,
                                 size: 24,
                               ),
@@ -254,6 +255,7 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
           SlideTransition(
             position: _slideAnimation,
             child: GestureDetector(
+              // 主袋：保留左滑 Remove，移除右滑 Add
               onHorizontalDragStart: widget.isSelectionMode ? null : (details) {
                 _dragStartX = details.globalPosition.dx;
               },
@@ -269,8 +271,10 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
                 } else if (!_justClosed) {
                   // 未開啟且沒有剛關閉時，才允許開啟
                   if (deltaX > 30) {
-                    // 右滑 - 顯示 Move/Add to bag
-                    _openSlideRight();
+                    // 右滑 - 主袋禁用、子袋仍可 Move/Add；這裡關掉主袋右滑
+                    if (!isInMainBag) {
+                      _openSlideRight();
+                    }
                   } else if (deltaX < -30) {
                     // 左滑 - 顯示 Remove
                     _openSlideLeft();
@@ -330,14 +334,8 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
       // 在主球袋：添加到其他球袋
       ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(widget.arsenalBallInstance.id);
 
-      // 獲取用戶配置文件以獲取袋子顏色（使用預設顏色列表）
-      final bagColors = <Color>[
-        Color(0xFF00BCD4), // 預設顏色，可以根據需要調整
-        Color(0xFF4CAF50),
-        Color(0xFFFF9800),
-        Color(0xFFE91E63),
-        Color(0xFF9C27B0),
-      ];
+      // 使用統一的袋子顏色來源
+      final bagColors = BagColorService.getAllBagColors();
 
       await ArsenalActions.showMoveSelected(
         context: context,
@@ -351,14 +349,8 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
       // 在子球袋：移動到其他球袋
       ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(widget.arsenalBallInstance.id);
 
-      // 獲取用戶配置文件以獲取袋子顏色（使用預設顏色列表）
-      final bagColors = <Color>[
-        Color(0xFF00BCD4), // 預設顏色，可以根據需要調整
-        Color(0xFF4CAF50),
-        Color(0xFFFF9800),
-        Color(0xFFE91E63),
-        Color(0xFF9C27B0),
-      ];
+      // 使用統一的袋子顏色來源
+      final bagColors = BagColorService.getAllBagColors();
 
       await ArsenalActions.showMoveSelected(
         context: context,

@@ -43,26 +43,26 @@ Future<bool?> showAppConfirmationDialog({
       if (isDangerous)
         AppStandardButton.destructiveOutlined(
           text: cancelText,
-          height: 44,
+          height: 40,
           onPressed: () => Navigator.of(context).pop(false),
         )
       else
         AppStandardButton.primaryOutlined(
           text: cancelText,
-          height: 44,
+          height: 40,
           onPressed: () => Navigator.of(context).pop(false),
         ),
       // 右：紅色實心（danger）或主色實心（非 danger）
       if (isDangerous)
         AppStandardButton.destructive(
           text: confirmText,
-          height: 44,
+          height: 40,
           onPressed: () => Navigator.of(context).pop(true),
         )
       else
         AppStandardButton(
           text: confirmText,
-          height: 44,
+          height: 40,
           onPressed: () => Navigator.of(context).pop(true),
         ),
     ],

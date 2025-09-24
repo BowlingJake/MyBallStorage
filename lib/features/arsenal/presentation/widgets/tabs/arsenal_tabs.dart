@@ -3,7 +3,7 @@ import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.d
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/tags/oval_tag.dart';
 
-class ArsenalTabs extends StatelessWidget {
+class ArsenalTabs extends StatefulWidget {
   const ArsenalTabs({
     super.key,
     required this.controller,
@@ -21,20 +21,42 @@ class ArsenalTabs extends StatelessWidget {
   final bool selectionMode;
   final VoidCallback? onBlockedSwitch;
 
+  @override
+  State<ArsenalTabs> createState() => _ArsenalTabsState();
+}
+
+class _ArsenalTabsState extends State<ArsenalTabs> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (userProfileState.profile == null) {
+    if (widget.userProfileState.profile == null) {
       return const SizedBox.shrink();
     }
 
-    final unlockedBags = userProfileState.profile!.unlockedBags;
-    final nextBagToUnlock = userProfileState.profile!.nextBagToUnlock;
+    final unlockedBags = widget.userProfileState.profile!.unlockedBags;
+    final nextBagToUnlock = widget.userProfileState.profile!.nextBagToUnlock;
 
     return Container(
       padding: const EdgeInsets.only(left: 8, right: 16, top: 0, bottom: 8),
       child: TabBar(
-        controller: controller,
+        controller: widget.controller,
         isScrollable: true,
         indicatorColor: Colors.transparent,
         labelColor: Colors.white,
@@ -44,22 +66,15 @@ class ArsenalTabs extends StatelessWidget {
         dividerColor: Colors.transparent,
         tabAlignment: TabAlignment.start,
         tabs: [
-          Tab(
-            child: OvalTag(
-              text: 'All My Arsenal',
-              color: bagColors[0],
-            ),
-          ),
-          ...unlockedBags.skip(1).map((bagInfo) {
-            final bagIndex = bagInfo.number - 1;
-            final bagColor = bagIndex < bagColors.length ? bagColors[bagIndex] : Colors.grey;
-            return Tab(
+          for (int i = 0; i < unlockedBags.length; i++)
+            Tab(
               child: OvalTag(
-                text: bagInfo.name,
-                color: bagColor,
+                text: i == 0 ? 'All My Arsenal' : unlockedBags[i].name,
+                color: widget.controller.index == i
+                    ? const Color(0xFFFFD700) // Brand yellow for selected
+                    : Colors.grey[600]!, // Dark gray for unselected
               ),
-            );
-          }).toList(),
+            ),
           if (nextBagToUnlock != null)
             Tab(
               child: Row(
@@ -80,15 +95,15 @@ class ArsenalTabs extends StatelessWidget {
             ),
         ],
         onTap: (index) {
-          if (selectionMode) {
-            onBlockedSwitch?.call();
+          if (widget.selectionMode) {
+            widget.onBlockedSwitch?.call();
             // 阻止切換
-            controller.index = controller.previousIndex;
+            widget.controller.index = widget.controller.previousIndex;
             return;
           }
           final unlockButtonIndex = nextBagToUnlock != null ? 1 + (unlockedBags.length - 1) : -1;
           if (nextBagToUnlock != null && index == unlockButtonIndex) {
-            onUnlockTap(nextBagToUnlock - 1);
+            widget.onUnlockTap(nextBagToUnlock - 1);
           }
         },
       ),
