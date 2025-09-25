@@ -52,7 +52,7 @@ class ArsenalDialogHandler {
     required WidgetRef ref,
   }) async {
     final removeBallsUseCase = ref.read(removeBallsUseCaseProvider.notifier);
-    await removeBallsUseCase.execute(context: context);
+    await removeBallsUseCase.execute(context: context, widgetRef: ref);
   }
 
   static Future<bool> showUnlockBagDialog({

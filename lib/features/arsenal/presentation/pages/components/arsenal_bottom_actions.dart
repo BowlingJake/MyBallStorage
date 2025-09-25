@@ -55,10 +55,9 @@ class ArsenalBottomActions extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              // 中間按鈕：次要色實心填滿
-              child: AppStandardButton.creative(
+              // 中間按鈕：主色填滿，無 icon
+              child: AppStandardButton(
                 text: 'Move',
-                icon: Icons.swap_horiz,
                 height: 36,
                 fontSize: 12,
                 enabled: !isMainBag && hasData,
@@ -67,10 +66,9 @@ class ArsenalBottomActions extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              // 右邊按鈕：紅色實心填滿
+              // 右邊按鈕：紅色實心填滿，無 icon
               child: AppStandardButton.destructive(
                 text: 'Remove',
-                icon: Icons.remove_circle_outline,
                 height: 36,
                 fontSize: 12,
                 enabled: hasData,

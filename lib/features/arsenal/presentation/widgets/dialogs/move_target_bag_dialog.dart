@@ -13,10 +13,14 @@ Future<int?> showMoveTargetBagDialog({
   required int selectedCount,
   List<int> alreadyInBags = const [],
   UserProfile? userProfile,
+  String? titleText,
+  String confirmText = 'Move',
 }) async {
   return ArsenalDialog.show<int>(
     context: context,
-    title: 'Move ' + selectedCount.toString() + ' Ball' + (selectedCount != 1 ? 's' : ''),
+    title: (titleText != null && titleText.isNotEmpty)
+        ? titleText
+        : 'Move ' + selectedCount.toString() + ' Ball' + (selectedCount != 1 ? 's' : ''),
     content: _MoveTargetBagContent(
       subBags: subBags,
       bagColors: bagColors,
@@ -32,12 +36,11 @@ Future<int?> showMoveTargetBagDialog({
         height: 40,
         onPressed: () => Navigator.of(context).pop(),
       ),
+      // 主色填滿，無 icon
       AppStandardButton(
-        text: 'Move',
+        text: confirmText,
         height: 40,
         onPressed: () {
-          // 由 content 內部 state 控制是否選擇，這裡觸發回傳選擇值
-          // 若未選擇，保持無動作（outlined 按鈕呈現 disabled 色由上層控制）
           _MoveTargetBagContentState.maybeSubmitSelected(context);
         },
       ),

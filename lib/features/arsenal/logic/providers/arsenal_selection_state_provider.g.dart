@@ -7,7 +7,7 @@ part of 'arsenal_selection_state_provider.dart';
 // **************************************************************************
 
 String _$arsenalSelectionStateProviderHash() =>
-    r'6d4e25980f72abdc723a9322a9ca647b4555bbca';
+    r'cd6b031f66b062b14138a75965f091a9222197d5';
 
 /// Arsenal selection state provider - handles only selection-related operations
 ///

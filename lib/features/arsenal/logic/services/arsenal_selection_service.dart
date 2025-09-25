@@ -105,6 +105,11 @@ class ArsenalSelectionService extends _$ArsenalSelectionService {
 
   /// Get selected instances for current mode
   Set<int> getSelectedInstances(NewArsenalState arsenalState) {
+    // 若控制器沒有進入 move/remove 模式，嘗試讀取通用選取狀態
+    if (!arsenalState.isMoveMode && !arsenalState.isRemoveMode) {
+      final selectionState = ref.read(arsenalSelectionStateProviderProvider);
+      return selectionState.selectedInstanceIds;
+    }
     if (arsenalState.isMoveMode) {
       return arsenalState.selectedForMove;
     } else if (arsenalState.isRemoveMode) {

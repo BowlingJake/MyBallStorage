@@ -16,11 +16,8 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$ArsenalSelectionState {
-  bool get isRemoveMode => throw _privateConstructorUsedError;
-  Set<int> get selectedForRemoval => throw _privateConstructorUsedError;
-  bool get isMoveMode => throw _privateConstructorUsedError;
-  Set<int> get selectedForMove => throw _privateConstructorUsedError;
-  SelectionModeType get activeMode => throw _privateConstructorUsedError;
+  SelectionModeType get selectionMode => throw _privateConstructorUsedError;
+  Set<int> get selectedInstanceIds => throw _privateConstructorUsedError;
   bool get isSelectionLocked => throw _privateConstructorUsedError;
 
   /// Create a copy of ArsenalSelectionState
@@ -37,11 +34,8 @@ abstract class $ArsenalSelectionStateCopyWith<$Res> {
       _$ArsenalSelectionStateCopyWithImpl<$Res, ArsenalSelectionState>;
   @useResult
   $Res call(
-      {bool isRemoveMode,
-      Set<int> selectedForRemoval,
-      bool isMoveMode,
-      Set<int> selectedForMove,
-      SelectionModeType activeMode,
+      {SelectionModeType selectionMode,
+      Set<int> selectedInstanceIds,
       bool isSelectionLocked});
 }
 
@@ -61,34 +55,19 @@ class _$ArsenalSelectionStateCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isRemoveMode = null,
-    Object? selectedForRemoval = null,
-    Object? isMoveMode = null,
-    Object? selectedForMove = null,
-    Object? activeMode = null,
+    Object? selectionMode = null,
+    Object? selectedInstanceIds = null,
     Object? isSelectionLocked = null,
   }) {
     return _then(_value.copyWith(
-      isRemoveMode: null == isRemoveMode
-          ? _value.isRemoveMode
-          : isRemoveMode // ignore: cast_nullable_to_non_nullable
-              as bool,
-      selectedForRemoval: null == selectedForRemoval
-          ? _value.selectedForRemoval
-          : selectedForRemoval // ignore: cast_nullable_to_non_nullable
-              as Set<int>,
-      isMoveMode: null == isMoveMode
-          ? _value.isMoveMode
-          : isMoveMode // ignore: cast_nullable_to_non_nullable
-              as bool,
-      selectedForMove: null == selectedForMove
-          ? _value.selectedForMove
-          : selectedForMove // ignore: cast_nullable_to_non_nullable
-              as Set<int>,
-      activeMode: null == activeMode
-          ? _value.activeMode
-          : activeMode // ignore: cast_nullable_to_non_nullable
+      selectionMode: null == selectionMode
+          ? _value.selectionMode
+          : selectionMode // ignore: cast_nullable_to_non_nullable
               as SelectionModeType,
+      selectedInstanceIds: null == selectedInstanceIds
+          ? _value.selectedInstanceIds
+          : selectedInstanceIds // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       isSelectionLocked: null == isSelectionLocked
           ? _value.isSelectionLocked
           : isSelectionLocked // ignore: cast_nullable_to_non_nullable
@@ -107,11 +86,8 @@ abstract class _$$ArsenalSelectionStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isRemoveMode,
-      Set<int> selectedForRemoval,
-      bool isMoveMode,
-      Set<int> selectedForMove,
-      SelectionModeType activeMode,
+      {SelectionModeType selectionMode,
+      Set<int> selectedInstanceIds,
       bool isSelectionLocked});
 }
 
@@ -129,34 +105,19 @@ class __$$ArsenalSelectionStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isRemoveMode = null,
-    Object? selectedForRemoval = null,
-    Object? isMoveMode = null,
-    Object? selectedForMove = null,
-    Object? activeMode = null,
+    Object? selectionMode = null,
+    Object? selectedInstanceIds = null,
     Object? isSelectionLocked = null,
   }) {
     return _then(_$ArsenalSelectionStateImpl(
-      isRemoveMode: null == isRemoveMode
-          ? _value.isRemoveMode
-          : isRemoveMode // ignore: cast_nullable_to_non_nullable
-              as bool,
-      selectedForRemoval: null == selectedForRemoval
-          ? _value._selectedForRemoval
-          : selectedForRemoval // ignore: cast_nullable_to_non_nullable
-              as Set<int>,
-      isMoveMode: null == isMoveMode
-          ? _value.isMoveMode
-          : isMoveMode // ignore: cast_nullable_to_non_nullable
-              as bool,
-      selectedForMove: null == selectedForMove
-          ? _value._selectedForMove
-          : selectedForMove // ignore: cast_nullable_to_non_nullable
-              as Set<int>,
-      activeMode: null == activeMode
-          ? _value.activeMode
-          : activeMode // ignore: cast_nullable_to_non_nullable
+      selectionMode: null == selectionMode
+          ? _value.selectionMode
+          : selectionMode // ignore: cast_nullable_to_non_nullable
               as SelectionModeType,
+      selectedInstanceIds: null == selectedInstanceIds
+          ? _value._selectedInstanceIds
+          : selectedInstanceIds // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
       isSelectionLocked: null == isSelectionLocked
           ? _value.isSelectionLocked
           : isSelectionLocked // ignore: cast_nullable_to_non_nullable
@@ -167,52 +128,34 @@ class __$$ArsenalSelectionStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ArsenalSelectionStateImpl implements _ArsenalSelectionState {
+class _$ArsenalSelectionStateImpl extends _ArsenalSelectionState {
   const _$ArsenalSelectionStateImpl(
-      {this.isRemoveMode = false,
-      final Set<int> selectedForRemoval = const {},
-      this.isMoveMode = false,
-      final Set<int> selectedForMove = const {},
-      this.activeMode = SelectionModeType.none,
+      {this.selectionMode = SelectionModeType.none,
+      final Set<int> selectedInstanceIds = const {},
       this.isSelectionLocked = false})
-      : _selectedForRemoval = selectedForRemoval,
-        _selectedForMove = selectedForMove;
+      : _selectedInstanceIds = selectedInstanceIds,
+        super._();
 
   @override
   @JsonKey()
-  final bool isRemoveMode;
-  final Set<int> _selectedForRemoval;
+  final SelectionModeType selectionMode;
+  final Set<int> _selectedInstanceIds;
   @override
   @JsonKey()
-  Set<int> get selectedForRemoval {
-    if (_selectedForRemoval is EqualUnmodifiableSetView)
-      return _selectedForRemoval;
+  Set<int> get selectedInstanceIds {
+    if (_selectedInstanceIds is EqualUnmodifiableSetView)
+      return _selectedInstanceIds;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_selectedForRemoval);
+    return EqualUnmodifiableSetView(_selectedInstanceIds);
   }
 
-  @override
-  @JsonKey()
-  final bool isMoveMode;
-  final Set<int> _selectedForMove;
-  @override
-  @JsonKey()
-  Set<int> get selectedForMove {
-    if (_selectedForMove is EqualUnmodifiableSetView) return _selectedForMove;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_selectedForMove);
-  }
-
-  @override
-  @JsonKey()
-  final SelectionModeType activeMode;
   @override
   @JsonKey()
   final bool isSelectionLocked;
 
   @override
   String toString() {
-    return 'ArsenalSelectionState(isRemoveMode: $isRemoveMode, selectedForRemoval: $selectedForRemoval, isMoveMode: $isMoveMode, selectedForMove: $selectedForMove, activeMode: $activeMode, isSelectionLocked: $isSelectionLocked)';
+    return 'ArsenalSelectionState(selectionMode: $selectionMode, selectedInstanceIds: $selectedInstanceIds, isSelectionLocked: $isSelectionLocked)';
   }
 
   @override
@@ -220,16 +163,10 @@ class _$ArsenalSelectionStateImpl implements _ArsenalSelectionState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ArsenalSelectionStateImpl &&
-            (identical(other.isRemoveMode, isRemoveMode) ||
-                other.isRemoveMode == isRemoveMode) &&
+            (identical(other.selectionMode, selectionMode) ||
+                other.selectionMode == selectionMode) &&
             const DeepCollectionEquality()
-                .equals(other._selectedForRemoval, _selectedForRemoval) &&
-            (identical(other.isMoveMode, isMoveMode) ||
-                other.isMoveMode == isMoveMode) &&
-            const DeepCollectionEquality()
-                .equals(other._selectedForMove, _selectedForMove) &&
-            (identical(other.activeMode, activeMode) ||
-                other.activeMode == activeMode) &&
+                .equals(other._selectedInstanceIds, _selectedInstanceIds) &&
             (identical(other.isSelectionLocked, isSelectionLocked) ||
                 other.isSelectionLocked == isSelectionLocked));
   }
@@ -237,11 +174,8 @@ class _$ArsenalSelectionStateImpl implements _ArsenalSelectionState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      isRemoveMode,
-      const DeepCollectionEquality().hash(_selectedForRemoval),
-      isMoveMode,
-      const DeepCollectionEquality().hash(_selectedForMove),
-      activeMode,
+      selectionMode,
+      const DeepCollectionEquality().hash(_selectedInstanceIds),
       isSelectionLocked);
 
   /// Create a copy of ArsenalSelectionState
@@ -254,25 +188,17 @@ class _$ArsenalSelectionStateImpl implements _ArsenalSelectionState {
           _$ArsenalSelectionStateImpl>(this, _$identity);
 }
 
-abstract class _ArsenalSelectionState implements ArsenalSelectionState {
+abstract class _ArsenalSelectionState extends ArsenalSelectionState {
   const factory _ArsenalSelectionState(
-      {final bool isRemoveMode,
-      final Set<int> selectedForRemoval,
-      final bool isMoveMode,
-      final Set<int> selectedForMove,
-      final SelectionModeType activeMode,
+      {final SelectionModeType selectionMode,
+      final Set<int> selectedInstanceIds,
       final bool isSelectionLocked}) = _$ArsenalSelectionStateImpl;
+  const _ArsenalSelectionState._() : super._();
 
   @override
-  bool get isRemoveMode;
+  SelectionModeType get selectionMode;
   @override
-  Set<int> get selectedForRemoval;
-  @override
-  bool get isMoveMode;
-  @override
-  Set<int> get selectedForMove;
-  @override
-  SelectionModeType get activeMode;
+  Set<int> get selectedInstanceIds;
   @override
   bool get isSelectionLocked;
 

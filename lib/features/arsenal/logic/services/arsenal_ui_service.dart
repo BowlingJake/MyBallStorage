@@ -200,19 +200,24 @@ class ArsenalUIService extends _$ArsenalUIService {
     );
     
     if (targetBag != null) {
+      // 若目前是通用選取模式（非 moveMode），也透過 selectionService 的集合
       await moveBallsUseCase.execute(
         context: context,
         targetBagNumber: targetBag,
       );
+      // 動作完成後，統一清空兩側狀態，避免底部按鈕仍為 enabled
+      ref.read(arsenalSelectionStateProviderProvider.notifier).exitSelectionMode();
+      ref.read(newArsenalControllerProvider.notifier).exitAllSelectionModes();
     }
   }
 
   /// Confirm and remove selected items
   Future<void> confirmRemoveSelected({
     required BuildContext context,
+    required WidgetRef widgetRef,
   }) async {
     final removeBallsUseCase = ref.read(removeBallsUseCaseProvider.notifier);
-    await removeBallsUseCase.execute(context: context);
+    await removeBallsUseCase.execute(context: context, widgetRef: widgetRef);
   }
 
   /// Show library selection dialog
@@ -291,6 +296,7 @@ class ArsenalUIService extends _$ArsenalUIService {
     required BuildContext context,
     required String operation, // 'move' or 'remove'
     required NewArsenalState arsenalState,
+    required WidgetRef widgetRef, // Required for operations
     List<Color>? bagColors, // Required for move operation
   }) async {
     final selectedCount = getSelectionCount(arsenalState);
@@ -316,7 +322,7 @@ class ArsenalUIService extends _$ArsenalUIService {
         }
         break;
       case 'remove':
-        await confirmRemoveSelected(context: context);
+        await confirmRemoveSelected(context: context, widgetRef: widgetRef);
         break;
     }
   }

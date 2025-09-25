@@ -13,6 +13,7 @@ import 'package:bowlingarsenal_app/shared/widgets/dialogs/app_base_dialog.dart';
 import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
 
 part 'remove_balls_use_case.g.dart';
 
@@ -27,79 +28,14 @@ class RemoveBallsUseCase extends _$RemoveBallsUseCase {
   /// Execute the remove balls use case
   Future<void> execute({
     required BuildContext context,
+    required WidgetRef widgetRef,
     Set<int>? selectedInstances,
   }) async {
-    final arsenalState = ref.read(newArsenalControllerProvider);
-    final selectionService = ref.read(arsenalSelectionServiceProvider.notifier);
-    
-    // Use provided instances or get from current state
-    final instancesToRemove = selectedInstances ?? 
-        selectionService.getSelectedInstances(arsenalState);
-    
-    if (instancesToRemove.isEmpty) {
-      TopNotification.showError(
-        context,
-        'No balls selected for removal',
-      );
-      return;
-    }
-
-    // Check if in main bag or sub bag and show appropriate dialog
-    final currentBag = arsenalState.selectedBagNumber;
-    RemovalType? removalType;
-    bool confirmed = false;
-    
-    if (currentBag == 1) {
-      // Main bag - simple confirmation for complete removal
-      final result = await showAppConfirmationDialog(
-        context: context,
-        title: 'Remove Selected Balls',
-        message: 'Are you sure you want to completely remove ${instancesToRemove.length} ball${instancesToRemove.length != 1 ? 's' : ''} from your arsenal?',
-        confirmText: 'Remove',
-        isDangerous: true,
-      );
-      if (result == true) {
-        confirmed = true;
-        removalType = RemovalType.complete;
-      }
-    } else {
-      // Sub bag - show tiered removal dialog and get user's choice
-      removalType = await _showTieredRemovalDialog(
-        context: context,
-        selectedCount: instancesToRemove.length,
-        currentBag: currentBag,
-      );
-      if (removalType != null) {
-        confirmed = await _confirmRemovalAction(
-          context: context,
-          removalType: removalType,
-          selectedCount: instancesToRemove.length,
-          currentBag: currentBag,
-        );
-      }
-    }
-
-    if (!confirmed || removalType == null) {
-      return;
-    }
-
-    try {
-      await _performRemoval(
-        context: context,
-        instancesToRemove: instancesToRemove,
-        removalType: removalType, // 使用用戶選擇的移除類型
-        currentBag: currentBag,
-      );
-      
-      // Exit selection mode after successful removal
-      selectionService.exitSelectionMode(arsenalState);
-      
-    } catch (e) {
-      TopNotification.showError(
-        context,
-        'Failed to remove balls: $e',
-      );
-    }
+    // 改用與單選一致的對話體驗
+    await ArsenalActions.confirmRemoveSelected(
+      context: context,
+      ref: widgetRef,
+    );
   }
 
 

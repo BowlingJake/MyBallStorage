@@ -14,6 +14,9 @@ import 'package:bowlingarsenal_app/features/auth/logic/auth_controller.dart';
 import 'package:bowlingarsenal_app/features/arsenal/logic/new_arsenal_controller.dart';
 import 'package:bowlingarsenal_app/shared/services/bag_color_service.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/controllers/arsenal_actions.dart';
+import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/multi_bag_selection_dialog.dart';
+import 'package:bowlingarsenal_app/features/user/data/models/user_profile.dart';
+import 'package:bowlingarsenal_app/features/user/logic/user_profile_controller.dart';
 
 /// Grid 專用的 Arsenal 球卡組件
 class ArsenalGridCard extends ConsumerWidget {
@@ -78,8 +81,8 @@ class ArsenalGridCard extends ConsumerWidget {
           // Content with tap handling (fill the card to keep centered layout)
           Positioned.fill(
             child: InkWell(
-            onTap: isSelectionMode 
-                ? onTap 
+            onTap: isSelectionMode
+                ? onTap
                 : () => _showArsenalActionDialog(context, instance, ref),
             borderRadius: BorderRadius.circular(12),
               child: Padding(
@@ -229,13 +232,17 @@ class ArsenalGridCard extends ConsumerWidget {
   }
 
   void _showOverflowMenu(BuildContext context, WidgetRef ref) {
+    final arsenalState = ref.read(newArsenalControllerProvider);
+    final currentBag = arsenalState.selectedBagNumber ?? 1;
+    final isMainBag = currentBag == 1;
+
     AppBaseDialog.show<void>(
       context: context,
       title: instance.displayName,
       barrierDismissible: true,
       content: const SizedBox.shrink(),
       actions: [
-        AppStandardButton.primaryOutlined(
+        AppStandardButton.destructive(
           text: 'Remove',
           height: 40,
           onPressed: () async {
@@ -247,15 +254,21 @@ class ArsenalGridCard extends ConsumerWidget {
           },
         ),
         AppStandardButton(
-          text: 'Move',
+          text: isMainBag ? 'Add to Other Bags' : 'Move',
           height: 40,
           onPressed: () async {
             Navigator.of(context).pop();
-            // 選取後開啟移動流程
-            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
-            final bagColors = BagColorService.getAllBagColors();
-            await ArsenalActions.showMoveSelected(context: context, ref: ref, bagColors: bagColors);
-            ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
+
+            if (isMainBag) {
+              // 主袋：使用與選擇模式相同的多袋選擇對話框
+              await _addToOtherBags(context, ref, [instance.id]);
+            } else {
+              // 子袋：保持原有移動邏輯
+              ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
+              final bagColors = BagColorService.getAllBagColors();
+              await ArsenalActions.showMoveSelected(context: context, ref: ref, bagColors: bagColors);
+              ref.read(newArsenalControllerProvider.notifier).toggleInstanceForMove(instance.id);
+            }
           },
         ),
       ],
@@ -376,5 +389,50 @@ class ArsenalGridCard extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _addToOtherBags(BuildContext context, WidgetRef ref, List<int> instanceIds) async {
+    final userProfileState = ref.read(userProfileControllerProvider);
+    final profile = userProfileState.profile;
+    if (profile == null) {
+      TopNotification.showError(context, 'Failed to load user profile');
+      return;
+    }
+
+    final List<BagInfo> availableBags = profile.unlockedBags
+        .where((b) => b.number != 1)
+        .toList();
+
+    final bagColors = BagColorService.getAllBagColors();
+    final targetBags = await showMultiBagSelectionDialog(
+      context: context,
+      subBags: availableBags,
+      bagColors: bagColors,
+      currentBagNumber: 1,
+      selectedCount: instanceIds.length,
+      userProfile: profile,
+      titleText: 'Add ${instanceIds.length} Ball${instanceIds.length != 1 ? 's' : ''} to Bags',
+    );
+
+    if (targetBags == null || targetBags.isEmpty) {
+      return;
+    }
+
+    final authState = ref.read(authControllerProvider);
+    if (!authState.hasValue || authState.value == null) {
+      TopNotification.showError(context, 'Please log in');
+      return;
+    }
+
+    final userId = authState.value!.id;
+    for (final bag in targetBags) {
+      await ref.read(newArsenalControllerProvider.notifier).addExistingInstancesToBag(
+        instanceIds: instanceIds,
+        bagNumber: bag,
+        userId: userId,
+      );
+    }
+
+    TopNotification.showSuccess(context, 'Added ${instanceIds.length} ball${instanceIds.length != 1 ? 's' : ''} to ${targetBags.length} bag${targetBags.length != 1 ? 's' : ''}');
   }
 }

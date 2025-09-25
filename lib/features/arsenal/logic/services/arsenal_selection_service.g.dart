@@ -7,7 +7,7 @@ part of 'arsenal_selection_service.dart';
 // **************************************************************************
 
 String _$arsenalSelectionServiceHash() =>
-    r'9eed7878a3af76134147a236c175633e22b0c3fa';
+    r'66bfc7d452f9606eda82d938e58ed20989b58506';
 
 /// Service for handling selection mode operations
 ///

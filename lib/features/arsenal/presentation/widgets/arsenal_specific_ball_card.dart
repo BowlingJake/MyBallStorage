@@ -501,7 +501,7 @@ class _ArsenalSpecificBallCardState extends ConsumerState<ArsenalSpecificBallCar
               ),
             ),
           ),
-          // Selection mode indicator
+          // Selection mode indicator（移除任何 icon 顯示的依賴，保持勾勾即可）
           if (widget.isSelectionMode && widget.isSelected) ...[
             // overlay layer
             Positioned.fill(

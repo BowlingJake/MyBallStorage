@@ -6,7 +6,7 @@ part of 'arsenal_ui_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$arsenalUIServiceHash() => r'076a422cfda7d0bef6ea33ec9cc041b97708e718';
+String _$arsenalUIServiceHash() => r'5223ebb31916c1f46c1cbc9d8b8181b74cd97b9d';
 
 /// Unified Arsenal UI Service that manages all UI-related operations
 /// This service integrates functionality from all Handler classes

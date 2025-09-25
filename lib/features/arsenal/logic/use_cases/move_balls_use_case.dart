@@ -12,6 +12,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/notifications/top_notif
 import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_button.dart';
 import 'package:bowlingarsenal_app/features/arsenal/presentation/widgets/dialogs/move_target_bag_dialog.dart';
 import 'package:core_theme/core_theme.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/providers/arsenal_selection_state_provider.dart';
 
 part 'move_balls_use_case.g.dart';
 
@@ -80,6 +81,8 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
   Future<int?> showBagSelectionDialog({
     required BuildContext context,
     required List<Color> bagColors,
+    String? titleText,
+    String confirmText = 'Move',
   }) async {
     final arsenalState = ref.read(newArsenalControllerProvider);
     final userProfileState = ref.read(userProfileControllerProvider);
@@ -91,7 +94,16 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
 
     final profile = userProfileState.profile!;
     final currentBagNumber = arsenalState.selectedBagNumber;
-    final selectedCount = arsenalState.selectedForMove.length;
+    // 取用目前模式下之選取數：優先 move 模式集合，否則讀取通用選取集合
+    int selectedCount;
+    if (arsenalState.isMoveMode) {
+      selectedCount = arsenalState.selectedForMove.length;
+    } else if (arsenalState.isRemoveMode) {
+      selectedCount = arsenalState.selectedForRemoval.length;
+    } else {
+      final selectionState = ref.read(arsenalSelectionStateProviderProvider);
+      selectedCount = selectionState.selectedInstanceIds.length;
+    }
     
     // Get selected instances and find which bags they're already in
     final selectedInstances = arsenalState.allInstances
@@ -125,6 +137,8 @@ class MoveBallsUseCase extends _$MoveBallsUseCase {
       selectedCount: selectedCount,
       alreadyInBags: alreadyInBags.toList(),
       userProfile: profile,
+      titleText: titleText,
+      confirmText: confirmText,
     );
   }
 

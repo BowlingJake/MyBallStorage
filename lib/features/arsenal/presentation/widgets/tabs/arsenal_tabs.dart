@@ -19,7 +19,7 @@ class ArsenalTabs extends StatefulWidget {
   final List<Color> bagColors;
   final void Function(int unlockIndex) onUnlockTap;
   final bool selectionMode;
-  final VoidCallback? onBlockedSwitch;
+  final void Function(int tappedIndex)? onBlockedSwitch;
 
   @override
   State<ArsenalTabs> createState() => _ArsenalTabsState();
@@ -96,7 +96,7 @@ class _ArsenalTabsState extends State<ArsenalTabs> {
         ],
         onTap: (index) {
           if (widget.selectionMode) {
-            widget.onBlockedSwitch?.call();
+            widget.onBlockedSwitch?.call(index);
             // 阻止切換
             widget.controller.index = widget.controller.previousIndex;
             return;

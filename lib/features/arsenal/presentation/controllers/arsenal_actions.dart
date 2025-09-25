@@ -21,6 +21,7 @@ import 'package:bowlingarsenal_app/shared/widgets/common/buttons/app_standard_bu
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/confirmation_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/dialogs/bag_management_dialog.dart';
 import 'package:bowlingarsenal_app/shared/widgets/common/filters/filter_popout.dart';
+import 'package:bowlingarsenal_app/features/arsenal/logic/providers/arsenal_selection_state_provider.dart';
 
 class ArsenalActions {
   const ArsenalActions._();
@@ -81,6 +82,9 @@ class ArsenalActions {
       );
       if (result == true) {
         await _performCompleteRemoval(context: context, ref: ref, selectedCount: selectedCount);
+        // 動作完成後清空所有選取並退出模式
+        ref.read(arsenalSelectionStateProviderProvider.notifier).exitSelectionMode();
+        ref.read(newArsenalControllerProvider.notifier).exitAllSelectionModes();
       }
       return;
     }
@@ -110,6 +114,8 @@ class ArsenalActions {
           selectedCount: selectedCount,
           bagNumber: currentBagNumber,
         );
+        ref.read(arsenalSelectionStateProviderProvider.notifier).exitSelectionMode();
+        ref.read(newArsenalControllerProvider.notifier).exitAllSelectionModes();
       }
     } else if (result == 'complete') {
       final confirmed = await showAppConfirmationDialog(
@@ -125,6 +131,8 @@ class ArsenalActions {
           ref: ref,
           selectedCount: selectedCount,
         );
+        ref.read(arsenalSelectionStateProviderProvider.notifier).exitSelectionMode();
+        ref.read(newArsenalControllerProvider.notifier).exitAllSelectionModes();
       }
     }
   }
@@ -188,6 +196,9 @@ class ArsenalActions {
         final userId = authState.value!.id;
         await ref.read(newArsenalControllerProvider.notifier).moveSelectedInstancesToBag(targetBagNumber, userId);
         TopNotification.showSuccess(context, 'Successfully moved $selectedCount ball${selectedCount != 1 ? 's' : ''} to $targetBagName');
+        // 完成後清空選取並退出模式
+        ref.read(arsenalSelectionStateProviderProvider.notifier).exitSelectionMode();
+        ref.read(newArsenalControllerProvider.notifier).exitAllSelectionModes();
       }
     } catch (e) {
       TopNotification.showError(context, 'Failed to move balls: $e');

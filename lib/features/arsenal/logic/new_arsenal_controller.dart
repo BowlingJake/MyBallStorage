@@ -590,6 +590,16 @@ class NewArsenalController extends _$NewArsenalController {
     state = state.copyWith(selectedForRemoval: currentSelection);
   }
 
+  /// Exit all selection modes and clear selections (used by UI X cancel)
+  void exitAllSelectionModes() {
+    state = state.copyWith(
+      isMoveMode: false,
+      selectedForMove: {},
+      isRemoveMode: false,
+      selectedForRemoval: {},
+    );
+  }
+
   /// Remove selected instances
   Future<void> removeSelectedInstances(String userId) async {
     try {
